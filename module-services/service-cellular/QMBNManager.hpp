@@ -1,15 +1,15 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Result.hpp"
+#include "at/Result.hpp"
+#include <string>
 
 class DLCChannel;
 
 namespace nv_paths
 {
-
     auto constexpr voice_domain_pref = "/nv/item_files/modem/mmode/voice_domain_pref";
     auto constexpr sms_domain_pref   = "/nv/item_files/modem/mmode/sms_domain_pref";
     auto constexpr IMS_enable        = "/nv/item_files/ims/IMS_enable";

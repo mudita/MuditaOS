@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SCO.hpp"
@@ -46,7 +46,7 @@ namespace bluetooth
         static const sys::Service *ownerService;
         static uint8_t negotiated_codec;
 
-        static auto audioInitialize(int sampleRate) -> Error;
+        static auto audioInitialize(int sampleRate) -> Result;
         static void initCvsd();
         static void receiveCvsd(uint8_t *packet, uint16_t size);
         static void writeToHostEndian(int16_t *buffer, uint8_t *packet, int length);
@@ -110,7 +110,7 @@ void SCO::SCOImpl::sendEvent(audio::EventType event, audio::Event::DeviceState s
     auto &busProxy = const_cast<sys::Service *>(ownerService)->bus;
     busProxy.sendUnicast(std::move(msg), service::name::evt_manager);
 }
-auto SCO::SCOImpl::audioInitialize(int sampleRate) -> Error
+auto SCO::SCOImpl::audioInitialize(int sampleRate) -> Result
 {
     sourceQueue = xQueueCreate(5, sizeof(AudioData_t));
     sinkQueue   = xQueueCreate(5, sizeof(AudioData_t));
@@ -124,18 +124,18 @@ auto SCO::SCOImpl::audioInitialize(int sampleRate) -> Error
 
     if (sourceQueue == nullptr || sinkQueue == nullptr) {
         LOG_ERROR("failed to create queue!");
-        return Error(Error::SystemError);
+        return Result(Result::Code::SystemError);
     }
 
     LOG_INFO("Init done!");
-    return Error(Error::Success);
+    return Result(Result::Code::Success);
 }
 
 void SCO::SCOImpl::initCvsd()
 {
     btstack_cvsd_plc_init(&cvsdPlcState);
     auto ret = audioInitialize(CVSD_SAMPLE_RATE);
-    if (ret.err == Error::Success) {
+    if (ret.result == Result::Code::Success) {
         LOG_INFO("CVSD init done!");
     }
 }

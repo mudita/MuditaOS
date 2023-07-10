@@ -1,8 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include "A2DPImpl.hpp"
+
 extern "C"
 {
 #include "classic/avrcp.h"
@@ -25,30 +27,40 @@ namespace bluetooth
         static std::uint16_t controllerVolumeToPercent(std::uint16_t volume);
 
       public:
-        static constexpr uint8_t subunitInfo[] = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
-                                                  4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7};
-        static constexpr uint32_t companyId    = 0x112233;
-        static constexpr int SDP_BUFFER_LENGTH = 200;
         struct PlaybackStatusInfo
         {
-            uint8_t track_id[8];
-            uint32_t song_length_ms;
+            std::uint8_t track_id[8];
+            std::uint32_t song_length_ms;
             avrcp_playback_status_t status = AVRCP_PLAYBACK_STATUS_STOPPED;
-            uint32_t song_position_ms; // 0xFFFFFFFF if not supported
+            std::uint32_t song_position_ms; // 0xFFFFFFFF if not supported
         };
 
-        static std::array<std::uint8_t, SDP_BUFFER_LENGTH> sdpTargetServiceBuffer;
-        static std::array<std::uint8_t, SDP_BUFFER_LENGTH> sdpControllerServiceBuffer;
+        static void packetHandler(std::uint8_t packetType,
+                                  std::uint16_t channel,
+                                  std::uint8_t *packet,
+                                  std::uint16_t size);
+        static void targetPacketHandler(std::uint8_t packetType,
+                                        std::uint16_t channel,
+                                        std::uint8_t *packet,
+                                        std::uint16_t size);
+        static void controllerPacketHandler(std::uint8_t packetType,
+                                            std::uint16_t channel,
+                                            std::uint8_t *packet,
+                                            std::uint16_t size);
+        static void init(sys::Service *service);
+
+        static constexpr std::uint8_t subunitInfo[]       = {0, 0, 0, 0, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3,
+                                                       4, 4, 4, 4, 5, 5, 5, 5, 6, 6, 6, 6, 7, 7, 7, 7};
+        static constexpr std::uint32_t companyId          = 0x112233;
+        static constexpr auto targetServiceBufferSize     = 200;
+        static constexpr auto controllerServiceBufferSize = 200;
+
+        static std::uint8_t sdpTargetServiceBuffer[targetServiceBufferSize];
+        static std::uint8_t sdpControllerServiceBuffer[controllerServiceBufferSize];
+
         static sys::Service *ownerService;
 
-        static avrcp_track_t tracks[3];
-        static int currentTrackIndex;
         static PlaybackStatusInfo playInfo;
         static MediaContext mediaTracker;
-
-        static void packetHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
-        static void targetPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
-        static void controllerPacketHandler(uint8_t packetType, uint16_t channel, uint8_t *packet, uint16_t size);
-        static void init(sys::Service *service);
     };
 } // namespace bluetooth

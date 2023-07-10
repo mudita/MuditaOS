@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-bluetooth/ServiceBluetooth.hpp"
@@ -11,7 +11,6 @@
 #include <Service/Message.hpp>
 #include <service-db/Settings.hpp>
 #include "service-bluetooth/messages/AudioVolume.hpp"
-#include "service-bluetooth/messages/AudioRouting.hpp"
 #include "service-bluetooth/messages/Connect.hpp"
 #include <service-bluetooth/messages/DeviceName.hpp>
 #include "service-bluetooth/messages/Disconnect.hpp"
@@ -44,8 +43,7 @@
 
 namespace
 {
-    constexpr auto BluetoothServiceStackDepth = 2560U;
-    inline constexpr auto nameSettings        = "ApplicationSettings";
+    constexpr auto BluetoothServiceStackDepth = 1024 * 3;
     inline constexpr auto connectionTimeout   = std::chrono::minutes{10};
     inline constexpr auto btRestartDelay      = std::chrono::milliseconds{500};
 
@@ -95,7 +93,6 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<message::bluetooth::A2DPVolume>();
     connectHandler<message::bluetooth::HSPVolume>();
     connectHandler<message::bluetooth::HFPVolume>();
-    connectHandler<message::bluetooth::StartAudioRouting>();
     connectHandler<message::bluetooth::Connect>();
     connectHandler<message::bluetooth::ConnectResult>();
     connectHandler<message::bluetooth::Disconnect>();
@@ -114,6 +111,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     connectHandler<cellular::CallerIdMessage>();
     connectHandler<cellular::IncomingCallMessage>();
     connectHandler<cellular::CallEndedNotification>();
+    connectHandler<cellular::CallMissedNotification>();
     connectHandler<cellular::CallStartedNotification>();
     connectHandler<cellular::SignalStrengthUpdateNotification>();
     connectHandler<cellular::CurrentOperatorNameNotification>();
@@ -319,7 +317,7 @@ auto convertDeviceStateIntoBluetoothState(const DeviceState &state) -> sys::blue
 
 auto ServiceBluetooth::handle(message::bluetooth::ConnectResult *msg) -> std::shared_ptr<sys::Message>
 {
-    if (msg->isSucceed()) {
+    if (msg->getResult() == message::bluetooth::ConnectResult::Result::Success) {
         auto device = msg->getDevice();
         bluetoothDevicesModel->mergeInternalDeviceState(device);
 
@@ -466,30 +464,11 @@ auto ServiceBluetooth::handle(message::bluetooth::HSPVolume *msg) -> std::shared
     AudioServiceAPI::BluetoothHSPVolumeChanged(this, msg->getVolume());
     return sys::MessageNone{};
 }
+
 auto ServiceBluetooth::handle(message::bluetooth::HFPVolume *msg) -> std::shared_ptr<sys::Message>
 {
     using namespace message::bluetooth;
     AudioServiceAPI::BluetoothHFPVolumeChanged(this, msg->getVolume());
-    return sys::MessageNone{};
-}
-
-auto ServiceBluetooth::handle(message::bluetooth::StartAudioRouting *msg) -> std::shared_ptr<sys::Message>
-{
-    sendWorkerCommand(std::make_unique<bluetooth::event::StartRouting>());
-    return std::make_shared<sys::ResponseMessage>();
-}
-
-auto ServiceBluetooth::handle(cellular::CallerIdMessage *msg) -> std::shared_ptr<sys::Message>
-{
-    auto number = msg->number;
-    auto btOn   = std::visit(bluetooth::BoolVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
-    LOG_DEBUG("Received caller ID msg! ");
-
-    if (btOn) {
-        LOG_DEBUG("Sending to profile!");
-        sendWorkerCommand(std::make_unique<bluetooth::event::IncomingCallNumber>(number));
-    }
-
     return sys::MessageNone{};
 }
 
@@ -531,6 +510,7 @@ void ServiceBluetooth::handleTurnOff()
     bus.sendMulticast(std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Disabled),
                       sys::BusChannel::BluetoothModeChanges);
 }
+
 void ServiceBluetooth::handleTurnOn()
 {
     cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_3);
@@ -538,6 +518,7 @@ void ServiceBluetooth::handleTurnOn()
     bus.sendMulticast(std::make_shared<sys::bluetooth::BluetoothModeChanged>(sys::bluetooth::BluetoothMode::Enabled),
                       sys::BusChannel::BluetoothModeChanges);
 }
+
 auto ServiceBluetooth::handle(message::bluetooth::RequestStatusIndicatorData *msg) -> std::shared_ptr<sys::Message>
 {
     bus.sendUnicast(std::make_shared<cellular::RequestCurrentOperatorNameMessage>(), cellular::service::name);
@@ -549,6 +530,7 @@ auto ServiceBluetooth::handle(message::bluetooth::RequestStatusIndicatorData *ms
 
     return sys::MessageNone{};
 }
+
 auto ServiceBluetooth::handle(sevm::BatteryStatusChangeMessage *msg) -> std::shared_ptr<sys::Message>
 {
     auto batteryLevel = Store::Battery::get().level;
@@ -556,11 +538,7 @@ auto ServiceBluetooth::handle(sevm::BatteryStatusChangeMessage *msg) -> std::sha
     sendWorkerCommand(std::make_unique<bluetooth::event::BatteryLevelData>(batteryLevel));
     return sys::MessageNone{};
 }
-auto ServiceBluetooth::handle(cellular::CallEndedNotification *msg) -> std::shared_ptr<sys::Message>
-{
-    sendWorkerCommand(std::make_unique<bluetooth::event::CallTerminated>());
-    return sys::MessageNone{};
-}
+
 auto ServiceBluetooth::handle(cellular::NetworkStatusUpdateNotification *msg) -> std::shared_ptr<sys::Message>
 {
     auto status = Store::GSM::get()->getNetwork().status;
@@ -568,19 +546,36 @@ auto ServiceBluetooth::handle(cellular::NetworkStatusUpdateNotification *msg) ->
     sendWorkerCommand(std::make_unique<bluetooth::event::NetworkStatusData>(status));
     return sys::MessageNone{};
 }
+
+auto ServiceBluetooth::handle(cellular::CallerIdMessage *msg) -> std::shared_ptr<sys::Message>
+{
+    auto number = msg->number;
+    auto btOn   = std::visit(bluetooth::BoolVisitor(), settingsHolder->getValue(bluetooth::Settings::State));
+    LOG_DEBUG("Received caller ID msg! ");
+
+    if (btOn) {
+        LOG_DEBUG("Sending to profile!");
+        sendWorkerCommand(std::make_unique<bluetooth::event::IncomingCallNumber>(number));
+    }
+
+    return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle(cellular::IncomingCallMessage *msg) -> std::shared_ptr<sys::Message>
+{
+    sendWorkerCommand(std::make_unique<bluetooth::event::IncomingCallStarted>());
+    return sys::MessageNone{};
+}
+
 auto ServiceBluetooth::handle(cellular::CallStartedNotification *msg) -> std::shared_ptr<sys::Message>
 {
     if (!msg->isCallIncoming()) {
-        auto evt = std::make_unique<bluetooth::event::CallStarted>(msg->getNumber());
+        auto evt = std::make_unique<bluetooth::event::OutgoingCallStarted>(msg->getNumber());
         sendWorkerCommand(std::move(evt));
     }
     return sys::MessageNone{};
 }
-auto ServiceBluetooth::handle(cellular::IncomingCallMessage *msg) -> std::shared_ptr<sys::Message>
-{
-    sendWorkerCommand(std::make_unique<bluetooth::event::StartRinging>());
-    return sys::MessageNone{};
-}
+
 auto ServiceBluetooth::handle(cellular::CallOutgoingAccepted *msg) -> std::shared_ptr<sys::Message>
 {
     LOG_DEBUG("Outgoing call accepted");
@@ -588,10 +583,23 @@ auto ServiceBluetooth::handle(cellular::CallOutgoingAccepted *msg) -> std::share
 
     return sys::MessageNone{};
 }
+
 auto ServiceBluetooth::handle(cellular::CallActiveNotification *msg) -> std::shared_ptr<sys::Message>
 {
     LOG_DEBUG("Incoming call accepted");
     sendWorkerCommand(std::make_unique<bluetooth::event::CallAnswered>());
 
+    return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle(cellular::CallEndedNotification *msg) -> std::shared_ptr<sys::Message>
+{
+    sendWorkerCommand(std::make_unique<bluetooth::event::CallTerminated>());
+    return sys::MessageNone{};
+}
+
+auto ServiceBluetooth::handle(cellular::CallMissedNotification *msg) -> std::shared_ptr<sys::Message>
+{
+    sendWorkerCommand(std::make_unique<bluetooth::event::CallMissed>());
     return sys::MessageNone{};
 }

@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <functional>
 #include "Device.hpp"
-#include "Error.hpp"
+#include "Result.hpp"
 
 namespace bluetooth
 {
@@ -17,10 +17,10 @@ namespace bluetooth
         virtual ~AbstractDriver() noexcept = default;
         using ErrorCallback                = std::function<void(uint8_t)>;
 
-        [[nodiscard]] virtual auto init() -> Error::Code                    = 0;
-        [[nodiscard]] virtual auto run() -> Error::Code                     = 0;
-        [[nodiscard]] virtual auto stop() -> Error::Code                    = 0;
-        [[nodiscard]] virtual auto scan() -> Error                          = 0;
+        [[nodiscard]] virtual auto init() -> Result::Code                   = 0;
+        [[nodiscard]] virtual auto run() -> Result::Code                    = 0;
+        [[nodiscard]] virtual auto stop() -> Result::Code                   = 0;
+        [[nodiscard]] virtual auto scan() -> Result                         = 0;
         virtual void stopScan()                                             = 0;
         virtual void setVisibility(bool visibility)                         = 0;
         virtual void pair(Devicei device, std::uint8_t protectionLevel = 0) = 0;

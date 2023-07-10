@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Error.hpp"
+#include "Result.hpp"
 #include "interface/profiles/ProfileManager.hpp"
 #include "interface/BluetoothDriver.hpp"
 
@@ -27,14 +27,14 @@ namespace bluetooth
       public:
         virtual ~AbstractCommandHandler() noexcept = default;
 
-        virtual Error::Code scan()                           = 0;
-        virtual Error::Code stopScan()                       = 0;
-        virtual Error::Code setVisibility(bool visibility)   = 0;
-        virtual Error::Code connect(const DataVariant &data) = 0;
-        virtual Error::Code disconnect()                     = 0;
-        virtual Error::Code pair(const DataVariant &data)    = 0;
-        virtual Error::Code unpair(const DataVariant &data)  = 0;
-        virtual Error::Code availableDevices()               = 0;
+        virtual Result::Code scan()                           = 0;
+        virtual Result::Code stopScan()                       = 0;
+        virtual Result::Code setVisibility(bool visibility)   = 0;
+        virtual Result::Code connect(const DataVariant &data) = 0;
+        virtual Result::Code disconnect()                     = 0;
+        virtual Result::Code pair(const DataVariant &data)    = 0;
+        virtual Result::Code unpair(const DataVariant &data)  = 0;
+        virtual Result::Code availableDevices()               = 0;
     };
 
     class CommandHandler : public AbstractCommandHandler
@@ -45,14 +45,14 @@ namespace bluetooth
                                 std::shared_ptr<bluetooth::BaseProfileManager> profileManager,
                                 std::shared_ptr<bluetooth::AbstractDriver> driver);
 
-        Error::Code scan() override;
-        Error::Code stopScan() override;
-        Error::Code setVisibility(bool visibility) override;
-        Error::Code connect(const DataVariant &data) override;
-        Error::Code disconnect() override;
-        Error::Code pair(const DataVariant &data) override;
-        Error::Code unpair(const DataVariant &data) override;
-        Error::Code availableDevices() override;
+        Result::Code scan() override;
+        Result::Code stopScan() override;
+        Result::Code setVisibility(bool visibility) override;
+        Result::Code connect(const DataVariant &data) override;
+        Result::Code disconnect() override;
+        Result::Code pair(const DataVariant &data) override;
+        Result::Code unpair(const DataVariant &data) override;
+        Result::Code availableDevices() override;
 
       private:
         sys::Service *service;

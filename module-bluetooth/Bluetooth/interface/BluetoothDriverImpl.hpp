@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "BluetoothDriver.hpp"
+#include "GAP/GAP.hpp"
 
 extern "C"
 {
@@ -11,7 +12,6 @@ extern "C"
 #include <hci_transport.h>
 #include <hci_transport_h4.h>
 }
-#include "GAP/GAP.hpp"
 
 namespace bluetooth
 {
@@ -35,13 +35,13 @@ namespace bluetooth
       public:
         Driver(const btstack_run_loop *runLoop, sys::Service *ownerService);
 
-        [[nodiscard]] auto init() -> Error::Code override;
-        [[nodiscard]] auto run() -> Error::Code override;
-        [[nodiscard]] auto stop() -> Error::Code override;
+        [[nodiscard]] auto init() -> Result::Code override;
+        [[nodiscard]] auto run() -> Result::Code override;
+        [[nodiscard]] auto stop() -> Result::Code override;
         void registerErrorCallback(const ErrorCallback &newCallback) override;
         void registerPowerOnCallback(const PowerOnCallback &newCallback) override;
 
-        auto scan() -> Error override;
+        auto scan() -> Result override;
         void stopScan() override;
         void setVisibility(bool visibility) override;
         void pair(Devicei device, std::uint8_t protectionLevel = 0) override;

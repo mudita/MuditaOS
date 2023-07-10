@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-bluetooth/ServiceBluetooth.hpp>
@@ -7,11 +7,10 @@
 
 namespace bluetooth
 {
-
     ProfileManager::ProfileManager(sys::Service *ownerService) : ownerService(ownerService)
     {}
 
-    auto ProfileManager::init() -> Error::Code
+    auto ProfileManager::init() -> Result::Code
     {
         if (!initialized) {
             profilesList = {{AudioProfile::A2DP, std::make_shared<bluetooth::A2DP>()},
@@ -34,10 +33,10 @@ namespace bluetooth
             }
             initialized = true;
         }
-        return Error::Success;
+        return Result::Code::Success;
     }
 
-    auto ProfileManager::connect(const Devicei &device) -> Error::Code
+    auto ProfileManager::connect(const Devicei &device) -> Result::Code
     {
         for (auto &[profileName, ptr] : profilesList) {
             if (ptr != nullptr) {
@@ -45,102 +44,118 @@ namespace bluetooth
                 ptr->connect();
             }
         }
-        return Error::Success;
+        return Result::Code::Success;
     }
 
-    auto ProfileManager::disconnect() -> Error::Code
+    auto ProfileManager::disconnect() -> Result::Code
     {
         for (auto &[profileName, ptr] : profilesList) {
             if (ptr != nullptr) {
                 ptr->disconnect();
             }
         }
-        return Error::Success;
+        return Result::Code::Success;
     }
 
-    auto ProfileManager::start() -> Error::Code
+    auto ProfileManager::start() -> Result::Code
     {
         musicProfilePtr->start();
-        return Error::Success;
+        return Result::Code::Success;
     }
 
-    auto ProfileManager::stop() -> Error::Code
+    auto ProfileManager::stop() -> Result::Code
     {
         musicProfilePtr->stop();
-        return Error::Success;
+        return Result::Code::Success;
     }
 
-    auto ProfileManager::startRinging() -> Error::Code
+    auto ProfileManager::incomingCallStarted() -> Result::Code
     {
-        return callProfilePtr->startRinging();
+        return callProfilePtr->incomingCallStarted();
     }
 
-    auto ProfileManager::stopRinging() -> Error::Code
+    auto ProfileManager::outgoingCallStarted(const utils::PhoneNumber &nr) -> Result::Code
     {
-        return callProfilePtr->stopRinging();
+        if (callProfilePtr) {
+            return callProfilePtr->outgoingCallStarted(nr.getView().getNonEmpty());
+        }
+        LOG_ERROR("No profile, returning!");
+        return Result::Code::NotReady;
     }
 
-    auto ProfileManager::initializeCall() -> Error::Code
+    auto ProfileManager::incomingCallAnswered() -> Result::Code
     {
-        return callProfilePtr->initializeCall();
-    }
-    auto ProfileManager::terminateCall() -> Error::Code
-    {
-        return callProfilePtr->terminateCall();
+        return callProfilePtr->incomingCallAnswered();
     }
 
-    auto ProfileManager::setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Error::Code
+    auto ProfileManager::outgoingCallAnswered() -> Result::Code
+    {
+        return callProfilePtr->outgoingCallAnswered();
+    }
+
+    auto ProfileManager::callTerminated() -> Result::Code
+    {
+        return callProfilePtr->callTerminated();
+    }
+
+    auto ProfileManager::callMissed() -> Result::Code
+    {
+        return callProfilePtr->callMissed();
+    }
+
+    auto ProfileManager::setAudioDevice(std::shared_ptr<BluetoothAudioDevice> device) -> Result::Code
     {
         auto profileType = device->getProfileType();
 
         if (profilesList[profileType] == nullptr) {
-            return Error::NotReady;
+            return Result::Code::NotReady;
         }
 
         profilesList[profileType]->setAudioDevice(device);
         LOG_ERROR("AudioDevice for profile: %s set!", magic_enum::enum_name(profileType).data());
-        return Error::Success;
+        return Result::Code::Success;
     }
-    auto ProfileManager::callAnswered() -> Error::Code
-    {
-        return callProfilePtr->callActive();
-    }
-    auto ProfileManager::setIncomingCallNumber(const utils::PhoneNumber &nr) -> Error::Code
+
+    auto ProfileManager::setIncomingCallNumber(const utils::PhoneNumber &nr) -> Result::Code
     {
         if (callProfilePtr) {
             return callProfilePtr->setIncomingCallNumber(nr.getView().getE164());
         }
         LOG_ERROR("No profile, returning!");
-        return Error::NotReady;
+        return Result::Code::NotReady;
     }
-    auto ProfileManager::setSignalStrengthData(const DataVariant &data) -> Error::Code
+
+    auto ProfileManager::setSignalStrengthData(const DataVariant &data) -> Result::Code
     {
         auto signalData = std::get<Store::SignalStrength>(data);
         if (callProfilePtr) {
             return callProfilePtr->setSignalStrength(static_cast<int>(signalData.rssiBar));
         }
         LOG_ERROR("No profile, returning!");
-        return Error::NotReady;
+        return Result::Code::NotReady;
     }
-    auto ProfileManager::setOperatorNameData(const DataVariant &data) -> Error::Code
+
+    auto ProfileManager::setOperatorNameData(const DataVariant &data) -> Result::Code
     {
         auto operatorName = std::get<OperatorName>(data);
         if (callProfilePtr) {
             return callProfilePtr->setOperatorName(operatorName.getName());
         }
         LOG_ERROR("No profile, returning!");
-        return Error::NotReady;
+        return Result::Code::NotReady;
     }
-    auto ProfileManager::setBatteryLevelData(unsigned int level) -> Error::Code
+
+    auto ProfileManager::setBatteryLevelData(unsigned int level) -> Result::Code
     {
         auto batteryLevel = BatteryLevel(level);
         if (callProfilePtr) {
             return callProfilePtr->setBatteryLevel(batteryLevel);
         }
         LOG_ERROR("No profile, returning!");
-        return Error::NotReady;
+        return Result::Code::NotReady;
     }
-    auto ProfileManager::setNetworkStatusData(const DataVariant &data) -> Error::Code
+
+    auto ProfileManager::setNetworkStatusData(const DataVariant &data) -> Result::Code
     {
         auto status = std::get<Store::Network::Status>(data);
         if (callProfilePtr) {
@@ -155,16 +170,9 @@ namespace bluetooth
             }
         }
         LOG_ERROR("No profile, returning!");
-        return Error::NotReady;
+        return Result::Code::NotReady;
     }
-    auto ProfileManager::callStarted(const utils::PhoneNumber &nr) -> Error::Code
-    {
-        if (callProfilePtr) {
-            return callProfilePtr->callStarted(nr.getView().getE164());
-        }
-        LOG_ERROR("No profile, returning!");
-        return Error::NotReady;
-    }
+
     void ProfileManager::deInit()
     {
         for (auto &[profileName, ptr] : profilesList) {
@@ -178,5 +186,4 @@ namespace bluetooth
 
         LOG_DEBUG("ProfileManager deinit done");
     }
-
 } // namespace bluetooth

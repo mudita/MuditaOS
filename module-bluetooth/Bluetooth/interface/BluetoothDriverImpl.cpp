@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothDriverImpl.hpp"
@@ -60,7 +60,7 @@ namespace bluetooth
         : runLoop{runLoop}, gap{std::make_unique<bluetooth::GAP>(ownerService)}
     {}
 
-    auto Driver::init() -> Error::Code
+    auto Driver::init() -> Result::Code
     {
         btstack_memory_init();
         config = {
@@ -88,7 +88,7 @@ namespace bluetooth
 
         gap_set_class_of_device(0x64020C);
         LOG_DEBUG("BT worker run success");
-        return Error::Success;
+        return Result::Code::Success;
     }
 
     void Driver::hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size)
@@ -167,16 +167,16 @@ namespace bluetooth
             break;
         }
     }
-    auto Driver::run() -> Error::Code
+    auto Driver::run() -> Result::Code
     {
         auto ret = hci_power_control(HCI_POWER_ON);
         if (ret != 0) {
             LOG_ERROR("HCI power on failed, can't start Bluetooth!");
-            return Error::LibraryError;
+            return Result::Code::LibraryError;
         }
         LOG_INFO("HCI turned on - run BtStack loop\n");
         btstack_run_loop_execute();
-        return Error::Success;
+        return Result::Code::Success;
     }
 
     void Driver::registerErrorCallback(const ErrorCallback &newCallback)
@@ -196,7 +196,7 @@ namespace bluetooth
         powerOnCallback = newCallback;
     }
 
-    auto Driver::stop() -> Error::Code
+    auto Driver::stop() -> Result::Code
     {
         auto ret = hci_power_control(HCI_POWER_OFF);
         if (ret != 0) {
@@ -204,9 +204,9 @@ namespace bluetooth
         }
         bluetooth::KeyStorage::settings->setValue(bluetooth::Settings::State,
                                                   static_cast<int>(BluetoothStatus::State::Off));
-        return ret != 0 ? Error::LibraryError : Error::Success;
+        return ret != 0 ? Result::Code::LibraryError : Result::Code::Success;
     }
-    auto Driver::scan() -> Error
+    auto Driver::scan() -> Result
     {
         return gap->scan();
     }

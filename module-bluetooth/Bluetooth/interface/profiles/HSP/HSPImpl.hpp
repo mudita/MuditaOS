@@ -1,50 +1,70 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include "HSP.hpp"
-#include "Error.hpp"
+#include "Result.hpp"
 #include <interface/profiles/SCO/SCO.hpp>
 #include <Audio/AudioCommon.hpp>
 
 namespace bluetooth
 {
-    static constexpr int serviceBufferLength = 150;
-    static constexpr int commandBufferLength = 150;
-
     class HSP::HSPImpl
     {
       public:
-        static void packetHandler(uint8_t packetType, uint16_t channel, uint8_t *event, uint16_t eventSize);
-        auto init() -> Error::Code;
-        void startRinging() const noexcept;
-        void stopRinging() const noexcept;
-        void initializeCall() const noexcept;
-        auto terminateCall() const noexcept -> Error::Code;
+        enum class HSPState
+        {
+            RfcommDisconnected,
+            RfcommConnected,
+            Ringing,
+            Answered
+        };
+
+        static void packetHandler(std::uint8_t packetType,
+                                  std::uint16_t channel,
+                                  std::uint8_t *event,
+                                  std::uint16_t eventSize);
+        auto init() -> Result::Code;
+        auto incomingCallStarted() const noexcept -> Result::Code;
+        auto outgoingCallStarted(const std::string &number) const noexcept -> Result::Code;
+        auto incomingCallAnswered() const noexcept -> Result::Code;
+        auto outgoingCallAnswered() const noexcept -> Result::Code;
+        auto callTerminated() const noexcept -> Result::Code;
+        auto callMissed() const noexcept -> Result::Code;
         void connect();
         void disconnect();
         void setDevice(const Devicei &dev);
-        void setOwnerService(const sys::Service *service);
+        void setOwnerService(sys::Service *service);
         void setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> audioDevice);
 
       private:
         static void sendAudioEvent(audio::EventType event, audio::Event::DeviceState state);
-        static void processHCIEvent(uint8_t *event);
-        static void processHSPEvent(uint8_t *event);
-        static void establishAudioConnection();
-        static std::array<uint8_t, serviceBufferLength> serviceBuffer;
-        static constexpr uint8_t rfcommChannelNr = 1;
-        static const std::string_view agServiceName;
-        static uint16_t scoHandle;
+        static void processHCIEvent(std::uint8_t *event);
+        static void processHSPEvent(std::uint8_t *event);
+
+        static constexpr auto serviceBufferSize           = 150;
+        static constexpr auto commandBufferSize           = 150;
+        static constexpr std::uint8_t rfcommChannelNr     = 1;
+        static constexpr std::uint32_t hspSdpRecordHandle = 0x10004;
+
+        static hci_con_handle_t scoHandle;
+
+        static std::uint8_t serviceBuffer[serviceBufferSize];
+
+        static const char *agServiceName;
+
         static std::unique_ptr<SCO> sco;
+        static std::shared_ptr<CVSDAudioDevice> audioDevice;
+
         static std::unique_ptr<CellularInterface> cellularInterface;
         static std::unique_ptr<AudioInterface> audioInterface;
-        static std::array<char, commandBufferLength> ATcommandBuffer;
-        static const sys::Service *ownerService;
-        static bool isConnected;
-        static bool callAnswered;
-        static bool isRinging;
-        static std::shared_ptr<CVSDAudioDevice> audioDevice;
+
+        static sys::Service *ownerService;
         static Devicei device;
+
+        static btstack_packet_callback_registration_t hciEventCallbackRegistration;
+        static char ATCommandBuffer[commandBufferSize];
+        static HSPState state;
     };
 } // namespace bluetooth

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,19 +24,25 @@ namespace message::bluetooth
     class ConnectResult : public BluetoothMessage
     {
       public:
-        explicit ConnectResult(Devicei device, bool succeed) : device(device), succeed(succeed)
+        enum class Result
+        {
+            Success,
+            Failure
+        };
+
+        explicit ConnectResult(Devicei device, Result result) : device(std::move(device)), result(result)
         {}
         [[nodiscard]] auto getDevice() const -> Devicei
         {
             return device;
         }
-        [[nodiscard]] auto isSucceed() const noexcept -> bool
+        [[nodiscard]] auto getResult() const noexcept -> Result
         {
-            return succeed;
+            return result;
         }
 
       private:
         Devicei device;
-        bool succeed;
+        Result result;
     };
 } // namespace message::bluetooth

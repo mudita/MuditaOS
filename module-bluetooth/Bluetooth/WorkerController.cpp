@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothStateMachine.hpp"
@@ -42,98 +42,117 @@ namespace bluetooth
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::StopScan &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::GetDevicesAvailable &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::VisibilityOn &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::VisibilityOff &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::Connect &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::Disconnect &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::PowerOn &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::PowerOff &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::ShutDown &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::Pair &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::Unpair &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bluetooth::event::StartRinging &evt)
-    {
-        pimpl->sm.process_event(evt);
-    };
-    void StatefulController::handle(const bluetooth::event::StopRinging &evt)
-    {
-        pimpl->sm.process_event(evt);
-    };
-    void StatefulController::handle(const bluetooth::event::StartRouting &evt)
-    {
-        pimpl->sm.process_event(evt);
-    };
+
     void StatefulController::handle(const bluetooth::event::StartStream &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::StopStream &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::CallAnswered &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::CallTerminated &evt)
     {
         pimpl->sm.process_event(evt);
     };
-    void StatefulController::handle(const bluetooth::event::CallStarted &evt)
+
+    void StatefulController::handle(const bluetooth::event::CallMissed &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
+    void StatefulController::handle(const bluetooth::event::OutgoingCallStarted &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+
+    void StatefulController::handle(const bluetooth::event::IncomingCallStarted &evt)
+    {
+        pimpl->sm.process_event(evt);
+    };
+
     void StatefulController::handle(const bluetooth::event::IncomingCallNumber &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::SignalStrengthData &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::OperatorNameData &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::BatteryLevelData &evt)
     {
         pimpl->sm.process_event(evt);
     };
+
     void StatefulController::handle(const bluetooth::event::NetworkStatusData &evt)
     {
         pimpl->sm.process_event(evt);

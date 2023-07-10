@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,9 +22,9 @@ namespace bluetooth
         A2DP(A2DP &&other) noexcept;
         auto operator=(A2DP &&other) noexcept -> A2DP &;
 
-        auto init() -> Error::Code override;
+        auto init() -> Result::Code override;
         void setDevice(const Devicei &device) override;
-        void setOwnerService(const sys::Service *service) override;
+        void setOwnerService(sys::Service *service) override;
 
         void connect() override;
         void disconnect() override;

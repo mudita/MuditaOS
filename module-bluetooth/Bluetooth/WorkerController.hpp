@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,7 +13,7 @@
 
 namespace bluetooth
 {
-    using DeviceRegistrationFunction = std::function<Error::Code()>;
+    using DeviceRegistrationFunction = std::function<Result::Code()>;
 
     class StatefulController : public AbstractController
     {
@@ -45,14 +45,13 @@ namespace bluetooth
         void handle(const bluetooth::event::ShutDown &evt) override;
         void handle(const bluetooth::event::Pair &evt) override;
         void handle(const bluetooth::event::Unpair &evt) override;
-        void handle(const bluetooth::event::StartRinging &evt) override;
-        void handle(const bluetooth::event::StopRinging &evt) override;
-        void handle(const bluetooth::event::StartRouting &evt) override;
         void handle(const bluetooth::event::StartStream &evt) override;
         void handle(const bluetooth::event::StopStream &evt) override;
         void handle(const bluetooth::event::CallAnswered &evt) override;
         void handle(const bluetooth::event::CallTerminated &evt) override;
-        void handle(const bluetooth::event::CallStarted &evt) override;
+        void handle(const bluetooth::event::CallMissed &evt) override;
+        void handle(const bluetooth::event::OutgoingCallStarted &evt) override;
+        void handle(const bluetooth::event::IncomingCallStarted &evt) override;
         void handle(const bluetooth::event::IncomingCallNumber &evt) override;
         void handle(const bluetooth::event::SignalStrengthData &evt) override;
         void handle(const bluetooth::event::OperatorNameData &evt) override;
