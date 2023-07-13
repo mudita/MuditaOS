@@ -52,6 +52,7 @@ namespace app
         bus.channels.push_back(sys::BusChannel::AlarmNotifications);
 
         addActionReceiver(manager::actions::ShowAlarm, [this](auto &&data) {
+            clearPendingPopups();
             switchWindow(gui::name::window::main_window, std::move(data));
             return actionHandled();
         });
