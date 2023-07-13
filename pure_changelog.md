@@ -3,56 +3,45 @@
 ## Unreleased
 
 ### Added
-* Added input mode selection display timeout
-* Added MMI/USSD code confirmation
 * Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
-* Added translations for Bluetooth connection status label
-* Added WCDMA recognition as 3G in status bar
 * Added extended information to crashdump filename
 * Added extended information to log filename
 
-### Changed / Improved
-
-* Replaced English labels occuring in French translation with French ones
-* Added new field to deviceInfo endpoint
-* Made EULA window scroll by a few lines at once
-* Updated Bluetooth stack
-* Unified GUI flow for adding contact with number already present in another contact
-* Decrease critical battery level from 10% to 5%
-* Optimized E-Ink energy consumption
-* Changed volume popup timeout to match phone modes popup
-* Information about device memory is now sent to MC in floating points numbers
-* Changed a way of returning information to Center about number duplications
-
 ### Fixed
 
-* Fixed wrong USSD flow when user closed USSD popup with back button
-* Fixed broken abbreviating of multiline text messages content in deletion window
-* Fixed misleading labels in the Phonebook application when using search engine
-* Fixed text pasting in new contact window when some text is already present there
-* Fixed unnecessary deep refresh when pressing up arrow in empty list view
-* Fixed going back to Messages instead of Contacts in case message thread was previously opened from Contacts
-* Fixed autoconnecting other BT devices when another one is already connected
-* Fixed going to Calls instead of Contacts after aborted or confirmed attempt to create contact from Calls
-* Fixed misleading "Nie" abbreviation for word "Niedziela" (Sunday) in new alarm window
-* Fixed automatic message pasting into content field in thread view after message forwarding
-* Fixed redundant logs about CSQ reporting mode
-* Fixed slider-related crash on phone turn off
-* Fixed problem with an unresponsive device after playing specific WAV files.
-* Fixed unresponsive Templates window for user input after templates were changed via MC.
-* Fixed USB charging port detection.
-* Fixed Template window clearing after all templates are removed.
-* Fixed wrong notification about multiple unread messages in case there's only one unread left
-* Fixed missing notification about new SMS when phone was locked on application Messages
-* Fixed MTP availability only after phone unlocked
-* Fixed a ghost call after quick click back key to end a call after start a call
-* Fixed autofill data during adding previously deleted phone number from dialing window
-* Fixed redirection to dial number view by pressing BACK from add new number view
-* Fixed occasional USB crash when USB cable was disconnected during files upload
 * Fixed unsupported character in several quotes
-* Fixed marking new message as read in Messages app main window
 * Fixed unwanted autolock on template selection window while rejecting call
 * Fixed scenario when Alarm not being handled properly during a phone call
+
+## [1.7.1 2023-07-13]
+
+### Added
+
+* Added missing translations for Bluetooth connection status.
+* Added missing translation in French.
+* Made EULA window scroll by a few lines at once.
+
+### Fixed
+* Fixed occasional USB crash when USB cable was disconnected during files upload.
+* Fixed Template window clearing after all templates are removed.
+* Fixed problem with an unresponsive device after playing specific WAV files.
+* Fixed unresponsive Templates window for user input after templates were changed via MC.
+* Fixed redirection to the dial number view by pressing BACK from add new number view.
+* Fixed for a ghost call after a quick click back key to end a call.
+* Fixed handling USSD started by #.
+* Fixed an issue with displaying a previously closed USSD session using a new USSD code.
+* Fixed problems occurring with MMI/USSD code handling.
+* Fixed misleading SMS notification text indicating the number of unread messages.
+* Fixed automatic pasting into the text input field of forwarded messages.
+* Fixed missing new message notifications.
+* Matched the time limit of the pop-up volume window with the pop-up phone mode window.
+* Fixed random crashes when turning off the phone.
+* Fixed unneeded deep refresh in the empty list (Alarm/Message/Contacts/Notes).
+* Fixed support for shortening multi-line strings in dialogue titles.
+* Fixed search engine labels.
+* Fixed access to contacts during onboarding in progress.
+* Fixed abbreviations of days of the week in Polish.
+* Fixed marking new message as read in Messages app main window.
 
 ## [1.7.0 2023-03-23]
 ### Changed / Improved
@@ -113,7 +102,6 @@
 * Fixed returning to call screen from message template
 * Fixed displaying wrong information on screen after rejecting call with SMS template
 * Fixed lack of contact search list update when returning to list after contact edition
-* Fixed access to contacts when onboarding is in progress
 
 ## [1.6.0 2023-02-27]
 
