@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ParserFSM.hpp"
@@ -16,16 +16,15 @@ namespace
 {
     constexpr auto receiveMsgTimerDelayMs = std::chrono::milliseconds{1000 * 5};
     constexpr auto parserTimerName        = "parserTimer";
-
 } // namespace
 
 namespace sdesktop::endpoints
 {
-
-    StateMachine::StateMachine(sys::Service *OwnerService)
-        : OwnerServicePtr(OwnerService),
-          parserTimer{sys::TimerFactory::createSingleShotTimer(
-              OwnerService, parserTimerName, receiveMsgTimerDelayMs, [this](sys::Timer & /*timer*/) { resetParser(); })}
+    StateMachine::StateMachine(sys::Service *ownerServicePtr)
+        : parserTimer{sys::TimerFactory::createSingleShotTimer(
+              ownerServicePtr, parserTimerName, receiveMsgTimerDelayMs, [this]([[maybe_unused]] sys::Timer &t) {
+                  resetParser();
+              })}
     {}
 
     void StateMachine::processMessage(std::string &&msg)

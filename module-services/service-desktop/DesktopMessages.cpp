@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-desktop/DesktopMessages.hpp"
@@ -16,28 +16,28 @@ namespace sdesktop
         AppFocusChangeEvent::AppFocusChangeEvent(std::string appName)
         {
             context.setResponseStatus(http::Code::OK);
-            context.setEndpoint(EndpointType::developerMode);
+            context.setEndpoint(EndpointType::DeveloperMode);
             context.setResponseBody(json11::Json::object{{json::developerMode::focus, appName}});
         }
 
         ScreenlockCheckEvent::ScreenlockCheckEvent(bool isLocked)
         {
             context.setResponseStatus(http::Code::OK);
-            context.setEndpoint(EndpointType::developerMode);
+            context.setEndpoint(EndpointType::DeveloperMode);
             context.setResponseBody(json11::Json::object{{json::developerMode::phoneLocked, isLocked}});
         }
 
         CellularStateInfoRequestEvent::CellularStateInfoRequestEvent(std::string stateStr)
         {
             context.setResponseStatus(http::Code::OK);
-            context.setEndpoint(EndpointType::developerMode);
+            context.setEndpoint(EndpointType::DeveloperMode);
             context.setResponseBody(json11::Json::object{{json::developerMode::cellularStateInfo, stateStr}});
         }
 
         CellularSleepModeInfoRequestEvent::CellularSleepModeInfoRequestEvent(bool isInSleepMode)
         {
             context.setResponseStatus(http::Code::OK);
-            context.setEndpoint(EndpointType::developerMode);
+            context.setEndpoint(EndpointType::DeveloperMode);
             context.setResponseBody(json11::Json::object{{json::developerMode::cellularSleepModeInfo, isInSleepMode}});
         }
     } // namespace developerMode

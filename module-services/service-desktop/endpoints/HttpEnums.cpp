@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/HttpEnums.hpp>
@@ -7,17 +7,16 @@
 
 namespace sdesktop::endpoints::http
 {
-
-    auto isMethodValid(uint8_t method) -> bool
+    auto isMethodValid(std::uint8_t method) -> bool
     {
-        if (method == static_cast<uint8_t>(http::Method::get) || method == static_cast<uint8_t>(http::Method::post) ||
-            method == static_cast<uint8_t>(http::Method::put) || method == static_cast<uint8_t>(http::Method::del)) {
+        if (method == static_cast<std::uint8_t>(http::Method::Get) ||
+            method == static_cast<std::uint8_t>(http::Method::Post) ||
+            method == static_cast<std::uint8_t>(http::Method::Put) ||
+            method == static_cast<std::uint8_t>(http::Method::Del)) {
             return true;
         }
-        else {
-            LOG_ERROR("Invalid method!");
-            return false;
-        }
-    }
 
+        LOG_ERROR("Invalid method!");
+        return false;
+    }
 } // namespace sdesktop::endpoints::http

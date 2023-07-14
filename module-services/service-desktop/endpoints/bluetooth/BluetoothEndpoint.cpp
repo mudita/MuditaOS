@@ -1,27 +1,25 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/bluetooth/BluetoothEndpoint.hpp>
 
 namespace sdesktop::endpoints
 {
-
     auto BluetoothEndpoint::handle(Context &context) -> void
     {
         switch (context.getMethod()) {
-        case http::Method::get:
+        case http::Method::Get:
             helper->processGetRequest(context);
             break;
-        case http::Method::post:
+        case http::Method::Post:
             helper->processPostRequest(context);
             break;
-        case http::Method::put:
+        case http::Method::Put:
             helper->processPutRequest(context);
             break;
-        case http::Method::del:
+        case http::Method::Del:
             helper->processDeleteRequest(context);
             break;
         }
     }
-
 } // namespace sdesktop::endpoints

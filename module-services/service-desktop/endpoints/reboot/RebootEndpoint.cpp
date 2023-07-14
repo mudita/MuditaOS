@@ -30,5 +30,4 @@ namespace sdesktop::endpoints
             LOG_ERROR("Response set when we already handled response in handler");
         }
     }
-
 } // namespace sdesktop::endpoints

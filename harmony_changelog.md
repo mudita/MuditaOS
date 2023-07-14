@@ -10,6 +10,7 @@
 * Added versioning for private assets
 * Added greetings in all languages
 * Added fade in and fade out to relaxation songs
+* Added time sync endpoint to be used by Mudita Center
 
 ### Changed / Improved
 

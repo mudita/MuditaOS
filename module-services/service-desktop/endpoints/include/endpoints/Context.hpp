@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -48,10 +48,10 @@ namespace sdesktop::endpoints
                 body = json11::Json();
             }
             if (static_cast<unsigned>(endpoint) > lastEndpoint) {
-                endpoint = EndpointType::invalid;
+                endpoint = EndpointType::Invalid;
             }
-            if (method > http::Method::del) {
-                method = http::Method::get;
+            if (method > http::Method::Del) {
+                method = http::Method::Get;
             }
         }
 
@@ -67,9 +67,9 @@ namespace sdesktop::endpoints
         Context()
         {
             body     = json11::Json();
-            endpoint = EndpointType::invalid;
+            endpoint = EndpointType::Invalid;
             uuid     = invalidUuid;
-            method   = http::Method::get;
+            method   = http::Method::Get;
         }
         virtual ~Context() noexcept = default;
 
@@ -186,10 +186,10 @@ namespace sdesktop::endpoints
         {
             switch (static_cast<EndpointType>(js[json::endpoint].int_value())) {
             // enable for pagination in other endpoints
-            // case EndpointType::calllog:
-            case EndpointType::contacts:
+            // case EndpointType::Calllog:
+            case EndpointType::Contacts:
                 return std::make_unique<PagedContext>(js, endpoint_pageing::contactsPageSize);
-            case EndpointType::messages:
+            case EndpointType::Messages:
                 return std::make_unique<PagedContext>(js, endpoint_pageing::messagesPageSize);
             default:
                 return std::make_unique<Context>(js);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationDesktop.hpp"
@@ -9,7 +9,6 @@
 #include <messages/DialogMetadataMessage.hpp>
 #include <notifications/NotificationsModel.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-time/TimeMessage.hpp>
 #include <time/time_conversion_factory.hpp>
 #include <windows/Dialog.hpp>
 #include <windows/DialogMetadata.hpp>
@@ -198,13 +197,6 @@ namespace gui
         };
     }
 
-    app::ApplicationDesktop *DesktopMainWindow::getAppDesktop() const
-    {
-        const auto app = dynamic_cast<app::ApplicationDesktop *>(application);
-        assert(app);
-        return app;
-    }
-
     RefreshModes DesktopMainWindow::updateTime()
     {
         AppWindow::updateTime();
@@ -220,4 +212,4 @@ namespace gui
         return app::manager::Controller::sendAction(
             application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>(number));
     }
-} /* namespace gui */
+} // namespace gui

@@ -11,36 +11,35 @@
 #include <endpoints/restore/RestoreEndpoint.hpp>
 #include <endpoints/update/UpdateEndpoint.hpp>
 #include <endpoints/reboot/RebootEndpoint.hpp>
+#include <endpoints/timeSync/TimeSyncEndpoint.hpp>
 
 namespace sdesktop::endpoints
 {
-
-    EndpointFactoryBell::EndpointFactoryBell() : EndpointFactory{}
-    {}
-
     std::unique_ptr<Endpoint> EndpointFactoryBell::create(Context &context, sys::Service *ownerServicePtr)
     {
         switch (context.getEndpoint()) {
-        case EndpointType::update:
+        case EndpointType::Update:
             return std::make_unique<UpdateEndpoint>(ownerServicePtr);
-        case EndpointType::filesystemUpload:
+        case EndpointType::FilesystemUpload:
             return FilesystemEndpoint::createInstance(ownerServicePtr);
-        case EndpointType::backup:
+        case EndpointType::Backup:
             return std::make_unique<BackupEndpoint>(ownerServicePtr);
-        case EndpointType::deviceInfo:
+        case EndpointType::DeviceInfo:
             return std::make_unique<DeviceInfoEndpoint>(ownerServicePtr);
-        case EndpointType::restore:
+        case EndpointType::Restore:
             return std::make_unique<RestoreEndpoint>(ownerServicePtr);
-        case EndpointType::factory:
+        case EndpointType::Factory:
             return std::make_unique<FactoryResetEndpoint>(ownerServicePtr);
-        case EndpointType::reboot:
+        case EndpointType::Reboot:
             return std::make_unique<RebootEndpoint>(ownerServicePtr);
+        case EndpointType::TimeSync:
+            return std::make_unique<TimeSyncEndpoint>(ownerServicePtr);
         default:
             return std::make_unique<NullEndpoint>(ownerServicePtr);
         }
     }
 
-    auto EndpointFactory::create(EndpointSecurity /*unused*/) -> std::unique_ptr<EndpointFactory>
+    auto EndpointFactory::create([[maybe_unused]] EndpointSecurity endpointSecurity) -> std::unique_ptr<EndpointFactory>
     {
         return std::make_unique<EndpointFactoryBell>();
     }

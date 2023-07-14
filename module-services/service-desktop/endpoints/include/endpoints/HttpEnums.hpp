@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -30,13 +30,13 @@ namespace sdesktop::endpoints::http
 
     /*! Enum class for the HTTP methods.
      */
-    enum class Method
+    enum class Method : std::uint8_t
     {
-        get = 1,
-        post,
-        put,
-        del
+        Get = 1,
+        Post,
+        Put,
+        Del
     };
 
-    [[nodiscard]] auto isMethodValid(uint8_t) -> bool;
+    [[nodiscard]] auto isMethodValid(std::uint8_t method) -> bool;
 }; // namespace sdesktop::endpoints::http

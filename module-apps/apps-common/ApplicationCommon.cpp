@@ -95,8 +95,8 @@ namespace app
                                             gui::status_bar::Indicator::PhoneMode});
 
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
-
         bus.channels.push_back(sys::BusChannel::USBNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceEvtmgrNotifications);
 
         longPressTimer = sys::TimerFactory::createPeriodicTimer(this,
                                                                 "LongPress",
@@ -360,6 +360,7 @@ namespace app
         case MessageType::KBDKeyEvent:
             return handleKBDKeyEvent(msgl);
         case MessageType::EVMMinuteUpdated:
+        case MessageType::EVMTimeUpdated:
             return handleMinuteUpdated(msgl);
         case MessageType::AppAction:
             return handleAction(msgl);
@@ -905,7 +906,7 @@ namespace app
         /// request handle actually switches window to popup window
         auto retval = request->handle();
         if (!retval) {
-            LOG_ERROR("Popup %s handling failure, please check registered blueprint!", popup);
+            LOG_ERROR("Popup '%s' handling failure, please check registered blueprint!", popup);
         }
 
         return retval;
