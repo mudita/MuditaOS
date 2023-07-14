@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,11 +7,10 @@
 
 namespace sdesktop::endpoints
 {
-
     class EndpointFactory
     {
       protected:
-        static constexpr auto Whitelist = {EndpointType::developerMode, EndpointType::usbSecurity};
+        static constexpr auto whitelist = {EndpointType::DeveloperMode, EndpointType::UsbSecurity};
 
         EndpointFactory() = default;
 
@@ -22,5 +21,4 @@ namespace sdesktop::endpoints
 
         virtual auto create(Context &context, sys::Service *ownerServicePtr) -> std::unique_ptr<Endpoint> = 0;
     };
-
 } // namespace sdesktop::endpoints

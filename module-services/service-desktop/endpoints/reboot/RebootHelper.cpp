@@ -4,15 +4,12 @@
 #include <endpoints/Context.hpp>
 #include <endpoints/reboot/RebootHelper.hpp>
 #include <endpoints/JsonKeyNames.hpp>
-#include <endpoints/message/Sender.hpp>
 #include <service-desktop/DesktopMessages.hpp>
-#include <service-desktop/ServiceDesktop.hpp>
 
 #include <json11.hpp>
 
 namespace sdesktop::endpoints
 {
-    using sender::putToSendQueue;
     auto RebootHelper::processPost(Context &context) -> ProcessResult
     {
         const auto rebootType = context.getBody()[json::reboot::rebootType].string_value();
@@ -32,5 +29,4 @@ namespace sdesktop::endpoints
         LOG_ERROR("Invalid request: %s", rebootType.c_str());
         return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
     }
-
 } // namespace sdesktop::endpoints

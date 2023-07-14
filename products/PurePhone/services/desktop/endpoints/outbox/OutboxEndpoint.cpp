@@ -1,19 +1,17 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/outbox/OutboxEndpoint.hpp>
 
 namespace sdesktop::endpoints
 {
-
     auto OutboxEndpoint::handle(Context &context) -> void
     {
-
         switch (context.getMethod()) {
-        case http::Method::get:
+        case http::Method::Get:
             helper->processGetRequest(context);
             break;
-        case http::Method::del:
+        case http::Method::Del:
             helper->processDeleteRequest(context);
             break;
         default:
@@ -21,5 +19,4 @@ namespace sdesktop::endpoints
             break;
         }
     }
-
 } // namespace sdesktop::endpoints

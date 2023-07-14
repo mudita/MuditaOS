@@ -65,6 +65,8 @@ target_sources(
         update/UpdateHelper.cpp
         reboot/RebootEndpoint.cpp
         reboot/RebootHelper.cpp
+        timeSync/TimeSyncEndpoint.cpp
+        timeSync/TimeSyncHelper.cpp
     PUBLIC
         include/endpoints/backup/BackupEndpoint.hpp
         include/endpoints/backup/BackupHelper.hpp
@@ -92,6 +94,8 @@ target_sources(
         include/endpoints/update/UpdateHelper.hpp
         include/endpoints/reboot/RebootEndpoint.hpp
         include/endpoints/reboot/RebootHelper.hpp
+        include/endpoints/timeSync/TimeSyncEndpoint.hpp
+        include/endpoints/timeSync/TimeSyncHelper.hpp
 )
 
 target_include_directories(

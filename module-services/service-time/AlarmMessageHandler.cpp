@@ -26,7 +26,7 @@ namespace alarms
     {
         return handleWithCallback<AlarmGetRequestMessage, AlarmGetResponseMessage, AlarmEventRecord>(
             request, [&](AlarmGetRequestMessage *request, IAlarmOperations::OnGetAlarmProcessed callback) {
-                alarmOperations->getAlarm(request->id, callback);
+                alarmOperations->getAlarm(request->id, std::move(callback));
             });
     }
 
@@ -38,7 +38,7 @@ namespace alarms
                                   std::pair<AlarmEventRecord, AlarmStatus>>(
             request,
             [&](AlarmGetWithStatusRequestMessage *request, IAlarmOperations::OnGetAlarmWithStatusProcessed callback) {
-                alarmOperations->getAlarmWithStatus(request->id, callback);
+                alarmOperations->getAlarmWithStatus(request->id, std::move(callback));
             });
     }
 
@@ -47,7 +47,7 @@ namespace alarms
     {
         return handleWithCallback<AlarmAddRequestMessage, AlarmAddResponseMessage, bool>(
             request, [&](AlarmAddRequestMessage *request, IAlarmOperations::OnAddAlarmProcessed callback) {
-                alarmOperations->addAlarm(request->alarmEvent, callback);
+                alarmOperations->addAlarm(request->alarmEvent, std::move(callback));
             });
     }
 
@@ -56,7 +56,7 @@ namespace alarms
     {
         return handleWithCallback<AlarmUpdateRequestMessage, AlarmUpdateResponseMessage, bool>(
             request, [&](AlarmUpdateRequestMessage *request, IAlarmOperations::OnUpdateAlarmProcessed callback) {
-                alarmOperations->updateAlarm(request->alarmEvent, callback);
+                alarmOperations->updateAlarm(request->alarmEvent, std::move(callback));
             });
     }
 
@@ -65,7 +65,7 @@ namespace alarms
     {
         return handleWithCallback<AlarmRemoveRequestMessage, AlarmRemoveResponseMessage, bool>(
             request, [&](AlarmRemoveRequestMessage *request, IAlarmOperations::OnRemoveAlarmProcessed callback) {
-                alarmOperations->removeAlarm(request->id, callback);
+                alarmOperations->removeAlarm(request->id, std::move(callback));
             });
     }
 
@@ -74,7 +74,7 @@ namespace alarms
     {
         return handleWithCallback<AlarmToggleAllRequestMessage, AlarmToggleAllResponseMessage, bool>(
             request, [&](AlarmToggleAllRequestMessage *request, IAlarmOperations::OnToggleAllProcessed callback) {
-                alarmOperations->toggleAll(request->toggle, callback);
+                alarmOperations->toggleAll(request->toggle, std::move(callback));
             });
     }
 
@@ -98,7 +98,7 @@ namespace alarms
                                   std::vector<SingleEventRecord>>(
             request,
             [&](AlarmGetNextSingleEventsRequestMessage *request, IAlarmOperations::OnGetAlarmsProcessed callback) {
-                alarmOperations->getNextSingleEvents(TimePointNow(), callback);
+                alarmOperations->getNextSingleEvents(TimePointNow(), std::move(callback));
             });
     }
 
@@ -107,7 +107,7 @@ namespace alarms
     {
         return handleWithCallback<RingingAlarmTurnOffRequestMessage, RingingAlarmTurnOffResponseMessage, bool>(
             request, [&](RingingAlarmTurnOffRequestMessage *request, IAlarmOperations::OnTurnOffRingingAlarm callback) {
-                alarmOperations->turnOffRingingAlarm(request->id, callback);
+                alarmOperations->turnOffRingingAlarm(request->id, std::move(callback));
             });
     }
 
@@ -116,7 +116,7 @@ namespace alarms
     {
         return handleWithCallback<TurnOffSnoozeRequestMessage, TurnOffSnoozeResponseMessage, bool>(
             request, [&](TurnOffSnoozeRequestMessage *request, IAlarmOperations::OnTurnOffRingingAlarm callback) {
-                alarmOperations->turnOffSnoozedAlarm(request->id, callback);
+                alarmOperations->turnOffSnoozedAlarm(request->id, std::move(callback));
             });
     }
 
@@ -125,7 +125,7 @@ namespace alarms
     {
         return handleWithCallback<RingingAlarmSnoozeRequestMessage, RingingAlarmSnoozeResponseMessage, bool>(
             request, [&](RingingAlarmSnoozeRequestMessage *request, IAlarmOperations::OnSnoozeRingingAlarm callback) {
-                alarmOperations->snoozeRingingAlarm(request->id, request->nextAlarmTime, callback);
+                alarmOperations->snoozeRingingAlarm(request->id, request->nextAlarmTime, std::move(callback));
             });
     }
 
@@ -134,7 +134,7 @@ namespace alarms
     {
         return handleWithCallback<PostponeSnoozeRequestMessage, PostponeSnoozeResponseMessage, bool>(
             request, [&](PostponeSnoozeRequestMessage *request, IAlarmOperations::OnSnoozeRingingAlarm callback) {
-                alarmOperations->postponeSnooze(request->id, request->nextAlarmTime, callback);
+                alarmOperations->postponeSnooze(request->id, request->nextAlarmTime, std::move(callback));
             });
     }
 
@@ -151,13 +151,13 @@ namespace alarms
     auto AlarmMessageHandler::handleAddSnoozedAlarmCountChangeCallback(
         AlarmOperationsCommon::OnSnoozedAlarmsCountChange callback) -> void
     {
-        alarmOperations->addSnoozedAlarmsCountChangeCallback(callback);
+        alarmOperations->addSnoozedAlarmsCountChangeCallback(std::move(callback));
     }
 
     auto AlarmMessageHandler::handleAddActiveAlarmCountChangeCallback(
         AlarmOperationsCommon::OnActiveAlarmCountChange callback) -> void
     {
-        alarmOperations->addActiveAlarmCountChangeCallback(callback);
+        alarmOperations->addActiveAlarmCountChangeCallback(std::move(callback));
         alarmOperations->updateEventsCache(TimePointNow());
     }
 
@@ -168,7 +168,7 @@ namespace alarms
                                   GetSnoozedAlarmsResponseMessage,
                                   std::vector<SingleEventRecord>>(
             request, [&](GetSnoozedAlarmsRequestMessage *request, IAlarmOperations::OnGetSnoozedAlarms callback) {
-                alarmOperations->getSnoozedAlarms(callback);
+                alarmOperations->getSnoozedAlarms(std::move(callback));
             });
     }
 

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,7 +13,6 @@
 
 namespace sdesktop::endpoints
 {
-
     enum class State
     {
         NoMsg,
@@ -24,7 +23,7 @@ namespace sdesktop::endpoints
     class StateMachine
     {
       public:
-        explicit StateMachine(sys::Service *OwnerService);
+        explicit StateMachine(sys::Service *ownerServicePtr);
         void processMessage(std::string &&msg);
         [[nodiscard]] auto getCurrentState() const noexcept -> State
         {
@@ -43,8 +42,7 @@ namespace sdesktop::endpoints
         State state = State::NoMsg;
         std::string payload;
         std::string header;
-        unsigned long payloadLength   = 0;
-        sys::Service *OwnerServicePtr = nullptr;
+        unsigned long payloadLength = 0;
         std::unique_ptr<MessageHandler> messageHandler;
         sys::TimerHandle parserTimer;
 
@@ -56,5 +54,4 @@ namespace sdesktop::endpoints
         void parsePartialMessage();
         void parsePayload();
     };
-
 } // namespace sdesktop::endpoints

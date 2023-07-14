@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,7 +14,6 @@ namespace sdesktop::endpoints::message
     inline constexpr auto size_header = size_length + 1;
 
     inline constexpr auto endpointChar = '#';
-    inline constexpr auto rawDataChar  = '$';
 
     inline void removeHeader(std::string &msg)
     {

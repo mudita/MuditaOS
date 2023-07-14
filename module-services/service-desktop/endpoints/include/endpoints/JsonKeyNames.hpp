@@ -70,8 +70,6 @@ namespace sdesktop::endpoints::json
         inline constexpr auto limit              = "limit";
         inline constexpr auto offset             = "offset";
         inline constexpr auto order              = "order";
-        inline constexpr auto totalCount         = "totalCount";
-        inline constexpr auto nextPage           = "nextPage";
         inline constexpr auto entries            = "entries";
         inline constexpr auto messageBody        = "messageBody";
         inline constexpr auto messageCount       = "messageCount";
@@ -87,8 +85,6 @@ namespace sdesktop::endpoints::json
         inline constexpr auto numberID           = "numberID";
         inline constexpr auto threadID           = "threadID";
         inline constexpr auto messageSnippet     = "messageSnippet";
-        inline constexpr auto unreadMessageCount = "unreadMessageCount";
-        inline constexpr auto messageTemplate    = "messageTemplate";
         inline constexpr auto templateBody       = "templateBody";
         inline constexpr auto templateID         = "templateID";
     } // namespace messages
@@ -122,4 +118,8 @@ namespace sdesktop::endpoints::json
         inline constexpr auto shutdown   = "shutdown";
     } // namespace reboot
 
+    namespace timeSync
+    {
+        inline constexpr auto timestamp = "timestamp";
+    }
 } // namespace sdesktop::endpoints::json

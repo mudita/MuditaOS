@@ -10,7 +10,7 @@ namespace sdesktop::endpoints
     class EndpointFactoryBell : public EndpointFactory
     {
       public:
-        explicit EndpointFactoryBell();
+        EndpointFactoryBell() = default;
 
         auto create(Context &context, sys::Service *ownerServicePtr) -> std::unique_ptr<Endpoint> override;
     };

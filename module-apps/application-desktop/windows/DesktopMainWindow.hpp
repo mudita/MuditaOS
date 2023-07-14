@@ -32,7 +32,6 @@ namespace gui
         void setActiveState();
         bool processLongReleaseEvent(const InputEvent &inputEvent);
         bool processShortReleaseEvent(const InputEvent &inputEvent);
-        app::ApplicationDesktop *getAppDesktop() const;
 
       public:
         explicit DesktopMainWindow(app::ApplicationCommon *app);

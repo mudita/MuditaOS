@@ -2,20 +2,23 @@
 
 - *endpoint* - the target endpoint
 ```
-    invalid = 0,
-    deviceInfo = 1,
-    update = 2, 
-    filesystemUpload = 3,
-    backup = 4,
-    restore = 5,
-    factory = 6,
-    contacts = 7,
-    messages = 8,
-    calllog = 9,
-    calendarEvents= 10,
-    developerMode = 11,
-    bluetooth = 12,
-    usbSecurity = 13
+    Invalid = 0,
+    DeviceInfo = 1,
+    Update = 2, 
+    FilesystemUpload = 3,
+    Backup = 4,
+    Restore = 5,
+    Factory = 6,
+    Contacts = 7,
+    Messages = 8,
+    Calllog = 9,
+    CalendarEvents = 10,
+    DeveloperMode = 11,
+    Bluetooth = 12,
+    UsbSecurity = 13,
+    Outbox = 14,
+    Reboot = 15,
+    TimeSync = 16
 ```
 
 - *method* - the request methods that indicate the desired action to be performed for a given resource.

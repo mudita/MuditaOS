@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -80,16 +80,16 @@ namespace stm::message
     class TimeChangeRequestMessage : public sys::DataMessage
     {
       public:
-        explicit TimeChangeRequestMessage(const time_t &time)
+        explicit TimeChangeRequestMessage(std::time_t time)
             : sys::DataMessage(MessageType::MessageTypeUninitialized), time(time){};
 
-        auto getTime() -> time_t
+        auto getTime() -> std::time_t
         {
             return time;
         }
 
       private:
-        time_t time;
+        const std::time_t time;
     };
 
     class SetAutomaticDateAndTimeRequest : public sys::DataMessage

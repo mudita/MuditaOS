@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/deviceInfo/DeviceInfoEndpointCommon.hpp>
@@ -12,7 +12,7 @@ namespace sdesktop::endpoints
     {
         http::Code status;
         switch (context.getMethod()) {
-        case http::Method::get:
+        case http::Method::Get:
             status = handleGet(context);
             break;
         default:

@@ -1,11 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/BaseHelper.hpp>
 
 namespace sdesktop::endpoints
 {
-
     auto ret() -> BaseHelper::ProcessResult
     {
         return {sent::no, std::nullopt};
@@ -35,17 +34,16 @@ namespace sdesktop::endpoints
     {
         preProcess(method, context);
         switch (method) {
-        case http::Method::del:
+        case http::Method::Del:
             return processDelete(context);
-        case http::Method::get:
+        case http::Method::Get:
             return processGet(context);
-        case http::Method::post:
+        case http::Method::Post:
             return processPost(context);
-        case http::Method::put:
+        case http::Method::Put:
             return processPut(context);
         }
         postProcess(method, context);
         return {sent::no, std::nullopt};
     }
-
 } // namespace sdesktop::endpoints

@@ -14,7 +14,5 @@ namespace sdesktop::endpoints
         {}
 
         auto processPost(Context &context) -> ProcessResult final;
-
-      private:
     };
 } // namespace sdesktop::endpoints
