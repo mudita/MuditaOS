@@ -5,17 +5,19 @@
 #include <log/log.hpp>
 #include <service-db/SettingsMessages.hpp>
 #include <service-db/agents/settings/Settings_queries.hpp>
-#include <serial-number-parser/SerialNumberParser.hpp>
+#include <serial-number-parser/DeviceMetadata.hpp>
 
 namespace settings
 {
     auto BellFactorySettings::getMfgEntries() const -> std::unique_ptr<QueryResult>
     {
-        const auto [serialNumber, colour] = serial_number_parser::getDeviceMetadata();
-        auto factoryData                  = std::make_unique<QueryResult>();
+        const auto [serialNumber, deviceVersionMetadata] = serial_number_parser::getDeviceMetadata();
+        const auto [colour, version]                     = deviceVersionMetadata;
+        auto factoryData                                 = std::make_unique<QueryResult>();
 
         factoryData->addRow({Field(factory::serial_number_key), Field(serialNumber.c_str())});
         factoryData->addRow({Field(factory::case_colour_key), Field(colour.c_str())});
+        factoryData->addRow({Field(factory::device_version_key), Field(std::to_string(version).c_str())});
 
         return factoryData;
     }

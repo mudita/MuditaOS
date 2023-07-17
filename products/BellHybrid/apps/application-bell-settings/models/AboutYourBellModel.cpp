@@ -15,6 +15,7 @@
 namespace
 {
     constexpr auto factoryDataSerialPath = "factory_data/serial";
+    constexpr auto factoryDataVersionPath = "factory_data/device_version";
 }
 
 namespace app::bell_settings
@@ -48,14 +49,18 @@ namespace app::bell_settings
 
     void AboutYourBellModel::createData()
     {
+        const auto productSerialNumber = settings.getValue(factoryDataSerialPath, settings::SettingsScope::Global);
+        const auto productVersion      = settings.getValue(factoryDataVersionPath, settings::SettingsScope::Global);
+        const auto productName =
+            utils::translate("app_bell_settings_about_product") + std::string(" ") + productVersion;
+
         internalData.push_back(
-            new gui::AboutYourBellListItem(utils::translate("app_bell_settings_about_product"),
+            new gui::AboutYourBellListItem(productName,
                                            utils::translate("app_bell_settings_about_version"),
                                            gui::AboutYourBellListItem::TokenMap({{"$VERSION", std::string(VERSION)}})));
 
-        internalData.push_back(
-            new gui::AboutYourBellListItem(utils::translate("app_bell_settings_about_serial_number"),
-                                           settings.getValue(factoryDataSerialPath, settings::SettingsScope::Global)));
+        internalData.push_back(new gui::AboutYourBellListItem(utils::translate("app_bell_settings_about_serial_number"),
+                                                              productSerialNumber));
 
 #if CONFIG_SHOW_MEMORY_INFO == 1
         struct statvfs stat

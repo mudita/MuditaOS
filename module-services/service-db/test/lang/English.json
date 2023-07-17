@@ -644,7 +644,7 @@
   "app_bell_settings_language": "Language",
   "app_bell_settings_layout": "Clock face",
   "app_bell_settings_about": "About",
-  "app_bell_settings_about_product": "Mudita Harmony",
+  "app_bell_settings_about_product": "Harmony",
   "app_bell_settings_about_version": "<text>OS version: <token>$VERSION</token></text>",
   "app_bell_settings_about_storage_title": "Storage",
   "app_bell_settings_about_storage_text": "<text><token>$USED_MEMORY</token>MB of <token>$TOTAL_MEMORY</token>MB used</text>",

@@ -63,7 +63,7 @@
     "app_bell_settings_about_info_text": "www.mudita.com",
     "app_bell_settings_about_serial_number": "Numer seryjny",
     "app_bell_settings_about_info_title": "Instrukcja i informacje dot. certyfikacji",
-    "app_bell_settings_about_product": "Mudita Harmony",
+    "app_bell_settings_about_product": "Harmony",
     "app_bell_settings_about_storage_text": "<text>Zu\u017cyto <token>$USED_MEMORY</token>MB z <token>$TOTAL_MEMORY</token>MB</text>",
     "app_bell_settings_about_storage_title": "Pami\u0119\u0107",
     "app_bell_settings_about_version": "<text>Wersja OS: <token>$VERSION</token></text>",

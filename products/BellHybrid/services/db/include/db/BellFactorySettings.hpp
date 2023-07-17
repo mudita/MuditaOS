@@ -11,6 +11,11 @@
 
 namespace settings
 {
+    namespace factory
+    {
+        static constexpr auto device_version_key = "device_version";
+    }
+
     class BellFactorySettings : public FactorySettings
     {
       public:
