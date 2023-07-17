@@ -3,10 +3,8 @@
 
 #pragma once
 #include "Common.hpp"
-#include <optional>
 
 namespace serial_number_parser
 {
-    bool isOldSerialNumberFormat(const std::string &serialNumber);
-    std::optional<VersionMetadata> getDeviceVersionMetadata(const std::string &serialNumber);
+    DeviceMetadata getDeviceMetadata();
 } // namespace serial_number_parser

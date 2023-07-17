@@ -1,0 +1,10 @@
+add_catch2_executable(
+        NAME
+        bell-serial-number-parser
+        SRCS
+        test-BellSerialNumberParser.cpp
+        LIBS
+        serial-number-parser
+        INCLUDE
+        $<TARGET_PROPERTY:serial-number-parser,INCLUDE_DIRECTORIES>
+)

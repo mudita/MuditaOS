@@ -64,7 +64,7 @@
     "app_bell_settings_about_info_text": "www.mudita.com",
     "app_bell_settings_about_serial_number": "Numéro de série",
     "app_bell_settings_about_info_title": "Manuel et certification",
-    "app_bell_settings_about_product": "Mudita Harmony",
+    "app_bell_settings_about_product": "Harmony",
     "app_bell_settings_about_storage_text": "<text><token>$USED_MEMORY</token> Mo sur <token>$TOTAL_MEMORY</token> Mo utilis\u00e9s</text>",
     "app_bell_settings_about_storage_title": "Stockage",
     "app_bell_settings_about_version": "<text>Version du syst\u00e8me: <token>$VERSION</token></text>",
