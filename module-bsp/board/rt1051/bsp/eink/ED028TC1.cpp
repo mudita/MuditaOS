@@ -509,13 +509,14 @@ EinkStatus_e EinkPowerOn()
 
     std::uint8_t cmd = EinkPowerON; // 0x04
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     s_einkIsPoweredOn = true;
 
     if (BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)) == 0) {
-        return EinkSPIErr;
+        return EinkTimeout;
     }
 
     return EinkOK;
@@ -529,10 +530,11 @@ EinkStatus_e EinkPowerOff()
 
     std::uint8_t cmd = EinkPowerOFF; // 0x02
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
-    const auto ret = BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)) == 1 ? EinkOK : EinkSPIErr;
+    const auto ret = BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)) == 1 ? EinkOK : EinkTimeout;
 
     // continue procedure regardless result
     BSP_EinkLogicPowerOff();
@@ -545,7 +547,6 @@ EinkStatus_e EinkPowerDown(void)
 {
     const auto powerOffStatus = EinkPowerOff();
     BSP_EinkDeinit();
-
     return powerOffStatus;
 }
 
@@ -560,6 +561,7 @@ std::int16_t EinkGetTemperatureInternal()
 
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
+        EinkPowerDown();
         return -1;
     }
 
@@ -569,6 +571,7 @@ std::int16_t EinkGetTemperatureInternal()
 
     if (BSP_EinkReadData(temp, sizeof(temp), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
+        EinkPowerDown();
         return -1;
     }
 
@@ -592,11 +595,12 @@ static void s_EinkSetGateOrder()
     buf[1] = 0x02; // Magic value required by the ED028TC1 display manufacturer
     buf[2] = 0x00;
     if (BSP_EinkWriteData(buf, sizeof(buf), SPI_AUTOMATIC_CS) != 0) {
+        EinkPowerDown();
         return;
     }
 }
 
-static void s_EinkSetInitialConfig()
+static EinkStatus_e s_EinkSetInitialConfig()
 {
     // send initialization data
     unsigned char tmpbuf[10];
@@ -607,7 +611,8 @@ static void s_EinkSetInitialConfig()
     tmpbuf[3] = 0x00; // 0x06
     tmpbuf[4] = 0x00;
     if (BSP_EinkWriteData(tmpbuf, 5, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     tmpbuf[0] = EinkPanelSetting;      // 0x00
@@ -615,19 +620,22 @@ static void s_EinkSetInitialConfig()
                                        // If 0x35 (DM - 1 is used (2bpp)) the SPI speed can be 25MHz
     tmpbuf[2] = 0x00;
     if (BSP_EinkWriteData(tmpbuf, 3, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     tmpbuf[0] = EinkPowerSaving; // 0x26
     tmpbuf[1] = 0x82;            // B2
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     tmpbuf[0] = EinkPowerOFFSequenceSetting; // 0x03
     tmpbuf[1] = 0x01;                        // 0x00;//0x03;
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     tmpbuf[0] = EinkBoosterSoftStart; // 0x07
@@ -643,27 +651,31 @@ static void s_EinkSetInitialConfig()
                 (EPD_BOOSTER_DRIVING_STRENGTH_7 << EPD_BOOSTER_DRIVING_STRENGTH_POS) |
                 (EPD_BOOSTER_START_PERIOD_10MS << EPD_BOOSTER_START_PERIOD_POS);
     if (BSP_EinkWriteData(tmpbuf, 4, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     tmpbuf[0] = EinkPLLControl; // 0x30
     tmpbuf[1] = 0x0E;
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     tmpbuf[0] = EinkTemperatureSensorSelection;              // Temp. sensor setting TSE
     tmpbuf[1] = EINK_TEMPERATURE_SENSOR_USE_INTERNAL | 0x00; // Temperature offset
     tmpbuf[2] = 0x00;                                        // Host forced temperature value
     if (BSP_EinkWriteData(tmpbuf, 3, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     tmpbuf[0] = EinkVcomAndDataIntervalSetting; // 0x50
     tmpbuf[1] = DDX;                            // 0x01;   // 0x0D
     tmpbuf[2] = 0x00;                           // 0x22;
     if (BSP_EinkWriteData(tmpbuf, 3, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     tmpbuf[0] = EinkTCONSetting; // 0x60
@@ -671,7 +683,8 @@ static void s_EinkSetInitialConfig()
     tmpbuf[2] = 0x09;
     tmpbuf[3] = 0x2D;
     if (BSP_EinkWriteData(tmpbuf, 4, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     tmpbuf[0] = EinkResolutionSetting; // 0x61
@@ -680,14 +693,17 @@ static void s_EinkSetInitialConfig()
     tmpbuf[3] = 0x01;                  // 0x01
     tmpbuf[4] = 0xE0;                  // 0xE0
     if (BSP_EinkWriteData(tmpbuf, 5, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     tmpbuf[0] = EinkVCM_DCSetting; // 0x82
     tmpbuf[1] = 0x30;
     if (BSP_EinkWriteData(tmpbuf, 2, SPI_AUTOMATIC_CS) != 0) {
-        return;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
+    return EinkOK;
 }
 
 EinkStatus_e EinkResetAndInitialize()
@@ -695,11 +711,17 @@ EinkStatus_e EinkResetAndInitialize()
     BSP_EinkLogicPowerOn();
 
     // Initialize the synchronization resources, SPI and GPIOs for the Eink BSP
-    BSP_EinkInit(NULL);
+    if (BSP_EinkInit() != 0) {
+        EinkPowerDown();
+        return EinkInitErr;
+    }
     // Reset the display
     BSP_EinkResetDisplayController();
     // Set the initial configuration of the eink registers after reset
-    s_EinkSetInitialConfig();
+    if (s_EinkSetInitialConfig() != EinkOK) {
+        EinkPowerDown();
+        return EinkInitErr;
+    }
 
     // After the reset the display is powered off
     s_einkIsPoweredOn = false;
@@ -710,12 +732,14 @@ EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings)
 {
     /// LUTD
     if (BSP_EinkWriteData(settings->LUTDData, settings->LUTDSize, SPI_AUTOMATIC_CS) != 0) {
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     /// LUTC
     if (BSP_EinkWriteData(settings->LUTCData, settings->LUTCSize + 1, SPI_AUTOMATIC_CS) != 0) {
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     s_einkConfiguredWaveform = settings->mode;
@@ -731,12 +755,14 @@ static EinkStatus_e s_EinkReadFlagsRegister(std::uint16_t *flags)
 
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     if (BSP_EinkReadData(flags, sizeof(std::uint16_t), SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     BSP_EinkWriteCS(BSP_Eink_CS_Set);
@@ -763,7 +789,8 @@ EinkStatus_e EinkDitherDisplay()
     std::uint8_t cmdWithArgs[2] = {EinkDPC, EINK_DITHER_4BPP_MODE | EINK_DITHER_START};
 
     if (BSP_EinkWriteData(cmdWithArgs, sizeof(cmdWithArgs), SPI_AUTOMATIC_CS) != 0) {
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     std::uint16_t flags = 0;
@@ -866,7 +893,8 @@ EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
     // the standard GUI coords system to the ED028TC1 one
 
     if (BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS) != 0) {
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     std::uint32_t msgSize = 2 + (static_cast<std::uint32_t>(frame.width) * static_cast<std::uint32_t>(frame.height) /
@@ -874,7 +902,8 @@ EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
     // Send the part of the image to the display memory
 
     if (BSP_EinkWriteData(s_einkServiceRotatedBuf, msgSize, SPI_AUTOMATIC_CS) != 0) {
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     return (EinkOK);
@@ -896,7 +925,8 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     buf[8] = EINK_DISPLAY_RES_Y & 0x00FF;
 
     if (BSP_EinkWriteData(buf, 9, SPI_AUTOMATIC_CS) != 0) {
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     BSP_EinkWriteCS(BSP_Eink_CS_Clr);
@@ -905,7 +935,8 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
     buf[1] = Eink1Bpp - 1;
     if (BSP_EinkWriteData(buf, 2, SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     std::uint8_t background = colorFill;
@@ -923,7 +954,8 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
 
     if (BSP_EinkWriteData(bg.get(), BOARD_EINK_DISPLAY_RES_Y * BOARD_EINK_DISPLAY_RES_X / 8, SPI_MANUAL_CS) != 0) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     BSP_EinkWriteCS(BSP_Eink_CS_Set);
@@ -971,11 +1003,12 @@ EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refres
     // the standard GUI coords system to the ED028TC1 one
 
     if (BSP_EinkWriteData(buf, sizeof(buf), SPI_AUTOMATIC_CS) != 0) {
-        return EinkSPIErr;
+        EinkPowerDown();
+        return EinkDMAErr;
     }
 
     if (BSP_EinkWaitUntilDisplayBusy(pdMS_TO_TICKS(BSP_EinkBusyTimeout)) == 0) {
-        return EinkSPIErr;
+        return EinkTimeout;
     }
 
     return EinkOK;

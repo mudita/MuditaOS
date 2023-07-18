@@ -147,7 +147,7 @@ static void s_LPSPI_MasterEdmaCallback(LPSPI_Type *base,
     portEND_SWITCHING_ISR(xHigherPriorityTaskWoken);
 }
 
-status_t BSP_EinkInit(bsp_eink_BusyEvent event)
+status_t BSP_EinkInit()
 {
     if (bsp_eink_IsInitialised) {
         return kStatus_Success;
@@ -288,7 +288,7 @@ status_t BSP_EinkChangeSpiFrequency(std::uint32_t frequencyHz)
     BSP_EINK_LPSPI_BASE->TCR =
         LPSPI_TCR_CPOL(s_eink_lpspi_master_config.cpol) | LPSPI_TCR_CPHA(s_eink_lpspi_master_config.cpha) |
         LPSPI_TCR_LSBF(s_eink_lpspi_master_config.direction) |
-        LPSPI_TCR_FRAMESZ(s_eink_lpspi_master_config.bitsPerFrame - 1) | LPSPI_TCR_PRESCALE(tcrPrescalerValue) |
+        LPSPI_TCR_FRAMESZ(s_eink_lpspi_master_config.bitsPerFrame - 1U) | LPSPI_TCR_PRESCALE(tcrPrescalerValue) |
         LPSPI_TCR_PCS(s_eink_lpspi_master_config.whichPcs);
 
     return 0;
@@ -342,7 +342,6 @@ status_t BSP_EinkWriteData(void *txBuffer, std::uint32_t len, eink_spi_cs_config
         SCB_CleanInvalidateDCache();
         status = LPSPI_MasterTransferEDMA(
             BSP_EINK_LPSPI_EdmaDriverState.resource->base, BSP_EINK_LPSPI_EdmaDriverState.handle, &xfer);
-
         if (status != kStatus_Success) {
             // in case of error just flush transfer complete queue
             xQueueReset(bsp_eink_TransferComplete);
@@ -350,7 +349,6 @@ status_t BSP_EinkWriteData(void *txBuffer, std::uint32_t len, eink_spi_cs_config
             if (cs == SPI_AUTOMATIC_CS) {
                 BSP_EinkWriteCS(BSP_Eink_CS_Set);
             }
-
             return status;
         }
         else {
@@ -359,7 +357,6 @@ status_t BSP_EinkWriteData(void *txBuffer, std::uint32_t len, eink_spi_cs_config
                 if (cs == SPI_AUTOMATIC_CS) {
                     BSP_EinkWriteCS(BSP_Eink_CS_Set);
                 }
-
                 return -1;
             }
         }
@@ -371,7 +368,6 @@ status_t BSP_EinkWriteData(void *txBuffer, std::uint32_t len, eink_spi_cs_config
     if (cs == SPI_AUTOMATIC_CS) {
         BSP_EinkWriteCS(BSP_Eink_CS_Set);
     }
-
     return tx_status;
 }
 

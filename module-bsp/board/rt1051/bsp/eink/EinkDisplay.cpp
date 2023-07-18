@@ -30,6 +30,7 @@ namespace hal::eink
         constexpr auto LUTTemperatureOffsetInterval    = 3;
         constexpr auto LUTTemperatureOffsetSubcritical = 12;
         constexpr auto LUTTemperatureOffsetCritical    = 13;
+        constexpr auto EinkDisplayMaxInitRetries       = 10U;
 
         const auto LutsFilePath = purefs::dir::getAssetsDirPath() / "luts.bin";
 
@@ -399,14 +400,25 @@ namespace hal::eink
 
     EinkStatus EinkDisplay::reinitAndPowerOn()
     {
+        auto errorCounter = 0U;
+        auto status       = EinkStatus::EinkUnknown;
         if (EinkIsPoweredOn()) {
             return EinkStatus::EinkOK;
         }
-        if (resetAndInit() != EinkStatus::EinkOK) {
-            return EinkStatus::EinkError;
+        while (status != EinkStatus::EinkOK && errorCounter++ < EinkDisplayMaxInitRetries) {
+            status = tryReinitAndPowerOn();
         }
-        if (powerOn() != EinkStatus::EinkOK) {
-            return EinkStatus::EinkError;
+
+        return status;
+    }
+
+    EinkStatus EinkDisplay::tryReinitAndPowerOn()
+    {
+        if (const auto status = resetAndInit(); status != EinkStatus::EinkOK) {
+            return status;
+        }
+        if (const auto status = powerOn(); status != EinkStatus::EinkOK) {
+            return status;
         }
         return EinkStatus::EinkOK;
     }

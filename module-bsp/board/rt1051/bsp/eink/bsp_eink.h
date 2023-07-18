@@ -29,7 +29,7 @@ extern "C"
 
     inline constexpr auto BSP_EinkBusyTimeout = 3000U;
 
-    status_t BSP_EinkInit(bsp_eink_BusyEvent event);
+    status_t BSP_EinkInit();
     void BSP_EinkDeinit(void);
 
     void BSP_EinkLogicPowerOn();
