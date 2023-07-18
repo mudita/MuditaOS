@@ -56,8 +56,8 @@ namespace service::eink
     {
         displayPowerOffTimer = sys::TimerFactory::createSingleShotTimer(
             this, "einkDisplayPowerOff", displayPowerOffTimeout, [this](sys::Timer &) {
-                if (display->shutdown() != hal::eink::EinkStatus::EinkOK) {
-                    LOG_ERROR("Error during display powerOff.");
+                if (const auto status = display->shutdown(); status != hal::eink::EinkStatus::EinkOK) {
+                    LOG_ERROR("Error during display powerOff. (%s)", magic_enum::enum_name(status).data());
                 }
                 eInkSentinel->ReleaseMinimumFrequency();
             });
@@ -357,7 +357,6 @@ namespace service::eink
 #endif
 
             eInkSentinel->HoldMinimumFrequency();
-
             const auto status = display->showImageUpdate(updateFrames, ctx.getData());
             if (status == hal::eink::EinkStatus::EinkOK) {
                 isImageUpdated = true;
@@ -415,6 +414,7 @@ namespace service::eink
                 refreshModeSum        = hal::eink::EinkRefreshMode::REFRESH_DEEP;
                 previousRefreshStatus = RefreshStatus::Success;
             }
+
             const auto status = display->showImageRefresh(refreshFramesSum, refreshModeSum);
             if (status != hal::eink::EinkStatus::EinkOK) {
                 previousContext.reset();

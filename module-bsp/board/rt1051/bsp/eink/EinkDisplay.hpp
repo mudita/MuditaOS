@@ -60,6 +60,7 @@ namespace hal::eink
         EinkStatus updateDisplay(EinkFrame frame, const std::uint8_t *frameBuffer);
         EinkStatus refreshDisplay(EinkFrame frame, const EinkRefreshMode refreshMode);
         EinkStatus prepareDisplay(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour);
+        EinkStatus tryReinitAndPowerOn();
 
         FrameSize size;
 

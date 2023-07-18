@@ -567,6 +567,7 @@ bool LPSPI_CheckTransferArgument(lpspi_transfer_t *transfer, uint32_t bitsPerFra
     assert(transfer);
 
     /* If the transfer count is zero, then return immediately.*/
+
     if (transfer->dataSize == 0) {
         return false;
     }
@@ -581,6 +582,7 @@ bool LPSPI_CheckTransferArgument(lpspi_transfer_t *transfer, uint32_t bitsPerFra
      *the transfer data size should be equal to bytesPerFrame if the bytesPerFrame is not integer multiples of 4 ,
      *otherwise , the transfer data size can be integer multiples of bytesPerFrame.
      */
+
     if (bytesPerFrame <= 4) {
         if ((transfer->dataSize % bytesPerFrame) != 0) {
             return false;
