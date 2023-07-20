@@ -1,13 +1,16 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookListView.hpp"
 
 namespace gui
 {
-
-    PhonebookListView::PhonebookListView(
-        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, std::shared_ptr<ListItemProvider> prov)
+    PhonebookListView::PhonebookListView(Item *parent,
+                                         std::uint32_t x,
+                                         std::uint32_t y,
+                                         std::uint32_t w,
+                                         std::uint32_t h,
+                                         std::shared_ptr<ListItemProvider> prov)
         : ListView(parent, x, y, w, h, std::move(prov))
     {}
 
@@ -20,18 +23,28 @@ namespace gui
                 body->addWidget(new PhonebookMarkItem(labelMark));
             }
             break;
+
         case listview::Direction::Top:
             if (currentPageSize == 0) {
                 labelMark = item->getLabelMarker();
-                return;
+                break;
             }
-            else if (labelMark != item->getLabelMarker()) {
-                previousLabelMark = labelMark;
-                labelMark         = item->getLabelMarker();
+
+            if (labelMark != item->getLabelMarker()) {
+                const auto initialSlotsLeft  = getSlotsLeft();
+                const auto previousLabelMark = labelMark;
+                labelMark                    = item->getLabelMarker();
 
                 body->removeWidget(item);
                 body->addWidget(new PhonebookMarkItem(previousLabelMark));
+
+                /* Add item to body even if it won't fit to avoid manual memory
+                 * management for item, but apply correction to currentPageSize
+                 * if it is not visible. */
                 body->addWidget(item);
+                if (initialSlotsLeft == 0) {
+                    currentPageSize--;
+                }
 
                 previousItemIsLabel = true;
             }
@@ -42,50 +55,42 @@ namespace gui
     void PhonebookListView::addItemsOnPage()
     {
         currentPageSize            = 0;
+        labelMark                  = "";
+
         ListItem *item             = nullptr;
         ListItem *previousListItem = nullptr;
-        labelMark                  = "";
-        previousLabelMark          = "";
 
         while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
 
-            // if direction bot add label mark before adding item
+            /* If direction is top-to-bottom, add label mark before adding phonebook item. */
             if (direction == listview::Direction::Bottom) {
                 addLabelMarker(dynamic_cast<gui::PhonebookItem *>(item));
             }
 
-            body->addWidget(item);
-
-            // if added item is not visible -> page is full.
-            if (!item->visible) {
-
-                // if page full and direction top remove last element and add floating label mark on top if there was no
-                // one previously
+            /* Check if new item fits, if it does - add it, if not - handle label insertion
+             * case for bottom-to-top navigation direction. */
+            if (getSlotsLeft() > 0) {
+                body->addWidget(item);
+            }
+            else {
                 if (direction == listview::Direction::Top) {
-
                     if (previousItemIsLabel) {
                         break;
                     }
-                    else {
-
-                        body->erase(item);
-                        body->erase(previousListItem);
-
-                        body->addWidget(new PhonebookMarkItem(labelMark));
-                        currentPageSize--;
-                    }
+                    body->erase(previousListItem);
+                    body->addWidget(new PhonebookMarkItem(labelMark));
+                    currentPageSize--;
                 }
                 break;
             }
 
-            // if direction top add label mark after adding item
+            /* If direction is bottom-to-top, add label mark after adding phonebook item. */
             if (direction == listview::Direction::Top) {
                 previousItemIsLabel = false;
                 addLabelMarker(dynamic_cast<gui::PhonebookItem *>(item));
             }
 
             previousListItem = item;
-
             currentPageSize++;
         }
 
@@ -97,4 +102,9 @@ namespace gui
         }
     }
 
+    std::size_t PhonebookListView::getSlotsLeft()
+    {
+        const auto singleSlotSpace = getProvider()->getMinimalItemSpaceRequired();
+        return body->getPrimarySizeLeft() / singleSlotSpace;
+    }
 } /* namespace gui */

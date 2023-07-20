@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-phonebook/ApplicationPhonebook.hpp>
@@ -20,7 +20,10 @@
 #include <string>
 #include <utility>
 
-const static std::uint32_t phonebookModelTimeout = 1000;
+namespace
+{
+    constexpr auto phonebookModelTimeout = 1000;
+}
 
 PhonebookModel::PhonebookModel(app::ApplicationCommon *app) : DatabaseModel(app), app::AsyncCallbackReceiver{app}
 {}
@@ -103,7 +106,6 @@ auto PhonebookModel::getMinimalItemSpaceRequired() const -> unsigned int
 
 auto PhonebookModel::getItem(gui::Order order) -> gui::ListItem *
 {
-
     const auto contact = getRecord(order);
 
     if (contact == nullptr) {
@@ -169,9 +171,7 @@ auto PhonebookModel::getLabelMarkerDisplayMode(uint32_t posOnList) -> LabelMarke
     if (posOnList < letterMap.favouritesCount) {
         return LabelMarkerDisplayMode::IncludeFavourites;
     }
-    else {
-        return LabelMarkerDisplayMode::IgnoreFavourites;
-    }
+    return LabelMarkerDisplayMode::IgnoreFavourites;
 }
 
 void PhonebookModel::setFilter(std::string filter, const std::uint32_t groupFilter, const std::uint32_t displayMode)

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,7 +13,6 @@
 
 namespace app
 {
-
     template <class T>
     class DatabaseModel
     {
@@ -39,17 +38,15 @@ namespace app
 
             assert(dbRecords.size() <= recordsCount);
 
-            if (!dbRecords.empty()) {
-                for (uint32_t i = 0; i < dbRecords.size(); i++) {
-                    records.push_back(std::make_shared<T>(dbRecords[i]));
-                }
-
-                return true;
-            }
-            else {
-                LOG_WARN("DB is empty");
+            if (dbRecords.empty()) {
+                LOG_INFO("DB is empty");
                 return false;
             }
+
+            for (const auto &dbRecord : dbRecords) {
+                records.push_back(std::make_shared<T>(dbRecord));
+            }
+            return true;
         }
 
         void clear()
@@ -60,24 +57,27 @@ namespace app
 
         std::shared_ptr<T> getRecord(gui::Order order)
         {
-            auto index = 0;
-            if (order == gui::Order::Next) {
+            int index = 0;
+
+            switch (order) {
+            case gui::Order::Next:
                 index = modelIndex;
-
                 modelIndex++;
-            }
-            else if (order == gui::Order::Previous) {
+                break;
+
+            case gui::Order::Previous:
                 index = records.size() - 1 + modelIndex;
-
                 modelIndex--;
+                break;
+
+            default:
+                break;
             }
 
-            if (isIndexValid(index)) {
-                return records[index];
-            }
-            else {
+            if (!isIndexValid(index)) {
                 return nullptr;
             }
+            return records[index];
         }
 
         [[nodiscard]] bool isIndexValid(unsigned int index) const noexcept
@@ -85,5 +85,4 @@ namespace app
             return index < records.size();
         }
     };
-
 } /* namespace app */
