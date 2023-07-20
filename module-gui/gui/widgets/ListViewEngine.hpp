@@ -109,7 +109,7 @@ namespace gui
         [[nodiscard]] unsigned getFocusItemIndex();
 
         /// Total provider elements count
-        unsigned int elementsCount = listview::nPos;
+        unsigned elementsCount = listview::nPos;
         void setElementsCount(unsigned count);
         void onElementsCountChanged(unsigned count);
         bool shouldCallEmptyListCallbacks = false;

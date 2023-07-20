@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCallLog.hpp"
@@ -21,13 +21,19 @@
 
 using namespace calllog;
 
+namespace
+{
+    constexpr auto applicationCallLogStackSize = 1024 * 7;
+}
+
 namespace app
 {
     ApplicationCallLog::ApplicationCallLog(std::string name,
                                            std::string parent,
                                            StatusIndicators statusIndicators,
                                            StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, 5120)
+        : Application(
+              std::move(name), std::move(parent), statusIndicators, startInBackground, applicationCallLogStackSize)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         addActionReceiver(manager::actions::ShowCallLog, [this](auto &&data) {
