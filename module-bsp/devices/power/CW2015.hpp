@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,7 +10,7 @@
 
 namespace bsp::devices::power
 {
-    /// MP2639B fuel gauge driver
+    /// CW2015 fuel gauge driver
     /// To enable interrupts support call \ref init_irq_pin and then invoke \ref handle_irq in the corresponding IRQ
     /// routine.
     class CW2015

@@ -13,6 +13,7 @@
 * Fixed problem with displaying some filenames in Relaxation
 * Fixed disabling the alarm on the system shutdown screen
 * Fixed "Next alarm will ring in 24h" popup on shutdown screen
+* Fixed problem with charging the device after powering on
 
 ### Added
 

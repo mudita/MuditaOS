@@ -1,15 +1,17 @@
 // Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "MP2639B.hpp"
+#include "MP2615GQ.hpp"
+
+#include <log/log.hpp>
 
 namespace bsp::devices::power
 {
-    MP2639B::MP2639B(const Configuration &conf) : configuration{conf}
+    MP2615GQ::MP2615GQ(const Configuration &conf) : configuration{conf}
     {
         irq_filter_timer =
             xTimerCreate("irq_charger_filter", pdMS_TO_TICKS(50), pdFALSE, this, [](TimerHandle_t xTimer) {
-                MP2639B *inst = static_cast<MP2639B *>(pvTimerGetTimerID(xTimer));
+                MP2615GQ *inst = static_cast<MP2615GQ *>(pvTimerGetTimerID(xTimer));
                 /// Charging disable is done automatically if the conditions are met.
                 if (not inst->is_valid_voltage()) {
                     inst->enable_charging(false);
@@ -30,7 +32,7 @@ namespace bsp::devices::power
         enable_charging(false);
     }
 
-    MP2639B::~MP2639B()
+    MP2615GQ::~MP2615GQ()
     {
         xTimerDelete(irq_filter_timer, pdMS_TO_TICKS(100));
         configuration.chgok_gpio->DisableInterrupt(1 << configuration.chgok_pin);
@@ -38,7 +40,7 @@ namespace bsp::devices::power
 
         enable_charging(false);
     }
-    MP2639B::ChargingStatus MP2639B::get_charge_status()
+    MP2615GQ::ChargingStatus MP2615GQ::get_charge_status()
     {
         /// For more info, please refer to the Table 1 "Charging Status Indication" in reference manual.
 
@@ -58,7 +60,7 @@ namespace bsp::devices::power
         }
         return status;
     }
-    void MP2639B::enable_charging(bool ctrl)
+    void MP2615GQ::enable_charging(bool ctrl)
     {
         if (ctrl) {
             configuration.mode_gpio->WritePin(configuration.mode_pin, 0);
@@ -67,7 +69,7 @@ namespace bsp::devices::power
             configuration.mode_gpio->WritePin(configuration.mode_pin, 1);
         }
     }
-    void MP2639B::enable_irq()
+    void MP2615GQ::enable_irq()
     {
         drivers::DriverGPIOPinParams ACOKPinConfig{};
         ACOKPinConfig.dir      = drivers::DriverGPIOPinParams::Direction::Input;
@@ -87,23 +89,23 @@ namespace bsp::devices::power
         configuration.acok_gpio->EnableInterrupt(1U << configuration.acok_pin);
     }
 
-    void MP2639B::handle_irq()
+    void MP2615GQ::handle_irq()
     {
         if (xTimerIsTimerActive(irq_filter_timer) == pdFALSE) {
             xTimerStart(irq_filter_timer, pdMS_TO_TICKS(500));
         }
     }
-    bool MP2639B::is_charging_enabled() const
+    bool MP2615GQ::is_charging_enabled() const
     {
         return configuration.mode_gpio->ReadPin(configuration.mode_pin) == 0;
     }
-    bool MP2639B::is_valid_voltage() const
+    bool MP2615GQ::is_valid_voltage() const
     {
         /// ACOK -> Valid Input Supply Indicator. A logic Low on this pin indicates the presence of a valid input power
         /// supply.
         return configuration.acok_gpio->ReadPin(configuration.acok_pin) == 0;
     }
-    bool MP2639B::is_charging() const
+    bool MP2615GQ::is_charging() const
     {
         /// CHGOK -> Charging Completion Indicator. A logic Low indicates charging operation. The pin will become an
         /// open drain once the charge is completed or suspended.
