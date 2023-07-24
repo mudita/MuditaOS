@@ -1,21 +1,22 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#pragma once
+#ifndef PUREPHONE_CPUFREQLPM_HPP
+#define PUREPHONE_CPUFREQLPM_HPP
 
 #include <cstdint>
 
 namespace bsp
 {
-    inline constexpr std::uint32_t VDDRun_975_mV  = 0x07;
-    inline constexpr std::uint32_t VDDRun_1050_mV = 0x0A;
-    inline constexpr std::uint32_t VDDRun_1075_mV = 0x0B;
-    inline constexpr std::uint32_t VDDRun_1100_mV = 0x0C;
-    inline constexpr std::uint32_t VDDRun_1125_mV = 0x0D;
-    inline constexpr std::uint32_t VDDRun_1150_mV = 0x0E;
-    inline constexpr std::uint32_t VDDRun_1275_mV = 0x13;
+    inline constexpr uint32_t VDDRun_900_mV  = 0x4;
+    inline constexpr uint32_t VDDRun_1050_mV = 0xa;
+    inline constexpr uint32_t VDDRun_1075_mV = 0xb;
+    inline constexpr uint32_t VDDRun_1100_mV = 0xc;
+    inline constexpr uint32_t VDDRun_1125_mV = 0xd;
+    inline constexpr uint32_t VDDRun_1150_mV = 0xe;
+    inline constexpr uint32_t VDDRun_1275_mV = 0x13;
 
-    inline constexpr std::uint32_t VDDStandby_925_mV = 0x01;
+    inline constexpr uint32_t VDDStandby_925_mV = 0x1;
 
     class CpuFreqLPM
     {
@@ -37,3 +38,4 @@ namespace bsp
     };
 } // namespace bsp
 
+#endif // PUREPHONE_CPUFREQLPM_HPP
