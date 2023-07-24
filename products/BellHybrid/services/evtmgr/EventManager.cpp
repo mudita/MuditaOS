@@ -39,7 +39,7 @@ namespace
 }
 
 EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &name)
-    : EventManagerCommon(std::move(logDumpFunction),
+    : EventManagerCommon(logDumpFunction,
                          {.battery{.critical = constants::criticalThreshold, .shutdown = constants::shutdownThreshold},
                           .voltage{.shutdown            = constants::shutdownVoltageThreshold,
                                    .measurementMaxCount = constants::measurementThreshold}},

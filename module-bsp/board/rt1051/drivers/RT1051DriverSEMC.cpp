@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverSEMC.hpp"
@@ -22,7 +22,7 @@ namespace drivers
     void RT1051DriverSEMC::SwitchToPLL2ClockSource()
     {
         cpp_freertos::CriticalSection::Enter();
-        if (pll2Driver == nullptr) {
+        if (!pll2Driver) {
             pll2Driver = std::make_shared<RT1051DriverPLL2>();
         }
         CLOCK_SetMux(kCLOCK_SemcMux, SemcMuxPLL2Clock);
