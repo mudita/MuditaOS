@@ -16,8 +16,12 @@ namespace bsp
         int32_t PowerOff() final;
         int32_t Reboot(RebootType reason) final;
         void SetCpuFrequency(CpuFrequencyMHz freq) final;
+        void SetHighestCoreVoltage() final;
         [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
+
+        void DisconnectInternalLoadResistor() final;
+        void ConnectInternalLoadResistor() final;
 
         void RegularLDOMode();
         void LowPowerLDOMode();

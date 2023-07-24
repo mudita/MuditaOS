@@ -179,11 +179,8 @@ namespace bsp
         //        SNVS->LPGPR[0] = rebootCode::rebootFailedToBoot;
         // TODO: Here we can implement boot-time fail detection
 
-        // Set internal DCDC to CCM mode, DCM is allowed ONLY in low power modes (see AN12085, 5.3.9, p.33)
-        DCDC_BootIntoCCM(DCDC);
-
-        // Disconnect DCDC internal load resistor
-        DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
+        // Set internal DCDC to DCM mode. Switching between DCM and CCM mode will be done automatically.
+        DCDC_BootIntoDCM(DCDC);
 
         PrintSystemClocks();
         clearAndPrintBootReason();

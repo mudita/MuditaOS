@@ -8,7 +8,13 @@
 namespace bsp
 {
     inline constexpr std::uint32_t VDDRun_950_mV  = 0x06;
+    inline constexpr std::uint32_t VDDRun_975_mV  = 0x07;
+    inline constexpr std::uint32_t VDDRun_1050_mV = 0x0A;
+    inline constexpr std::uint32_t VDDRun_1075_mV = 0x0B;
+    inline constexpr std::uint32_t VDDRun_1100_mV = 0x0C;
+    inline constexpr std::uint32_t VDDRun_1125_mV = 0x0D;
     inline constexpr std::uint32_t VDDRun_1150_mV = 0x0E;
+    inline constexpr std::uint32_t VDDRun_1275_mV = 0x13;
 
     inline constexpr std::uint32_t VDDStandby_925_mV = 0x01;
 
@@ -47,5 +53,6 @@ namespace bsp
 
         CpuFreqLPM();
         void SetCpuFrequency(CpuClock freq);
+        void SetHighestCoreVoltage();
     };
 } // namespace bsp
