@@ -165,6 +165,7 @@ void EventManager::buildKeySequences()
 
     auto powerOffSeq      = std::make_unique<PowerOffSequence>(*this);
     powerOffSeq->onAction = [this]() {
+        backlightHandler.handleScreenLight(backlight::Type::Frontlight);
         app::manager::Controller::sendAction(
             this, app::manager::actions::ShowPopup, std::make_unique<PowerOffPopupRequestParams>());
     };
