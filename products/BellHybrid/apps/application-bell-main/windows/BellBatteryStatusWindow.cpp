@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellBatteryStatusWindow.hpp"
@@ -13,6 +13,8 @@
 
 namespace
 {
+    using namespace std::chrono_literals;
+
     constexpr auto imageType = gui::ImageTypeSpecifier::W_G;
     constexpr auto batteryEntries =
         std::array<battery_utils::BatteryLevelEntry, 6>{{{{0, 9}, "bell_status_battery_lvl0"},
@@ -21,13 +23,16 @@ namespace
                                                          {{40, 69}, "bell_status_battery_lvl3"},
                                                          {{70, 95}, "bell_status_battery_lvl4"},
                                                          {{96, 100}, "bell_status_battery_lvl5"}}};
+    // this time must be longer than the long press time (10s) to turn off the system
+    constexpr auto windowLongTimeout{12s};
+    // default screen timeout
+    constexpr auto windowDefaultTimeout{3s};
 } // namespace
 
 namespace gui
 {
-    using namespace std::chrono_literals;
-
-    BellBatteryStatusWindow::BellBatteryStatusWindow(app::ApplicationCommon *app) : WindowWithTimer{app, name, 5s}
+    BellBatteryStatusWindow::BellBatteryStatusWindow(app::ApplicationCommon *app)
+        : WindowWithTimer{app, name, windowLongTimeout}
     {
         buildInterface();
     }
@@ -88,6 +93,19 @@ namespace gui
             application->returnToPreviousWindow();
             return true;
         }
+        else if (inputEvent.getKeyCode() == KeyCode::KEY_RF) {
+            if (inputEvent.isLongRelease()) {
+                // here the "back" button is held all the time, so we set the screen timeout to a long time
+                // to stay on this screen until the system shutdown popup is displayed
+                resetTimer(windowLongTimeout);
+            }
+            else {
+                // here the "back" button is released, so we set the screen timeout to the default time
+                resetTimer(windowDefaultTimeout);
+            }
+            return true;
+        }
+
         return false;
     }
     void BellBatteryStatusWindow::onBeforeShow(ShowMode mode, SwitchData *data)
@@ -104,5 +122,9 @@ namespace gui
             }
         }
         WindowWithTimer::onBeforeShow(mode, data);
+    }
+    void BellBatteryStatusWindow::onClose(CloseReason reason)
+    {
+        application->popCurrentWindow();
     }
 } // namespace gui

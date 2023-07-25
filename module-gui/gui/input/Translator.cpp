@@ -161,7 +161,6 @@ namespace gui
             return gui::KeyCode::HEADSET_OK;
 
         case bsp::KeyCodes::HeadsetVolUp:
-            void resetPreviousKeyPress();
             return gui::KeyCode::HEADSET_VOLUP;
 
         case bsp::KeyCodes::HeadsetVolDown:
