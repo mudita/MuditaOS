@@ -35,6 +35,33 @@ namespace gui
                                     listview::ScrollBarType::Proportional);
         smsList->setOrientation(listview::Orientation::BottomTop);
 
+        // Text for Old Messages
+        oldMessagesText = new gui::Text(this, 0, 0, 0, 0, ExpandMode::None);
+        oldMessagesText->setText(utils::translate("app_messages_old_messages"));
+        oldMessagesText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        oldMessagesText->setMaximumSize(style::window::default_body_width, style::messages::oldSmsLabel::h);
+        oldMessagesText->setFont(style::window::font::verysmall);
+
+        // Arrow sign for Old Messages
+        oldMessagesArrow = new gui::Image("old_messages_arrow_24px_W_M");
+
+        // HBox for Old Messages
+        oldMessagesHBox = new gui::HBox(this,
+                                        style::messages::oldSmsLabel::x,
+                                        style::messages::oldSmsLabel::y,
+                                        style::messages::oldSmsLabel::w,
+                                        style::messages::oldSmsLabel::h);
+        oldMessagesHBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        oldMessagesHBox->setEdges(gui::RectangleEdge::None);
+        oldMessagesHBox->addWidget(oldMessagesText);
+        oldMessagesHBox->addWidget(oldMessagesArrow);
+        oldMessagesHBox->visible = false;
+
+        // Set callback to switch on/off visible of Old Message Label
+        smsList->onElementsAboveOfCurrentPageChangeCallback = [this](const signed int elementsAboveOfCurrentPageCount) {
+            oldMessagesHBox->visible = (elementsAboveOfCurrentPageCount > 0);
+        };
+
         setFocusItem(smsList);
     }
 

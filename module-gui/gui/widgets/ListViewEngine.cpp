@@ -154,7 +154,7 @@ namespace gui
 
         if (direction == listview::Direction::Top) {
             const int position = currentPageSize - 1 - index;
-            index        = std::abs(position);
+            index              = std::abs(position);
         }
 
         return index;
@@ -229,6 +229,8 @@ namespace gui
             rebuildRequests.pop_back();
             rebuildList(request.first, request.second);
         }
+
+        updateCountOfElementsAboveCurrentPage();
 
         fillFirstPage();
     }
@@ -382,6 +384,8 @@ namespace gui
                 }
             }
 
+            updateCountOfElementsAboveCurrentPage();
+
             reSendLastRebuildRequest();
             return false;
         }
@@ -438,7 +442,7 @@ namespace gui
             const unsigned diff = currentPageSize < body->getVisibleChildrenCount()
                                       ? 0
                                       : currentPageSize - body->getVisibleChildrenCount();
-            currentPageSize   = body->getVisibleChildrenCount();
+            currentPageSize     = body->getVisibleChildrenCount();
 
             if (direction == listview::Direction::Top) {
                 startIndex += diff;
@@ -537,5 +541,13 @@ namespace gui
         provider->requestRecords(topFetchIndex, limit);
 
         return true;
+    }
+
+    void ListViewEngine::updateCountOfElementsAboveCurrentPage()
+    {
+        unsigned countOfElementsAboveCurrentPage = startIndex;
+        if (onElementsAboveOfCurrentPageChangeCallback) {
+            onElementsAboveOfCurrentPageChangeCallback(countOfElementsAboveCurrentPage);
+        }
     }
 } /* namespace gui */

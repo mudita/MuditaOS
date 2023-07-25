@@ -200,6 +200,11 @@ namespace gui
         [[nodiscard]] bool isEmpty() const noexcept;
         std::function<void()> emptyListCallback;
         std::function<void()> notEmptyListCallback;
+
+        /// Update the number of items above the current page
+        void updateCountOfElementsAboveCurrentPage();
+        /// Callback on update the number of items above the current page
+        std::function<void(const unsigned elementsAboveOfCurrentPageCount)> onElementsAboveOfCurrentPageChangeCallback;
     };
 
 } /* namespace gui */
