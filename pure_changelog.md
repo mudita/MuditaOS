@@ -20,6 +20,7 @@
 * Fixed scenario when Alarm not being handled properly during a phone call
 * Fixed handsfree device still ringing after caller has hung up
 * Fixed missing contact entries when scrolling through the contact list
+* Fixed misunderstanding holes in sms conversations
 
 ## [1.7.2 2023-07-28]
 

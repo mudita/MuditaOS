@@ -20,7 +20,10 @@ namespace gui
     {
       private:
         std::shared_ptr<SMSThreadModel> smsModel;
-        gui::ListView *smsList = nullptr;
+        gui::ListView *smsList       = nullptr;
+        gui::HBox *oldMessagesHBox   = nullptr;
+        gui::Text *oldMessagesText   = nullptr;
+        gui::Image *oldMessagesArrow = nullptr;
 
         void requestContact(unsigned int numberID);
         bool handleContactQueryResponse(db::QueryResult *);

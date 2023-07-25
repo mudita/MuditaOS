@@ -106,6 +106,14 @@ namespace style
             inline constexpr uint32_t w = style::listview::body_width_with_scroll;
         } // namespace smsList
 
+        namespace oldSmsLabel
+        {
+            inline constexpr std::uint32_t x = style::messages::smsList::x;
+            inline constexpr std::uint32_t y = style::messages::smsList::y;
+            inline constexpr std::uint32_t h = 25;
+            inline constexpr std::uint32_t w = style::messages::smsList::w;
+        } // namespace oldSmsLabel
+
         namespace templates
         {
             namespace list
