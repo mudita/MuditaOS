@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "popups/BellTurnOffOptionWindow.hpp"
@@ -12,6 +12,14 @@
 #include <options/OptionBellMenu.hpp>
 #include <service-appmgr/Constants.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
+#include <GuiTimer.hpp>
+
+namespace
+{
+    using namespace std::chrono_literals;
+    constexpr auto windowTimeout{10s};
+    constexpr auto timerName{"BellTurnOffPopupTimer"};
+} // namespace
 
 namespace gui
 {
@@ -20,6 +28,15 @@ namespace gui
     {
         addOptions(settingsOptionsList());
         setListTitle(utils::translate("app_bell_turn_off_question"));
+
+        popupTimer    = app::GuiTimerFactory::createSingleShotTimer(application, this, timerName, windowTimeout);
+        timerCallback = [this, name](Item &, sys::Timer &timer) {
+            if (application->getCurrentWindow()->getName() == name) {
+                application->returnToPreviousWindow();
+                return true;
+            }
+            return false;
+        };
     }
 
     std::list<Option> BellTurnOffOptionWindow::settingsOptionsList()
@@ -42,5 +59,20 @@ namespace gui
         });
 
         return settingsOptionList;
+    }
+
+    void BellTurnOffOptionWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        if (popupTimer.isValid()) {
+            popupTimer.start();
+        }
+    }
+
+    void BellTurnOffOptionWindow::onClose([[maybe_unused]] CloseReason reason)
+    {
+        if (popupTimer.isValid()) {
+            popupTimer.stop();
+            popupTimer.reset(nullptr);
+        }
     }
 } /* namespace gui */
