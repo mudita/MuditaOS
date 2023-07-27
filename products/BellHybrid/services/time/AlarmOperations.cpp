@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <time/AlarmOperations.hpp>
@@ -224,6 +224,17 @@ namespace alarms
         return event;
     }
 
+    void AlarmOperations::turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)
+    {
+        auto nextEvent = getNextPreWakeUpEvent();
+        if (nextEvent.isValid()) {
+            if (auto event = std::dynamic_pointer_cast<AlarmEventRecord>(nextEvent.parent); event) {
+                disablePreWakeUp(event);
+            }
+        }
+        AlarmOperationsCommon::turnOffRingingAlarm(id, callback);
+    }
+
     void AlarmOperations::handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision)
     {
         if (auto alarmEventPtr = std::dynamic_pointer_cast<AlarmEventRecord>(event.parent); alarmEventPtr) {
@@ -234,6 +245,12 @@ namespace alarms
                 handleAlarmEvent(alarmEventPtr, alarms::AlarmType::PreWakeUpFrontlight, true);
             }
         }
+    }
+
+    auto AlarmOperations::disablePreWakeUp(const std::shared_ptr<AlarmEventRecord> &event) -> void
+    {
+        AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
+        AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
     }
 
     bool AlarmOperations::processSnoozeChime(TimePoint now)
@@ -279,9 +296,7 @@ namespace alarms
         if (alarmType != alarms::AlarmType::Clock) {
             return;
         }
-
-        handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
-        handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
+        disablePreWakeUp(event);
     }
     bool AlarmOperations::isBedtimeAllowed() const
     {
@@ -293,8 +308,7 @@ namespace alarms
                                            bool newStateOn)
     {
         if (newStateOn && alarmType == alarms::AlarmType::Clock) {
-            AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
-            AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
+            disablePreWakeUp(event);
         }
         AlarmOperationsCommon::handleAlarmEvent(event, alarmType, newStateOn);
     }

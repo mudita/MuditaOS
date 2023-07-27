@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -105,9 +105,11 @@ namespace alarms
 
         SingleEventRecord getNextPreWakeUpEvent();
         void handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
+        void disablePreWakeUp(const std::shared_ptr<AlarmEventRecord> &event);
         void handleSnoozeChime(const SingleEventRecord &event, bool newStateOn);
         void handleBedtime(const SingleEventRecord &event, bool decision);
         void processBedtime(TimePoint now);
+        void turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback) override;
         void onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event, alarms::AlarmType alarmType) override;
         void handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
                               alarms::AlarmType alarmType,
