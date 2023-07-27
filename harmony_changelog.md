@@ -14,6 +14,7 @@
 * Fixed disabling the alarm on the system shutdown screen
 * Fixed "Next alarm will ring in 24h" popup on shutdown screen
 * Fixed redundant clock face display while shutting down Harmony
+* Fixed problem with disabling the frontlight in pre-wake up
 
 ### Added
 
