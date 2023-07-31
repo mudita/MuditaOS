@@ -319,4 +319,6 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
      */
     auto changeNumberRecordInPlaceIfCountryCodeIsOnlyDifferent(const std::vector<std::uint32_t> &oldNumberIDs,
                                                                std::vector<ContactRecord::Number> &newNumbers) -> bool;
+
+    auto hasContactRecordSameNumbers(const ContactRecord &rec) -> bool;
 };

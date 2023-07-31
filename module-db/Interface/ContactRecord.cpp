@@ -35,6 +35,15 @@ ContactRecordInterface::ContactRecordInterface(ContactsDB *db)
 
 auto ContactRecordInterface::Add(ContactRecord &rec) -> bool
 {
+    if (rec.numbers.size() > 2) {
+        LOG_WARN("Contact has more than 2 numbers");
+    }
+
+    if (hasContactRecordSameNumbers(rec)) {
+        LOG_ERROR("New record can not have 2 same numbers");
+        return false;
+    }
+
     bool result = contactDB->contacts.add(ContactsTableRow{Record(DB_ID_NONE), .speedDial = rec.speeddial});
     if (!result) {
         return false;
@@ -125,6 +134,10 @@ auto ContactRecordInterface::RemoveByID(uint32_t id) -> bool
 
 auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
 {
+    if (rec.numbers.size() > 2) {
+        LOG_WARN("Contact has more than 2 numbers");
+    }
+
     ContactsTableRow contact = contactDB->contacts.getByIdWithTemporary(rec.ID);
     if (!contact.isValid()) {
         return false;
@@ -132,6 +145,12 @@ auto ContactRecordInterface::Update(const ContactRecord &rec) -> bool
 
     auto oldNumberIDs = splitNumberIDs(contact.numbersID);
     auto newNumbers   = rec.numbers;
+
+    if (hasContactRecordSameNumbers(rec)) {
+        LOG_ERROR("Updated record can not have 2 same numbers");
+        return false;
+    }
+
     if (!changeNumberRecordInPlaceIfCountryCodeIsOnlyDifferent(oldNumberIDs, newNumbers)) {
         return false;
     }
@@ -1594,4 +1613,25 @@ auto ContactRecordInterface::changeNumberRecordInPlaceIfCountryCodeIsOnlyDiffere
         }
     }
     return true;
+}
+auto ContactRecordInterface::hasContactRecordSameNumbers(const ContactRecord &rec) -> bool
+{
+    if (rec.numbers.size() >= 2) {
+        if (rec.numbers.size() > 2) {
+            LOG_WARN("Contact record has more than 2 numbers. Checking similarity for first 2 numbers only");
+        }
+        utils::PhoneNumber firstPhoneNumber(rec.numbers.at(0).number);
+        utils::PhoneNumber secondPhoneNumber(rec.numbers.at(1).number);
+
+        utils::PhoneNumber::Match matchLevel = firstPhoneNumber.match(secondPhoneNumber);
+
+        switch (matchLevel) {
+        case utils::PhoneNumber::Match::EXACT:
+        case utils::PhoneNumber::Match::POSSIBLE:
+            return true;
+        default:
+            return false;
+        }
+    }
+    return false;
 }
