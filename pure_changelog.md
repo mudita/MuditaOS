@@ -20,6 +20,12 @@
 * Fixed handsfree device still ringing after caller has hung up
 * Fixed missing contact entries when scrolling through the contact list
 
+## [1.7.2 2023-07-28]
+
+### Fixed
+
+* Fixed issue with frequent crashes on some devices that appeared in MuditaOS 1.7.1.
+
 ## [1.7.1 2023-07-13]
 
 ### Added
