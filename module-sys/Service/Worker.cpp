@@ -265,9 +265,16 @@ namespace sys
     {
         assert(getState() == State::Running || getState() == State::Stopped);
         if (xSemaphoreTake(joinSemaphore, timeout) != pdTRUE) {
+            LOG_ERROR("Failed to take semaphore!");
             return false;
         }
-        while (eTaskGetState(taskHandle) != eDeleted) {}
+        const auto waitDeleteTaskTick = xTaskGetTickCount();
+        while (eTaskGetState(taskHandle) != eDeleted) {
+            if ((xTaskGetTickCount() - waitDeleteTaskTick) > timeout) {
+                LOG_ERROR("Task waiting aborted (timeout). TaskState != eDeleted");
+                return false;
+            }
+        }
         return true;
     }
 
