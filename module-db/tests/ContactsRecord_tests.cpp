@@ -767,7 +767,6 @@ TEST_CASE("Check replacement of number in place in db when only different is hav
 
     // Preparation of DB initial state
     auto records = ContactRecordInterface(&contactsDb.get());
-    ContactRecord testContactRecord;
 
     std::array<std::string, 2> numbers   = {{{"500600100"}, {"500600200"}}};
     std::array<std::string, 2> numbersPL = {{{"+48500600100"}, {"+48500600200"}}}; // Poland country code
@@ -922,5 +921,255 @@ TEST_CASE("Check replacement of number in place in db when only different is hav
         // Check number table
         REQUIRE(contactsDb.get().number.getById(FIRST_CONTACT_ID).numberUser == numbersPL[0]);
         REQUIRE(contactsDb.get().number.getById(SECOND_NEW_CONTACT_ID).numberUser == numbersFR[0]);
+    }
+}
+
+TEST_CASE("Check if contact can have 2 similar number (exactly the same or just with/with no country code))")
+{
+    db::tests::DatabaseUnderTest<ContactsDB> contactsDb{"contacts.db", db::tests::getPurePhoneScriptsPath()};
+
+    // Preparation of DB initial state
+    auto records = ContactRecordInterface(&contactsDb.get());
+
+    std::string number                 = "500600100";
+    std::string numberPL               = "+48500600100"; // Poland country code
+    constexpr int32_t FIRST_CONTACT_ID = 1;
+
+    SECTION("Add a new contact with 2 exactly the same number (without country code)")
+    {
+        // Adding of normal contact with 2 exactly the same numbers
+        ContactRecord noTempContactRecordExactlySameNumbers;
+        noTempContactRecordExactlySameNumbers.primaryName     = "PrimaryNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.alternativeName = "AlternativeNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(number, std::string(""), ContactNumberType::HOME),
+            ContactRecord::Number(number, std::string(""), ContactNumberType::HOME),
+        });
+
+        REQUIRE(records.Add(noTempContactRecordExactlySameNumbers) ==
+                false);                                // Try to add contact witch the same numbers
+        REQUIRE(contactsDb.get().number.count() == 0); // There should be no contact
+
+        // No new contact
+        auto validationRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        // No new temporary contact
+        validationRecord = records.GetByIdWithTemporary(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+    }
+
+    SECTION("Add a new contact with 2 exactly the same number (with country code)")
+    {
+        // Adding of normal contact with 2 exactly the same numbers
+        ContactRecord noTempContactRecordExactlySameNumbers;
+        noTempContactRecordExactlySameNumbers.primaryName     = "PrimaryNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.alternativeName = "AlternativeNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numberPL, std::string(""), ContactNumberType::HOME),
+            ContactRecord::Number(numberPL, std::string(""), ContactNumberType::HOME),
+        });
+
+        REQUIRE(records.Add(noTempContactRecordExactlySameNumbers) ==
+                false);                                // Try to add contact witch the same numbers
+        REQUIRE(contactsDb.get().number.count() == 0); // There should be no contact
+
+        // No new contact
+        auto validationRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        // No new temporary contact
+        validationRecord = records.GetByIdWithTemporary(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+    }
+
+    SECTION("Add a new contact with 2 same numbers but one with country code and one without")
+    {
+        // Adding of normal contact with 2 same numbers
+        ContactRecord noTempContactRecordExactlySameNumbers;
+        noTempContactRecordExactlySameNumbers.primaryName     = "PrimaryNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.alternativeName = "AlternativeNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.numbers         = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(number, std::string(""), ContactNumberType::HOME),
+            ContactRecord::Number(numberPL, std::string(""), ContactNumberType::HOME),
+        });
+
+        REQUIRE(records.Add(noTempContactRecordExactlySameNumbers) ==
+                false);                                // Try to add contact witch the same numbers
+        REQUIRE(contactsDb.get().number.count() == 0); // There should be no contact
+
+        // No new contact
+        auto validationRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        // No new temporary contact
+        validationRecord = records.GetByIdWithTemporary(FIRST_CONTACT_ID);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+    }
+
+    SECTION("Update contact to contact with 2 exactly same numbers (without country code)")
+    {
+        // Adding of normal contact with
+        ContactRecord noTempContactRecordExactlySameNumbers;
+        noTempContactRecordExactlySameNumbers.primaryName     = "PrimaryNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.alternativeName = "AlternativeNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.numbers         = std::vector<ContactRecord::Number>(
+            {ContactRecord::Number(number, std::string(""), ContactNumberType::HOME)});
+
+        // Add normal valid contact and check it
+        REQUIRE(records.Add(noTempContactRecordExactlySameNumbers) == true);
+        REQUIRE(contactsDb.get().number.count() == 1); // There should be no contact
+        auto normalContactRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(normalContactRecord.numbers.size() == 1);
+        REQUIRE(normalContactRecord.numbers[0].number.getEntered() == number); // without country code
+
+        // Update contact to contact with the same numers
+        auto recordToUpdate    = records.GetByID(FIRST_CONTACT_ID);
+        recordToUpdate.numbers = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(number, std::string(""), ContactNumberType::HOME),
+            ContactRecord::Number(number, std::string(""), ContactNumberType::HOME),
+        });
+        REQUIRE(records.Update(recordToUpdate) == false);
+
+        // Check contact record after Update
+        auto recordAfterUpdate = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(recordAfterUpdate.numbers.size() == 1);
+        REQUIRE(recordAfterUpdate.numbers[0].number.getEntered() == number); // without country code
+
+        // No new contact
+        auto validationRecord = records.GetByID(FIRST_CONTACT_ID + 1);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        // No new temporary contact
+        validationRecord = records.GetByIdWithTemporary(FIRST_CONTACT_ID + 1);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+    }
+
+    SECTION("Update contact to contact with 2 exactly same numbers (with country code)")
+    {
+        // Adding of normal contact
+        ContactRecord noTempContactRecordExactlySameNumbers;
+        noTempContactRecordExactlySameNumbers.primaryName     = "PrimaryNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.alternativeName = "AlternativeNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.numbers         = std::vector<ContactRecord::Number>(
+            {ContactRecord::Number(numberPL, std::string(""), ContactNumberType::HOME)});
+
+        // Add normal valid contact and check it
+        REQUIRE(records.Add(noTempContactRecordExactlySameNumbers) == true);
+        REQUIRE(contactsDb.get().number.count() == 1); // There should be no contact
+        auto normalContactRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(normalContactRecord.numbers.size() == 1);
+        REQUIRE(normalContactRecord.numbers[0].number.getEntered() == numberPL); // without country code
+
+        // Update contact to contact with the same numbers
+        auto recordToUpdate    = records.GetByID(FIRST_CONTACT_ID);
+        recordToUpdate.numbers = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numberPL, std::string(""), ContactNumberType::HOME),
+            ContactRecord::Number(numberPL, std::string(""), ContactNumberType::HOME),
+        });
+        REQUIRE(records.Update(recordToUpdate) == false);
+
+        // Check contact record after Update
+        auto recordAfterUpdate = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(recordAfterUpdate.numbers.size() == 1);
+        REQUIRE(recordAfterUpdate.numbers[0].number.getEntered() == numberPL); // without country code
+
+        // No new contact
+        auto validationRecord = records.GetByID(FIRST_CONTACT_ID + 1);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        // No new temporary contact
+        validationRecord = records.GetByIdWithTemporary(FIRST_CONTACT_ID + 1);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+    }
+
+    SECTION("Update contact to contact with 2 same numbers but one without country code and new with country code")
+    {
+        // Adding of normal contact
+        ContactRecord noTempContactRecordExactlySameNumbers;
+        noTempContactRecordExactlySameNumbers.primaryName     = "PrimaryNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.alternativeName = "AlternativeNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.numbers         = std::vector<ContactRecord::Number>(
+            {ContactRecord::Number(number, std::string(""), ContactNumberType::HOME)});
+
+        // Add normal valid contact and check it
+        REQUIRE(records.Add(noTempContactRecordExactlySameNumbers) == true);
+        REQUIRE(contactsDb.get().number.count() == 1); // There should be no contact
+        auto normalContactRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(normalContactRecord.numbers.size() == 1);
+        REQUIRE(normalContactRecord.numbers[0].number.getEntered() == number); // without country code
+
+        // Update contact to contact with the same numbers
+        auto recordToUpdate    = records.GetByID(FIRST_CONTACT_ID);
+        recordToUpdate.numbers = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(number, std::string(""), ContactNumberType::HOME),
+            ContactRecord::Number(numberPL, std::string(""), ContactNumberType::HOME),
+        });
+        REQUIRE(records.Update(recordToUpdate) == false);
+
+        // Check contact record after Update
+        auto recordAfterUpdate = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(recordAfterUpdate.numbers.size() == 1);
+        REQUIRE(recordAfterUpdate.numbers[0].number.getEntered() == number); // without country code
+
+        // No new contact
+        auto validationRecord = records.GetByID(FIRST_CONTACT_ID + 1);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        // No new temporary contact
+        validationRecord = records.GetByIdWithTemporary(FIRST_CONTACT_ID + 1);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+    }
+
+    SECTION("Update contact to contact with 2 same numbers but one with country code and new without")
+    {
+        // Adding of normal contact
+        ContactRecord noTempContactRecordExactlySameNumbers;
+        noTempContactRecordExactlySameNumbers.primaryName     = "PrimaryNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.alternativeName = "AlternativeNameNoTemporary";
+        noTempContactRecordExactlySameNumbers.numbers         = std::vector<ContactRecord::Number>(
+            {ContactRecord::Number(numberPL, std::string(""), ContactNumberType::HOME)});
+
+        // Add normal valid contact and check it
+        REQUIRE(records.Add(noTempContactRecordExactlySameNumbers) == true);
+        REQUIRE(contactsDb.get().number.count() == 1); // There should be no contact
+        auto normalContactRecord = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(normalContactRecord.numbers.size() == 1);
+        REQUIRE(normalContactRecord.numbers[0].number.getEntered() == numberPL); // without country code
+
+        // Update contact to contact with the same numbers
+        auto recordToUpdate    = records.GetByID(FIRST_CONTACT_ID);
+        recordToUpdate.numbers = std::vector<ContactRecord::Number>({
+            ContactRecord::Number(numberPL, std::string(""), ContactNumberType::HOME),
+            ContactRecord::Number(number, std::string(""), ContactNumberType::HOME),
+        });
+        REQUIRE(records.Update(recordToUpdate) == false);
+
+        // Check contact record after Update
+        auto recordAfterUpdate = records.GetByID(FIRST_CONTACT_ID);
+        REQUIRE(recordAfterUpdate.numbers.size() == 1);
+        REQUIRE(recordAfterUpdate.numbers[0].number.getEntered() == numberPL); // without country code
+
+        // No new contact
+        auto validationRecord = records.GetByID(FIRST_CONTACT_ID + 1);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
+
+        // No new temporary contact
+        validationRecord = records.GetByIdWithTemporary(FIRST_CONTACT_ID + 1);
+        REQUIRE(validationRecord.ID == DB_ID_NONE);
+        REQUIRE(validationRecord.numbers.empty());
     }
 }
