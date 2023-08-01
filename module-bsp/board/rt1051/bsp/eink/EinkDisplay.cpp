@@ -407,6 +407,14 @@ namespace hal::eink
         }
         while (status != EinkStatus::EinkOK && errorCounter++ < EinkDisplayMaxInitRetries) {
             status = tryReinitAndPowerOn();
+            if (status != EinkStatus::EinkOK) {
+                if (errorCounter < EinkDisplayMaxInitRetries) {
+                    LOG_WARN("Failed to initialize and power on Eink, trying once more...");
+                }
+                else {
+                    LOG_ERROR("Permanently failed to initialize and power on Eink");
+                }
+            }
         }
 
         return status;
@@ -415,9 +423,11 @@ namespace hal::eink
     EinkStatus EinkDisplay::tryReinitAndPowerOn()
     {
         if (const auto status = resetAndInit(); status != EinkStatus::EinkOK) {
+            LOG_WARN("Eink initialization failed (%s)", magic_enum::enum_name(status).data());
             return status;
         }
         if (const auto status = powerOn(); status != EinkStatus::EinkOK) {
+            LOG_WARN("Eink power on failed (%s)", magic_enum::enum_name(status).data());
             return status;
         }
         return EinkStatus::EinkOK;

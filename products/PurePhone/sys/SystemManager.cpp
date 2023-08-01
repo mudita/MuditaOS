@@ -13,6 +13,7 @@
 #include <service-cellular/CellularServiceAPI.hpp>
 #include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
+#include <service-desktop/ServiceDesktopName.hpp>
 
 namespace sys
 {
@@ -22,7 +23,24 @@ namespace sys
             {bsp::KeyCodes::SSwitchUp, phone_modes::PhoneMode::Connected},
             {bsp::KeyCodes::SSwitchMid, phone_modes::PhoneMode::DoNotDisturb},
             {bsp::KeyCodes::SSwitchDown, phone_modes::PhoneMode::Offline}};
-    } // namespace
+
+        namespace RegularClose
+        {
+            const std::vector<std::string> whitelist{service::name::evt_manager, service::name::cellular};
+        } // namespace RegularClose
+        namespace Update
+        {
+            const std::vector<std::string> whitelist{service::name::evt_manager, service::name::cellular};
+        } // namespace Update
+        namespace Restore
+        {
+            const std::vector<std::string> whitelist{
+                service::name::service_desktop, // Handle restore procedure
+                service::name::evt_manager, // Workaround for charging battery after shutting down and turn on the phone
+                service::name::appmgr,
+                service::name::cellular};
+        } // namespace Restore
+    }     // namespace
 
     SystemManager::SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators)
         : SystemManagerCommon(std::move(creators))
@@ -165,6 +183,7 @@ namespace sys
         // check if we are discharging - if so -> shutdown
         if (Store::Battery::get().state == Store::Battery::State::Discharging) {
             set(State::ShutdownReady);
+            DestroySystemService(service::name::evt_manager, this);
         }
         else {
             // await from EvtManager for info that red key was pressed / timeout
@@ -178,5 +197,21 @@ namespace sys
             }
             msg->Execute(this);
         }
+    }
+
+    const std::vector<std::string> &SystemManager::getWhiteListFor(WhiteListType type)
+    {
+        switch (type) {
+        case WhiteListType::RegularClose: {
+            return RegularClose::whitelist;
+        }
+        case WhiteListType::Update: {
+            return Update::whitelist;
+        }
+        case WhiteListType::Restore: {
+            return Restore::whitelist;
+        }
+        }
+        return RegularClose::whitelist;
     }
 } // namespace sys

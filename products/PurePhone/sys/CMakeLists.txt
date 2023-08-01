@@ -21,4 +21,5 @@ target_link_libraries(sys
         module-utils
         module-sys
         service-appmgr
+        service-desktop
 )

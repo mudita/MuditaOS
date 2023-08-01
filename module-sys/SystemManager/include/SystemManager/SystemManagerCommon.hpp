@@ -20,6 +20,7 @@
 #include "DeviceManager.hpp"
 #include <chrono>
 #include <vector>
+#include <algorithm>
 
 namespace app
 {
@@ -45,6 +46,12 @@ namespace sys
         RebootToRecovery,
         FactoryReset,
         None,
+    };
+    enum class WhiteListType
+    {
+        RegularClose,
+        Update,
+        Restore
     };
 
     class SystemInitialisationError : public std::runtime_error
@@ -134,7 +141,8 @@ namespace sys
         virtual void batteryNormalLevelAction();
         virtual void batteryCriticalLevelAction(bool charging);
         virtual void batteryShutdownLevelAction();
-        virtual void handleShutdown() = 0;
+        virtual void handleShutdown()                                               = 0;
+        virtual const std::vector<std::string> &getWhiteListFor(WhiteListType type) = 0;
 
       private:
         MessagePointer DataReceivedHandler(DataMessage *msg, ResponseMessage *resp) override;

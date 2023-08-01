@@ -18,7 +18,6 @@
 #include <service-evtmgr/EVMessages.hpp>
 #include <service-appmgr/messages/OnboardingPowerDownRequest.hpp>
 #include <service-appmgr/messages/UserPowerDownRequest.hpp>
-#include <service-desktop/ServiceDesktopName.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <system/messages/DeviceRegistrationMessage.hpp>
@@ -29,10 +28,8 @@
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>
 #include <purefs/vfs_subsystem.hpp>
-#include <service-gui/ServiceGUIName.hpp>
-#include <service-db/DBServiceName.hpp>
+
 #include <module-gui/gui/Common.hpp>
-#include <service-eink/ServiceEinkName.hpp>
 #include <hal/boot_control.h>
 #include <algorithm>
 
@@ -64,35 +61,13 @@ namespace sys
         }
 
     } // namespace
-
     namespace state
     {
-        namespace restore
-        {
-            static constexpr std::array whitelist = {
-                service::name::service_desktop, // Handle restore procedure
-                service::name::evt_manager, // Workaround for charging battery after shutting down and turn on the phone
-                service::name::appmgr,
-                service::name::cellular,
-            };
-        }
-
-        namespace regularClose
-        {
-            static constexpr std::array whitelist = {service::name::evt_manager, service::name::cellular};
-        }
-
-        namespace update
-        {
-            static constexpr std::array whitelist = {service::name::evt_manager, service::name::cellular};
-        }
-
         template <typename T>
         static bool isOnWhitelist(const T &list, const std::string &serviceName)
         {
             return std::find(std::begin(list), std::end(list), serviceName) != std::end(list);
         }
-
     } // namespace state
 
     using namespace cpp_freertos;
@@ -177,7 +152,6 @@ namespace sys
             handleShutdown();
         }
 
-        DestroySystemService(service::name::evt_manager, this);
         CloseService();
 
         // it should be called before systemDeinit to make sure this log is dumped to the file
@@ -725,16 +699,16 @@ namespace sys
         case CloseReason::OnboardingPowerDown:
         case CloseReason::SystemBrownout:
         case CloseReason::LowBattery:
-            DestroyServices(sys::state::regularClose::whitelist);
+            DestroyServices(getWhiteListFor(WhiteListType::RegularClose));
             set(State::Shutdown);
             break;
         case CloseReason::Reboot:
-            DestroyServices(sys::state::regularClose::whitelist);
+            DestroyServices(getWhiteListFor(WhiteListType::RegularClose));
             set(State::Reboot);
             break;
         case CloseReason::RebootToRecovery:
         case CloseReason::FactoryReset:
-            DestroyServices(sys::state::update::whitelist);
+            DestroyServices(getWhiteListFor(WhiteListType::Update));
             set(State::RebootToRecovery);
             break;
         }
@@ -751,7 +725,7 @@ namespace sys
         }
         CriticalSection::Exit();
 
-        DestroyServices(sys::state::restore::whitelist);
+        DestroyServices(getWhiteListFor(WhiteListType::Restore));
 
         LOG_INFO("entered restore state");
     }
