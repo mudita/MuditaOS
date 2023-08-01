@@ -11,6 +11,14 @@
 
 namespace sys
 {
+    namespace
+    {
+        namespace RegularClose
+        {
+            const std::vector<std::string> whitelist{};
+        } // namespace RegularClose
+    }     // namespace
+
     SystemManager::SystemManager(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators)
         : SystemManagerCommon(std::move(creators))
     {}
@@ -44,5 +52,10 @@ namespace sys
     void SystemManager::handleShutdown()
     {
         set(State::ShutdownReady);
+    }
+
+    const std::vector<std::string> &SystemManager::getWhiteListFor(WhiteListType /*type*/)
+    {
+        return RegularClose::whitelist;
     }
 } // namespace sys
