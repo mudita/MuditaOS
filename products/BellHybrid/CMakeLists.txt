@@ -120,6 +120,7 @@ else()
         DEPENDS
             install_scripts
             create_product_databases
+            remove_var_directory
             create_user_directories
             assets
             BellHybrid-version.json-target

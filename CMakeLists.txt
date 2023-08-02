@@ -189,6 +189,13 @@ add_directories(
         DIRECTORIES log assets crash_dumps data bin db scripts var
 )
 
+# Remove 'var' directory to delete all files created during simulator operation
+add_custom_target(
+        remove_var_directory
+        COMMAND rm -rf ${SYSROOT_PATH}/system_a/var
+        COMMENT "Removing 'var' directory"
+)
+
 # Create and initialize product-specific databases
 add_databases_target(
         TARGET create_product_databases
@@ -198,6 +205,7 @@ add_databases_target(
         DEST_DIR ${SYSROOT_PATH}/system_a/db
         DEVEL ${WITH_DEVELOPMENT_FEATURES}
 )
+
 # Install scripts
 add_scripts_target(
         TARGET install_scripts
