@@ -17,11 +17,14 @@ extern "C"
 #include <string.h>
 #include <unistd.h>
 
-inline constexpr auto SERIAL_BUFFER_LEN = 512;
-inline constexpr auto SERIAL_BAUDRATE   = 115200;
-
 namespace bsp
 {
+    namespace constants::serial
+    {
+        inline constexpr auto bufferLength = 512;
+        inline constexpr auto baudRate = 115200;
+    }
+
     enum class USBDeviceStatus : std::uint32_t
     {
         Disconnected,
@@ -42,7 +45,7 @@ namespace bsp
     };
 
     int usbInit(const usbInitParams &initParams);
-    int usbCDCReceive(void *ptr);
+    ssize_t usbCDCReceive(void *ptr);
     std::size_t usbCDCSend(std::string *sendMsg);
     std::size_t usbCDCSendRaw(const char *dataPtr, std::size_t dataLen);
     void usbDeinit();
