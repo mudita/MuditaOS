@@ -21,6 +21,7 @@
 * Fixed handsfree device still ringing after caller has hung up
 * Fixed missing contact entries when scrolling through the contact list
 * Fixed misunderstanding holes in sms conversations
+* Fixed occasional crash when unplugging Pure from PC when connected with Mudita Center
 
 ## [1.7.2 2023-07-28]
 

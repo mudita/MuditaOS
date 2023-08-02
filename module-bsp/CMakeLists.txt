@@ -51,7 +51,7 @@ target_compile_definitions(${PROJECT_NAME}
         -D__STARTUP_INITIALIZE_NONCACHEDATA
         -D__USE_CMSIS
         -DDEBUG_VCOM=1
-        -DDEBUG_USB=1
+        -DDEBUG_USB=0
         )
 
 target_include_directories(${PROJECT_NAME}
