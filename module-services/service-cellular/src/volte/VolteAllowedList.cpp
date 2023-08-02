@@ -10,7 +10,7 @@
 #include "ImsiParser_GreatBritain.hpp"
 #include "ImsiParser_Canada.hpp"
 #include "ImsiParser_Austria.hpp"
-
+#include "ImsiParser_Egypt.hpp"
 #include "module-utils/log/Logger.hpp"
 
 namespace
@@ -47,6 +47,7 @@ namespace cellular::service
                  ImsiParserNL(),
                  ImsiParserGB(),
                  ImsiParserCA(),
-                 ImsiParserAT());
+                 ImsiParserAT(),
+                 ImsiParserEG());
     }
 } // namespace cellular::service
