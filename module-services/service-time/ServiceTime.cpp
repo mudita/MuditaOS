@@ -50,8 +50,16 @@ namespace stm
         alarmOperations->updateEventsCache(TimePointNow());
         alarmOperations->addCheckIfPhoneCallIsOngoingCallback([this]() -> bool {
             bool isPhoneCallInProgress = false;
+            // Check Call state in Cellular
             if (!CellularServiceAPI::IsCallInProgress(this, isPhoneCallInProgress)) {
-                LOG_ERROR("Unable to check if the Call is in progress");
+                LOG_ERROR("Unable to check if the Call is in progress for Cellular service");
+            }
+
+            // Double check is ApplicationCall (if App exist) has active state of call
+            if (!isPhoneCallInProgress &&
+                !CellularServiceAPI::IsCallStateForCallApplicationActive(this, isPhoneCallInProgress)) {
+                LOG_WARN("Unable to check if the ApplicationCall has Active Call State. "
+                         "Call Status not considered active");
             }
             return isPhoneCallInProgress;
         });

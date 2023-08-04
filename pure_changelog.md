@@ -33,6 +33,7 @@
 * Fixed hard fault handling
 * Fixed issue with uneven first screen redraw after turning the phone on
 * Fixed issue with bypassing phone lock window after unplugging USB cable on tethering popup
+* Fixed Alarm disappearance during end of call window
 
 ## [1.7.2 2023-07-28]
 

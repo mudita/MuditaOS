@@ -86,6 +86,7 @@ namespace CellularServiceAPI
     bool GetQNWINFO(sys::Service *serv, std::string &response);
     bool GetAntenna(sys::Service *serv, bsp::cellular::antenna &response);
     bool IsCallInProgress(sys::Service *serv, bool &response);
+    bool IsCallStateForCallApplicationActive(sys::Service *serv, bool &response);
     /**
      * @brief Transmits DTMF tone
      * @param serv

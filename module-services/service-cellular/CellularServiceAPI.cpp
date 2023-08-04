@@ -4,6 +4,7 @@
 #include "service-cellular/CellularMessage.hpp"
 #include "service-cellular/CellularServiceAPI.hpp"
 #include "service-cellular/ServiceCellular.hpp"
+#include "application-call/include/application-call/ApplicationCall.hpp"
 
 #include <MessageType.hpp>
 #include <modem/mux/CellularMux.h>
@@ -242,6 +243,7 @@ bool CellularServiceAPI::GetAntenna(sys::Service *serv, bsp::cellular::antenna &
 
 bool CellularServiceAPI::IsCallInProgress(sys::Service *serv, bool &response)
 {
+    // Ask cellular is in Active state (any other state than Idle)
     auto msg = std::make_shared<cellular::IsCallActive>();
     auto ret = serv->bus.sendUnicastSync(msg, service::name::cellular, 1000);
     if (ret.first == sys::ReturnCodes::Success) {
@@ -252,6 +254,31 @@ bool CellularServiceAPI::IsCallInProgress(sys::Service *serv, bool &response)
             return true;
         }
     }
+    return false;
+}
+
+bool CellularServiceAPI::IsCallStateForCallApplicationActive(sys::Service *serv, bool &response)
+{
+    // Ask ApplicationCall (if App even exist) about its internal Call State
+    auto msg = std::make_shared<cellular::IsCallActive>();
+    auto ret = serv->bus.sendUnicastSync(msg, app::name_call, 1000);
+    if (ret.first == sys::ReturnCodes::Success) {
+        auto celResponse = std::dynamic_pointer_cast<cellular::IsCallActiveResponse>(ret.second);
+        if ((celResponse != nullptr) && (celResponse->retCode == sys::ReturnCodes::Success)) {
+            LOG_DEBUG("Is Call in active for ApplicationCall: %d", celResponse->active);
+            response = celResponse->active;
+            return true;
+        }
+    }
+    else if (ret.first == sys::ReturnCodes::ServiceDoesntExist) {
+        LOG_DEBUG("App doesn't exist so it cannot have an active call state");
+        response = false;
+        return true; // Tolerant behavior
+    }
+
+    LOG_DEBUG("ApplicationCall doesn't seem to be responding, so we're assuming the app doesn't exist, "
+              "so App can not have active call state");
+    response = false;
     return false;
 }
 
