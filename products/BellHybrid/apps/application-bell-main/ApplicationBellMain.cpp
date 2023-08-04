@@ -42,9 +42,10 @@ namespace app
             const auto popupId = params.getPopupId();
             if (popupId == gui::popup::ID::Alarm || popupId == gui::popup::ID::AlarmActivated ||
                 popupId == gui::popup::ID::AlarmDeactivated) {
-                return gui::name::window::main_window != getCurrentWindow()->getName();
+                return gui::name::window::main_window != getCurrentWindow()->getName() ? gui::popup::FilterType::Show
+                                                                                       : gui::popup::FilterType::Remove;
             }
-            return true;
+            return gui::popup::FilterType::Show;
         });
 
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
@@ -84,6 +85,11 @@ namespace app
         });
         connect(typeid(AlarmDeactivated), [this](sys::Message *request) -> sys::MessagePointer {
             alarmModel->turnOff();
+            alarmModel->activateAlarm(false);
+            return sys::msgHandled();
+        });
+        connect(typeid(AlarmActivated), [this](sys::Message *request) -> sys::MessagePointer {
+            alarmModel->activateAlarm(true);
             return sys::msgHandled();
         });
     }

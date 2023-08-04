@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/popups/presenter/AlarmActivatedPresenter.hpp>
@@ -21,18 +21,4 @@ namespace app::popup
         return alarmModel.getAlarmTime();
     }
 
-    void AlarmActivatedPresenter::activate()
-    {
-        return alarmModel.activate(true);
-    }
-
-    void AlarmActivatedPresenter::deactivate()
-    {
-        return alarmModel.activate(false);
-    }
-
-    void AlarmActivatedPresenter::updateAlarmModel(AlarmModelReadyHandler callback)
-    {
-        alarmModel.update(callback);
-    }
 } // namespace app::popup

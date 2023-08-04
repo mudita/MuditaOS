@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WindowsPopupFilter.hpp"
@@ -14,7 +14,8 @@ TEST_CASE("WindowsPopupQueue::isPermitted", "[!mayfail]")
     gui::popup::Filter filter;
     SECTION("filter is ok, there is not stack")
     {
-        filter.addAppDependentFilter([](const gui::PopupRequestParams &) -> bool { return true; });
+        filter.addAppDependentFilter(
+            [](const gui::PopupRequestParams &) -> gui::popup::FilterType { return gui::popup::FilterType::Show; });
         REQUIRE(filter.isPermitted(prp));
     }
 
@@ -84,6 +85,7 @@ TEST_CASE("WindowsPopupQueue::addAppDependentFilter")
     gui::popup::Filter filter;
     auto prp = gui::PopupRequestParams(gui::popup::ID::Alarm);
     // create filter that accepts nothing
-    filter.addAppDependentFilter([](const gui::PopupRequestParams &) -> bool { return false; });
+    filter.addAppDependentFilter(
+        [](const gui::PopupRequestParams &) -> gui::popup::FilterType { return gui::popup::FilterType::Ignore; });
     REQUIRE(not filter.isPermitted(prp));
 }

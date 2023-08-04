@@ -153,7 +153,9 @@ namespace app
     {
         snoozeCount    = 0;
         nextSnoozeTime = TIME_POINT_INVALID;
-        alarms::AlarmServiceAPI::requestTurnOffRingingAlarm(app, cachedRecord.parent->ID);
+        if (cachedRecord.parent != nullptr) {
+            alarms::AlarmServiceAPI::requestTurnOffRingingAlarm(app, cachedRecord.parent->ID);
+        }
     }
 
     void AlarmModel::snooze()
@@ -218,6 +220,12 @@ namespace app
         alarmEventPtr->alarmTime = AlarmTime{7h, 00min};
 
         updateAlarm(*alarmEventPtr);
+    }
+
+    void AlarmModel::activateAlarm(bool state)
+    {
+        auto callback = [this, state]() { activate(state); };
+        update(callback);
     }
 
     alarms::AlarmStatus AlarmModel::getAlarmStatus()

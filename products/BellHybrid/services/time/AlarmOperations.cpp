@@ -181,10 +181,6 @@ namespace alarms
 
     bool AlarmOperations::processPreWakeUp(TimePoint now)
     {
-        if (nextSingleEvents.empty()) {
-            return false;
-        }
-
         auto nextEvent = getNextPreWakeUpEvent();
         if (!nextEvent.isValid()) {
             return false;
@@ -209,6 +205,10 @@ namespace alarms
 
     SingleEventRecord AlarmOperations::getNextPreWakeUpEvent()
     {
+        if (nextSingleEvents.empty()) {
+            return {};
+        }
+
         const auto event = *(nextSingleEvents.front());
         if (getAlarmEventType(event) != alarms::AlarmType::Clock) {
             return {};

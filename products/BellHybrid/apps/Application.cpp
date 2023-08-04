@@ -34,7 +34,7 @@ namespace app
             if (val == true) {
                 LOG_ERROR("block popup - as curent window is in higher order popup");
             }
-            return !val;
+            return val ? gui::popup::FilterType::Ignore : gui::popup::FilterType::Show;
         });
     }
 

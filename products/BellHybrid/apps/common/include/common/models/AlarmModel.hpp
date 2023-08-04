@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -37,6 +37,7 @@ namespace app
         bool isSnoozeActive() override;
         void turnOff() override;
         void snooze() override;
+        void activateAlarm(bool state) override;
         std::chrono::seconds getTimeToNextSnooze() override;
         TimePoint getTimeOfNextSnooze() override;
         alarms::AlarmStatus getAlarmStatus() override;

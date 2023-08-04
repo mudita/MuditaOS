@@ -28,10 +28,6 @@ namespace gui
                                                                            std::move(presenter))
     {
         getPresenter()->attach(this);
-        getPresenter()->updateAlarmModel([&]() {
-            setAlarmTime(getPresenter()->getAlarmTime());
-            getPresenter()->activate();
-        });
         buildInterface();
 
         timerCallback = [this](Item &, sys::Timer &) {
@@ -56,6 +52,7 @@ namespace gui
 
     void AlarmActivatedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
+        setAlarmTime(getPresenter()->getAlarmTime());
         WindowWithTimer::onBeforeShow(mode, data);
     }
 
