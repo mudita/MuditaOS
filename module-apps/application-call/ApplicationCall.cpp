@@ -187,6 +187,10 @@ namespace app
             return sys::MessageNone{};
         });
 
+        connect(typeid(cellular::IsCallActive), [&](sys::Message *request) {
+            return std::make_shared<cellular::IsCallActiveResponse>(callModel->getState() != call::CallState::None);
+        });
+
         connect(typeid(cellular::CallStartedNotification), [&](sys::Message *request) {
             auto message = static_cast<cellular::CallStartedNotification *>(request);
             callModel->setPhoneNumber(message->getNumber());
