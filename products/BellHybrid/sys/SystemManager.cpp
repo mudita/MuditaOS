@@ -32,7 +32,7 @@ namespace sys
     {
         switch (request->getStatus()) {
         case AlarmActivationStatus::ACTIVATED:
-            bus.sendUnicast(std::make_shared<AlarmActivated>(), service::name::appmgr);
+            bus.sendMulticast(std::make_shared<AlarmActivated>(), sys::BusChannel::AlarmNotifications);
             break;
         case AlarmActivationStatus::DEACTIVATED:
             bus.sendMulticast(std::make_shared<AlarmDeactivated>(), sys::BusChannel::AlarmNotifications);

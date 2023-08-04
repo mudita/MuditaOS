@@ -16,7 +16,7 @@ namespace gui::popup
     bool Filter::isPermitted(const gui::PopupRequestParams &params) const
     {
         for (const auto &filter : appDependentFilter) {
-            if (filter != nullptr && not filter(params)) {
+            if (filter != nullptr && filter(params) != FilterType::Show) {
                 return false;
             }
         }
@@ -40,7 +40,17 @@ namespace gui::popup
         return true;
     }
 
-    void Filter::addAppDependentFilter(std::function<bool(const gui::PopupRequestParams &)> f)
+    bool Filter::addPopup(const gui::PopupRequestParams &params) const
+    {
+        for (const auto &filter : appDependentFilter) {
+            if (filter == nullptr || filter(params) == FilterType::Remove) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    void Filter::addAppDependentFilter(std::function<FilterType(const gui::PopupRequestParams &)> f)
     {
         appDependentFilter.push_back(f);
     }

@@ -864,9 +864,14 @@ namespace app
             data->setDisposition(gui::popup::Disposition{
                 gui::popup::Disposition::Priority::Normal, gui::popup::Disposition::WindowType::Popup, id});
         }
-        windowsPopupQueue->pushRequest(gui::popup::Request(id, std::move(data), *blueprint));
-        auto result = tryShowPopup();
-        LOG_INFO("tryShowPopup %s status: %s", magic_enum::enum_name(id).data(), result ? "shown" : "ignored");
+        if (popupFilter->addPopup(gui::PopupRequestParams(id))) {
+            windowsPopupQueue->pushRequest(gui::popup::Request(id, std::move(data), *blueprint));
+            auto result = tryShowPopup();
+            LOG_INFO("Try to show Popup %s status: %s", magic_enum::enum_name(id).data(), result ? "shown" : "ignored");
+        }
+        else {
+            LOG_INFO("Popup %s removed", magic_enum::enum_name(id).data());
+        }
     }
 
     gui::popup::Filter &ApplicationCommon::getPopupFilter() const

@@ -23,7 +23,6 @@ namespace gui
     {
         getPresenter()->attach(this);
         buildInterface();
-        getPresenter()->updateAlarmModel([&]() { getPresenter()->deactivate(); });
 
         timerCallback = [this](Item &, sys::Timer &) {
             returnToPreviousWindow();

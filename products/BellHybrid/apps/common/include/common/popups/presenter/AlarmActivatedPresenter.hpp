@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -36,11 +36,8 @@ namespace app::popup
         {
           public:
             virtual ~Presenter() noexcept                                  = default;
-            virtual void updateAlarmModel(AlarmModelReadyHandler callback) = 0;
             virtual time_t getAlarmTime() const noexcept                   = 0;
             virtual bool isAlarmActive() const noexcept                    = 0;
-            virtual void activate()                                        = 0;
-            virtual void deactivate()                                      = 0;
         };
     };
 
@@ -49,11 +46,8 @@ namespace app::popup
       public:
         AlarmActivatedPresenter(AbstractAlarmModel &alarmModel);
 
-        void updateAlarmModel(AlarmModelReadyHandler callback);
         time_t getAlarmTime() const noexcept;
         bool isAlarmActive() const noexcept;
-        void activate();
-        void deactivate();
 
       private:
         AbstractAlarmModel &alarmModel;

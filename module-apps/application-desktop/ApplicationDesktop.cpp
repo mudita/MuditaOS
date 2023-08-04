@@ -33,8 +33,9 @@ namespace app
                               std::make_shared<SIMConfiguration>(SIMConfiguration::DisplayMode::OnlyInactiveState));
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
 
-        getPopupFilter().addAppDependentFilter(
-            [&](const gui::PopupRequestParams & /*popupParams*/) { return !blockAllPopups; });
+        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams & /*popupParams*/) {
+            return blockAllPopups ? gui::popup::FilterType::Ignore : gui::popup::FilterType::Show;
+        });
 
         addActionReceiver(app::manager::actions::ShowMMIResponse, [this](auto &&data) {
             switchWindow(app::window::name::desktop_mmi_pull, std::move(data));

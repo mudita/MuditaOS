@@ -43,9 +43,9 @@ namespace app
 
         getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &popupParams) {
             if (popupParams.getPopupId() == gui::popup::ID::Volume) {
-                return true;
+                return gui::popup::FilterType::Show;
             }
-            return true;
+            return gui::popup::FilterType::Show;
         });
         statusBarManager->enableIndicators(
             {Indicator::Signal, Indicator::Time, Indicator::Battery, Indicator::SimCard});

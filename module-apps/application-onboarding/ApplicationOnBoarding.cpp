@@ -47,7 +47,8 @@ namespace app
         bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 
         getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams & /*popupParams*/) {
-            return gui::name::window::main_window != getCurrentWindow()->getName();
+            return gui::name::window::main_window != getCurrentWindow()->getName() ? gui::popup::FilterType::Show
+                                                                                   : gui::popup::FilterType::Ignore;
         });
     }
 
@@ -146,7 +147,7 @@ namespace app
             const auto eulaDirPath  = purefs::dir::getSystemDataDirPath() / "licenses";
             const auto eulaFilename = "eula.txt";
             auto eulaRepository     = std::make_unique<app::onBoarding::EULARepository>(eulaDirPath, eulaFilename);
-            auto presenter      = std::make_unique<app::onBoarding::EULALicenseWindowPresenter>([&]() { acceptEULA(); },
+            auto presenter = std::make_unique<app::onBoarding::EULALicenseWindowPresenter>([&]() { acceptEULA(); },
                                                                                            std::move(eulaRepository));
             return std::make_unique<app::onBoarding::EULALicenseWindow>(app, std::move(presenter));
         });
