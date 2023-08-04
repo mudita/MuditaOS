@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventStore.hpp"
@@ -46,15 +46,15 @@ namespace Store
         return ptr;
     }
 
-    void GSM::setSignalStrength(const SignalStrength &signalStrength)
+    void GSM::setSignalStrength(const SignalStrength &newSignalStrength)
     {
         cpp_freertos::LockGuard lock(mutex);
         LOG_INFO("Setting signal strength to rssi = %d dBm (%d) : %d bars",
-                 signalStrength.rssidBm,
-                 signalStrength.rssi,
-                 static_cast<int>(signalStrength.rssiBar));
+                 newSignalStrength.rssidBm,
+                 newSignalStrength.rssi,
+                 static_cast<int>(newSignalStrength.rssiBar));
 
-        this->signalStrength = signalStrength;
+        signalStrength = newSignalStrength;
     }
 
     SignalStrength GSM::getSignalStrength() const
@@ -63,10 +63,10 @@ namespace Store
         return signalStrength;
     }
 
-    void GSM::setNetwork(const Network &network)
+    void GSM::setNetwork(const Network &newNetwork)
     {
         cpp_freertos::LockGuard lock(mutex);
-        this->network = network;
+        network = newNetwork;
     }
 
     Network GSM::getNetwork() const
@@ -80,21 +80,25 @@ namespace Store
         cpp_freertos::LockGuard lock(mutex);
         return (sim == SIM::SIM1 || sim == SIM::SIM2);
     }
+
     void GSM::setNetworkOperatorName(const std::string &newNetworkOperatorName)
     {
         cpp_freertos::LockGuard lock(mutex);
         networkOperatorName = newNetworkOperatorName;
     }
+
     std::string GSM::getNetworkOperatorName() const
     {
         cpp_freertos::LockGuard lock(mutex);
         return networkOperatorName;
     }
-    void GSM::setTethering(const Tethering &tethering)
+
+    void GSM::setTethering(const Tethering &newTethering)
     {
         cpp_freertos::LockGuard lock(mutex);
-        this->tethering = tethering;
+        tethering = newTethering;
     }
+
     Tethering GSM::getTethering() const
     {
         cpp_freertos::LockGuard lock(mutex);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimCardsWindow.hpp"
@@ -118,6 +118,8 @@ namespace gui
                                                                    const std::string &phoneNumber)
     {
         std::list<gui::Option> optList;
+
+        const auto &simText = (phoneNumber.empty() ? simStr : (simStr + " / " + phoneNumber));
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_network_active_card"),
             [=](gui::Item &item) { return createSwitchSimAction(sim); },
@@ -125,7 +127,7 @@ namespace gui
             this,
             gui::option::SettingRightItem::Text,
             false,
-            simStr + " / " + phoneNumber,
+            simText,
             true));
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(

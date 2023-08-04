@@ -168,7 +168,7 @@ namespace Store
             ON_INITIALIZED,  /// modem is on, and it's fully initialized
         } modem = Modem::OFF;
 
-        void setSignalStrength(const SignalStrength &signalStrength);
+        void setSignalStrength(const SignalStrength &newSignalStrength);
         SignalStrength getSignalStrength() const;
 
         void setNetwork(const Network &network);
@@ -177,7 +177,7 @@ namespace Store
         void setNetworkOperatorName(const std::string &newNetworkOperatorName);
         std::string getNetworkOperatorName() const;
 
-        void setTethering(const Tethering &tethering);
+        void setTethering(const Tethering &newTethering);
         Tethering getTethering() const;
 
         static GSM *get();

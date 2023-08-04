@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "response.hpp"
@@ -209,7 +209,7 @@ namespace at
             }
             return false;
         }
-        bool parseCSQ(std::string cellularResponse, uint32_t &result)
+        bool parseCSQ(std::string cellularResponse, std::uint32_t &result)
         {
             std::string CSQstring;
             if (parseCSQ(cellularResponse, CSQstring)) {
@@ -228,12 +228,12 @@ namespace at
         }
         namespace creg
         {
-            bool isRegistered(uint32_t commandData)
+            bool isRegistered(std::uint32_t commandData)
             {
 
                 // Creg command returns 1 when registered in home network, 5 when registered in roaming
-                constexpr uint32_t registeredHome    = 1;
-                constexpr uint32_t registeredRoaming = 5;
+                constexpr std::uint32_t registeredHome    = 1;
+                constexpr std::uint32_t registeredRoaming = 5;
 
                 if (commandData == registeredHome || commandData == registeredRoaming) {
                     return true;
@@ -241,7 +241,7 @@ namespace at
                 return false;
             }
         } // namespace creg
-        bool parseCREG(std::string &response, uint32_t &result)
+        bool parseCREG(std::string &response, std::uint32_t &result)
         {
             auto resp = response;
             auto pos  = resp.find(',');
@@ -258,15 +258,15 @@ namespace at
         }
         bool parseCREG(std::string &response, std::string &result)
         {
-            std::map<uint32_t, std::string> cregCodes;
-            cregCodes.insert(std::pair<uint32_t, std::string>(0, "Not registered"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(1, "Registered, home network"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(2, "Not registered, searching"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(3, "Registration denied"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(4, "Unknown"));
-            cregCodes.insert(std::pair<uint32_t, std::string>(5, "Registered, roaming"));
+            std::map<std::uint32_t, std::string> cregCodes;
+            cregCodes.insert(std::pair<std::uint32_t, std::string>(0, "Not registered"));
+            cregCodes.insert(std::pair<std::uint32_t, std::string>(1, "Registered, home network"));
+            cregCodes.insert(std::pair<std::uint32_t, std::string>(2, "Not registered, searching"));
+            cregCodes.insert(std::pair<std::uint32_t, std::string>(3, "Registration denied"));
+            cregCodes.insert(std::pair<std::uint32_t, std::string>(4, "Unknown"));
+            cregCodes.insert(std::pair<std::uint32_t, std::string>(5, "Registered, roaming"));
 
-            uint32_t cregValue = 0;
+            std::uint32_t cregValue = 0;
             if (parseCREG(response, cregValue)) {
                 auto cregCode = cregCodes.find(cregValue);
                 if (cregCode != cregCodes.end()) {
@@ -293,11 +293,22 @@ namespace at
 
         namespace qnwinfo
         {
-            uint32_t parseNetworkFrequency(std::string &response)
-            {
-                auto tokens = utils::split(response, ",");
+            auto constexpr qnwinfoResponseSize = 4;
 
-                auto constexpr qnwinfoResponseSize = 4;
+            std::string parseOperatorCode(const std::string &response)
+            {
+                auto const tokens               = utils::split(response, ",");
+                auto constexpr operatorTokenPos = 1;
+
+                if (tokens.size() != qnwinfoResponseSize) {
+                    return "";
+                }
+                return tokens[operatorTokenPos];
+            }
+
+            std::uint32_t parseNetworkFrequency(std::string &response)
+            {
+                auto tokens                        = utils::split(response, ",");
                 auto constexpr bandTokenPos        = 2;
                 if (tokens.size() == qnwinfoResponseSize) {
 
@@ -313,7 +324,7 @@ namespace at
                 }
                 return 0;
             }
-            uint32_t parseNumericBandString(std::string &string)
+            std::uint32_t parseNumericBandString(std::string &string)
             {
                 utils::findAndReplaceAll(string, gsmString, "");
                 utils::findAndReplaceAll(string, wcdmaString, "");
@@ -324,27 +335,27 @@ namespace at
                 utils::toNumeric(string, freq);
                 return freq;
             }
-            uint32_t parseLteBandString(std::string &string)
+            std::uint32_t parseLteBandString(std::string &string)
             {
 
-                std::map<uint32_t, uint32_t> lteFreqs;
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_1, band_1_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_2, band_2_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_3, band_3_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_4, band_4_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_5, band_5_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_7, band_7_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_8, band_8_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_12, band_12_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_13, band_13_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_18, band_18_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_20, band_20_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_25, band_25_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_26, band_26_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_28, band_28_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_38, band_38_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_40, band_40_freq));
-                lteFreqs.insert(std::pair<uint32_t, uint32_t>(band_41, band_41_freq));
+                std::map<std::uint32_t, std::uint32_t> lteFreqs;
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_1, band_1_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_2, band_2_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_3, band_3_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_4, band_4_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_5, band_5_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_7, band_7_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_8, band_8_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_12, band_12_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_13, band_13_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_18, band_18_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_20, band_20_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_25, band_25_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_26, band_26_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_28, band_28_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_38, band_38_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_40, band_40_freq));
+                lteFreqs.insert(std::pair<std::uint32_t, std::uint32_t>(band_41, band_41_freq));
 
                 auto constexpr toRemove    = "LTE BAND ";
                 auto constexpr emptyString = "";

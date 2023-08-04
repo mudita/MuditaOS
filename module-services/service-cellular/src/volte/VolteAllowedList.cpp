@@ -26,7 +26,7 @@ namespace cellular::service
 {
     auto VolteAllowedList::isVolteAllowed(const std::string &imsi) const -> bool
     {
-        for (auto country : allowedList) {
+        for (const auto &country : allowedList) {
             if (country.isAllowed(imsi)) {
                 LOG_INFO("MCC supported, VoLTE allowed.");
                 return true;

@@ -65,10 +65,9 @@ namespace cellular::internal
             auto channel     = owner->cmux->get(CellularMux::Channel::Commands);
             auto permitVolte = volteCapability->isVolteAllowed(*channel);
             auto enableVolte =
-                owner->settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global) == "1"
-                    ? true
-                    : false;
-            bool volteNeedReset = false;
+                owner->settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global) == "1";
+            auto volteNeedReset = false;
+
             try {
                 volteNeedReset    = !volteHandler->switchVolte(*channel, permitVolte, enableVolte);
                 auto notification = std::make_shared<cellular::VolteStateNotification>(volteHandler->getVolteState());
@@ -105,6 +104,7 @@ namespace cellular::internal
     void ServiceCellularPriv::connectSimCard()
     {
         using namespace cellular::msg;
+
         /**
          * Request message handlers
          */
@@ -115,6 +115,7 @@ namespace cellular::internal
             simCard->handleSimCardSelected();
             return std::make_shared<request::sim::SetActiveSim::Response>(result);
         });
+
         owner->connect(typeid(request::sim::GetPinSettings), [&](sys::Message *) -> sys::MessagePointer {
             if (!simCard->isSimCardInserted()) {
                 owner->bus.sendMulticast<notification::SimNotInserted>();
@@ -126,6 +127,7 @@ namespace cellular::internal
             }
             return std::make_shared<request::sim::GetPinSettings::Response>(simLockState.value());
         });
+
         owner->connect(typeid(request::sim::ChangePin), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::ChangePin *>(request);
             if (!simCard->isSimCardInserted()) {
@@ -134,6 +136,7 @@ namespace cellular::internal
             }
             return std::make_shared<request::sim::ChangePin::Response>(simCard->handleChangePin(msg->oldPin, msg->pin));
         });
+
         owner->connect(typeid(request::sim::UnblockWithPuk), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::UnblockWithPuk *>(request);
             if (!simCard->isSimCardInserted()) {
@@ -143,6 +146,7 @@ namespace cellular::internal
             return std::make_shared<request::sim::UnblockWithPuk::Response>(
                 simCard->handleUnblockWithPuk(msg->puk, msg->pin));
         });
+
         owner->connect(typeid(request::sim::SetPinLock), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::SetPinLock *>(request);
             if (!simCard->isSimCardInserted()) {
@@ -152,6 +156,7 @@ namespace cellular::internal
             return std::make_shared<request::sim::SetPinLock::Response>(
                 simCard->handleSetPinLock(msg->pin, msg->pinLock), msg->pinLock);
         });
+
         owner->connect(typeid(request::sim::PinUnlock), [&](sys::Message *request) -> sys::MessagePointer {
             auto msg = static_cast<request::sim::PinUnlock *>(request);
             if (!simCard->isSimCardInserted()) {
@@ -168,6 +173,7 @@ namespace cellular::internal
             simCard->handleTrayState();
             return sys::MessageNone{};
         });
+
         owner->connect(typeid(cellular::SimInsertedNotication), [&](sys::Message *request) -> sys::MessagePointer {
             auto message = static_cast<cellular::SimInsertedNotication *>(request);
 
