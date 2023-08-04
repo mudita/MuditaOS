@@ -12,6 +12,7 @@
 ### Changed / Improved
 
 * General improvement in Eink display and error handling
+* Change roaming indicator to show domestic roaming as home network
 
 ### Fixed
 

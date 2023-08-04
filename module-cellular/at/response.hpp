@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -181,8 +181,8 @@ namespace at
         std::optional<ResponseTokens> getTokensForATResults(const at::Result &resp, std::string_view head);
 
         bool parseCSQ(std::string response, std::string &result);
-        bool parseCSQ(std::string cellularResponse, uint32_t &result);
-        bool parseCREG(std::string &response, uint32_t &result);
+        bool parseCSQ(std::string cellularResponse, std::uint32_t &result);
+        bool parseCREG(std::string &response, std::uint32_t &result);
         bool parseCREG(std::string &response, std::string &result);
         bool parseQNWINFO(std::string &response, std::string &result);
         bool parseQPINC(const at::Result &resp, qpinc::AttemptsCounters &ret);
@@ -208,7 +208,7 @@ namespace at
         bool parseQCFG_IMS(const at::Result &resp, std::pair<qcfg_ims::IMSState, qcfg_ims::VoLTEIMSState> &ret);
         namespace creg
         {
-            bool isRegistered(uint32_t commandData);
+            bool isRegistered(std::uint32_t commandData);
         }
         namespace qnwinfo
         {
@@ -255,14 +255,15 @@ namespace at
             auto constexpr band_40_freq = 2300;
             auto constexpr band_41_freq = 2500;
 
-            uint32_t parseNetworkFrequency(std::string &response);
-            uint32_t parseNumericBandString(std::string &string);
-            uint32_t parseLteBandString(std::string &string);
+            std::string parseOperatorCode(const std::string &response);
+            std::uint32_t parseNetworkFrequency(std::string &response);
+            std::uint32_t parseNumericBandString(std::string &string);
+            std::uint32_t parseLteBandString(std::string &string);
         } // namespace qnwinfo
 
         namespace clir
         {
-            constexpr uint32_t clirTokens = 2;
+            constexpr std::uint32_t clirTokens = 2;
 
             enum class ServiceState
             {
