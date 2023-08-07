@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <service-desktop/ServiceDesktopDependencies.hpp>
+#include <service-eink/ServiceEinkDependencies.hpp>
 #include <service-gui/ServiceGUIName.hpp>
 #include <string>
 #include <vector>
@@ -17,7 +17,7 @@ namespace sys::dependencies
     template <>
     inline std::vector<std::string> getDependenciesFor<service::gui::ServiceGUI>()
     {
-        return sys::dependencies::getDependenciesTo<ServiceDesktop>();
+        return sys::dependencies::getDependenciesTo<service::eink::ServiceEink>();
     }
 
     template <>

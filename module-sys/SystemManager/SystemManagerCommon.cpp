@@ -473,6 +473,10 @@ namespace sys
             serviceCloseTimer.stop();
 
             const auto message = static_cast<ReadyToCloseMessage *>(msg);
+            if (std::find(servicesToClose.begin(), servicesToClose.end(), message->sender) == servicesToClose.end()) {
+                LOG_ERROR("%s is not on the list. Further processing skipped.", message->sender.c_str());
+                return;
+            }
             LOG_INFO("ready to close %s", message->sender.c_str());
             servicesToClose.erase(std::remove(servicesToClose.begin(), servicesToClose.end(), message->sender),
                                   servicesToClose.end());
