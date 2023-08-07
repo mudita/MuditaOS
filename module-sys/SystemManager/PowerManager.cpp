@@ -21,7 +21,7 @@ namespace sys
         constexpr auto highestLevelName{"highestCpuFrequency"};
     } // namespace
 
-    CpuFrequencyMonitor::CpuFrequencyMonitor(const std::string name) : levelName(name)
+    CpuFrequencyMonitor::CpuFrequencyMonitor(const std::string &name) : levelName(name)
     {}
 
     [[nodiscard]] auto CpuFrequencyMonitor::GetName() const noexcept -> std::string
@@ -105,6 +105,9 @@ namespace sys
     [[nodiscard]] cpu::UpdateResult PowerManager::UpdateCpuFrequency()
     {
         uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad();
+        if (lowPowerControl->GetCurrentFrequencyLevel() == bsp::CpuFrequencyMHz::Level_0) {
+            cpuLoad = 100;
+        }
         cpu::UpdateResult retval;
         cpu::AlgorithmData data{
             cpuLoad, lowPowerControl->GetCurrentFrequencyLevel(), cpuGovernor->GetMinimumFrequencyRequested()};
@@ -153,18 +156,18 @@ namespace sys
         cpuStatistics.TrackChange(ret);
     }
 
-    bool PowerManager::IsCpuPernamentFrequency()
+    bool PowerManager::IsCpuPermanentFrequency()
     {
         return cpuAlgorithms->get(sys::cpu::AlgoID::FrequencyHold) != nullptr;
     }
 
-    void PowerManager::SetPernamentFrequency(bsp::CpuFrequencyMHz freq)
+    void PowerManager::SetPermanentFrequency(bsp::CpuFrequencyMHz freq)
     {
         cpuAlgorithms->emplace(sys::cpu::AlgoID::FrequencyHold,
                                std::make_unique<sys::cpu::FrequencyHold>(freq, powerProfile));
     }
 
-    void PowerManager::ResetPernamentFrequency()
+    void PowerManager::ResetPermanentFrequency()
     {
         cpuAlgorithms->remove(sys::cpu::AlgoID::FrequencyHold);
     }

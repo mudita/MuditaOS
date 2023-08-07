@@ -21,5 +21,4 @@ namespace bsp
         std::shared_ptr<drivers::DriverGPIO> gpio_1;
         std::shared_ptr<drivers::DriverGPIO> gpio_2;
     };
-
 } // namespace bsp

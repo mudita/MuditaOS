@@ -25,7 +25,7 @@ namespace sys
     class CpuFrequencyMonitor
     {
       public:
-        explicit CpuFrequencyMonitor(const std::string name);
+        explicit CpuFrequencyMonitor(const std::string &name);
 
         [[nodiscard]] auto GetName() const noexcept -> std::string;
         [[nodiscard]] auto GetPeriodRuntimePercentage(const TickType_t periodTicksIncrease) const noexcept
@@ -65,9 +65,9 @@ namespace sys
         void RemoveSentinel(std::string sentinelName) const;
         void SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request);
         void ResetCpuFrequencyRequest(const std::string &sentinelName);
-        bool IsCpuPernamentFrequency();
-        void SetPernamentFrequency(bsp::CpuFrequencyMHz freq);
-        void ResetPernamentFrequency();
+        bool IsCpuPermanentFrequency();
+        void SetPermanentFrequency(bsp::CpuFrequencyMHz freq);
+        void ResetPermanentFrequency();
 
         void LogPowerManagerStatistics();
 
