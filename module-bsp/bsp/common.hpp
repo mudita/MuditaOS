@@ -4,12 +4,13 @@
 #pragma once
 
 #include <cstdint>
+
 namespace bsp
 {
-    enum class RetCode{
+    enum class RetCode
+    {
         Success,
         Failure
-
     };
 
     /// CPU frequency is dependent on the clock settings.
@@ -25,16 +26,15 @@ namespace bsp
         Level_6 = 528
     };
 
-    uint8_t CpuMHZToLevel(enum CpuFrequencyMHz val);
-
-    constexpr auto MHz_frequency_multiplier = 1000000U;
-
-    enum class Board{
+    enum class Board
+    {
         RT1051,
-    	Linux,
-    	none
+        Linux,
+        none
     };
-    [[nodiscard]] const char *c_str(const Board &board);
 
+    constexpr auto HzPerMHz = 1000000U;
+
+    [[nodiscard]] std::uint8_t CpuMHZToLevel(CpuFrequencyMHz val);
+    [[nodiscard]] const char *c_str(Board board);
 }
-

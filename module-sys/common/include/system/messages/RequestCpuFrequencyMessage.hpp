@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,20 +8,19 @@
 
 namespace sys
 {
-
-    struct IsCpuPernament : public sys::DataMessage
+    struct IsCpuPermanent : public sys::DataMessage
     {
       public:
-        explicit IsCpuPernament()
+        explicit IsCpuPermanent()
         {}
     };
 
-    struct IsCpuPernamentResponse : public sys::ResponseMessage
+    struct IsCpuPermanentResponse : public sys::ResponseMessage
     {
       public:
-        explicit IsCpuPernamentResponse(bool pernament) : pernament(pernament)
+        explicit IsCpuPermanentResponse(bool permanent) : permanent(permanent)
         {}
-        const bool pernament = false;
+        const bool permanent = false;
     };
 
     struct HoldCpuFrequencyPermanentlyMessage : public sys::DataMessage
@@ -37,5 +36,4 @@ namespace sys
 
     class ReleaseCpuPermanentFrequencyMessage : public sys::DataMessage
     {};
-
 } // namespace sys

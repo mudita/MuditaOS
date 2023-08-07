@@ -14,7 +14,6 @@ namespace drivers
 
 namespace bsp
 {
-
     class LowPowerMode
     {
       public:
@@ -23,6 +22,7 @@ namespace bsp
             External,
             Internal
         };
+        
         enum class RebootType
         {
             NormalRestart,
@@ -38,12 +38,12 @@ namespace bsp
 
         static std::optional<std::unique_ptr<LowPowerMode>> Create();
 
-        virtual int32_t PowerOff()                = 0;
-        virtual int32_t Reboot(RebootType reason) = 0;
+        virtual std::int32_t PowerOff()                = 0;
+        virtual std::int32_t Reboot(RebootType reason) = 0;
 
         virtual void SetCpuFrequency(CpuFrequencyMHz freq) = 0;
         [[nodiscard]] CpuFrequencyMHz GetCurrentFrequencyLevel() const noexcept;
-        [[nodiscard]] virtual uint32_t GetCpuFrequency() const noexcept = 0;
+        [[nodiscard]] virtual std::uint32_t GetCpuFrequency() const noexcept = 0;
 
         virtual void SwitchOscillatorSource(OscillatorSource source) = 0;
 

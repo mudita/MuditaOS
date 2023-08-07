@@ -5,7 +5,6 @@
 
 namespace bsp
 {
-    void SwitchToExternalOscillator();
-    bool SwitchToInternalOscillator();
-    [[nodiscard]] bool IsExternalOscillatorEnabled();
+    void SwitchToRegularBandgap();
+    void SwitchToLowPowerBandgap();
 } // namespace bsp

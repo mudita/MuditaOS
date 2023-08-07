@@ -13,10 +13,10 @@ namespace bsp
     {
       public:
         RT1051LPMCommon();
-        int32_t PowerOff() final;
-        int32_t Reboot(RebootType reason) final;
+        std::int32_t PowerOff() final;
+        std::int32_t Reboot(RebootType reason) final;
         void SetCpuFrequency(CpuFrequencyMHz freq) final;
-        [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
+        [[nodiscard]] std::uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
 
         void RegularLDOMode();
@@ -29,5 +29,4 @@ namespace bsp
         std::unique_ptr<bsp::CpuFreqLPM> CpuFreq;
         std::shared_ptr<drivers::DriverSEMC> driverSEMC;
     };
-
 } // namespace bsp

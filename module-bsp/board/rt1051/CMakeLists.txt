@@ -27,6 +27,7 @@ target_sources(module-bsp
 		bsp/lpm/CpuFreqLPM.cpp
 		bsp/lpm/Oscillator.cpp
 		bsp/lpm/RT1051LPMCommon.cpp
+		bsp/lpm/Bandgap.cpp
 		bsp/magnetometer/ALS31300.cpp
 		bsp/pit/pit.cpp
 		bsp/rtc/rtc.cpp
