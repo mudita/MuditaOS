@@ -34,10 +34,11 @@ namespace service::gui
 
         enum class ServiceGUIState
         {
-            Displaying,
+            Idle = 0,
             Rendering,
+            Displaying,
             Closing,
-            Idle
+            ReadyToClose
         };
 
       public:

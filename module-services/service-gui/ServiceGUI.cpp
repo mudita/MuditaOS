@@ -100,6 +100,7 @@ namespace service::gui
     {
         if (isInState(ServiceGUIState::Idle)) {
             sendCloseReadyMessage(this);
+            setState(ServiceGUIState::ReadyToClose);
             return;
         }
         else {
@@ -227,6 +228,7 @@ namespace service::gui
 
     sys::MessagePointer ServiceGUI::handleImageDisplayedNotification(sys::Message *message)
     {
+        setState(ServiceGUIState::Idle);
         const auto msg       = static_cast<eink::ImageDisplayedNotification *>(message);
         const auto contextId = msg->getContextId();
         contextPool->returnContext(contextId);
@@ -234,14 +236,15 @@ namespace service::gui
 
         // Even if the next render is already cached, if any context in the pool is currently being processed, then
         // we better wait for it.
+        if (isInState(ServiceGUIState::ReadyToClose)) {
+            LOG_WARN("Post closing notification.");
+        }
         if (isNextFrameReady() and not isAnyFrameBeingRenderedOrDisplayed()) {
             trySendNextFrame();
         }
         else if (isInState(ServiceGUIState::Closing)) {
             sendCloseReadyMessage(this);
-        }
-        else {
-            setState(ServiceGUIState::Idle);
+            setState(ServiceGUIState::ReadyToClose);
         }
         return sys::MessageNone{};
     }
@@ -267,7 +270,10 @@ namespace service::gui
 
     void ServiceGUI::setState(const ServiceGUIState &nextState)
     {
-        if (isInState(ServiceGUIState::Closing)) {
+        if (isInState(ServiceGUIState::ReadyToClose)) {
+            return;
+        }
+        if (isInState(ServiceGUIState::Closing) && (nextState != ServiceGUIState::ReadyToClose)) {
             return;
         }
         state = nextState;

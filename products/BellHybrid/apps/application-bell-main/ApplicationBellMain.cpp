@@ -80,7 +80,9 @@ namespace app
         });
 
         connect(typeid(sdesktop::usb::USBConfigured), [&](sys::Message *msg) -> sys::MessagePointer {
-            homeScreenPresenter->setUSBStatusConnected();
+            if (getCurrentWindow()->getName() == gui::name::window::main_window) {
+                homeScreenPresenter->setUSBStatusConnected();
+            }
             return sys::msgHandled();
         });
         connect(typeid(AlarmDeactivated), [this](sys::Message *request) -> sys::MessagePointer {
