@@ -16,6 +16,7 @@
 * Fixed redundant clock face display while shutting down Harmony
 * Fixed problem with disabling the frontlight in pre-wake up
 * Fixed occasional crash when a deep press occurs during popups
+* Fixed diacritics in translations
 
 ### Added
 

@@ -24,6 +24,7 @@
 * Fixed misunderstanding holes in sms conversations
 * Fixed occasional crash when unplugging Pure from PC when connected with Mudita Center
 * Fixed ability to create contact with 2 same numbers
+* Fixed diacritics in translations
 
 ## [1.7.2 2023-07-28]
 
