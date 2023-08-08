@@ -190,6 +190,7 @@ namespace alarms
         if (!decision.timeForChime && !decision.timeForFrontlight) {
             return false;
         }
+        preWakeUp.setActive(true);
         handlePreWakeUp(nextEvent, decision);
         return true;
     }
@@ -249,8 +250,11 @@ namespace alarms
 
     auto AlarmOperations::disablePreWakeUp(const std::shared_ptr<AlarmEventRecord> &event) -> void
     {
-        AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
-        AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
+        if (preWakeUp.isActive()) {
+            AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
+            AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
+            preWakeUp.setActive(false);
+        }
     }
 
     bool AlarmOperations::processSnoozeChime(TimePoint now)
@@ -323,7 +327,6 @@ namespace alarms
         const auto frontlightSettings  = settingsProvider->getFrontlightSettings();
         const auto isTimeForChime      = isTimeForPreWakeUp(now, event, chimeSettings);
         const auto isTimeForFrontlight = isTimeForPreWakeUp(now, event, frontlightSettings);
-        active                         = isTimeForChime || isTimeForFrontlight;
         return {isTimeForChime, isTimeForFrontlight};
     }
 
@@ -337,6 +340,11 @@ namespace alarms
     auto PreWakeUp::isActive() const -> bool
     {
         return active;
+    }
+
+    auto PreWakeUp::setActive(bool state) -> void
+    {
+        active = state;
     }
 
     Bedtime::Bedtime(std::unique_ptr<AbstractBedtimeSettingsProvider> &&settingsProvider)

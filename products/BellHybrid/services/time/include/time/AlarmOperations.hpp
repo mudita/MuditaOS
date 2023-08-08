@@ -65,6 +65,7 @@ namespace alarms
         explicit PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider);
         auto decide(TimePoint now, const SingleEventRecord &event) -> Decision;
         auto isActive() const -> bool;
+        auto setActive(bool state) -> void;
 
       private:
         auto isTimeForPreWakeUp(TimePoint now,
