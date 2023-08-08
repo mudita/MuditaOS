@@ -29,6 +29,15 @@
 #include <Timers/TimerFactory.hpp>
 #include <AppMessage.hpp>
 
+namespace
+{
+    constexpr auto informationPromptTimeout = std::chrono::seconds{15};
+    constexpr auto informationTimerName     = "OnBoardingInformationTimer";
+    constexpr auto userIdleTimeout          = std::chrono::minutes{3};
+    constexpr auto userIdleTimerName        = "OnBoardingUserIdleTimer";
+
+} // namespace
+
 namespace app
 {
     ApplicationBellOnBoarding::ApplicationBellOnBoarding(std::string name,
@@ -38,9 +47,21 @@ namespace app
         : Application(std::move(name), std::move(parent), statusIndicators, startInBackground)
     {}
 
+    ApplicationBellOnBoarding::~ApplicationBellOnBoarding()
+    {
+        if (informationPromptTimer.isValid()) {
+            informationPromptTimer.stop();
+            informationPromptTimer.reset();
+        }
+        if (userIdleTimer.isValid()) {
+            userIdleTimer.stop();
+            userIdleTimer.reset();
+        }
+    }
+
     sys::ReturnCodes ApplicationBellOnBoarding::InitHandler()
     {
-        auto ret = Application::InitHandler();
+        const auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
@@ -55,10 +76,18 @@ namespace app
         });
 
         informationPromptTimer = sys::TimerFactory::createSingleShotTimer(
-            this,
-            OnBoarding::informationTimerName,
-            OnBoarding::informationPromptTimeout,
-            [this]([[maybe_unused]] sys::Timer &timer) { displayInformation(getCurrentWindow()->getName()); });
+            this, informationTimerName, informationPromptTimeout, [this]([[maybe_unused]] sys::Timer &timer) {
+                displayInformation(getCurrentWindow()->getName());
+            });
+
+        userIdleTimer = sys::TimerFactory::createSingleShotTimer(
+            this, userIdleTimerName, userIdleTimeout, [this]([[maybe_unused]] sys::Timer &timer) {
+                if (getCurrentWindow()->getName() == gui::window::name::onBoardingLanguageWindow) {
+                    switchWindow(gui::name::window::main_window);
+                }
+            });
+
+        userIdleTimer.start();
 
         return sys::ReturnCodes::Success;
     }
@@ -155,15 +184,15 @@ namespace app
     {
         // If user is during language selection, pick new language for hint popup
         if (windowToReturn == gui::window::name::onBoardingLanguageWindow) {
-            auto languageSelectWindow = dynamic_cast<gui::OnBoardingLanguageWindow *>(getWindow(windowToReturn));
-            auto selectedLang         = languageSelectWindow->getSelectedLanguage();
+            const auto languageSelectWindow = dynamic_cast<gui::OnBoardingLanguageWindow *>(getWindow(windowToReturn));
+            const auto selectedLang         = languageSelectWindow->getSelectedLanguage();
 
             if (utils::getDisplayLanguage() != selectedLang) {
                 utils::setDisplayLanguage(selectedLang);
             }
         }
 
-        auto [icon, text] = getDisplayDataFromState();
+        const auto [icon, text] = getDisplayDataFromState();
         switchWindow(
             gui::window::name::informationOnBoardingWindow,
             gui::BellFinishedWindowData::Factory::create(icon,
@@ -190,11 +219,12 @@ namespace app
 
     bool ApplicationBellOnBoarding::isInformationPromptPermittedOnCurrentWindow()
     {
-        auto currentWindow = getCurrentWindow()->getName();
+        const auto currentWindow = getCurrentWindow()->getName();
         return (currentWindow != gui::name::window::main_window &&
                 currentWindow != gui::window::name::finalizeOnBoardingWindow &&
                 (currentWindow != gui::window::name::informationOnBoardingWindow ||
-                 informationState == OnBoarding::InformationStates::DeepClickWarningInfo));
+                 informationState == OnBoarding::InformationStates::DeepClickWarningInfo ||
+                 informationState == OnBoarding::InformationStates::DeepClickCorrectionInfo));
     }
 
     void ApplicationBellOnBoarding::startTimerOnWindows()
@@ -214,7 +244,7 @@ namespace app
 
     void ApplicationBellOnBoarding::handleInformationBeforeSwitchWindow(sys::DataMessage *msgl)
     {
-        auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
+        const auto msg = static_cast<AppSwitchWindowMessage *>(msgl);
 
         informationPromptTimer.stop();
 
@@ -241,15 +271,16 @@ namespace app
 
     bool ApplicationBellOnBoarding::handleInformationOnInputEvent(sys::DataMessage *msgl)
     {
-        auto inputEvent = static_cast<AppInputEventMessage *>(msgl)->getEvent();
+        const auto inputEvent = static_cast<AppInputEventMessage *>(msgl)->getEvent();
         restartTimerOnWindows();
+        userIdleTimer.restart(userIdleTimeout);
 
         if (isInformationPromptPermittedOnCurrentWindow()) {
             if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) || inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN)) {
                 gui::AppWindow *window = getCurrentWindow();
-                auto shortcutsWindow   = window->getName() == gui::window::name::onBoardingShortcutsWindow
-                                             ? dynamic_cast<gui::OnBoardingShortcutsWindow *>(window)
-                                             : nullptr;
+                const auto shortcutsWindow = window->getName() == gui::window::name::onBoardingShortcutsWindow
+                                                 ? dynamic_cast<gui::OnBoardingShortcutsWindow *>(window)
+                                                 : nullptr;
                 if (shortcutsWindow != nullptr) {
                     if (shortcutsWindow->isOneOfTwoLastShortcuts() && inputEvent.isKeyRelease(gui::KeyCode::KEY_UP))
                         informationState = OnBoarding::InformationStates::LightClickInfo;

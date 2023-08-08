@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,9 +10,6 @@ namespace app::OnBoarding
 {
     /// Image name, Prompt info text
     using InformationDisplay = std::pair<std::string, std::string>;
-
-    constexpr auto informationPromptTimeout = std::chrono::seconds{15};
-    constexpr auto informationTimerName     = "OnBoardingInformationTimer";
 
     enum class InformationStates
     {
@@ -30,6 +27,7 @@ namespace app
       private:
         OnBoarding::InformationStates informationState = OnBoarding::InformationStates::RotateInfo;
         sys::TimerHandle informationPromptTimer;
+        sys::TimerHandle userIdleTimer;
 
         OnBoarding::InformationDisplay getDisplayDataFromState();
         void displayInformation(const std::string &windowToReturn);
@@ -46,6 +44,7 @@ namespace app
                                            std::string parent                  = "",
                                            StatusIndicators statusIndicators   = StatusIndicators{},
                                            StartInBackground startInBackground = {false});
+        ~ApplicationBellOnBoarding();
 
         sys::ReturnCodes InitHandler() override;
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;

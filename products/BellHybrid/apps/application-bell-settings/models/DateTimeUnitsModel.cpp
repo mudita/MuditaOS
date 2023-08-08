@@ -154,8 +154,8 @@ namespace app::bell_settings
     {
         using namespace date::literals;
 
-        /// Default date/time after factory reset: 2022/01/01 12:00PM
-        const auto factoryResetDate   = 2022_y / jan / 1_d;
+        /// Default date/time after factory reset: 2023/01/01 12:00PM
+        const auto factoryResetDate   = 2023_y / jan / 1_d;
         const auto factoryRestTimeFmt = utils::time::Locale::TimeFormat::FormatTime12H;
 
         dateSetListItem->dateSetSpinner->setDate(factoryResetDate);

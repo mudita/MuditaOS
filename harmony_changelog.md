@@ -18,6 +18,7 @@
 * Fixed occasional crash when a deep press occurs during popups
 * Fixed diacritics in translations
 * Fixed problem with sounds in relaxation and power nap applications
+* Fixed the logic in onboarding screens
 
 ### Added
 
@@ -26,12 +27,14 @@
 * Added extended information to crashdump filename
 * Added extended information to log filename
 * Added Harmony version information in about section
+* Added system shutdown if there is no user activity for 180 seconds on the language selection screen
 
 ### Changed / Improved
 
 * Information about device memory is now sent to MC in floating points numbers
 * General improvement in Eink display and error handling
 * Changed the "Turn off Harmony" popup display time to 10 seconds
+* The default year has been updated to 2023
 
 ## [2.0.0 2023-06-29]
 
