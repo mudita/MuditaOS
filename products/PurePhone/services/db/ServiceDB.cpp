@@ -83,10 +83,10 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
          */
 
     case MessageType::DBContactAdd: {
-        auto time             = utils::time::Scoped("DBContactAdd");
-        auto msg              = static_cast<DBContactMessage *>(msgl);
-        auto ret              = contactRecordInterface->Add(msg->record);
-        auto record           = std::make_unique<std::vector<ContactRecord>>();
+        auto time   = utils::time::Scoped("DBContactAdd");
+        auto msg    = static_cast<DBContactMessage *>(msgl);
+        auto ret    = contactRecordInterface->Add(msg->record);
+        auto record = std::make_unique<std::vector<ContactRecord>>();
         record->push_back(msg->record);
         LOG_DEBUG("Last ID %" PRIu32, msg->record.ID);
         responseMsg = std::make_shared<DBContactResponseMessage>(std::move(record), ret);
@@ -94,21 +94,21 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
     } break;
 
     case MessageType::DBContactGetByID: {
-        auto time             = utils::time::Scoped("DBContactGetByID");
-        auto msg              = static_cast<DBContactMessage *>(msgl);
-        auto ret              = (msg->withTemporary ? contactRecordInterface->GetByIdWithTemporary(msg->record.ID)
-                                                    : contactRecordInterface->GetByID(msg->record.ID));
-        auto records          = std::make_unique<std::vector<ContactRecord>>();
+        auto time    = utils::time::Scoped("DBContactGetByID");
+        auto msg     = static_cast<DBContactMessage *>(msgl);
+        auto ret     = (msg->withTemporary ? contactRecordInterface->GetByIdWithTemporary(msg->record.ID)
+                                           : contactRecordInterface->GetByID(msg->record.ID));
+        auto records = std::make_unique<std::vector<ContactRecord>>();
         records->push_back(ret);
         responseMsg = std::make_shared<DBContactResponseMessage>(
             std::move(records), true, msg->limit, msg->offset, msg->favourite, 1, MessageType::DBContactGetByID);
     } break;
 
     case MessageType::DBContactGetBySpeedDial: {
-        auto time             = utils::time::Scoped("DBContactGetBySpeedDial");
-        auto msg              = static_cast<DBContactMessage *>(msgl);
-        auto ret              = contactRecordInterface->GetBySpeedDial(msg->record.speeddial);
-        responseMsg           = std::make_shared<DBContactResponseMessage>(std::move(ret),
+        auto time   = utils::time::Scoped("DBContactGetBySpeedDial");
+        auto msg    = static_cast<DBContactMessage *>(msgl);
+        auto ret    = contactRecordInterface->GetBySpeedDial(msg->record.speeddial);
+        responseMsg = std::make_shared<DBContactResponseMessage>(std::move(ret),
                                                                  true,
                                                                  msg->limit,
                                                                  msg->offset,
@@ -150,6 +150,15 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
         }
     } break;
 
+    case MessageType::DBCheckContactNumbersIsSame: {
+        auto time   = utils::time::Scoped("DBCheckContactNumbersIsSame");
+        auto msg    = static_cast<DBContactMessage *>(msgl);
+        auto ret    = contactRecordInterface->hasContactRecordSameNumbers(msg->record);
+        auto record = std::make_unique<std::vector<ContactRecord>>();
+        LOG_DEBUG("Has contact same numbers: %d" PRIu32, ret);
+        responseMsg = std::make_shared<DBResponseMessage>(ret, 0, MessageType::MessageTypeUninitialized);
+    } break;
+
     case MessageType::DBContactMatchByNumberID: {
         auto time = utils::time::Scoped("DBContactMatchByNumberID");
         auto msg  = static_cast<DBMatchContactByNumberIDMessage *>(msgl);
@@ -164,18 +173,18 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
     } break;
 
     case MessageType::DBContactRemove: {
-        auto time             = utils::time::Scoped("DBContactRemove");
-        auto msg              = static_cast<DBContactMessage *>(msgl);
-        auto ret              = contactRecordInterface->RemoveByID(msg->id);
-        responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+        auto time   = utils::time::Scoped("DBContactRemove");
+        auto msg    = static_cast<DBContactMessage *>(msgl);
+        auto ret    = contactRecordInterface->RemoveByID(msg->id);
+        responseMsg = std::make_shared<DBContactResponseMessage>(nullptr, ret);
         sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Delete, msg->id);
     } break;
 
     case MessageType::DBContactUpdate: {
-        auto time             = utils::time::Scoped("DBContactUpdate");
-        auto msg              = static_cast<DBContactMessage *>(msgl);
-        auto ret              = contactRecordInterface->Update(msg->record);
-        responseMsg           = std::make_shared<DBContactResponseMessage>(nullptr, ret);
+        auto time   = utils::time::Scoped("DBContactUpdate");
+        auto msg    = static_cast<DBContactMessage *>(msgl);
+        auto ret    = contactRecordInterface->Update(msg->record);
+        responseMsg = std::make_shared<DBContactResponseMessage>(nullptr, ret);
         sendUpdateNotification(db::Interface::Name::Contact, db::Query::Type::Update, msg->record.ID);
     } break;
 
@@ -184,11 +193,11 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
          */
 
     case MessageType::DBCalllogAdd: {
-        auto time             = utils::time::Scoped("DBCalllogAdd");
-        auto msg              = static_cast<DBCalllogMessage *>(msgl);
-        auto record           = std::make_unique<std::vector<CalllogRecord>>();
-        msg->record.ID        = DB_ID_NONE;
-        auto ret              = calllogRecordInterface->Add(msg->record);
+        auto time      = utils::time::Scoped("DBCalllogAdd");
+        auto msg       = static_cast<DBCalllogMessage *>(msgl);
+        auto record    = std::make_unique<std::vector<CalllogRecord>>();
+        msg->record.ID = DB_ID_NONE;
+        auto ret       = calllogRecordInterface->Add(msg->record);
         if (ret) {
             // return the newly added record
             msg->record = calllogRecordInterface->GetByID(calllogRecordInterface->GetLastID());
@@ -200,18 +209,18 @@ sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::
     } break;
 
     case MessageType::DBCalllogRemove: {
-        auto time             = utils::time::Scoped("DBCalllogRemove");
-        auto msg              = static_cast<DBCalllogMessage *>(msgl);
-        auto ret              = calllogRecordInterface->RemoveByID(msg->id);
-        responseMsg           = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
+        auto time   = utils::time::Scoped("DBCalllogRemove");
+        auto msg    = static_cast<DBCalllogMessage *>(msgl);
+        auto ret    = calllogRecordInterface->RemoveByID(msg->id);
+        responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
         sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Delete, msg->id);
     } break;
 
     case MessageType::DBCalllogUpdate: {
-        auto time             = utils::time::Scoped("DBCalllogUpdate");
-        auto msg              = static_cast<DBCalllogMessage *>(msgl);
-        auto ret              = calllogRecordInterface->Update(msg->record);
-        responseMsg           = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
+        auto time   = utils::time::Scoped("DBCalllogUpdate");
+        auto msg    = static_cast<DBCalllogMessage *>(msgl);
+        auto ret    = calllogRecordInterface->Update(msg->record);
+        responseMsg = std::make_shared<DBCalllogResponseMessage>(nullptr, ret);
         sendUpdateNotification(db::Interface::Name::Calllog, db::Query::Type::Update, msg->record.ID);
     } break;
 

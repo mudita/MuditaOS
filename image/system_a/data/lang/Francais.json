@@ -336,6 +336,8 @@
     "app_phonebook_new_contact_email": "Email",
     "app_phonebook_new_contact_first_name": "Pr\u00e9nom",
     "app_phonebook_new_contact_invalid_number": "<text>Impossible d'enregistrer ce contact.<br></br>Le num\u00e9ro de t\u00e9l\u00e9phone que vous avez entr\u00e9 <br></br>est dans un format invalide.</text>",
+    "app_phonebook_new_contact_unable_to_save": "Impossible d'enreg. le contact",
+    "app_phonebook_new_contact_same_numbers": "<text>Malgr\u00e9 l'indicatif du pays saisi, les num\u00e9ros de t\u00e9l\u00e9phone sont les m\u00eames.</text> <br></br><br></br> <text weight='bold' size='27'>Entrez un autre num\u00e9ro pour enregistrer le contact.</text>",
     "app_phonebook_new_contact_last_name": "Nom",
     "app_phonebook_new_contact_note": "Note",
     "app_phonebook_new_contact_number": "Num\u00e9ro",

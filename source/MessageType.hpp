@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -29,9 +29,12 @@ enum class MessageType
     DBMatchContactNumberBesidesOfContactID
     [[deprecated]], ///< used to best match with a single contact using a phone number (primary or secondary)
                     ///< but witch omitting specific contact ID
-    DBContactAdd [[deprecated]],    ///< Add contact record
-    DBContactRemove [[deprecated]], ///< Remove contact remove
-    DBContactUpdate [[deprecated]], ///< Update contact remove
+    DBCheckContactNumbersIsSame [[deprecated]], ///< used to check if a contact have 2 or more same numbers according to
+                                                ///< internal rules of number the similarity when the numbers are
+                                                ///< practically the same e.g. having a country code is only difference
+    DBContactAdd [[deprecated]],                ///< Add contact record
+    DBContactRemove [[deprecated]],             ///< Remove contact remove
+    DBContactUpdate [[deprecated]],             ///< Update contact remove
 
     DBQuery,
 

@@ -35,13 +35,13 @@ namespace sys
 class DBServiceAPI
 {
   public:
-
     enum class ContactVerificationResult
     {
         emptyContact,
         temporaryContactExists,
         primaryNumberDuplicate,
         secondaryNumberDuplicate,
+        primaryAndSecondaryNumberAreTheSame,
         speedDialDuplicate,
         success
     };
@@ -114,6 +114,8 @@ class DBServiceAPI
 
     static auto IsContactInFavourites(sys::Service *serv, const utils::PhoneNumber::View &numberView) -> bool;
     static auto IsContactInEmergency(sys::Service *serv, const utils::PhoneNumber::View &numberView) -> bool;
+
+    static auto hasContactSameNumbers(sys::Service *serv, const ContactRecord &rec) -> bool;
     /**
      * @brief Add sms via DBService interface
      *

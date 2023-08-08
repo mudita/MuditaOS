@@ -193,6 +193,9 @@ namespace gui
             case DBServiceAPI::ContactVerificationResult::secondaryNumberDuplicate:
                 showDialogDuplicatedNumber(contact->numbers[1].number, contact->ID);
                 return false;
+            case DBServiceAPI::ContactVerificationResult::primaryAndSecondaryNumberAreTheSame:
+                showDialogPrimaryAndSecondaryNumberAreTheSame();
+                return false;
             case DBServiceAPI::ContactVerificationResult::speedDialDuplicate:
                 showDialogDuplicatedSpeedDialNumber();
                 return false;
@@ -338,4 +341,18 @@ namespace gui
         return newContactModel->isAnyUnsavedChange(contact);
     }
 
+    void PhonebookNewContact::showDialogPrimaryAndSecondaryNumberAreTheSame()
+    {
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{utils::translate("app_phonebook_new_contact_unable_to_save"),
+                                "fail_128px_W_G",
+                                utils::translate("app_phonebook_new_contact_same_numbers"),
+                                "",
+                                [=]() -> bool {
+                                    application->returnToPreviousWindow();
+                                    return true;
+                                }});
+
+        application->switchWindow(gui::window::name::dialog, std::move(metaData));
+    }
 } // namespace gui

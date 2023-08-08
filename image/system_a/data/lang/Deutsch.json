@@ -369,6 +369,8 @@
     "app_phonebook_new_contact_email": "E-Mail",
     "app_phonebook_new_contact_first_name": "Vorname",
     "app_phonebook_new_contact_invalid_number": "<text>Dieser Kontakt kann nicht gespeichert werden.<br></br>Die von Ihnen eingegebene Telefonnummer<br></br>hat ein ung\u00fcltiges Format.</text>",
+    "app_phonebook_new_contact_unable_to_save": "Kontakt nicht gespeichert",
+    "app_phonebook_new_contact_same_numbers": "<text>Trotz der eingegebenen Landesvorwahl sind die Telefonnummern identisch.</text> <br></br><br></br> <text weight='bold' size='27'> Geben Sieeine weitere Nummer ein, um den Kontakt zu speichern.</text>",
     "app_phonebook_new_contact_last_name": "Nachname",
     "app_phonebook_new_contact_note": "Notiz",
     "app_phonebook_new_contact_number": "Nummer",

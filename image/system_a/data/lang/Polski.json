@@ -362,6 +362,8 @@
     "app_phonebook_new_contact_email": "E-mail",
     "app_phonebook_new_contact_first_name": "Imi\u0119",
     "app_phonebook_new_contact_invalid_number": "<text>Nie mo\u017cna zapisa\u0107 tego kontaktu.<br></br>Wprowadzony numer telefonu<br></br>ma nieprawid\u0142owy format.</text>",
+    "app_phonebook_new_contact_unable_to_save": "Nie mo\u017cna zapisa\u0107 kontaktu",
+    "app_phonebook_new_contact_same_numbers": "<text>Pomijaj\u0105c numery kierunkowe,<br></br>wprowad\u017aone numery s\u0105 takie same.</text> <br></br><br></br> <text weight='bold' size='27'>Wprowad\u017a inne numery <br></br>by zapisać kontakt.</text>",
     "app_phonebook_new_contact_last_name": "Nazwisko",
     "app_phonebook_new_contact_note": "Notatka",
     "app_phonebook_new_contact_number": "Numer",

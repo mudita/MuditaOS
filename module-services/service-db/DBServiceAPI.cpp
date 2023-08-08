@@ -157,6 +157,10 @@ auto DBServiceAPI::verifyContact(sys::Service *serv, const ContactRecord &rec)
         return ContactVerificationResult::speedDialDuplicate;
     }
 
+    if (rec.numbers.size() >= 2 && hasContactSameNumbers(serv, rec)) {
+        return ContactVerificationResult::primaryAndSecondaryNumberAreTheSame;
+    }
+
     if (rec.numbers.size() > 0 && rec.numbers[0].number.getEntered().size() > 0) {
         auto retPhone1 = MatchContactByPhoneNumber(serv, rec.numbers[0].number, rec.ID);
         if (retPhone1) {
@@ -305,4 +309,23 @@ void DBServiceAPI::InformLanguageChanged(sys::Service *serv)
 {
     auto query = std::make_unique<Quotes::Messages::InformLanguageChangeRequest>();
     DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+}
+
+auto DBServiceAPI::hasContactSameNumbers(sys::Service *serv, const ContactRecord &rec) -> bool
+{
+    std::shared_ptr<DBContactMessage> msg =
+        std::make_shared<DBContactMessage>(MessageType::DBCheckContactNumbersIsSame, rec);
+
+    auto ret             = serv->bus.sendUnicastSync(msg, service::name::db, constants::DefaultTimeoutInMs);
+    auto contactResponse = dynamic_cast<DBResponseMessage *>(ret.second.get());
+    if (contactResponse == nullptr) {
+        LOG_ERROR("DB response error, return code: %s", c_str(ret.first));
+        return false; // Assumption that the numbers in the contact are not the same
+    }
+    if (ret.first == sys::ReturnCodes::Success) {
+        return contactResponse->retCode;
+    }
+
+    LOG_ERROR("Checking if contact has same numbers failed");
+    return false; // Assumption that the numbers in the contact are not the same
 }
