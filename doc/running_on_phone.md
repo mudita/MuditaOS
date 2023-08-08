@@ -16,6 +16,7 @@ Some assets can be omitted though e.g. for fonts the default fallback font will 
 An executable can be uploaded directly to the memory in an executable (image) form. J-Link GDB Server enables this. J-Link Server messages `"Download 15243 bytes…"` represent this way of running the executable. The binary is lost on reset and/or power loss. Booting from SDRAM doesn't involve bootloader.
 
 ### Upload to SDRAM via J-Link
+**WARNING:** Remember about switching off `Automatic date and time` function (in *Settings->System->Date and time*) otherwise Pure will hang/freeze after a while after starting debugging. Also remember to connect the USB to properly power the phone while debugging.
 
 You need to upload the `PurePhone.elf` file. To do so run in three parallel consoles/sessions:
 
