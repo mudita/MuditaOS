@@ -225,6 +225,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
 
     auto GetNumbersIdsByContact(std::uint32_t contactId) -> std::vector<std::uint32_t>;
 
+    auto hasContactRecordSameNumbers(const ContactRecord &rec) -> bool;
+
     /**
      * @brief Merge contacts list with overriding the duplicates in contacts DB
      *
@@ -319,6 +321,4 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
      */
     auto changeNumberRecordInPlaceIfCountryCodeIsOnlyDifferent(const std::vector<std::uint32_t> &oldNumberIDs,
                                                                std::vector<ContactRecord::Number> &newNumbers) -> bool;
-
-    auto hasContactRecordSameNumbers(const ContactRecord &rec) -> bool;
 };
