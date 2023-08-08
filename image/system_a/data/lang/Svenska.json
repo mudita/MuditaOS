@@ -227,6 +227,8 @@
     "app_phonebook_new_contact_email": "Mail",
     "app_phonebook_new_contact_first_name": "F\u00f6rnamn",
     "app_phonebook_new_contact_invalid_number": "<text>Det g\u00e5r inte att spara den h\u00e4r kontakten.<br></br>Telefonnumret du angav<br></br>\u00e4r i ett ogiltigt format.</text>",
+    "app_phonebook_new_contact_unable_to_save": "Kan inte spara kontakt",
+    "app_phonebook_new_contact_same_numbers": "<text>Trots landskoden \u00e4r telefonnumren identiska.</text> <br></br><br></br> <text weight='bold' size='27'>Ange ett annat nummer för att sparakontakten.</text>",
     "app_phonebook_new_contact_last_name": "Efternamn",
     "app_phonebook_new_contact_note": "Anteckning",
     "app_phonebook_new_contact_number": "Nummer",

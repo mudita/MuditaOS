@@ -372,6 +372,8 @@
     "app_phonebook_new_contact_email": "Email",
     "app_phonebook_new_contact_first_name": "First name",
     "app_phonebook_new_contact_invalid_number": "<text>Cannot save this contact.<br></br>The phone number you entered <br></br>is in an invalid format.</text>",
+    "app_phonebook_new_contact_unable_to_save": "Unable to save contact",
+    "app_phonebook_new_contact_same_numbers": "<text>Despite the country code entered,<br></br>the phone numbers are the same.</text> <br></br><br></br> <text weight='bold' size='27'>Enter another numbers to save <br></br>the contact.</text>",
     "app_phonebook_new_contact_last_name": "Last name",
     "app_phonebook_new_contact_note": "Note",
     "app_phonebook_new_contact_number": "Phone number",

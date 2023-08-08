@@ -368,6 +368,8 @@
     "app_phonebook_new_contact_email": "Correo electr\u00f3nico",
     "app_phonebook_new_contact_first_name": "Nombre",
     "app_phonebook_new_contact_invalid_number": "<text>No se puede guardar este contacto.<br></br>El n\u00famero de tel\u00e9fono que ingres\u00f3 <br></br>tiene un formato no v\u00e1lido.</text>",
+    "app_phonebook_new_contact_unable_to_save": "No se pudo guardar el contacto",
+    "app_phonebook_new_contact_same_numbers": "<text>A pesar del c\u00f3digo de país ingresado, los n\u00fameros de tel\u00e9fono son los mismos.</text> <br></br><br></br> <text weight='bold' size='27'>Ingrese otros n\u00fameros para guardar el contacto.</text>",
     "app_phonebook_new_contact_last_name": "Apellido",
     "app_phonebook_new_contact_note": "Nota",
     "app_phonebook_new_contact_number": "N\u00famero",

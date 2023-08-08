@@ -35,6 +35,7 @@
 * Fixed missing tethering icon on "Tethering is on" window
 * Fixed showing "Copy text" option in empty note
 * Fixed "Copy" option missing from the options list in "New message" window
+* Fixed the ability to create a contact with the same primary and secondary phone number, which resulted in mismatching
 
 ## [1.7.2 2023-07-28]
 
