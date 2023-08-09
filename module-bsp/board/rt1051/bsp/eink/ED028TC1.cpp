@@ -960,10 +960,8 @@ EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill)
 
     BSP_EinkWriteCS(BSP_Eink_CS_Set);
 
-    EinkRefreshImage(EinkFrame_t{0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y},
-                     EinkDisplayTimingsDeepCleanMode);
-
-    return EinkOK;
+    return EinkRefreshImage(EinkFrame_t{0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y},
+                            EinkDisplayTimingsDeepCleanMode);
 }
 
 EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refreshTimingsMode)

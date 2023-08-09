@@ -117,14 +117,13 @@ namespace service::eink
 
     sys::ReturnCodes ServiceEink::DeinitHandler()
     {
-        // Eink must be turned on before wiping out the display
-        display->reinitAndPowerOn();
-
         if ((exitAction == ExitAction::WipeOut) ||
             ((display->getMode() == hal::eink::EinkDisplayColorMode::EinkDisplayColorModeInverted) &&
              (systemCloseReason != sys::CloseReason::FactoryReset))) {
             LOG_INFO("Performing low-level display wipeout");
-            display->wipeOut();
+            if (const auto status = display->wipeOut(); status != hal::eink::EinkStatus::EinkOK) {
+                LOG_ERROR("Low-level display wipeout failed");
+            }
         }
 
         display->shutdown();
