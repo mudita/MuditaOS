@@ -273,7 +273,8 @@ namespace hal::eink
 
     EinkStatus EinkDisplay::wipeOut()
     {
-        if (const auto status = reinitAndPowerOn(); status != EinkStatus::EinkOK) {
+        if (const auto status = prepareDisplay(EinkRefreshMode::REFRESH_DEEP, WaveformTemperature::KEEP_CURRENT);
+            status != EinkStatus::EinkOK) {
             return status;
         }
         return translateStatus(EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite));
