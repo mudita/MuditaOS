@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationCommon.hpp"
@@ -36,11 +36,26 @@ namespace app::meditation
         timer->stop();
     }
 
+    bool MeditationCountdownPresenter::isFinished()
+    {
+        return finished;
+    }
+
+    void MeditationCountdownPresenter::setReady(bool status)
+    {
+        ready = status;
+    }
+
+    bool MeditationCountdownPresenter::isReady()
+    {
+        return ready;
+    }
+
     void MeditationCountdownPresenter::onCountdownFinished()
     {
-        auto data                        = std::make_unique<gui::SwitchData>();
-        data->ignoreCurrentWindowOnStack = true;
-
-        app->switchWindow(meditation::windows::meditationProgress, std::move(data));
+        finished = true;
+        if (ready) {
+            app->switchWindow(meditation::windows::meditationProgress);
+        }
     }
 } // namespace app::meditation

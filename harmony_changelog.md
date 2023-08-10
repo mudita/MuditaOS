@@ -21,6 +21,7 @@
 * Fixed the logic in onboarding screens
 * Fixed issues with file uploads with low disk space.
 * Fixed hard fault handling
+* Fixed meditation countdown timer when a deep press is performed
 
 ### Added
 

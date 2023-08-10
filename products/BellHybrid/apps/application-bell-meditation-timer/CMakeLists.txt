@@ -49,6 +49,7 @@ target_link_libraries(application-bell-meditation-timer
         bell::app-common
         bell::app-main
         bell::paths
+        bell::keymap
         service-appmgr
         service-time
     PUBLIC
