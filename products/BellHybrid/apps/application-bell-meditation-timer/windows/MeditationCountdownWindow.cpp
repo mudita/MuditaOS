@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Arc.hpp>
@@ -8,6 +8,7 @@
 #include "MeditationCountdownWindow.hpp"
 #include "MeditationStyle.hpp"
 
+#include <keymap/KeyMap.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 
 namespace
@@ -90,12 +91,20 @@ namespace gui
         if (mode == ShowMode::GUI_SHOW_INIT) {
             presenter->start();
         }
+        else if (presenter->isFinished()) {
+            application->switchWindow(app::meditation::windows::meditationProgress);
+        }
+        presenter->setReady(true);
     }
 
     bool MeditationCountdownWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (key == KeyMap::Back) {
             presenter->stop();
+        }
+        if (key == KeyMap::DeepPressUp || key == KeyMap::DeepPressDown) {
+            presenter->setReady(false);
         }
         return AppWindow::onInput(inputEvent);
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -38,6 +38,9 @@ namespace app::meditation
             virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
             virtual void start()                                                    = 0;
             virtual void stop()                                                     = 0;
+            virtual bool isFinished()                                               = 0;
+            virtual bool isReady()                                                  = 0;
+            virtual void setReady(bool status)                                      = 0;
         };
     };
 
@@ -50,12 +53,17 @@ namespace app::meditation
         std::chrono::seconds duration;
 
         void onCountdownFinished();
+        bool finished{false};
+        bool ready{true};
 
       public:
         MeditationCountdownPresenter(app::ApplicationCommon *app, models::StartDelay &startDelay);
 
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
+        bool isFinished() override;
         void start() override;
         void stop() override;
+        bool isReady() override;
+        void setReady(bool status) override;
     };
 } // namespace app::meditation
