@@ -23,18 +23,13 @@ class ServiceAudio : public sys::Service
 {
   public:
     ServiceAudio();
-
     ~ServiceAudio();
 
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
-
     sys::ReturnCodes InitHandler() override;
-
     sys::ReturnCodes DeinitHandler() override;
-
     void ProcessCloseReason(sys::CloseReason closeReason) override;
-
-    sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final;
+    sys::ReturnCodes SwitchPowerModeHandler(sys::ServicePowerMode mode) override final;
 
   private:
     enum class VibrationType
@@ -101,7 +96,7 @@ class ServiceAudio : public sys::Service
     std::string GetSound(const audio::PlaybackType &plType);
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
-    auto IsBusy() -> bool;
+    auto GetOperationState() -> audio::Operation::State;
     auto IsSystemSound(const audio::PlaybackType &type) -> bool;
     audio::PlaybackType generatePlayback(const audio::PlaybackType &type,
                                          const audio::Setting &setting = audio::Setting::Volume);
@@ -133,6 +128,7 @@ class ServiceAudio : public sys::Service
     auto handleSingleVibrationStart() -> sys::MessagePointer;
 
     void notifyAboutNewRoutingIfRouterAvailable();
+    void updateMinimumCpuFrequency(audio::Operation::State operationState);
 };
 
 namespace sys
