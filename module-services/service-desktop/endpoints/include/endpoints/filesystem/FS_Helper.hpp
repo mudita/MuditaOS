@@ -42,7 +42,7 @@ namespace sdesktop::endpoints
         auto startGetFile(Context &context) const -> ResponseContext;
         auto getFileChunk(Context &context) const -> ResponseContext;
 
-        auto getFreeSpaceForUserFilesMiB() const -> unsigned long;
+        auto getFreeSpaceForUserFilesMiB() const -> float;
 
         auto startSendFile(Context &context) const -> ResponseContext;
         auto sendFileChunk(Context &context) const -> ResponseContext;

@@ -19,6 +19,7 @@
 * Fixed diacritics in translations
 * Fixed problem with sounds in relaxation and power nap applications
 * Fixed the logic in onboarding screens
+* Fixed issues with file uploads with low disk space.
 
 ### Added
 

@@ -126,7 +126,7 @@ namespace sdesktop::endpoints
     auto FS_Helper::requestLogsFlush() const -> void
     {
         auto ownerService = dynamic_cast<ServiceDesktop *>(owner);
-        if (ownerService) {
+        if (ownerService != nullptr) {
             ownerService->requestLogsFlush();
         }
     }
@@ -200,13 +200,13 @@ namespace sdesktop::endpoints
         json11::Json::object response{};
         auto code = http::Code::BadRequest;
 
-        if (dataWithCrc32.data.length()) {
+        if (!dataWithCrc32.data.empty()) {
             code     = http::Code::OK;
             response = json11::Json::object({{json::fs::rxID, static_cast<int>(rxID)},
                                              {json::fs::chunkNo, static_cast<int>(chunkNo)},
                                              {json::fs::data, dataWithCrc32.data}});
 
-            if (dataWithCrc32.crc32.length()) {
+            if (!dataWithCrc32.crc32.empty()) {
                 response[json::fs::fileCrc32] = dataWithCrc32.crc32;
             }
         }
@@ -224,11 +224,11 @@ namespace sdesktop::endpoints
 
     auto FS_Helper::startSendFile(Context &context) const -> ResponseContext
     {
-        const auto &body        = context.getBody();
-        const auto &filePath    = body[json::fs::fileName].string_value();
-        const uint32_t fileSize = body[json::fs::fileSize].int_value();
-        const auto &fileCrc32   = body[json::fs::fileCrc32].string_value();
-        auto code               = http::Code::BadRequest;
+        const auto &body             = context.getBody();
+        const auto &filePath         = body[json::fs::fileName].string_value();
+        const std::uint32_t fileSize = body[json::fs::fileSize].int_value();
+        const auto &fileCrc32        = body[json::fs::fileCrc32].string_value();
+        auto code                    = http::Code::BadRequest;
 
         LOG_DEBUG("Start sending of file: %s", filePath.c_str());
 
@@ -240,7 +240,7 @@ namespace sdesktop::endpoints
 
         const auto freeSpaceLeftForUserFilesMiB = getFreeSpaceForUserFilesMiB();
 
-        if (fileSize / bytesInMebibyte > freeSpaceLeftForUserFilesMiB) {
+        if ((freeSpaceLeftForUserFilesMiB - (static_cast<float>(fileSize) / bytesInMebibyte)) <= 0) {
             LOG_ERROR("Not enough space left on device!");
             code = http::Code::InsufficientStorage;
             return ResponseContext{.status = code};
@@ -361,7 +361,7 @@ namespace sdesktop::endpoints
         return ResponseContext{.status = http::Code::OK, .body = response};
     }
 
-    auto FS_Helper::getFreeSpaceForUserFilesMiB() const -> unsigned long
+    auto FS_Helper::getFreeSpaceForUserFilesMiB() const -> float
     {
         const auto userDiskPath = purefs::dir::getUserDiskPath();
         struct statvfs vfstat
@@ -371,9 +371,8 @@ namespace sdesktop::endpoints
             return 0;
         }
 
-        const auto freeBytes =
-            (static_cast<std::uint64_t>(vfstat.f_bfree) * static_cast<std::uint64_t>(vfstat.f_bsize));
-        const auto freeMiBs = freeBytes / bytesInMebibyte;
+        const auto freeBytes = (static_cast<float>(vfstat.f_bfree) * static_cast<float>(vfstat.f_bsize));
+        const auto freeMiBs  = freeBytes / bytesInMebibyte;
 
         return freeMiBs;
     }
