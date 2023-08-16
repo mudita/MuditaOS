@@ -21,9 +21,9 @@
 namespace
 {
     hal::battery::AbstractBatteryCharger::ChargingStatus transformChargingState(
-        bsp::battery_charger::batteryRetval status)
+        bsp::battery_charger::BatteryRetval status)
     {
-        using Status   = bsp::battery_charger::batteryRetval;
+        using Status   = bsp::battery_charger::BatteryRetval;
         using NewState = hal::battery::AbstractBatteryCharger::ChargingStatus;
         switch (status) {
         case Status::ChargerCharging:
@@ -39,25 +39,26 @@ namespace
 
     /// A few constants to make code readability better
     constexpr auto int_b_soc_change =
-        static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::SOCOnePercentChange);
-    constexpr auto int_b_max_temp = static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::maxTemp);
-    constexpr auto int_b_min_temp = static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minTemp);
-    constexpr auto int_b_all      = static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::all);
-    constexpr auto int_b_miv_v    = static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::minVAlert);
+        static_cast<std::uint16_t>(bsp::battery_charger::BatteryINTBSource::SOCOnePercentChange);
+    constexpr auto int_b_max_temp = static_cast<std::uint16_t>(bsp::battery_charger::BatteryINTBSource::maxTemp);
+    constexpr auto int_b_min_temp = static_cast<std::uint16_t>(bsp::battery_charger::BatteryINTBSource::minTemp);
+    constexpr auto int_b_all      = static_cast<std::uint16_t>(bsp::battery_charger::BatteryINTBSource::all);
+    constexpr auto int_b_miv_v    = static_cast<std::uint16_t>(bsp::battery_charger::BatteryINTBSource::minVAlert);
 
     constexpr auto int_source_charger =
-        static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::CHGR_INT);
+        static_cast<std::uint8_t>(bsp::battery_charger::TopControllerIRQsource::CHGR_INT);
 
     constexpr auto int_source_fuel_gauge =
-        static_cast<std::uint8_t>(bsp::battery_charger::topControllerIRQsource::FG_INT);
+        static_cast<std::uint8_t>(bsp::battery_charger::TopControllerIRQsource::FG_INT);
 
-    constexpr uint16_t clearStatusTickTime_MS = 10000;
+    constexpr auto irqClearTimerName   = "BatteryIrqClearTimer";
+    constexpr auto irqClearTimerTimeMs = 10000;
 
-    void clearIrqStatusHandler(TimerHandle_t xTimer)
+    void clearIrqStatusHandler([[maybe_unused]] TimerHandle_t xTimer)
     {
-        if (bsp::battery_charger::getStatusRegister()) {
-            bsp::battery_charger::clearFuelGuageIRQ(
-                static_cast<std::uint16_t>(bsp::battery_charger::batteryINTBSource::all));
+        if (bsp::battery_charger::getStatusRegister() != 0) {
+            bsp::battery_charger::clearFuelGaugeIRQ(
+                static_cast<std::uint16_t>(bsp::battery_charger::BatteryINTBSource::all));
         }
     }
 } // namespace
@@ -71,8 +72,8 @@ namespace hal::battery
         {
             enum class Type
             {
-                Controller,
-                USBChargerAttached
+                ControllerINTB,
+                USBChargerAttached,
             };
             Type type;
             std::uint8_t chargerType{};
@@ -90,37 +91,41 @@ namespace hal::battery
         static BatteryWorkerQueue &getWorkerQueueHandle();
 
       private:
-        static constexpr auto workerStackSize = 2048;
+        static constexpr auto irqWorkerStackSize = 1024 * 2;
 
         void setChargingCurrentLimit(std::uint8_t usbType);
         void sendNotification(AbstractBatteryCharger::Events event);
         void checkControllerInterrupts();
 
         QueueHandle_t notificationChannel;
-        TimerHandle_t timerHandle;
+        TimerHandle_t irqClearTimerHandle;
         inline static std::unique_ptr<BatteryWorkerQueue> workerQueue;
     };
 
     PureBatteryCharger::PureBatteryCharger(QueueHandle_t irqQueueHandle)
         : notificationChannel{irqQueueHandle},
-          timerHandle{xTimerCreate(
-              "clearIrqStatusTimer", pdMS_TO_TICKS(clearStatusTickTime_MS), false, nullptr, clearIrqStatusHandler)}
+          irqClearTimerHandle{xTimerCreate(
+              irqClearTimerName, pdMS_TO_TICKS(irqClearTimerTimeMs), pdFALSE, nullptr, clearIrqStatusHandler)}
     {
 
         workerQueue = std::make_unique<BatteryWorkerQueue>(
             "battery_charger",
             [this](const auto &msg) {
                 switch (msg.type) {
-                case IrqEvents::Type::Controller: {
+                case IrqEvents::Type::ControllerINTB:
                     checkControllerInterrupts();
-                } break;
+                    break;
 
-                case IrqEvents::Type::USBChargerAttached: {
+                case IrqEvents::Type::USBChargerAttached:
                     setChargingCurrentLimit(msg.chargerType);
-                } break;
+                    break;
+
+                default:
+                    LOG_ERROR("Unhandled IrqEvent %d", static_cast<int>(msg.type));
+                    break;
                 }
             },
-            workerStackSize);
+            irqWorkerStackSize);
 
         bsp::battery_charger::init();
         bsp::battery_charger::printFuelGaugeInfo();
@@ -129,109 +134,124 @@ namespace hal::battery
         CurrentMeasurementScope::start();
 #endif
     }
+
     PureBatteryCharger::~PureBatteryCharger()
     {
         bsp::battery_charger::deinit();
     }
+
     void PureBatteryCharger::setChargingCurrentLimit(std::uint8_t usbType)
     {
         using namespace bsp::battery_charger;
-        const auto event = static_cast<batteryChargerType>(usbType);
-        LOG_INFO("USB charging port discovery result: %s", std::string{magic_enum::enum_name(event)}.c_str());
+
+        const auto event = static_cast<BatteryChargerType>(usbType);
+        LOG_INFO("USB charging port discovery result: %s", magic_enum::enum_name(event).data());
 
         switch (event) {
-        case batteryChargerType::DcdTimeOut:
-        case batteryChargerType::DcdUnknownType:
-        case batteryChargerType::DcdError:
-        case batteryChargerType::DcdSDP:
+        case BatteryChargerType::DcdTimeOut:
+        case BatteryChargerType::DcdUnknownType:
+        case BatteryChargerType::DcdError:
+        case BatteryChargerType::DcdSDP:
             LOG_INFO("USB current limit set to 500mA");
             setMaxBusCurrent(USBCurrentLimit::lim500mA);
             break;
-        case batteryChargerType::DcdCDP:
-        case batteryChargerType::DcdDCP:
+
+        case BatteryChargerType::DcdCDP:
+        case BatteryChargerType::DcdDCP:
             LOG_INFO("USB current limit set to 1000mA");
             setMaxBusCurrent(USBCurrentLimit::lim1000mA);
             break;
         }
     }
+
     std::optional<AbstractBatteryCharger::Voltage> PureBatteryCharger::getBatteryVoltage() const
     {
         return bsp::battery_charger::getVoltageFilteredMeasurement();
     }
+
     std::optional<AbstractBatteryCharger::SOC> PureBatteryCharger::getSOC() const
     {
         const auto soc = bsp::battery_charger::getBatteryLevel();
-        if (not soc) {
+        if (!soc.has_value()) {
             LOG_ERROR("Cannot read SOC (I2C issue)");
             return std::nullopt;
         }
         bsp::battery_charger::storeBatteryLevelChange(soc.value());
-        const auto scaled_soc = scale_soc(soc.value());
-        if (not scaled_soc) {
+        const auto scaledSoc = scale_soc(soc.value());
+        if (!scaledSoc.has_value()) {
             LOG_ERROR("SOC is out of valid range. SOC: %d", soc.value());
             return std::nullopt;
         }
-        return scaled_soc;
+        return scaledSoc;
     }
+
     AbstractBatteryCharger::ChargingStatus PureBatteryCharger::getChargingStatus() const
     {
         return transformChargingState(bsp::battery_charger::getChargeStatus());
     }
+
     AbstractBatteryCharger::ChargerPresence PureBatteryCharger::getChargerPresence() const
     {
         return bsp::battery_charger::isChargerPlugged() ? AbstractBatteryCharger::ChargerPresence::PluggedIn
                                                         : AbstractBatteryCharger::ChargerPresence::Unplugged;
     }
+
     PureBatteryCharger::BatteryWorkerQueue &PureBatteryCharger::getWorkerQueueHandle()
     {
         return *workerQueue;
     }
+
     void PureBatteryCharger::checkControllerInterrupts()
     {
-        std::array<std::optional<Events>, 4> events;
+        std::vector<Events> eventsToProcess;
 
-        const auto topINT = bsp::battery_charger::getTopControllerINTSource();
-        if (topINT & int_source_charger) {
-            bsp::battery_charger::clearAllChargerIRQs();
-            events[magic_enum::enum_integer(Events::Charger)] = Events::Charger;
+        const auto IRQSource = bsp::battery_charger::getTopControllerINTSource();
+        if (!IRQSource.has_value()) {
+            return;
         }
-        if (topINT & int_source_fuel_gauge) {
-            const auto status = bsp::battery_charger::getStatusRegister();
-            if (status & int_b_miv_v) {
-                bsp::battery_charger::clearFuelGuageIRQ(int_b_miv_v);
 
-                if (bsp::battery_charger::getChargeStatus() == bsp::battery_charger::batteryRetval::ChargerCharging) {
-                    if (xTimerIsTimerActive(timerHandle) == pdFALSE) {
-                        xTimerStart(timerHandle, 0);
-                        LOG_DEBUG("Battery Brownout detected while charging");
+        if (static_cast<bool>(IRQSource.value() & int_source_charger)) {
+            bsp::battery_charger::clearAllChargerIRQs();
+            eventsToProcess.push_back(Events::Charger);
+        }
+        if (static_cast<bool>(IRQSource.value() & int_source_fuel_gauge)) {
+            const auto status = bsp::battery_charger::getStatusRegister();
+            if (static_cast<bool>(status & int_b_miv_v)) {
+                bsp::battery_charger::clearFuelGaugeIRQ(int_b_miv_v);
+                if (bsp::battery_charger::getChargeStatus() == bsp::battery_charger::BatteryRetval::ChargerCharging) {
+                    if (xTimerIsTimerActive(irqClearTimerHandle) == pdFALSE) {
+                        xTimerStart(irqClearTimerHandle, 0);
+                        LOG_INFO("Battery brownout detected while charging");
                     }
                 }
                 else {
-                    events[magic_enum::enum_integer(Events::Brownout)] = Events::Brownout;
+                    eventsToProcess.push_back(Events::Brownout);
                 }
             }
-            if (status & int_b_soc_change) {
-                bsp::battery_charger::clearFuelGuageIRQ(int_b_soc_change);
-                events[magic_enum::enum_integer(Events::SOC)] = Events::SOC;
+            if (static_cast<bool>(status & int_b_soc_change)) {
+                bsp::battery_charger::clearFuelGaugeIRQ(int_b_soc_change);
+                eventsToProcess.push_back(Events::SOC);
             }
-            if (status & int_b_min_temp || status & int_b_max_temp) {
-                bsp::battery_charger::clearFuelGuageIRQ(int_b_min_temp | int_b_max_temp);
+            if (static_cast<bool>(status & int_b_min_temp) || static_cast<bool>(status & int_b_max_temp)) {
+                bsp::battery_charger::clearFuelGaugeIRQ(int_b_min_temp | int_b_max_temp);
                 bsp::battery_charger::checkTemperatureRange();
             }
-            /// Clear other unsupported IRQ sources just in case
-            bsp::battery_charger::clearFuelGuageIRQ(int_b_all);
+            // Clear other unsupported IRQ sources just in case
+            bsp::battery_charger::clearFuelGaugeIRQ(int_b_all);
         }
 
-        /// Send notifications
-        for (const auto &event : events) {
-            if (event) {
-                sendNotification(*event);
-            }
+        // Send notifications
+        for (const auto &event : eventsToProcess) {
+            sendNotification(event);
         }
     }
+
     void PureBatteryCharger::sendNotification(AbstractBatteryCharger::Events event)
     {
-        xQueueSend(notificationChannel, &event, pdMS_TO_TICKS(100));
+        const auto status = xQueueSend(notificationChannel, &event, pdMS_TO_TICKS(100));
+        if (status != pdTRUE) {
+            LOG_ERROR("Failed to push event to battery charger queue, status %" PRIi32, status);
+        }
     }
 
     std::unique_ptr<AbstractBatteryCharger> AbstractBatteryCharger::Factory::create(xQueueHandle irqQueueHandle)
@@ -247,12 +267,6 @@ namespace hal::battery
 
     BaseType_t INTBHandlerIRQ()
     {
-        return PureBatteryCharger::getWorkerQueueHandle().post({PureBatteryCharger::IrqEvents::Type::Controller});
+        return PureBatteryCharger::getWorkerQueueHandle().post({PureBatteryCharger::IrqEvents::Type::ControllerINTB});
     }
-
-    BaseType_t INOKBHandlerIRQ()
-    {
-        return PureBatteryCharger::getWorkerQueueHandle().post({PureBatteryCharger::IrqEvents::Type::Controller});
-    }
-
 } // namespace hal::battery

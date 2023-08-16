@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
@@ -18,18 +18,21 @@ namespace bsp::battery_charger::utils
             bitset.flip();
             return static_cast<int>(bitset.to_ulong() * -1);
         }
-        else {
-            return static_cast<int>(toConvert);
-        }
+        return static_cast<int>(toConvert);
     }
 
     std::size_t getFileSize(std::ifstream &file)
     {
+        const auto currentPosition = file.tellg();
+
+        file.seekg(0, std::ios::beg);
         const auto begin = file.tellg();
+
         file.seekg(0, std::ios::end);
         const auto end = file.tellg();
-        file.seekg(0, std::ios::beg);
+
+        file.seekg(currentPosition, std::ios::beg);
+
         return end - begin;
     }
-
 } // namespace bsp::battery_charger::utils

@@ -30,9 +30,9 @@ namespace
         case Status::Charging:
             return NewState::Charging;
         case Status::ChargingDone:
-            return NewState ::ChargingDone;
+            return NewState::ChargingDone;
         case Status::PluggedNotCharging:
-            return NewState ::PluggedNotCharging;
+            return NewState::PluggedNotCharging;
         default:
             return NewState::Discharging;
         }
@@ -48,9 +48,9 @@ namespace
         case Status::Charging:
             return NewState::Charging;
         case Status::ChargingDone:
-            return NewState ::ChargingDone;
+            return NewState::ChargingDone;
         case Status::PluggedNotCharging:
-            return NewState ::PluggedNotCharging;
+            return NewState::PluggedNotCharging;
         default:
             return NewState::Discharging;
         }
@@ -66,9 +66,9 @@ namespace
         case Status::Shutdown:
             return NewState::Shutdown;
         case Status::CriticalCharging:
-            return NewState ::CriticalCharging;
+            return NewState::CriticalCharging;
         case Status::CriticalNotCharging:
-            return NewState ::CriticalNotCharging;
+            return NewState::CriticalNotCharging;
         default:
             return NewState::Normal;
         }
@@ -108,15 +108,15 @@ BatteryController::BatteryController(sys::Service *service, xQueueHandle notific
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
     batteryState.check(transformChargingState(Store::Battery::modify().state), Store::Battery::modify().level);
 
-    LOG_INFO("Initial charger state:%s", magic_enum::enum_name(Store::Battery::get().state).data());
-    LOG_INFO("Initial battery SOC:%d", Store::Battery::get().level);
-    LOG_INFO("Initial battery voltage:%" PRIu32 "mV", getVoltage());
-    LOG_INFO("Initial battery state:%s", magic_enum::enum_name(Store::Battery::get().levelState).data());
+    LOG_INFO("Initial charger state: %s", magic_enum::enum_name(Store::Battery::get().state).data());
+    LOG_INFO("Initial battery SOC: %d", Store::Battery::get().level);
+    LOG_INFO("Initial battery voltage: %" PRIu32 "mV", getVoltage());
+    LOG_INFO("Initial battery state: %s", magic_enum::enum_name(Store::Battery::get().levelState).data());
 }
 
 void sevm::battery::BatteryController::handleNotification(Events evt)
 {
-    LOG_INFO("Incoming event: %s", std::string{magic_enum::enum_name(evt)}.c_str());
+    LOG_INFO("Incoming event: %s", magic_enum::enum_name(evt).data());
     switch (evt) {
     case Events::Charger:
         checkChargerPresence();
@@ -136,14 +136,16 @@ void sevm::battery::BatteryController::poll()
     update();
     brownoutDetector.poll();
 }
+
 void sevm::battery::BatteryController::printCurrentState()
 {
-    LOG_INFO("Charger state:%s Battery SOC %d voltage: %" PRIu32 "mV state: %s",
+    LOG_INFO("Charger state: %s | Battery SOC: %d%% | Voltage: %" PRIu32 "mV | Level state: %s",
              magic_enum::enum_name(Store::Battery::get().state).data(),
              Store::Battery::get().level,
              getVoltage(),
              magic_enum::enum_name(Store::Battery::get().levelState).data());
 }
+
 void sevm::battery::BatteryController::update()
 {
     const auto lastSoc   = Store::Battery::get().level;
@@ -186,12 +188,15 @@ units::Voltage sevm::battery::BatteryController::getVoltage()
 
 void sevm::battery::BatteryController::checkChargerPresence()
 {
+    using PlugEvent = sevm::USBPlugEvent::Event;
+
     const auto newChargerPresence = charger->getChargerPresence();
-    if (chargerPresence != newChargerPresence) {
-        service->bus.sendUnicast(std::make_shared<sevm::USBPlugEvent>(newChargerPresence == ChargerPresence::PluggedIn
-                                                                          ? sevm::USBPlugEvent::Event::CablePlugged
-                                                                          : sevm::USBPlugEvent::Event::CableUnplugged),
-                                 service::name::service_desktop);
-        chargerPresence = newChargerPresence;
+    if (chargerPresence == newChargerPresence) {
+        return;
     }
+
+    const auto plugEvent =
+        (newChargerPresence == ChargerPresence::PluggedIn) ? PlugEvent::CablePlugged : PlugEvent::CableUnplugged;
+    service->bus.sendUnicast(std::make_shared<sevm::USBPlugEvent>(plugEvent), service::name::service_desktop);
+    chargerPresence = newChargerPresence;
 }
