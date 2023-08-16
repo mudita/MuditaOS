@@ -97,7 +97,7 @@ namespace gui
          * Applies configuration change on the current status bar configuration.
          * @param configChange  The function that contains the status bar configuration changes.
          */
-        void applyToStatusBar(StatusBarConfigurationChangeFunction configChange);
+        void applyToStatusBar(const StatusBarConfigurationChangeFunction &configChange);
 
         void setTitle(const UTF8 &text);
         [[nodiscard]] UTF8 getTitle();

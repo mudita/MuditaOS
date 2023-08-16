@@ -1,13 +1,12 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
 namespace bsp::battery_charger
 {
-
-    constexpr inline auto BATTERY_CHARGER_I2C_ADDR = 0xD2 >> 1;
-    constexpr inline auto FUEL_GAUGE_I2C_ADDR      = 0x6C >> 1;
-    constexpr inline auto TOP_CONTROLLER_I2C_ADDR  = 0xCC >> 1;
+    constexpr inline auto BATTERY_CHARGER_I2C_ADDR = (0xD2 >> 1);
+    constexpr inline auto FUEL_GAUGE_I2C_ADDR      = (0x6C >> 1);
+    constexpr inline auto TOP_CONTROLLER_I2C_ADDR  = (0xCC >> 1);
 
     enum class Registers
     {
@@ -16,6 +15,7 @@ namespace bsp::battery_charger
         TOP_CONTROLL_IRQ_SRC_REG  = 0x22,
         TOP_CONTROLL_IRQ_MASK_REG = 0x23,
         SYSTEM_IRQ_REG            = 0x24,
+        SYSTEM_IRQ_MASK_REG       = 0x26,
 
         STATUS_REG     = 0x00,
         VALRT_Th_REG   = 0x01,
@@ -104,7 +104,6 @@ namespace bsp::battery_charger
         CHG_CNFG_10    = 0xC1,
         CHG_CNFG_11    = 0xC2,
         CHG_CNFG_12    = 0xC3
-
     };
 
     // STATUS register bits
@@ -125,10 +124,17 @@ namespace bsp::battery_charger
         Vmx    = (1 << 12),
         Tmx    = (1 << 13),
         Smx    = (1 << 14),
-        Br     = (1 << 15),
+        Br     = (1 << 15)
     };
 
-    /// CHG_INT register
+    enum class TOP_MASK
+    {
+        CHGR_INT_MASK = (1 << 0),
+        FG_INT_MASK   = (1 << 1),
+        SYS_INT_MASK  = (1 << 2)
+    };
+
+    // CHG_INT register
     enum class CHG_INT
     {
         BYP_I   = (1 << 0),
@@ -153,7 +159,7 @@ namespace bsp::battery_charger
         AICL_M  = (1 << 7)
     };
 
-    /// CHG_DETAILS_01 register
+    // CHG_DETAILS_01 register
     enum class CHG_DETAILS_01
     {
         CHARGER_PREQUALIFICATION = 0x00,
@@ -166,11 +172,11 @@ namespace bsp::battery_charger
         CHARGER_OFF              = 0x08,
     };
 
-    // CHG_CNFG_09 register
-    enum class USBCurrentLimit
+    // CHG_CNFG_00 register
+    enum class ChargerMode
     {
-        lim500mA  = 0x0F,
-        lim1000mA = 0x1E,
+        ChargerOffBuckOn = 0x04,
+        ChargerOnBuckOn  = 0x05
     };
 
     // CHG_CNFG_02 register
@@ -179,6 +185,20 @@ namespace bsp::battery_charger
         lim300mA  = 0x06, /// est. 0.2C of battery
         lim450mA  = 0x09, /// default
         lim1600mA = 0x20, /// 1C of battery
+    };
+
+    // CHG_CNFG_06
+    enum class ChargerSettingsProtection
+    {
+        Enable  = 0,
+        Disable = (0x03 << 2)
+    };
+
+    // CHG_CNFG_09 register
+    enum class USBCurrentLimit
+    {
+        lim500mA  = 0x0F,
+        lim1000mA = 0x1E,
     };
 
     enum class ChargeTerminationVoltage
@@ -190,36 +210,35 @@ namespace bsp::battery_charger
     // CONFIG register bits
     enum class CONFIG
     {
-        Ber    = 1 << 0,
-        Bei    = 1 << 1,
-        Aen    = 1 << 2,
-        FTHRM  = 1 << 3,
-        ETHRM  = 1 << 4,
-        SPR_5  = 1 << 5,
-        I2CSH  = 1 << 6,
-        SHDN   = 1 << 7,
-        Tex    = 1 << 8,
-        Ten    = 1 << 9,
-        AINSH  = 1 << 10,
-        SPR_11 = 1 << 11,
-        Vs     = 1 << 12,
-        Ts     = 1 << 13,
-        Ss     = 1 << 14,
-        SPR_15 = 1 << 15
+        Ber    = (1 << 0),
+        Bei    = (1 << 1),
+        Aen    = (1 << 2),
+        FTHRM  = (1 << 3),
+        ETHRM  = (1 << 4),
+        SPR_5  = (1 << 5),
+        I2CSH  = (1 << 6),
+        SHDN   = (1 << 7),
+        Tex    = (1 << 8),
+        Ten    = (1 << 9),
+        AINSH  = (1 << 10),
+        SPR_11 = (1 << 11),
+        Vs     = (1 << 12),
+        Ts     = (1 << 13),
+        Ss     = (1 << 14),
+        SPR_15 = (1 << 15)
     };
 
     // CONFIG2 register bits
     enum class CONFIG2
     {
-        ISysNCurr    = 1 << 0,
-        OCVQen       = 1 << 4,
-        LdMdl        = 1 << 5,
-        TAlrtEn      = 1 << 6,
-        dSOCen       = 1 << 7,
-        ThmHotAlrtEn = 1 << 8,
-        ThmHotEn     = 1 << 9,
-        FCThmHot     = 1 << 10,
-        SPR          = 1 << 11
+        ISysNCurr    = (1 << 0),
+        OCVQen       = (1 << 4),
+        LdMdl        = (1 << 5),
+        TAlrtEn      = (1 << 6),
+        dSOCen       = (1 << 7),
+        ThmHotAlrtEn = (1 << 8),
+        ThmHotEn     = (1 << 9),
+        FCThmHot     = (1 << 10),
+        SPR          = (1 << 11)
     };
-
 } // namespace bsp::battery_charger

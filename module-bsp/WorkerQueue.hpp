@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -44,7 +44,7 @@ class WorkerQueue
         bool kill{false};
     };
 
-    static constexpr auto queueLength = 2;
+    static constexpr auto queueLength = 4;
 
     xQueueHandle queueHandle{};
     xTaskHandle taskHandle{};
@@ -91,6 +91,7 @@ WorkerQueue<Message>::~WorkerQueue()
         vQueueDelete(queueHandle);
     }
 }
+
 template <typename Message>
 void WorkerQueue<Message>::worker()
 {
@@ -107,6 +108,7 @@ void WorkerQueue<Message>::worker()
         }
     }
 }
+
 template <typename Message>
 BaseType_t WorkerQueue<Message>::post(const Message &msg)
 {

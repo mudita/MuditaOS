@@ -65,12 +65,14 @@ namespace gui
         return appConfiguration;
     }
 
-    void AppWindow::applyToStatusBar(StatusBarConfigurationChangeFunction configChange)
+    void AppWindow::applyToStatusBar(const StatusBarConfigurationChangeFunction &configChange)
     {
-        if (configChange) {
-            auto newConfiguration = configChange(statusBar->getConfiguration());
-            statusBar->configure(std::move(newConfiguration));
+        if (configChange == nullptr) {
+            return;
         }
+
+        auto newConfiguration = configChange(statusBar->getConfiguration());
+        statusBar->configure(std::move(newConfiguration));
     }
 
     bool AppWindow::updateBluetooth(sys::bluetooth::BluetoothMode mode)
@@ -105,7 +107,7 @@ namespace gui
         }
         return statusBar->updateBattery();
     }
-    // updates battery level in the window
+
     bool AppWindow::updateSignalStrength()
     {
         if (statusBar == nullptr) {

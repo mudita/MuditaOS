@@ -283,11 +283,15 @@ namespace gui::status_bar
 
     bool StatusBar::showBattery(bool enabled)
     {
-        const auto visibilityChanged = battery->isVisible() == enabled ? false : true;
-        enabled ? battery->show() : battery->hide();
+        const auto visibilityChanged = (battery->isVisible() != enabled);
+        if (enabled) {
+            battery->show();
+        }
+        else {
+            battery->hide();
+        }
         const auto stateChanged    = battery->update(Store::Battery::get());
         const auto refreshRequired = stateChanged || visibilityChanged;
-
         return refreshRequired;
     }
 

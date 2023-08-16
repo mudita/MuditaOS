@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,17 +13,17 @@ namespace bsp::battery_charger
 {
     using Register = std::uint16_t;
 
-    enum class batteryChargerType
+    enum class BatteryChargerType
     {
         DcdTimeOut = 0x00U, /*!< Dcd detect result is timeout */
         DcdUnknownType,     /*!< Dcd detect result is unknown type */
-        DcdError,           /*!< Dcd detect result is error*/
+        DcdError,           /*!< Dcd detect result is error */
         DcdSDP,             /*!< The SDP facility is detected */
         DcdCDP,             /*!< The CDP facility is detected */
         DcdDCP,             /*!< The DCP facility is detected */
     };
 
-    enum class batteryRetval
+    enum class BatteryRetval
     {
         OK,
         ChargerError,
@@ -32,26 +32,20 @@ namespace bsp::battery_charger
         ChargingDone
     };
 
-    enum class batteryIRQSource
-    {
-        INTB  = 0x01,
-        INOKB = 0x02
-    };
-
-    enum class topControllerIRQsource
+    enum class TopControllerIRQsource
     {
         CHGR_INT = (1 << 0),
         FG_INT   = (1 << 1),
         SYS_INT  = (1 << 2)
     };
 
-    enum class batteryINTBSource
+    enum class BatteryINTBSource
     {
-        maxTemp             = 1 << 13,
-        minSOCAlert         = 1 << 10,
-        minTemp             = 1 << 9,
-        minVAlert           = 1 << 8,
-        SOCOnePercentChange = 1 << 7,
+        SOCOnePercentChange = (1 << 7),
+        minVAlert           = (1 << 8),
+        minTemp             = (1 << 9),
+        minSOCAlert         = (1 << 10),
+        maxTemp             = (1 << 13),
         all                 = 0xFFFF
     };
 
@@ -62,35 +56,29 @@ namespace bsp::battery_charger
     };
 
     int init();
-
     void deinit();
 
     [[nodiscard]] std::optional<units::SOC> getBatteryLevel();
 
-    void storeBatteryLevelChange(const units::SOC newSocValue);
+    void storeBatteryLevelChange(units::SOC newSocValue);
 
-    batteryRetval getChargeStatus();
+    BatteryRetval getChargeStatus();
 
     void clearAllChargerIRQs();
-
-    void clearFuelGuageIRQ(std::uint16_t intToClear);
+    void clearFuelGaugeIRQ(std::uint16_t intToClear);
 
     Register getStatusRegister();
 
     void checkTemperatureRange();
 
-    std::uint8_t getTopControllerINTSource();
+    std::optional<std::uint8_t> getTopControllerINTSource();
 
     void setMaxBusCurrent(USBCurrentLimit limit);
 
-    int getVoltageFilteredMeasurement();
-
-    MaxMinVolt getMaxMinVolt();
+    std::optional<int> getVoltageFilteredMeasurement();
+    std::optional<MaxMinVolt> getMaxMinVolt();
 
     void printFuelGaugeInfo();
 
-    bool checkConfigurationFile(std::ifstream &file);
-
     bool isChargerPlugged();
-
 } // namespace bsp::battery_charger

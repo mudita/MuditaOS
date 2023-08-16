@@ -24,12 +24,6 @@ namespace sys
     class Service;
 } // namespace sys
 
-struct KeyState
-{
-    uint8_t event;
-    uint8_t code;
-};
-
 enum class WorkerEventQueues
 {
     queueService = 0,
@@ -73,7 +67,7 @@ class WorkerEventCommon : public sys::Worker
     /**
      * @brief list of keys with long press enabled. First item is key code, second is long press time.
      */
-    std::map<uint32_t, uint32_t> longPressParamsList;
+    std::map<std::uint32_t, std::uint32_t> longPressParamsList;
     bsp::KeyEvents lastState  = bsp::KeyEvents::Released;
     bsp::KeyCodes lastPressed = static_cast<bsp::KeyCodes>(0);
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
@@ -91,5 +85,5 @@ class WorkerEventCommon : public sys::Worker
      * This method is called from thread when new message arrives in queue.
      * @param queueID Index of the queue in the queues vector.
      */
-    bool handleMessage(uint32_t queueID) override;
+    bool handleMessage(std::uint32_t queueID) override;
 };

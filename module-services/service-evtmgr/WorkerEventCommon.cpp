@@ -10,7 +10,6 @@
 #include <MessageType.hpp>
 #include <Service/Worker.hpp>
 #include <bsp/rtc/rtc.hpp>
-#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <bsp/vibrator/vibrator.hpp>
 #include <bsp/eink_frontlight/eink_frontlight.hpp>
 
@@ -20,7 +19,6 @@
 
 #include "task.h"
 
-#include <sys/types.h>
 #include <memory>
 #include <optional>
 
@@ -32,7 +30,7 @@ WorkerEventCommon::WorkerEventCommon(sys::Service *service)
       service(service), keyInput{hal::key_input::AbstractKeyInput::Factory::create()}
 {}
 
-bool WorkerEventCommon::handleMessage(uint32_t queueID)
+bool WorkerEventCommon::handleMessage(std::uint32_t queueID)
 {
 #if DEBUG_HEAP_ALLOCATIONS == 1
     LOG_INFO("Free space: %zu", usermemGetFreeHeapSize());
@@ -41,7 +39,7 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
     auto &queue = queues[queueID];
 
     // service queue
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueService)) {
+    if (queueID == static_cast<std::uint32_t>(WorkerEventQueues::queueService)) {
         sys::WorkerCommand wcmd;
         if (!queue->Dequeue(&wcmd, 0)) {
             return false;
@@ -50,8 +48,8 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         // place some code here to handle messages from service
     }
 
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueKeyboardIRQ)) {
-        uint8_t notification;
+    if (queueID == static_cast<std::uint32_t>(WorkerEventQueues::queueKeyboardIRQ)) {
+        std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
@@ -65,25 +63,27 @@ bool WorkerEventCommon::handleMessage(uint32_t queueID)
         if (!queue->Dequeue(&event, 0)) {
             return false;
         }
+
         batteryController->handleNotification(event);
     }
 
-    if (queueID == static_cast<uint32_t>(WorkerEventQueues::queueRTC)) {
-        uint8_t notification;
+    if (queueID == static_cast<std::uint32_t>(WorkerEventQueues::queueRTC)) {
+        std::uint8_t notification;
         if (!queue->Dequeue(&notification, 0)) {
             return false;
         }
 
-        time_t timestamp;
+        std::time_t timestamp;
         bsp::rtc::getCurrentTimestamp(&timestamp);
         bsp::rtc::setMinuteAlarm(timestamp);
+
         /// Poll battery controller to recalculate state and possibly send update requests to
         /// appmgr/sysmgr
         batteryController->poll();
 
         auto message       = std::make_shared<sevm::RtcMinuteAlarmMessage>(MessageType::EVMMinuteUpdated);
         message->timestamp = timestamp;
-        service->bus.sendUnicast(message, service::name::evt_manager);
+        service->bus.sendUnicast(std::move(message), service::name::evt_manager);
     }
 
     return true;
@@ -114,13 +114,14 @@ bool WorkerEventCommon::initEventQueues()
 
 bool WorkerEventCommon::initCommonHardwareComponents(EventManagerParams params)
 {
-    keyInput->init(queues[static_cast<int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
-    auto queueBatteryHandle = queues[static_cast<int32_t>(WorkerEventQueues::queueBatteryController)]->GetQueueHandle();
+    keyInput->init(queues[static_cast<std::int32_t>(WorkerEventQueues::queueKeyboardIRQ)]->GetQueueHandle());
 
+    const auto queueBatteryHandle =
+        queues[static_cast<std::int32_t>(WorkerEventQueues::queueBatteryController)]->GetQueueHandle();
     batteryController = std::make_shared<sevm::battery::BatteryController>(service, queueBatteryHandle, params);
-    bsp::rtc::init(queues[static_cast<int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
 
-    time_t timestamp;
+    std::time_t timestamp;
+    bsp::rtc::init(queues[static_cast<std::int32_t>(WorkerEventQueues::queueRTC)]->GetQueueHandle());
     bsp::rtc::getCurrentTimestamp(&timestamp);
     bsp::rtc::setMinuteAlarm(timestamp);
 
@@ -142,10 +143,9 @@ void WorkerEventCommon::init(std::shared_ptr<settings::Settings> settings, Event
     initCommonHardwareComponents(params);
 }
 
-bool WorkerEventCommon::deinit(void)
+bool WorkerEventCommon::deinit()
 {
     Worker::deinit();
-
     keyInput->deinit();
     return true;
 }
@@ -154,7 +154,7 @@ void WorkerEventCommon::sendKeyUnicast(RawKey const &key)
 {
     auto message = std::make_shared<sevm::KbdMessage>();
     message->key = key;
-    service->bus.sendUnicast(message, service::name::evt_manager);
+    service->bus.sendUnicast(std::move(message), service::name::evt_manager);
 }
 
 void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code)
@@ -163,7 +163,7 @@ void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code
     case bsp::KeyEvents::Pressed: {
         auto const tick = xTaskGetTickCount();
         if (lastState == bsp::KeyEvents::Pressed) {
-            LOG_WARN("Generating Release %s", c_str(lastPressed));
+            LOG_WARN("Generating release %s", c_str(lastPressed));
             sendKeyUnicast({RawKey::State::Released, lastPressed, 0, tick});
         }
         sendKeyUnicast({RawKey::State::Pressed, code, tick, 0});
@@ -171,6 +171,7 @@ void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code
         lastPressed = code;
         break;
     }
+
     case bsp::KeyEvents::Released:
         if (lastState != bsp::KeyEvents::Pressed || lastPressed != code) {
             return;
@@ -179,6 +180,7 @@ void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code
         lastState   = bsp::KeyEvents::Released;
         lastPressed = code;
         break;
+
     case bsp::KeyEvents::Moved:
         sendKeyUnicast({RawKey::State::Moved, code});
         break;

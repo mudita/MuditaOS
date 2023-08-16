@@ -331,13 +331,11 @@ auto ServiceDesktop::handle(sdesktop::usb::USBConfigured *msg) -> std::shared_pt
         LOG_INFO("Endpoint security enabled, requesting passcode");
         bus.sendUnicast(std::make_shared<locks::UnlockPhoneForMTP>(), service::name::appmgr);
     }
-    else {
-        if (isPlugEventUnhandled) {
-            bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
-                            service::name::system_manager);
-            isPlugEventUnhandled = false;
-            desktopWorker->notify(WorkerDesktop::Signal::unlockMTP);
-        }
+    else if (isPlugEventUnhandled) {
+        bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
+                        service::name::system_manager);
+        isPlugEventUnhandled = false;
+        desktopWorker->notify(WorkerDesktop::Signal::unlockMTP);
     }
 
     return sys::MessageNone{};
@@ -357,7 +355,7 @@ auto ServiceDesktop::handle(sdesktop::usb::USBDisconnected * /*msg*/) -> std::sh
 
 auto ServiceDesktop::handle(sevm::USBPlugEvent *msg) -> std::shared_ptr<sys::Message>
 {
-    auto message = static_cast<sevm::USBPlugEvent *>(msg);
+    const auto message = static_cast<sevm::USBPlugEvent *>(msg);
     if (message->event == sevm::USBPlugEvent::Event::CablePlugged) {
         usbWorkerInit();
         isPlugEventUnhandled = true;
