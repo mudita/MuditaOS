@@ -287,6 +287,7 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
     auto addQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
     auto updateQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
     auto removeQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
+    auto removeMultipleQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
     auto numberGetByIdQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
     auto mergeContactsListQuery(const std::shared_ptr<db::Query> &query) -> const std::unique_ptr<db::QueryResult>;
     auto checkContactsListDuplicatesQuery(const std::shared_ptr<db::Query> &query)

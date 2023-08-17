@@ -116,6 +116,7 @@ set(SOURCES
         queries/phonebook/QueryContactGetByID.cpp
         queries/phonebook/QueryContactGetByNumberID.cpp
         queries/phonebook/QueryContactRemove.cpp
+        queries/phonebook/QueryMultipleContactRemove.cpp
         queries/phonebook/QueryContactUpdate.cpp
         queries/phonebook/QueryMergeContactsList.cpp
         queries/phonebook/QueryNumberGetByID.cpp

@@ -40,6 +40,7 @@ namespace sdesktop::endpoints
         inline constexpr auto note             = "note";
         inline constexpr auto mail             = "email";
         inline constexpr auto id               = "id";
+        inline constexpr auto contactIDs       = "contactIDs";
         inline constexpr auto numbers          = "numbers";
         inline constexpr auto numbersIDs       = "numbersIDs";
         inline constexpr auto isBlocked        = "blocked";

@@ -7,6 +7,7 @@
 #include <queries/phonebook/QueryContactGet.hpp>
 #include <queries/phonebook/QueryContactAdd.hpp>
 #include <queries/phonebook/QueryContactRemove.hpp>
+#include <queries/phonebook/QueryMultipleContactRemove.hpp>
 
 #include <BaseInterface.hpp>
 #include <Common/Common.hpp>
@@ -263,9 +264,15 @@ namespace sdesktop::endpoints
 
     auto ContactHelper::deleteDBEntry(Context &context) -> sys::ReturnCodes
     {
-        auto id    = context.getBody()[json::contacts::id].int_value();
-        auto query = std::make_unique<db::query::ContactRemove>(id);
-
+        if (!context.getBody()[json::contacts::contactIDs].is_array()) {
+            context.setResponseStatus(http::Code::BadRequest);
+            putToSendQueue(context.createSimpleResponse());
+            return sys::ReturnCodes::Failure;
+        }
+        auto jsonIDs = context.getBody()[json::contacts::contactIDs].array_items();
+        std::vector<std::uint32_t> ids(context.getBody()[json::contacts::contactIDs].array_items().size());
+        std::transform(jsonIDs.begin(), jsonIDs.end(), ids.begin(), [](auto &id) { return id.int_value(); });
+        auto query    = std::make_unique<db::query::MultipleContactRemove>(ids);
         auto listener = std::make_unique<db::EndpointListener>(
             [](db::QueryResult *result, Context context) {
                 if (auto contactResult = dynamic_cast<db::query::ContactRemoveResult *>(result)) {
@@ -281,8 +288,8 @@ namespace sdesktop::endpoints
             context);
 
         query->setQueryListener(std::move(listener));
-
         DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Contact, std::move(query));
+
         return sys::ReturnCodes::Success;
     }
 

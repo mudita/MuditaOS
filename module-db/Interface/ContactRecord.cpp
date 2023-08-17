@@ -7,6 +7,7 @@
 #include "queries/phonebook/QueryContactGetByNumberID.hpp"
 #include "queries/phonebook/QueryContactUpdate.hpp"
 #include "queries/phonebook/QueryContactRemove.hpp"
+#include "queries/phonebook/QueryMultipleContactRemove.hpp"
 #include "queries/phonebook/QueryMergeContactsList.hpp"
 #include "queries/phonebook/QueryCheckContactsListDuplicates.hpp"
 #include <Utils.hpp>
@@ -442,6 +443,9 @@ auto ContactRecordInterface::runQuery(std::shared_ptr<db::Query> query) -> std::
     else if (typeid(*query) == typeid(db::query::ContactRemove)) {
         return removeQuery(query);
     }
+    else if (typeid(*query) == typeid(db::query::MultipleContactRemove)) {
+        return removeMultipleQuery(query);
+    }
     else if (typeid(*query) == typeid(db::query::NumberGetByID)) {
         return numberGetByIdQuery(query);
     }
@@ -673,6 +677,20 @@ auto ContactRecordInterface::removeQuery(const std::shared_ptr<db::Query> &query
     auto response    = std::make_unique<db::query::ContactRemoveResult>(result);
     response->setRequestQuery(query);
     response->setRecordID(removeQuery->getID());
+    return response;
+}
+
+auto ContactRecordInterface::removeMultipleQuery(const std::shared_ptr<db::Query> &query)
+    -> const std::unique_ptr<db::QueryResult>
+{
+    auto removeQuery = static_cast<db::query::MultipleContactRemove *>(query.get());
+    bool result      = {};
+    for (const auto &id : removeQuery->getIDs()) {
+        result &= ContactRecordInterface::RemoveByID(id);
+    }
+    auto response = std::make_unique<db::query::ContactRemoveResult>(result);
+    response->setRequestQuery(query);
+    response->setRecordID(0);
     return response;
 }
 
