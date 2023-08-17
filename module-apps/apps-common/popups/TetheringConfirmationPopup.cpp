@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TetheringConfirmationPopup.hpp"
@@ -23,7 +23,7 @@ namespace gui
         metadata.action = [this]() {
             application->bus.sendUnicast(std::make_shared<sys::TetheringEnabledResponse>(),
                                          service::name::system_manager);
-            app::manager::Controller::sendAction(application, app::manager::actions::Home);
+            application->returnToPreviousWindow();
             return true;
         };
         auto msg = std::make_unique<DialogMetadataMessage>(std::move(metadata));
