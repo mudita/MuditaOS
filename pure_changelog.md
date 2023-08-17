@@ -27,6 +27,7 @@
 * Fixed ability to create contact with 2 same numbers
 * Fixed diacritics in translations
 * Fixed issues with file uploads with low disk space.
+* Fixed data losing because switching tethering via tethering popup
 
 ## [1.7.2 2023-07-28]
 
