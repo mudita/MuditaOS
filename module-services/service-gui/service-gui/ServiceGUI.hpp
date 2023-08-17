@@ -32,15 +32,6 @@ namespace service::gui
     {
         friend WorkerGUI;
 
-        enum class ServiceGUIState
-        {
-            Idle = 0,
-            Rendering,
-            Displaying,
-            Closing,
-            ReadyToClose
-        };
-
       public:
         explicit ServiceGUI(::gui::Size displaySize,
                             const std::string &name = service::name::gui,
@@ -55,7 +46,9 @@ namespace service::gui
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
       private:
-        ServiceGUIState state = ServiceGUIState::Idle;
+        bool isRendering{};
+        bool isDisplaying{};
+        bool isClosing{};
 
         static void initAssetManagers();
         void registerMessageHandlers();
@@ -70,8 +63,6 @@ namespace service::gui
         bool isNextFrameReady() const noexcept;
         bool isAnyFrameBeingRenderedOrDisplayed() const noexcept;
         void trySendNextFrame();
-        void setState(const ServiceGUIState &nextState);
-        bool isInState(const ServiceGUIState &serviceState);
 
         sys::MessagePointer handleDrawMessage(sys::Message *message);
         sys::MessagePointer handleGUIRenderingFinished(sys::Message *message);
