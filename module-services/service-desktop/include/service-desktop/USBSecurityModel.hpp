@@ -46,7 +46,7 @@ namespace sdesktop
       private:
         auto isPasscodeEnabled() const -> bool;
         auto isPhoneLocked() const -> bool;
-        auto isEulaAccepted() const -> bool;
+        auto isOnboardingFinished() const -> bool;
         auto isBatteryLevelCritical() const -> bool;
 
         PhoneLockState phoneLocked;

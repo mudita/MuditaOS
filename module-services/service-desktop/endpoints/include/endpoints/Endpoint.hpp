@@ -20,7 +20,7 @@ namespace sdesktop::endpoints
     {
         NoReason,
         DeviceLocked,
-        EulaNotAccepted,
+        OnboardingNotFinished,
         BatteryCriticalLevel
     };
 
