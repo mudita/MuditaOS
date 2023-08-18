@@ -63,15 +63,15 @@ Parameters:
 ```c++
     enum class BlockReason
     {
-        EulaNotAccepted = 2,
+        OnboardingNotFinished = 2,
         BatteryCriticalLevel
     };
 ```
 
 Access to all edpoints is blocked when:
 
-- device is locked - 403 status is returned
-- EULA is not accepted - 423 status is returned
+- Device is locked - 403 status is returned
+- Onboarding not finished - 423 status is returned
 - Critical battery level - 423 status is returned
 
 ### Get phone lock time

@@ -45,10 +45,10 @@ namespace sdesktop
         return isPasscodeEnabled() && isPhoneLocked();
     }
 
-    auto USBSecurityModel::isEulaAccepted() const -> bool
+    auto USBSecurityModel::isOnboardingFinished() const -> bool
     {
         return utils::getNumericValue<bool>(
-            settings->getValue(settings::SystemProperties::eulaAccepted, settings::SettingsScope::Global));
+            settings->getValue(settings::SystemProperties::onboardingDone, settings::SettingsScope::Global));
     }
 
     auto USBSecurityModel::isBatteryLevelCritical() const -> bool
@@ -64,8 +64,8 @@ namespace sdesktop
         if (isBatteryLevelCritical()) {
             return {EndpointSecurity::Block, BlockReason::BatteryCriticalLevel};
         }
-        if (!isEulaAccepted()) {
-            return {EndpointSecurity::Block, BlockReason::EulaNotAccepted};
+        if (!isOnboardingFinished()) {
+            return {EndpointSecurity::Block, BlockReason::OnboardingNotFinished};
         }
         if (isSecurityEnabled()) {
             return {EndpointSecurity::Block, BlockReason::DeviceLocked};

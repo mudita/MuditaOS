@@ -64,7 +64,7 @@ namespace sdesktop::endpoints
             case BlockReason::DeviceLocked:
                 responseContext.status = http::Code::Forbidden;
                 break;
-            case BlockReason::EulaNotAccepted:
+            case BlockReason::OnboardingNotFinished:
             case BlockReason::BatteryCriticalLevel:
                 responseContext.status = http::Code::Locked;
                 responseContext.body =
