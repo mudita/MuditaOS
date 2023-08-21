@@ -10,6 +10,7 @@
 #include <system/messages/TetheringStateRequest.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
+#include <service-desktop/endpoints/include/endpoints/filesystem/FileOperations.hpp>
 
 ServiceDesktop::ServiceDesktop(const std::filesystem::path &mtpRootPath)
     : sys::Service(service::name::service_desktop, "", sdesktop::serviceStackSize),
@@ -203,12 +204,15 @@ auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes
     if (!initialized) {
         return sys::ReturnCodes::Success;
     }
+
     LOG_DEBUG("Deinitializing USB worker");
     settings->deinit();
     desktopWorker->closeWorker();
     desktopWorker.reset();
     initialized     = false;
     isUsbConfigured = false;
+    // It must be run after the worker is closed.
+    cleanFileSystemEndpointUndeliveredTransfers();
     return sys::ReturnCodes::Success;
 }
 
@@ -373,4 +377,9 @@ auto ServiceDesktop::getOnboardingState() const -> sdesktop::endpoints::Onboardi
 {
     return static_cast<sdesktop::endpoints::OnboardingState>(utils::getNumericValue<int>(
         settings->getValue(settings::SystemProperties::onboardingDone, settings::SettingsScope::Global)));
+}
+
+void ServiceDesktop::cleanFileSystemEndpointUndeliveredTransfers()
+{
+    FileOperations::instance().cleanUpUndeliveredTransfers();
 }

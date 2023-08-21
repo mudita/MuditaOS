@@ -8,6 +8,7 @@
 * Added extended information to crashdump filename
 * Added extended information to log filename
 * Added GUI screens informing about failed MMI/USSD request
+* Files not fully transferred via Center will be now removed when USB cable is unplugged
 
 ### Changed / Improved
 

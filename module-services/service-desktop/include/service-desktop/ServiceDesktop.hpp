@@ -120,6 +120,8 @@ class ServiceDesktop : public sys::Service
 
     void checkChargingCondition();
 
+    void cleanFileSystemEndpointUndeliveredTransfers();
+
     template <typename T>
     auto connectHandler() -> bool
     {

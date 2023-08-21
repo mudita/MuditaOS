@@ -67,7 +67,7 @@ void FileOperations::cancelTimedOutWriteTransfer()
 
     fileCtxEntry->second.reset();
 
-    LOG_DEBUG("Canceling timed out rxID %u", static_cast<unsigned>(timedOutXfer));
+    LOG_DEBUG("Canceling timed out txID %u", static_cast<unsigned>(timedOutXfer));
     writeTransfers.erase(timedOutXfer);
 }
 
@@ -175,7 +175,6 @@ auto FileOperations::createTransmitIDForFile(const std::filesystem::path &file,
 
     createFileWriteContextFor(file, size, Crc32, txID);
     fileData = std::make_unique<std::vector<uint8_t>>(SingleChunkSize, 0);
-
     return txID;
 }
 
@@ -225,4 +224,18 @@ auto FileOperations::sendDataForTransmitID(transfer_id txID, std::uint32_t chunk
     }
 
     return returnCode;
+}
+
+auto FileOperations::cleanUpUndeliveredTransfers() -> void
+{
+    if (writeTransfers.empty()) {
+        return;
+    }
+
+    LOG_INFO("Clean up after undelivered transfers");
+    for (auto &wt : writeTransfers) {
+        wt.second->removeFile();
+        wt.second.reset();
+        writeTransfers.erase(wt.first);
+    }
 }
