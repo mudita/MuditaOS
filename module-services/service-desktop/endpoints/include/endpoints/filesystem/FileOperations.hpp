@@ -5,6 +5,7 @@
 
 #include "FileContext.hpp"
 
+#include <log/log.hpp>
 #include <filesystem>
 #include <vector>
 #include <map>
@@ -26,7 +27,6 @@ class FileOperations
     std::atomic<transfer_id> runningRxId{0};
     std::atomic<transfer_id> runningTxId{0};
     std::unique_ptr<std::vector<std::uint8_t>> fileData{};
-
     auto createFileReadContextFor(const std::filesystem::path &file, std::size_t fileSize, transfer_id xfrId) -> void;
 
     auto createFileWriteContextFor(const std::filesystem::path &file,
@@ -71,4 +71,6 @@ class FileOperations
         -> transfer_id;
 
     auto sendDataForTransmitID(transfer_id, std::uint32_t chunkNo, const std::string &data) -> sys::ReturnCodes;
+
+    auto cleanUpUndeliveredTransfers() -> void;
 };
