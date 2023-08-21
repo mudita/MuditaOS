@@ -33,6 +33,7 @@ namespace gui
         presenter.attachCallbacks();
         buildInterface();
     }
+
     CallWindow::~CallWindow() noexcept
     {
         presenter.clearModel();
@@ -43,6 +44,7 @@ namespace gui
         destroyInterface();
         buildInterface();
     }
+
     void CallWindow::buildInterface()
     {
         AppWindow::buildInterface();
@@ -54,7 +56,6 @@ namespace gui
         navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
         navBar->setText(gui::nav_bar::Side::Center, utils::translate(strings::message));
 
-        // top circle image
         imageCircleTop = new gui::Image(this, imageCircleTop::x, imageCircleTop::y, 0, 0, imageCircleTop::name);
         imageCircleBottom =
             new gui::Image(this, imageCircleBottom::x, imageCircleBottom::y, 0, 0, imageCircleBottom::name);
@@ -244,6 +245,7 @@ namespace gui
         navBar->setActive(gui::nav_bar::Side::Center, false);
         navBar->setActive(gui::nav_bar::Side::Right, false);
     }
+
     void CallWindow::setIncomingCallLayout(bool isValidCallerId)
     {
         navBar->setText(gui::nav_bar::Side::Left, utils::translate(strings::answer), true);
@@ -315,5 +317,4 @@ namespace gui
     {
         speakerIcon->set(icon);
     }
-
 } /* namespace gui */
