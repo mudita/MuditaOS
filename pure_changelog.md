@@ -14,6 +14,7 @@
 * General improvement in Eink display and error handling
 * Change roaming indicator to show domestic roaming as home network
 * Optimized ServiceAudio power management
+* Blocked call execution with empty phone number field
 
 ### Fixed
 

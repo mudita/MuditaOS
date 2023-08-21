@@ -6,14 +6,11 @@
 #include "CallSwitchData.hpp"
 #include "NumberWindow.hpp"
 
-#include <ContactRecord.hpp>
-#include <gui/widgets/Image.hpp>
 #include <gui/widgets/text/Label.hpp>
 #include <gui/widgets/Window.hpp>
 #include <i18n/i18n.hpp>
 #include <text/modes/InputMode.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-cellular/CellularServiceAPI.hpp>
 
 #include <cassert>
 
@@ -79,15 +76,20 @@ namespace gui
 
     bool NumberWindow::onInput(const InputEvent &inputEvent)
     {
-        auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
+        const auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
+
         if (inputEvent.isShortRelease()) {
             // Call function
             if (inputEvent.is(KeyCode::KEY_LF)) {
+                if (enteredNumber.empty()) {
+                    return false;
+                }
                 interface->handleCallEvent(enteredNumber);
                 return true;
             }
+
             // Clear/back function
-            else if (inputEvent.is(KeyCode::KEY_RF)) {
+            if (inputEvent.is(KeyCode::KEY_RF)) {
                 // if there isn't any char in phone number field return to previous application
                 if (enteredNumber.empty()) {
                     formatter->Clear();
