@@ -3,23 +3,33 @@
 ## Unreleased
 
 ### Fixed
+* Fixed frequency lock during user activity
+
+
+### Added
+
+
+### Changed / Improved
+* Disabled USB MTP protocol
+
+
+## [2.2.1 2023-10-30]
+
+### Fixed
 * Fixed meditation countdown timer when a deep press is performed
-* Fixed "turn off" window display time
 * Fixed uneven screen refresh when turning on the device
 * Fixed not disappearing snooze icon when an alarm is deactivated
 * Fixed incorrect message after new alarm setting in some scenarios
-* Fixed frequency lock during user activity
-* Fixed possibility of OS crash during update package size check
-* Fixed incorrect calculation of requested CPU frequency
-* Fixed CPU frequency setting when dumping logs to a file
+* Fixed the possibility of OS crash during update package size check
+* Fixed errors that occur when uploading a music file with graphics in the metadata via the Center
 
 ### Added
 * Files not fully transferred via Center will be now removed when USB cable is unplugged
 
 ### Changed / Improved
-* Hardware faults during device startup now result in shutdown and more user friendly message
+* Improved the display time of the "turn off" window.
+* Hardware faults during device startup now result in shutdown and a more user friendly message
 * Discharged device screen changed
-* Disabled USB MTP protocol
 
 ## [2.2.0 2023-09-28]
 
