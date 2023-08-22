@@ -69,9 +69,30 @@ static int isARMv6MDevice(void);
 static void dumpFaultStatusRegisters(void);
 static void advanceProgramCounterPastHardcodedBreakpoint(const Object* pObject);
 
+/* See FreeRTOSConfig.h */
+#define configPRIO_BITS 4
+#define configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY 2
+#define configMAX_SYSCALL_INTERRUPT_PRIORITY (configLIBRARY_MAX_SYSCALL_INTERRUPT_PRIORITY << (8 - configPRIO_BITS))
+
+static inline void __attribute__((always_inline)) CrashCatcher_EnterCritical(void)
+{
+    uint32_t ulNewBASEPRI;
+
+    __asm__ __volatile__
+    (
+        "mov %0, %1\n"
+        "cpsid i\n"
+        "msr basepri, %0\n"
+        "isb\n"
+        "dsb\n"
+        "cpsie i\n"
+        : "=r" ( ulNewBASEPRI ) : "i" ( configMAX_SYSCALL_INTERRUPT_PRIORITY ) : "memory"
+    );
+}
 
 void CrashCatcher_Entry(const CrashCatcherExceptionRegisters* pExceptionRegisters)
 {
+    CrashCatcher_EnterCritical();
     Object object = initStackPointers(pExceptionRegisters);
     advanceStackPointerToValueBeforeException(&object);
     initFloatingPointFlag(&object);
