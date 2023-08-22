@@ -28,6 +28,7 @@
 * Fixed diacritics in translations
 * Fixed issues with file uploads with low disk space.
 * Fixed data losing because switching tethering via tethering popup
+* Fixed hard fault handling
 
 ## [1.7.2 2023-07-28]
 
