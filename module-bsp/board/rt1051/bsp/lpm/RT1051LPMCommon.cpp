@@ -10,10 +10,10 @@
 #include <hal/boot_reason.h>
 #include <critical.hpp>
 
-namespace
-{
-    constexpr auto ldoStabilizationDelayUs{40};
-}
+// namespace
+//{
+//     constexpr auto ldoStabilizationDelayUs{40};
+// }
 
 namespace bsp
 {
@@ -161,38 +161,38 @@ namespace bsp
 
     void RT1051LPMCommon::RegularLDOMode()
     {
-        cpp_freertos::CriticalSection::Enter();
-
-        // Enable regular 2P5 and 1P1 LDO
-        PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_LINREG_MASK;
-        PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_LINREG_MASK;
-
-        // Wait for regular LDOs to become stable (documentation Low Power AN12085)
-        while ((PMU->REG_2P5 & PMU_REG_2P5_OK_VDD2P5_MASK) == 0) {}
-        while ((PMU->REG_1P1 & PMU_REG_1P1_OK_VDD1P1_MASK) == 0) {}
-
-        // Turn off weak 2P5 and 1P1 LDO
-        PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
-        PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
-
-        cpp_freertos::CriticalSection::Exit();
+        //        cpp_freertos::CriticalSection::Enter();
+        //
+        //        // Enable regular 2P5 and 1P1 LDO
+        //        PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_LINREG_MASK;
+        //        PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_LINREG_MASK;
+        //
+        //        // Wait for regular LDOs to become stable (documentation Low Power AN12085)
+        //        while ((PMU->REG_2P5 & PMU_REG_2P5_OK_VDD2P5_MASK) == 0) {}
+        //        while ((PMU->REG_1P1 & PMU_REG_1P1_OK_VDD1P1_MASK) == 0) {}
+        //
+        //        // Turn off weak 2P5 and 1P1 LDO
+        //        PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
+        //        PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
+        //
+        //        cpp_freertos::CriticalSection::Exit();
     }
 
     void RT1051LPMCommon::LowPowerLDOMode()
     {
-        cpp_freertos::CriticalSection::Enter();
-
-        // Enable weak 2P5 and 1P1 LDO
-        PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
-        PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
-
-        // Wait for weak LDOs to stabilize
-        SDK_DelayAtLeastUs(ldoStabilizationDelayUs, CLOCK_GetCpuClkFreq());
-
-        // Disable regular 2P5 and 1P1 LDO
-        PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_LINREG_MASK;
-        PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_LINREG_MASK;
-
-        cpp_freertos::CriticalSection::Exit();
+        //        cpp_freertos::CriticalSection::Enter();
+        //
+        //        // Enable weak 2P5 and 1P1 LDO
+        //        PMU->REG_2P5_SET = PMU_REG_2P5_ENABLE_WEAK_LINREG_MASK;
+        //        PMU->REG_1P1_SET = PMU_REG_1P1_ENABLE_WEAK_LINREG_MASK;
+        //
+        //        // Wait for weak LDOs to stabilize
+        //        SDK_DelayAtLeastUs(ldoStabilizationDelayUs, CLOCK_GetCpuClkFreq());
+        //
+        //        // Disable regular 2P5 and 1P1 LDO
+        //        PMU->REG_2P5_CLR = PMU_REG_2P5_ENABLE_LINREG_MASK;
+        //        PMU->REG_1P1_CLR = PMU_REG_1P1_ENABLE_LINREG_MASK;
+        //
+        //        cpp_freertos::CriticalSection::Exit();
     }
 } // namespace bsp
