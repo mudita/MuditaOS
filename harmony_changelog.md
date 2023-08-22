@@ -21,6 +21,7 @@
 * Fixed the logic in onboarding screens
 * Fixed issues with file uploads with low disk space.
 * Fixed information about next alarm ring
+* Fixed hard fault handling
 
 ### Added
 
