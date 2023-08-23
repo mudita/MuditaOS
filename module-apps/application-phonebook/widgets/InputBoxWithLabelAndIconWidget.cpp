@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputBoxWithLabelAndIconWidget.hpp"
@@ -172,6 +172,9 @@ namespace gui
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) {
             tickImage->visible = contact->isOnFavourites();
         };
+        onCheckUnsavedChangeCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            return tickImage->visible != contact->isOnFavourites();
+        };
     }
     void InputBoxWithLabelAndIconWidget::addToICEHandler()
     {
@@ -214,6 +217,9 @@ namespace gui
         };
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->addToIce(tickImage->visible); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { tickImage->visible = contact->isOnIce(); };
+        onCheckUnsavedChangeCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            return tickImage->visible != contact->isOnIce();
+        };
     }
 
 } /* namespace gui */

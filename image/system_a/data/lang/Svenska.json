@@ -526,5 +526,7 @@
     "tethering_menu_access_decline": "<text>Internetdelning \u00e4r p\u00e5.<br /><br />F\u00f6r att \u00f6ppna menyn, <br />st\u00e4ng av internetdelning.</text>",
     "tethering_phone_mode_change_prohibited": "<text>Internetdelning \u00e4r p\u00e5.<br /><br />Andra l\u00e4gen (ansluten, DND, <br />offline) \u00e5sidos\u00e4tts av detta <br /> l\u00e4ge och fungerar inte.</text>",
     "tethering_turn_off_question": "St\u00e4nga av Internetdelning?",
-    "volume_text": "LJUDVOLYM"
+    "volume_text": "LJUDVOLYM",
+    "unsaved_changes": "Osparade \u00e4ndringar",
+    "exit_without_saving": "Vill du g\u00e5 h\u00e4rifr\u00e5n utan att spara?"
 }

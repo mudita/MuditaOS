@@ -42,6 +42,7 @@ namespace app::notes
         void setCharactersCount(std::uint32_t count);
         void setNoteText(const UTF8 &text);
         void saveNote();
+        bool isCurrentTextDifferentThanSaved();
 
         std::unique_ptr<NoteEditWindowContract::Presenter> presenter;
         std::shared_ptr<NotesRecord> notesRecord;

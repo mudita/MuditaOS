@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,6 +14,7 @@ namespace gui::name::window
     inline constexpr auto notes_search_result = "NotesSearchResult";
     inline constexpr auto note_dialog         = "Dialog";
     inline constexpr auto note_confirm_dialog = "ConfirmDialog";
+    inline constexpr auto notes_dialog_yes_no = "DialogYesNo";
 } // namespace gui::name::window
 
 namespace app

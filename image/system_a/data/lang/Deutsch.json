@@ -716,5 +716,7 @@
     "tethering_enable_question": "<text>Sie sind mit dem Computer verbunden.<br />Tethering einschalten?<br /><text color='4'>(einige Funktionen k\u00f6nnen deaktiviert sein)</text></text>",
     "tethering_menu_access_decline": "<text>Tethering ist eingeschaltet.<br /><br />Schalten Sie Tethering aus,<br />um auf das Men\u00fc zuzugreifen</text>",
     "tethering_phone_mode_change_prohibited": "<text>Tethering ist eingeschaltet.<br /><br />Andere Betriebsarten (Verbunden, DND,<br />Offline) werden von dieser Betriebsart \u00fcberlagert<br />und funktionieren nicht.</text>",
-    "tethering_turn_off_question": "Tethering ausschalten?"
+    "tethering_turn_off_question": "Tethering ausschalten?",
+    "unsaved_changes": "Ungespeicherte \u00c4nderungen",
+    "exit_without_saving": "M\u00f6chten Sie den Vorgang ohne Speichern beenden?"
 }

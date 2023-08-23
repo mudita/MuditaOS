@@ -687,5 +687,7 @@
     "tethering_enable_question": "<text>Vous \u00eates connect\u00e9 \u00e0 l'ordinateur.<br />Voulez-vous activer le partage de connexion?<br /><text color='4'>(certaines fonctions peuvent \u00eatre d\u00e9sactiv\u00e9es)</text></text>",
     "tethering_menu_access_decline": "<text>Le partage de connexion est activ\u00e9.<br /><br />Pour acc\u00e9der au menu, veuillez<br />d\u00e9sactiver le partage de connextion.</text>",
     "tethering_phone_mode_change_prohibited": "<text>Le partage de connexion est activ\u00e9.<br /><br />Ce mode-ci remplace et d\u00e9sactive les autres modes<br />(Connect\u00e9, NPD, Hors ligne)</text>",
-    "tethering_turn_off_question": "Voulez-vous d\u00e9sactiver le partage de connexion?"
+    "tethering_turn_off_question": "Voulez-vous d\u00e9sactiver le partage de connexion?",
+    "unsaved_changes": "Modifications non enregistr\u00e9es",
+    "exit_without_saving": "Voulez-vous quitter sans sauvegarder ?"
 }

@@ -28,6 +28,7 @@ class NewContactModel : public app::InternalModel<gui::ContactListItem *>, publi
     void createData();
     bool verifyData();
     bool emptyData();
+    bool isAnyUnsavedChange(std::shared_ptr<ContactRecord> contactRecord);
     [[nodiscard]] auto getRequestType() -> PhonebookItemData::RequestType;
 
     [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
