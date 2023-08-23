@@ -46,6 +46,7 @@ namespace app
         }
 
         alarmModel = std::make_unique<app::AlarmModel>(this);
+        alarmModel->update(nullptr);
         return sys::ReturnCodes::Success;
     }
 
