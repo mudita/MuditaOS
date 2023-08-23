@@ -16,20 +16,23 @@
 
 namespace
 {
-    using namespace std::chrono_literals;
-    constexpr auto windowTimeout{10s};
     constexpr auto timerName{"BellTurnOffPopupTimer"};
 } // namespace
 
 namespace gui
 {
-    BellTurnOffOptionWindow::BellTurnOffOptionWindow(app::ApplicationCommon *app, const char *name)
+    BellTurnOffOptionWindow::BellTurnOffOptionWindow(app::ApplicationCommon *app,
+                                                     std::chrono::milliseconds duration,
+                                                     const char *name)
         : BellShortOptionWindow(app, name), yesStr{utils::translate("common_yes")}, noStr{utils::translate("common_no")}
     {
         addOptions(settingsOptionsList());
         setListTitle(utils::translate("app_bell_turn_off_question"));
 
-        popupTimer    = app::GuiTimerFactory::createSingleShotTimer(application, this, timerName, windowTimeout);
+        if (duration > std::chrono::milliseconds::zero()) {
+            popupTimer = app::GuiTimerFactory::createSingleShotTimer(application, this, timerName, duration);
+        }
+
         timerCallback = [this, name](Item &, sys::Timer &timer) {
             if (application->getCurrentWindow()->getName() == name) {
                 application->returnToPreviousWindow();

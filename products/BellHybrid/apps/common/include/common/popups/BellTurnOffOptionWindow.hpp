@@ -8,11 +8,16 @@
 
 namespace gui
 {
+    constexpr std::chrono::seconds turnOffPopupTimeout{10};
+    constexpr std::chrono::milliseconds defaultWindowTimeout{0};
+
     class BellTurnOffOptionWindow : public BellShortOptionWindow
     {
       public:
         static constexpr auto defaultName = "BellTurnOffOptionWindow";
-        explicit BellTurnOffOptionWindow(app::ApplicationCommon *app, const char *name = defaultName);
+        explicit BellTurnOffOptionWindow(app::ApplicationCommon *app,
+                                         std::chrono::milliseconds duration = defaultWindowTimeout,
+                                         const char *name                   = defaultName);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void onClose(CloseReason reason) override;
 
