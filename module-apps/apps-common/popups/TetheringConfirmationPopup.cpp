@@ -6,7 +6,6 @@
 #include "ApplicationCommon.hpp"
 
 #include <system/messages/TetheringQuestionRequest.hpp>
-#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {

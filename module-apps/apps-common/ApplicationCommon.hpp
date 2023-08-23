@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,7 +23,6 @@
 #include <list>     // for list
 #include <map>      // for allocator, map
 #include <memory>   // for make_shared
-#include <stdint.h> // for uint32_t
 #include <string>   // for string
 #include <utility>  // for move, pair
 #include <vector>   // for vector
@@ -189,8 +188,7 @@ namespace app
         std::unique_ptr<gui::popup::Filter> popupFilter;
         std::unique_ptr<WindowsStack> windowsStackImpl;
         std::string default_window;
-        State state        = State::DEACTIVATED;
-        bool phoneIsLocked = false;
+        State state = State::DEACTIVATED;
 
         sys::MessagePointer handleSignalStrengthUpdate(sys::Message *msgl);
         sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);
@@ -224,7 +222,7 @@ namespace app
                                    std::string parent                  = "",
                                    StatusIndicators statusIndicators   = StatusIndicators{},
                                    StartInBackground startInBackground = {false},
-                                   uint32_t stackDepth                 = 4096,
+                                   std::uint32_t stackDepth            = 1024 * 4,
                                    sys::ServicePriority priority       = sys::ServicePriority::Idle);
 
         virtual ~ApplicationCommon() noexcept;
@@ -328,13 +326,13 @@ namespace app
                                   manager::actions::ActionId actionId,
                                   manager::actions::ActionParamsPtr &&data);
         static void messageSwitchApplication(sys::Service *sender,
-                                             std::string application,
-                                             std::string window,
+                                             const std::string &application,
+                                             const std::string &window,
                                              std::unique_ptr<gui::SwitchData> data,
                                              StartupReason startupReason);
-        static void messageCloseApplication(sys::Service *sender, std::string application);
-        static void messageRebuildApplication(sys::Service *sender, std::string application);
-        static void messageApplicationLostFocus(sys::Service *sender, std::string application);
+        static void messageCloseApplication(sys::Service *sender, const std::string &application);
+        static void messageRebuildApplication(sys::Service *sender, const std::string &application);
+        static void messageApplicationLostFocus(sys::Service *sender, const std::string &application);
         static void messageSwitchBack(sys::Service *sender, const std::string &application);
         /// @}
 
@@ -368,7 +366,7 @@ namespace app
         bool userInterfaceDBNotification(sys::Message *msg, const UiNotificationFilter &filter = nullptr);
         virtual gui::popup::Filter &getPopupFilter() const;
 
-        void requestShutdownWindow(std::string windowName);
+        void requestShutdownWindow(const std::string &windowName);
 
       public:
         /// push window to the top of windows stack
@@ -377,9 +375,6 @@ namespace app
         /// getter for previous window name
         /// @ingrup AppWindowStack
         std::optional<std::string> getPreviousWindow(std::uint32_t count = 1) const;
-        /// clears windows stack
-        /// @ingrup AppWindowStack
-        void cleanPrevWindw();
         /// getter for current wisible window in application
         /// if there is none - returns default window
         /// @ingrup AppWindowStack
@@ -418,7 +413,7 @@ namespace app
         /// informs self that there was key press
         /// used to provide a way for long press/multipress handling in application
         static void messageInputEventApplication(sys::Service *sender,
-                                                 std::string application,
+                                                 const std::string &application,
                                                  const gui::InputEvent &event);
 
         void addActionReceiver(manager::actions::ActionId actionId, OnActionReceived &&callback);

@@ -32,6 +32,7 @@
 * Fixed data losing because switching tethering via tethering popup
 * Fixed hard fault handling
 * Fixed issue with uneven first screen redraw after turning the phone on
+* Fixed issue with bypassing phone lock window after unplugging USB cable on tethering popup
 
 ## [1.7.2 2023-07-28]
 

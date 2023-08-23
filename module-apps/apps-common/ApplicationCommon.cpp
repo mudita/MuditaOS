@@ -78,7 +78,7 @@ namespace app
                                          std::string parent,
                                          StatusIndicators statusIndicators,
                                          StartInBackground startInBackground,
-                                         uint32_t stackDepth,
+                                         std::uint32_t stackDepth,
                                          sys::ServicePriority priority)
         : Service(std::move(name), std::move(parent), stackDepth, priority),
           popupFilter(std::make_unique<gui::popup::Filter>()), windowsStackImpl(std::make_unique<WindowsStack>()),
@@ -192,14 +192,14 @@ namespace app
     {
         const auto actualTimeStamp = xTaskGetTickCount();
         if (keyTranslator->isKeyPressTimedOut(actualTimeStamp)) {
-            gui::InputEvent iev = keyTranslator->translate(actualTimeStamp);
-            messageInputEventApplication(this, this->GetName(), iev);
+            const auto inputEvent = keyTranslator->translate(actualTimeStamp);
+            messageInputEventApplication(this, this->GetName(), inputEvent);
             keyTranslator->resetPreviousKeyPress();
             longPressTimer.stop();
 
             debug_input_events("AppInput -> K:|%s|, S:|%s|, App:|%s|, W:|%s|",
-                               magic_enum::enum_name(iev.getKeyCode()).data(),
-                               magic_enum::enum_name(iev.getState()).data(),
+                               magic_enum::enum_name(inputEvent.getKeyCode()).data(),
+                               magic_enum::enum_name(inputEvent.getState()).data(),
                                GetName().c_str(),
                                getCurrentWindow()->getName().c_str());
         }
@@ -231,8 +231,9 @@ namespace app
             bus.sendUnicast(std::move(message), service::name::gui);
         }
 
-        if (suspendInProgress)
+        if (suspendInProgress) {
             suspendInProgress = false;
+        }
     }
 
     void ApplicationCommon::updateStatuses(gui::AppWindow *window) const
@@ -254,7 +255,7 @@ namespace app
     {
         const auto currentWindow = getCurrentWindow();
         auto msg                 = std::make_shared<AppUpdateWindowMessage>(
-            currentWindow ? currentWindow->getName() : "", std::move(data), command, refreshMode);
+            (currentWindow != nullptr) ? currentWindow->getName() : "", std::move(data), command, refreshMode);
         bus.sendUnicast(std::move(msg), this->GetName());
     }
 
@@ -277,12 +278,16 @@ namespace app
             window   = getCurrentWindow()->getName();
             auto msg = std::make_shared<AppSwitchWindowMessage>(
                 window, getCurrentWindow()->getName(), std::move(data), cmd, reason);
-            bus.sendUnicast(msg, this->GetName());
+            bus.sendUnicast(std::move(msg), this->GetName());
         }
         else {
             auto msg = std::make_shared<AppSwitchWindowMessage>(
-                windowName, getCurrentWindow() ? getCurrentWindow()->getName() : "", std::move(data), cmd, reason);
-            bus.sendUnicast(msg, this->GetName());
+                windowName,
+                (getCurrentWindow() != nullptr) ? getCurrentWindow()->getName() : "",
+                std::move(data),
+                cmd,
+                reason);
+            bus.sendUnicast(std::move(msg), this->GetName());
         }
     }
 
@@ -291,14 +296,14 @@ namespace app
                                               std::unique_ptr<gui::SwitchData> data,
                                               SwitchReason reason)
     {
-        bus.sendUnicast(std::make_shared<AppSwitchWindowPopupMessage>(windowName, std::move(data), reason, d),
-                        this->GetName());
+        auto msg = std::make_shared<AppSwitchWindowPopupMessage>(windowName, std::move(data), reason, d);
+        bus.sendUnicast(std::move(msg), this->GetName());
     }
 
     void ApplicationCommon::returnToPreviousWindow()
     {
         auto window = windowsStack().get(previousWindow);
-        if (not window) {
+        if (!window.has_value()) {
             LOG_DEBUG("No window to back from - get to previous app");
             app::manager::Controller::switchBack(this);
             return;
@@ -329,16 +334,16 @@ namespace app
 
     void ApplicationCommon::refreshWindow(gui::RefreshModes mode)
     {
-        auto window = windowsStack().get(topWindow);
-        if (window) {
+        const auto &window = windowsStack().get(topWindow);
+        if (window.has_value()) {
             auto msg = std::make_shared<AppRefreshMessage>(mode, *window);
-            bus.sendUnicast(msg, this->GetName());
+            bus.sendUnicast(std::move(msg), this->GetName());
         }
     }
 
     sys::MessagePointer ApplicationCommon::DataReceivedHandler(sys::DataMessage *msgl)
     {
-        auto msg = dynamic_cast<cellular::NotificationMessage *>(msgl);
+        const auto msg = dynamic_cast<cellular::NotificationMessage *>(msgl);
         if (msg != nullptr) {
             if (msg->content == cellular::NotificationMessage::Content::SignalStrengthUpdate) {
                 return handleSignalStrengthUpdate(msgl);
@@ -395,7 +400,7 @@ namespace app
         }
     }
 
-    sys::MessagePointer ApplicationCommon::handleSignalStrengthUpdate(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleSignalStrengthUpdate([[maybe_unused]] sys::Message *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateSignalStrength()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -403,7 +408,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer ApplicationCommon::handleNetworkAccessTechnologyUpdate(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleNetworkAccessTechnologyUpdate([[maybe_unused]] sys::Message *msgl)
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateNetworkAccessTechnology()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -413,14 +418,14 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleInputEvent(sys::Message *msgl)
     {
-        AppInputEventMessage *msg = reinterpret_cast<AppInputEventMessage *>(msgl);
+        const auto msg = static_cast<AppInputEventMessage *>(msgl);
         if (msg->getEvent().isKeyPress()) {
             longPressTimer.start();
         }
         else if (msg->getEvent().isShortRelease()) {
             longPressTimer.stop();
         }
-        if (not windowsStack().isEmpty() && getCurrentWindow()->onInput(msg->getEvent())) {
+        if (!windowsStack().isEmpty() && getCurrentWindow()->onInput(msg->getEvent())) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
         }
         return sys::msgHandled();
@@ -431,10 +436,10 @@ namespace app
         if (this->getState() != app::ApplicationCommon::State::ACTIVE_FORGROUND) {
             LOG_FATAL("!!! Terrible terrible damage! application with no focus grabbed key!");
         }
-        sevm::KbdMessage *msg = static_cast<sevm::KbdMessage *>(msgl);
-        gui::InputEvent iev   = keyTranslator->translate(msg->key);
-        if (!iev.is(gui::KeyCode::KEY_UNDEFINED)) {
-            messageInputEventApplication(this, this->GetName(), iev);
+        const auto msg        = static_cast<sevm::KbdMessage *>(msgl);
+        const auto inputEvent = keyTranslator->translate(msg->key);
+        if (!inputEvent.is(gui::KeyCode::KEY_UNDEFINED)) {
+            messageInputEventApplication(this, this->GetName(), inputEvent);
         }
 
         debug_input_events("AppInput -> K:|%s|, S:|%s|, App:|%s|, W:|%s|",
@@ -462,12 +467,12 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer ApplicationCommon::handleMinuteUpdated(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleMinuteUpdated([[maybe_unused]] sys::Message *msgl)
     {
         if (state == State::ACTIVE_FORGROUND) {
-            if (auto reqestedRefreshMode = getCurrentWindow()->updateTime();
-                reqestedRefreshMode != gui::RefreshModes::GUI_REFRESH_NONE) {
-                refreshWindow(reqestedRefreshMode);
+            if (const auto requestedRefreshMode = getCurrentWindow()->updateTime();
+                requestedRefreshMode != gui::RefreshModes::GUI_REFRESH_NONE) {
+                refreshWindow(requestedRefreshMode);
             }
         }
         return sys::msgHandled();
@@ -475,7 +480,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleAction(sys::Message *msgl)
     {
-        auto *msg         = static_cast<AppActionRequest *>(msgl);
+        const auto msg    = static_cast<AppActionRequest *>(msgl);
         const auto action = msg->getAction();
         try {
             const auto &actionHandler = receivers.at(action);
@@ -498,7 +503,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleApplicationSwitch(sys::Message *msgl)
     {
-        auto *msg = static_cast<AppSwitchMessage *>(msgl);
+        const auto msg = static_cast<AppSwitchMessage *>(msgl);
 
         switch (msg->getApplicationStartupReason()) {
         case StartupReason::Launch:
@@ -512,10 +517,10 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleApplicationSwitchLaunch(sys::Message *msgl)
     {
-        auto *msg    = static_cast<AppSwitchMessage *>(msgl);
+        const auto msg = static_cast<AppSwitchMessage *>(msgl);
         bool handled = false;
         LOG_DEBUG("AppSwitch: %s", msg->getTargetApplicationName().c_str());
-        // Application is starting or it is in the background. Upon switch command if name if correct it goes
+        // Application is starting or it is in the background. Upon switch command if name is correct it goes
         // foreground
         if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND)) {
 
@@ -557,7 +562,7 @@ namespace app
         return sys::msgNotHandled();
     }
 
-    sys::MessagePointer ApplicationCommon::handleApplicationSwitchOnAction(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleApplicationSwitchOnAction([[maybe_unused]] sys::Message *msgl)
     {
         if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND)) {
             setState(State::ACTIVE_FORGROUND);
@@ -574,16 +579,17 @@ namespace app
     {
         const auto msg        = static_cast<AppSwitchWindowMessage *>(msgl);
         const auto windowName = msg->getWindowName();
-        if (not windowsFactory.isRegistered(windowName)) {
+        if (!windowsFactory.isRegistered(windowName)) {
             LOG_ERROR("No such window: %s", windowName.c_str());
             return sys::msgHandled();
         }
 
-        auto switchData = std::move(msg->getData());
+        const auto switchData = std::move(msg->getData());
         if (switchData && switchData->ignoreCurrentWindowOnStack) {
             windowsStack().pop();
         }
-        auto anotherWindowOnTop = (not isCurrentWindow(windowName)) and (not windowsStack().isEmpty());
+
+        const auto anotherWindowOnTop = !isCurrentWindow(windowName) && !windowsStack().isEmpty();
         if (anotherWindowOnTop) {
             auto closeReason = gui::Window::CloseReason::WindowSwitch;
             switch (msg->getReason()) {
@@ -612,7 +618,7 @@ namespace app
         /// This is kind of gentle hack on our stateless Application Window management switching
         /// if we are not requesting for popup and we cant handle next popup - just refresh the window
         /// else -> popup will refresh it for us
-        if (not tryShowPopup()) {
+        if (!tryShowPopup()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
         }
         return sys::msgHandled();
@@ -620,9 +626,9 @@ namespace app
 
     bool ApplicationCommon::handleUpdateTextRefresh(gui::SwitchData *data)
     {
-        auto ret = dynamic_cast<gui::SwitchSpecialChar *>(data);
-        if (ret != nullptr && ret->type == gui::SwitchSpecialChar::Type::Response) {
-            auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
+        const auto ret = dynamic_cast<gui::SwitchSpecialChar *>(data);
+        if ((ret != nullptr) && (ret->type == gui::SwitchSpecialChar::Type::Response)) {
+            const auto text = dynamic_cast<gui::Text *>(getCurrentWindow()->getFocusItem());
             if (text != nullptr) {
                 text->addText(ret->getDescription());
                 refreshWindow(gui::RefreshModes::GUI_REFRESH_DEEP);
@@ -634,10 +640,10 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleUpdateWindow(sys::Message *msgl)
     {
-        auto msg         = static_cast<AppUpdateWindowMessage *>(msgl);
-        auto haveBuilder = windowsFactory.isRegistered(msg->getWindowName());
-        auto window      = isCurrentWindow(msg->getWindowName());
-        if (haveBuilder && window) {
+        const auto msg           = static_cast<AppUpdateWindowMessage *>(msgl);
+        const auto haveBuilder   = windowsFactory.isRegistered(msg->getWindowName());
+        const auto isWindowOnTop = isCurrentWindow(msg->getWindowName());
+        if (haveBuilder && isWindowOnTop) {
             const auto &switchData = msg->getData();
             getCurrentWindow()->handleSwitchData(switchData.get());
             getCurrentWindow()->onBeforeShow(msg->getCommand(), switchData.get());
@@ -648,12 +654,12 @@ namespace app
                       msg->getWindowName().c_str(),
                       GetName().c_str(),
                       haveBuilder ? "yes" : "no",
-                      window ? "yes" : "no");
+                      isWindowOnTop ? "yes" : "no");
         }
         return sys::msgHandled();
     }
 
-    sys::MessagePointer ApplicationCommon::handleAppClose(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleAppClose([[maybe_unused]] sys::Message *msgl)
     {
         setState(State::DEACTIVATING);
 
@@ -667,10 +673,9 @@ namespace app
             app::manager::Controller::finalizingClose(this);
             return sys::msgHandled();
         }
-        else {
-            app::manager::Controller::confirmClose(this);
-            return sys::msgHandled();
-        }
+
+        app::manager::Controller::confirmClose(this);
+        return sys::msgHandled();
     }
 
     void ApplicationCommon::checkBlockingRequests()
@@ -682,7 +687,7 @@ namespace app
         }
     }
 
-    sys::MessagePointer ApplicationCommon::handleAppRebuild(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleAppRebuild([[maybe_unused]] sys::Message *msgl)
     {
         LOG_INFO("Application %s rebuilding gui", GetName().c_str());
         windowsStack().rebuildWindows(windowsFactory, this);
@@ -696,7 +701,7 @@ namespace app
 
     sys::MessagePointer ApplicationCommon::handleAppRefresh(sys::Message *msgl)
     {
-        auto *msg = static_cast<AppRefreshMessage *>(msgl);
+        const auto msg = static_cast<AppRefreshMessage *>(msgl);
         assert(msg);
         if (windowsStack().isEmpty() || (getCurrentWindow()->getName() != msg->getWindowName())) {
             LOG_DEBUG("Ignore request for window %s we are on window %s",
@@ -714,20 +719,20 @@ namespace app
             LOG_ERROR("Current window is not defined - can't dump DOM");
             return sys::msgNotHandled();
         }
-        auto window = getCurrentWindow();
+        const auto window = getCurrentWindow();
         if (window == nullptr) {
             LOG_ERROR("No window - can't dump DOM");
             return sys::msgNotHandled();
         }
 
-        auto request = static_cast<app::manager::DOMRequest *>(msgl);
+        const auto request = static_cast<app::manager::DOMRequest *>(msgl);
         LOG_DEBUG("Get DOM for: %s", request->getSenderName().c_str());
         bus.sendUnicast(DOMResponder(GetName(), *window, std::move(request->event)).build(), request->getSenderName());
 
         return sys::msgHandled();
     }
 
-    sys::MessagePointer ApplicationCommon::handleAppFocusLost(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleAppFocusLost([[maybe_unused]] sys::Message *msgl)
     {
         if (state == State::ACTIVE_FORGROUND) {
             setState(State::ACTIVE_BACKGROUND);
@@ -736,7 +741,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer ApplicationCommon::handleSimStateUpdateMessage(sys::Message *msgl)
+    sys::MessagePointer ApplicationCommon::handleSimStateUpdateMessage([[maybe_unused]] sys::Message *msgl)
     {
         if (getCurrentWindow()->updateSim()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
@@ -790,47 +795,49 @@ namespace app
                                           manager::actions::ActionParamsPtr &&data)
     {
         auto msg = std::make_shared<AppActionRequest>(actionId, std::move(data));
-        sender->bus.sendUnicast(msg, applicationName);
+        sender->bus.sendUnicast(std::move(msg), applicationName);
     }
 
     void ApplicationCommon::messageSwitchApplication(sys::Service *sender,
-                                                     std::string application,
-                                                     std::string window,
+                                                     const std::string &application,
+                                                     const std::string &window,
                                                      std::unique_ptr<gui::SwitchData> data,
                                                      StartupReason startupReason)
     {
         auto msg = std::make_shared<AppSwitchMessage>(application, window, std::move(data), startupReason);
-        sender->bus.sendUnicast(msg, application);
+        sender->bus.sendUnicast(std::move(msg), application);
     }
 
-    void ApplicationCommon::messageCloseApplication(sys::Service *sender, std::string application)
+    void ApplicationCommon::messageCloseApplication(sys::Service *sender, const std::string &application)
     {
         auto msg = std::make_shared<AppMessage>(MessageType::AppClose);
-        sender->bus.sendUnicast(msg, application);
+        sender->bus.sendUnicast(std::move(msg), application);
     }
 
-    void ApplicationCommon::messageRebuildApplication(sys::Service *sender, std::string application)
+    void ApplicationCommon::messageRebuildApplication(sys::Service *sender, const std::string &application)
     {
         auto msg = std::make_shared<AppRebuildMessage>();
-        sender->bus.sendUnicast(msg, application);
+        sender->bus.sendUnicast(std::move(msg), application);
     }
 
-    void ApplicationCommon::messageApplicationLostFocus(sys::Service *sender, std::string application)
+    void ApplicationCommon::messageApplicationLostFocus(sys::Service *sender, const std::string &application)
     {
-        sender->bus.sendUnicast(std::make_shared<AppLostFocusMessage>(), application);
+        auto msg = std::make_shared<AppLostFocusMessage>();
+        sender->bus.sendUnicast(std::move(msg), application);
     }
 
     void ApplicationCommon::messageSwitchBack(sys::Service *sender, const std::string &application)
     {
-        sender->bus.sendUnicast(std::make_shared<AppSwitchBackMessage>(), application);
+        auto msg = std::make_shared<AppSwitchBackMessage>();
+        sender->bus.sendUnicast(std::move(msg), application);
     }
 
     void ApplicationCommon::messageInputEventApplication(sys::Service *sender,
-                                                         std::string application,
+                                                         const std::string &application,
                                                          const gui::InputEvent &event)
     {
         auto msg = std::make_shared<AppInputEventMessage>(event);
-        sender->bus.sendUnicast(msg, application);
+        sender->bus.sendUnicast(std::move(msg), application);
     }
 
     void ApplicationCommon::actionPopupPush(std::unique_ptr<gui::SwitchData> params)
@@ -844,11 +851,10 @@ namespace app
         // two lines below is to **not** loose data on copy on dynamic_cast, but to move the data
         (void)params.release();
         auto data                    = std::unique_ptr<gui::PopupRequestParams>(rdata);
-        auto id                      = data->getPopupId();
+        const auto id                = data->getPopupId();
         auto blueprint               = popupBlueprint.getBlueprint(id);
-        auto appNameWhichAskForPopup = data->nameOfSenderApplication;
 
-        auto topOfWindowsStackId = windowsStack().getWindowData(app::topWindow)->disposition.id;
+        const auto topOfWindowsStackId = windowsStack().getWindowData(app::topWindow)->disposition.id;
         if (data->ignoreIfTheSamePopupIsOnTopOfTheStack && id == topOfWindowsStackId) {
             LOG_WARN("ignoring popup because the same is already on the top of the stack");
             return;
@@ -889,7 +895,7 @@ namespace app
         using namespace gui::popup;
 
         auto request = windowsPopupQueue->popRequest(getPopupFilter());
-        if (!request) {
+        if (!request.has_value()) {
             return false;
         }
 
@@ -904,7 +910,7 @@ namespace app
         LOG_DEBUG("handling popup: %s", popup);
         /// request handle actually switches window to popup window
         auto retval = request->handle();
-        if (not retval) {
+        if (!retval) {
             LOG_ERROR("Popup %s handling failure, please check registered blueprint!", popup);
         }
 
@@ -914,8 +920,19 @@ namespace app
     void ApplicationCommon::abortPopup(gui::popup::ID id)
     {
         const auto popupName = gui::popup::resolveWindowName(id);
-        LOG_INFO("abort popup: %s from window %s", popupName.c_str(), getCurrentWindow()->getName().c_str());
-        if (not windowsStack().pop(popupName)) {
+
+        /* Hack for dropping tethering confirmation window on locked phone to prevent removing
+         * phone lock popup, thus unlocking the phone without providing passcode. */
+        if ((id == gui::popup::ID::Tethering) &&
+            windowsStack().isWindowOnStack(gui::popup::window::phone_lock_window)) {
+            LOG_INFO("Aborting tethering confirmation window on locked phone");
+            windowsStack().drop(popupName);
+            return;
+        }
+
+        /* Regular popup aborting handler */
+        LOG_INFO("Aborting popup %s from window %s", popupName.c_str(), getCurrentWindow()->getName().c_str());
+        if (!windowsStack().pop(popupName)) {
             return;
         }
         if (popupName == getCurrentWindow()->getName()) {
@@ -923,26 +940,26 @@ namespace app
         }
     }
 
-    void ApplicationCommon::requestShutdownWindow(std::string windowName)
+    void ApplicationCommon::requestShutdownWindow(const std::string &windowName)
     {
 #if DEBUG_APPLICATION_MANAGEMENT == 1
         LOG_INFO("switching [%s] to shutdown window: %s",
                  GetName().c_str(),
                  windowName.length() ? windowName.c_str() : default_window.c_str());
 #endif
-        if (not windowsFactory.isRegistered(windowName)) {
+        if (!windowsFactory.isRegistered(windowName)) {
             LOG_ERROR("Cannot find window %s windowsFactory in application: %s", windowName.c_str(), GetName().c_str());
             return;
         }
 
         pushWindow(windowName);
         const auto window = getWindow(windowName);
-        if (not window) {
+        if (window == nullptr) {
             LOG_ERROR("Cannot find window %s in application %s", windowName.c_str(), GetName().c_str());
             return;
         }
 
-        const auto response = bus.sendUnicastSync(
+        const auto &response = bus.sendUnicastSync(
             std::make_shared<service::gui::DrawMessage>(window->buildDrawList(), gui::RefreshModes::GUI_REFRESH_DEEP),
             service::name::gui,
             100);
@@ -989,31 +1006,31 @@ namespace app
         if (windowsStack().isEmpty()) {
             windowsStack().push(default_window, windowsFactory.build(this, default_window));
         }
-        auto windowname = windowsStack().get(topWindow);
-        auto window     = windowsStack().get(*windowname);
-        if (windowname != window->getName()) {
-            LOG_FATAL("Factory vs Builtin name mismatch ! %s vs %s", windowname->c_str(), window->getName().c_str());
-            window->setName(*windowname);
+        const auto &windowName = windowsStack().get(topWindow);
+        const auto window      = windowsStack().get(*windowName);
+        if (windowName != window->getName()) {
+            LOG_FATAL("Factory vs Builtin name mismatch ! %s vs %s", windowName->c_str(), window->getName().c_str());
+            window->setName(*windowName);
         }
         return window;
     }
 
     bool ApplicationCommon::isCurrentWindow(const std::string &windowName) const noexcept
     {
-        if (const auto &window = windowsStack().get(topWindow); window != std::nullopt) {
+        if (const auto &window = windowsStack().get(topWindow); window.has_value()) {
             return window == windowName;
         }
-        LOG_ERROR("no window: %s", windowName.c_str());
+        LOG_ERROR("No window: %s", windowName.c_str());
         return false;
     }
 
     bool ApplicationCommon::isPreviousWindow(const std::string &windowName) const noexcept
     {
-        if (const auto &previousWindowName = getPreviousWindow(); previousWindowName != std::nullopt) {
+        if (const auto &previousWindowName = getPreviousWindow(); previousWindowName.has_value()) {
             return previousWindowName == windowName;
         }
 
-        LOG_WARN("no previous window");
+        LOG_WARN("No previous window");
         return false;
     }
 
@@ -1039,16 +1056,15 @@ namespace app
 
     void ApplicationCommon::handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams)
     {
-        if (auto window = getCurrentWindow()->getName(); window == gui::popup::window::phone_lock_window) {
-
-            auto refreshMode = getRefreshModeFromNotifications(notificationsParams.get());
+        if (const auto &window = getCurrentWindow()->getName(); window == gui::popup::window::phone_lock_window) {
+            const auto refreshMode = getRefreshModeFromNotifications(notificationsParams.get());
             updateCurrentWindow(std::move(notificationsParams), gui::ShowMode::GUI_SHOW_INIT, refreshMode);
         }
     }
 
     gui::RefreshModes ApplicationCommon::getRefreshModeFromNotifications(gui::SwitchData *notificationsParams)
     {
-        auto data = static_cast<manager::actions::NotificationsChangedParams *>(notificationsParams);
+        const auto data = static_cast<manager::actions::NotificationsChangedParams *>(notificationsParams);
         return data->fastRefreshOnNotificationUpdate() ? gui::RefreshModes::GUI_REFRESH_FAST
                                                        : gui::RefreshModes::GUI_REFRESH_DEEP;
     }
