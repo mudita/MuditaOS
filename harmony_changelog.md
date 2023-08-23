@@ -23,6 +23,7 @@
 * Fixed hard fault handling
 * Fixed meditation countdown timer when a deep press is performed
 * Fixed "turn off" window display time
+* Fixed information about next alarm ring
 
 ### Added
 

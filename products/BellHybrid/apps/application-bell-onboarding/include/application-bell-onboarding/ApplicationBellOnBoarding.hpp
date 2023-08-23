@@ -43,7 +43,8 @@ namespace app
         explicit ApplicationBellOnBoarding(std::string name                    = applicationBellOnBoardingName,
                                            std::string parent                  = "",
                                            StatusIndicators statusIndicators   = StatusIndicators{},
-                                           StartInBackground startInBackground = {false});
+                                           StartInBackground startInBackground = {false},
+                                           std::uint32_t stackDepth            = 1024 * 8);
         ~ApplicationBellOnBoarding();
 
         sys::ReturnCodes InitHandler() override;
