@@ -3,8 +3,8 @@
 
 #pragma once
 
-namespace bsp::bandgap
+namespace bsp::ldo
 {
     void SwitchToRegularMode();
     void SwitchToLowPowerMode();
-} // namespace bsp::bandgap
+} // namespace bsp::ldo
