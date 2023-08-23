@@ -71,7 +71,8 @@ namespace app
                 break;
             case ID::PowerOff:
                 windowsFactory.attach(window::power_off_window, [](ApplicationCommon *app, const std::string &name) {
-                    return std::make_unique<gui::BellTurnOffOptionWindow>(app, window::power_off_window);
+                    return std::make_unique<gui::BellTurnOffOptionWindow>(
+                        app, gui::turnOffPopupTimeout, window::power_off_window);
                 });
                 windowsFactory.attach(gui::BellTurnOffWindow::name,
                                       [](ApplicationCommon *app, const std::string &name) {
