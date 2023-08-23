@@ -716,5 +716,7 @@
     "tethering_enable_question": "<text>Est\u00e1s conectado al ordenador.<br />\u00bfActivar el anclaje de red?<br /><text color='4'>(algunas funciones podr\u00edan desactivarse)</text></text>",
     "tethering_menu_access_decline": "<text>El anclaje de red est\u00e1 activado.<br /><br />Para acceder al men\u00fa,<br />desactiva el tethering.</text>",
     "tethering_phone_mode_change_prohibited": "<text>El anclaje de red est\u00e1 activado.<br /><br />Este modo anula otros modos (Conectado, No molestar,<br />Desconectado) <br />y hace que dejen de funcionar.</text>",
-    "tethering_turn_off_question": "\u00bfDesactivar el anclaje de red?"
+    "tethering_turn_off_question": "\u00bfDesactivar el anclaje de red?",
+    "unsaved_changes": "Cambios no guardados",
+    "exit_without_saving": "\u00bfQuieres salir sin guardar?"
 }

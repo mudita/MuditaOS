@@ -727,5 +727,7 @@
     "tethering_enable_question": "<text>You're connected to the computer.<br />Turn tethering on?<br /><text color='4'>(some functions may be disabled)</text></text>",
     "tethering_menu_access_decline": "<text>Tethering is on.<br /><br />To access menu,<br />turn tethering off.</text>",
     "tethering_phone_mode_change_prohibited": "<text>Tethering is on.<br /><br />Other modes (Connected, DND,<br />Offline) are overriden by this mode<br />and are not working.</text>",
-    "tethering_turn_off_question": "Turn tethering off?"
+    "tethering_turn_off_question": "Turn tethering off?",
+    "unsaved_changes": "Unsaved changes",
+    "exit_without_saving": "<text>Do you want to exit </text><br></br><text weight='bold'>without saving?</text>"
 }

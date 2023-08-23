@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NoteEditWindow.hpp"
+#include "DialogMetadataMessage.hpp"
 
 #include <sstream>
 
@@ -155,6 +156,24 @@ namespace app::notes
                     std::make_unique<gui::OptionsWindowOptions>(noteEditOptions(application, edit)));
             }
         }
+        if (isCurrentTextDifferentThanSaved() &&
+            (inputEvent.isShortRelease(gui::KeyCode::KEY_RF) || inputEvent.isLongRelease(gui::KeyCode::KEY_RF))) {
+
+            // Show a popup warning about possible data loss
+            auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+                gui::DialogMetadata{utils::translate("unsaved_changes"),
+                                    "delete_128px_W_G",
+                                    utils::translate("exit_without_saving"),
+                                    "",
+                                    [=]() -> bool {
+                                        application->returnToPreviousWindow(); // To exit this popup
+                                        application->returnToPreviousWindow(); // To switch back to previous window
+                                        return true;
+                                    }});
+
+            application->switchWindow(gui::name::window::notes_dialog_yes_no, std::move(metaData));
+            return true;
+        }
         return AppWindow::onInput(inputEvent);
     }
 
@@ -168,5 +187,10 @@ namespace app::notes
     bool NoteEditWindow::isNoteEmpty() const noexcept
     {
         return (edit != nullptr) ? edit->isEmpty() : true;
+    }
+
+    bool NoteEditWindow::isCurrentTextDifferentThanSaved()
+    {
+        return notesRecord->snippet != edit->getText();
     }
 } // namespace app::notes

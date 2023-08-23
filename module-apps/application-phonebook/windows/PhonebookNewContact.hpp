@@ -38,9 +38,11 @@ namespace gui
         void showDialogDuplicatedNumber(const utils::PhoneNumber::View &duplicatedNumber,
                                         const std::uint32_t duplicatedNumberContactID = 0u);
         void showDialogDuplicatedSpeedDialNumber();
+        void showDialogUnsavedChanges(std::function<bool()> whereToGoOnYes = nullptr);
         void setSaveButtonVisible(bool visible);
         void showContactDeletedNotification();
         bool checkIfContactWasDeletedDuringEditProcess() const;
+        bool areUnsavedChanges() const;
 
         std::shared_ptr<ContactRecord> contact           = nullptr;
         std::shared_ptr<NewContactModel> newContactModel = nullptr;

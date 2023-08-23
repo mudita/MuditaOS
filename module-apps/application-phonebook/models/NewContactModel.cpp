@@ -235,3 +235,14 @@ void NewContactModel::openTextOptions(gui::Text *text)
     auto data = std::make_unique<PhonebookInputOptionData>(text);
     application->switchWindow(gui::window::name::input_options, std::move(data));
 }
+bool NewContactModel::isAnyUnsavedChange(std::shared_ptr<ContactRecord> contactRecord)
+{
+    for (const auto &item : internalData) {
+        if (item->onCheckUnsavedChangeCallback) {
+            if (item->onCheckUnsavedChangeCallback(contactRecord)) {
+                return true;
+            }
+        }
+    }
+    return false; // there is no change between already provided data and saved ones
+}

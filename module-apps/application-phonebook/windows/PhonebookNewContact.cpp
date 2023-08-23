@@ -115,6 +115,22 @@ namespace gui
         return true;
     }
 
+    void PhonebookNewContact::showDialogUnsavedChanges(std::function<bool()> whereToGoOnYes)
+    {
+        // Show a popup warning about possible data loss
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(
+            gui::DialogMetadata{utils::translate("unsaved_changes"),
+                                "delete_128px_W_G",
+                                utils::translate("exit_without_saving"),
+                                "",
+                                [=]() -> bool {
+                                    application->returnToPreviousWindow(); // To exit this popup
+                                    return whereToGoOnYes();
+                                }});
+
+        application->switchWindow(gui::window::name::dialog_yes_no, std::move(metaData));
+    }
+
     void PhonebookNewContact::setSaveButtonVisible(bool visible)
     {
         navBar->setActive(nav_bar::Side::Center, visible);
@@ -135,14 +151,31 @@ namespace gui
             return true;
         }
         else if (!inputEvent.isShortRelease(KeyCode::KEY_RF) || !shouldCurrentAppBeIgnoredOnSwitchBack()) {
+            if (areUnsavedChanges()) {
+                if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF) || inputEvent.isLongRelease(gui::KeyCode::KEY_RF)) {
+                    showDialogUnsavedChanges([this]() {
+                        application->returnToPreviousWindow();
+                        return true;
+                    });
+                    return true;
+                }
+            }
             return AppWindow::onInput(inputEvent);
         }
 
-        return shouldCurrentAppBeIgnoredOnSwitchBack()
-                   ? app::manager::Controller::switchBack(
-                         application,
-                         std::make_unique<app::manager::SwitchBackRequest>(nameOfPreviousApplication.value()))
-                   : true;
+        auto returnWhenCurrentAppShouldBeIgnoredOnSwitchBack = [this]() {
+            return shouldCurrentAppBeIgnoredOnSwitchBack()
+                       ? app::manager::Controller::switchBack(
+                             application,
+                             std::make_unique<app::manager::SwitchBackRequest>(nameOfPreviousApplication.value()))
+                       : true;
+        };
+
+        if (areUnsavedChanges()) {
+            showDialogUnsavedChanges(returnWhenCurrentAppShouldBeIgnoredOnSwitchBack);
+            return true;
+        }
+        return returnWhenCurrentAppShouldBeIgnoredOnSwitchBack();
     }
 
     auto PhonebookNewContact::verifyAndSave() -> bool
@@ -207,38 +240,37 @@ namespace gui
             DBServiceAPI::MatchContactByPhoneNumber(application, duplicatedNumber, duplicatedNumberContactID);
         const auto oldContactRecord = (matchedContact != nullptr) ? *matchedContact : ContactRecord{};
 
-        auto metaData         = std::make_unique<gui::DialogMetadataMessage>(
-            gui::DialogMetadata{duplicatedNumber.getFormatted(),
-                                "info_128px_W_G",
-                                text::RichTextParser()
-                                    .parse(utils::translate("app_phonebook_duplicate_numbers"),
-                                           nullptr,
-                                           gui::text::RichTextParser::TokenMap(
-                                               {{"$CONTACT_FORMATTED_NAME$", oldContactRecord.getFormattedName()}}))
-                                    ->getText(),
-                                "",
-                                [=]() -> bool {
-                                    if (contactAction == ContactAction::Add) {
-                                        contact->ID = oldContactRecord.ID;
-                                    }
-                                    if (!DBServiceAPI::ContactUpdate(application, *contact)) {
-                                        LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
-                                        return false;
-                                    }
+        auto metaData = std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{
+            duplicatedNumber.getFormatted(),
+            "info_128px_W_G",
+            text::RichTextParser()
+                .parse(utils::translate("app_phonebook_duplicate_numbers"),
+                       nullptr,
+                       gui::text::RichTextParser::TokenMap(
+                           {{"$CONTACT_FORMATTED_NAME$", oldContactRecord.getFormattedName()}}))
+                ->getText(),
+            "",
+            [=]() -> bool {
+                if (contactAction == ContactAction::Add) {
+                    contact->ID = oldContactRecord.ID;
+                }
+                if (!DBServiceAPI::ContactUpdate(application, *contact)) {
+                    LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
+                    return false;
+                }
 
-                                    /* Pop "Add contact" window from the stack so that clicking
-                                     * back button after saving the modified contact returns to
-                                     * contacts list, not to the "Add contact" window. */
-                                    application->popWindow(gui::window::name::new_contact);
+                /* Pop "Add contact" window from the stack so that clicking
+                 * back button after saving the modified contact returns to
+                 * contacts list, not to the "Add contact" window. */
+                application->popWindow(gui::window::name::new_contact);
 
-                                    /* Switch to contact details */
-                                    auto switchData =
-                                        std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
-                                    switchData->ignoreCurrentWindowOnStack = true;
-                                    application->switchWindow(gui::window::name::contact, std::move(switchData));
+                /* Switch to contact details */
+                auto switchData = std::make_unique<PhonebookItemData>(contact, newContactModel->getRequestType());
+                switchData->ignoreCurrentWindowOnStack = true;
+                application->switchWindow(gui::window::name::contact, std::move(switchData));
 
-                                    return true;
-                                }});
+                return true;
+            }});
         application->switchWindow(gui::window::name::dialog_yes_no, std::move(metaData));
     }
 
@@ -300,6 +332,10 @@ namespace gui
         return contactByID->size() == 1 and contactByID->front().ID == 0 and
                contactByID->front().primaryName.empty() and contactByID->front().alternativeName.empty() and
                contactByID->front().numbers.empty();
+    }
+    bool PhonebookNewContact::areUnsavedChanges() const
+    {
+        return newContactModel->isAnyUnsavedChange(contact);
     }
 
 } // namespace gui

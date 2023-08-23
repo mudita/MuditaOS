@@ -163,6 +163,10 @@ namespace gui
         onSaveCallback  = [&](std::shared_ptr<ContactRecord> contact) { contact->primaryName = inputText->getText(); };
         onLoadCallback  = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->primaryName); };
         onEmptyCallback = [&]() { return inputText->isEmpty(); };
+
+        onCheckUnsavedChangeCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            return contact->primaryName != inputText->getText();
+        };
     }
     void InputLinesWithLabelWidget::secondNameHandler()
     {
@@ -176,6 +180,10 @@ namespace gui
         };
         onLoadCallback  = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->alternativeName); };
         onEmptyCallback = [&]() { return inputText->isEmpty(); };
+
+        onCheckUnsavedChangeCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            return contact->alternativeName != inputText->getText();
+        };
     }
     void InputLinesWithLabelWidget::numberHandler()
     {
@@ -208,6 +216,11 @@ namespace gui
         };
 
         onEmptyCallback = [&]() { return inputText->isEmpty(); };
+
+        onCheckUnsavedChangeCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            std::string savedNumber = (!contact->numbers.empty()) ? (contact->numbers[0].number.getEntered()) : "";
+            return savedNumber != std::string(inputText->getText());
+        };
     }
     void InputLinesWithLabelWidget::secondNumberHandler()
     {
@@ -241,6 +254,11 @@ namespace gui
         };
 
         onEmptyCallback = [&]() { return inputText->isEmpty(); };
+
+        onCheckUnsavedChangeCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            std::string savedNumber = (contact->numbers.size() > 1) ? (contact->numbers[1].number.getEntered()) : "";
+            return savedNumber != std::string(inputText->getText());
+        };
     }
     void InputLinesWithLabelWidget::emailHandler()
     {
@@ -252,6 +270,10 @@ namespace gui
         onSaveCallback  = [&](std::shared_ptr<ContactRecord> contact) { contact->mail = inputText->getText(); };
         onLoadCallback  = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->mail); };
         onEmptyCallback = [&]() { return inputText->isEmpty(); };
+
+        onCheckUnsavedChangeCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            return contact->mail != inputText->getText();
+        };
     }
     void InputLinesWithLabelWidget::addressHandler()
     {
@@ -262,6 +284,10 @@ namespace gui
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->address = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->address); };
+
+        onCheckUnsavedChangeCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            return contact->address != inputText->getText();
+        };
     }
     void InputLinesWithLabelWidget::noteHandler()
     {
@@ -272,6 +298,10 @@ namespace gui
 
         onSaveCallback = [&](std::shared_ptr<ContactRecord> contact) { contact->note = inputText->getText(); };
         onLoadCallback = [&](std::shared_ptr<ContactRecord> contact) { inputText->setText(contact->note); };
+
+        onCheckUnsavedChangeCallback = [&](std::shared_ptr<ContactRecord> contact) {
+            return contact->note != inputText->getText();
+        };
     }
 
 } /* namespace gui */
