@@ -90,7 +90,6 @@ namespace sys
                 CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::On);
                 break;
             case Store::Battery::LevelState::CriticalCharging:
-                [[fallthrough]];
             case Store::Battery::LevelState::CriticalNotCharging:
                 CellularServiceAPI::ChangeModulePowerState(this, cellular::service::State::PowerState::Off);
                 break;
@@ -146,7 +145,7 @@ namespace sys
                 bus.sendUnicast(std::make_shared<TetheringQuestionAbort>(), service::name::appmgr);
             }
             else {
-                // Turned on, disabling...
+                // Turned on, disabling
                 LOG_INFO("Disabling tethering");
                 bus.sendUnicast(std::make_shared<sevm::RequestPhoneModeForceUpdate>(), service::name::evt_manager);
             }
