@@ -31,6 +31,7 @@
 * Fixed issues with file uploads with low disk space.
 * Fixed data losing because switching tethering via tethering popup
 * Fixed hard fault handling
+* Fixed issue with uneven first screen redraw after turning the phone on
 
 ## [1.7.2 2023-07-28]
 
