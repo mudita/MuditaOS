@@ -105,9 +105,6 @@ namespace sys
     [[nodiscard]] cpu::UpdateResult PowerManager::UpdateCpuFrequency()
     {
         uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad();
-        if (lowPowerControl->GetCurrentFrequencyLevel() == bsp::CpuFrequencyMHz::Level_0) {
-            cpuLoad = 100;
-        }
         cpu::UpdateResult retval;
         cpu::AlgorithmData data{
             cpuLoad, lowPowerControl->GetCurrentFrequencyLevel(), cpuGovernor->GetMinimumFrequencyRequested()};
