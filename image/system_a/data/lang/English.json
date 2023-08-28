@@ -304,7 +304,7 @@
     "app_messages_no_messages": "<text align='center' color='4'>No messages yet.<p>Press <b>left arrow</b> to add new.</p></text>",
     "app_messages_no_sim": "No SIM.\n\nTo send a SMS,\nplease insert a SIM card.",
     "app_messages_no_templates": "<text align='center'>No templates yet.<p><b>Create a new template</b> in Mudita</p><p>Center to use in your Pure.</p></text>",
-    "app_messages_old_messages": "Old Messages",
+    "app_messages_old_messages": "Previous messages",
     "app_messages_templates": "Templates",
     "app_messages_thread_delete_confirmation": "Delete this conversation?",
     "app_messages_thread_draft": "Draft: ",

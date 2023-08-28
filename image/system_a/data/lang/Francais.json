@@ -268,7 +268,7 @@
     "app_messages_no_messages": "<text align = 'center' color = '4'>Aucun message.<p>Appuyez sur la <b>fl\u00e8che gauche</b> pour en composer un nouveau.</p></text>",
     "app_messages_no_sim": "Pas de carte SIM.\n\nPour envoyer un SMS,\nveuillez ins\u00e9rer une carte SIM.",
     "app_messages_no_templates": "<text align='center'>Pas encore de mod\u00e8les.<p><b>Cr\u00e9ez un nouveau mod\u00e8le</b> sur Mudita</p><p>Center \u00e0 utiliser dans votre Pure.</p></text>",
-    "app_messages_old_messages": "Anciens messages",
+    "app_messages_old_messages": "Messages pr\u00e9c\u00e9dents",
     "app_messages_templates": "Mod\u00e8les",
     "app_messages_thread_delete_confirmation": "Supprimer cette conversation ?",
     "app_messages_thread_draft": "Brouillon: ",
