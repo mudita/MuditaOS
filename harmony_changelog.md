@@ -24,6 +24,7 @@
 * Fixed meditation countdown timer when a deep press is performed
 * Fixed "turn off" window display time
 * Fixed information about next alarm ring
+* Fixed uneven screen refresh when turning on the device
 
 ### Added
 
@@ -41,6 +42,7 @@
 * General improvement in Eink display and error handling
 * Changed the "Turn off Harmony" popup display time to 10 seconds
 * The default year has been updated to 2023
+* Hardware faults during device startup now result in shutdown and more user friendly message
 
 ## [2.0.0 2023-06-29]
 
