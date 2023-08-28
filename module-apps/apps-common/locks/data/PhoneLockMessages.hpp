@@ -48,13 +48,13 @@ namespace locks
     class SkippedSetPhoneLock : public sys::DataMessage
     {};
 
-    class UnLockPhoneInput : public sys::DataMessage
+    class UnlockPhoneInput : public sys::DataMessage
     {
       private:
-        std::vector<unsigned int> inputData;
+        std::vector<unsigned> inputData;
 
       public:
-        explicit UnLockPhoneInput(std::vector<unsigned int> inputData) : inputData(std::move(inputData))
+        explicit UnlockPhoneInput(std::vector<unsigned> inputData) : inputData(std::move(inputData))
         {}
 
         [[nodiscard]] auto getInputData() const noexcept
@@ -88,10 +88,10 @@ namespace locks
     class NextPhoneUnlockAttemptLockTime : public sys::DataMessage
     {
       private:
-        time_t nextPhoneUnlockAttemptLockTime;
+        std::time_t nextPhoneUnlockAttemptLockTime;
 
       public:
-        explicit NextPhoneUnlockAttemptLockTime(time_t nextPhoneUnlockAttemptLockTime)
+        explicit NextPhoneUnlockAttemptLockTime(std::time_t nextPhoneUnlockAttemptLockTime)
             : nextPhoneUnlockAttemptLockTime(nextPhoneUnlockAttemptLockTime)
         {}
 
@@ -101,10 +101,10 @@ namespace locks
         }
     };
 
-    class ExternalUnLockPhone : public UnLockPhoneInput
+    class ExternalUnlockPhone : public UnlockPhoneInput
     {
       public:
-        explicit ExternalUnLockPhone(std::vector<unsigned int> inputData) : UnLockPhoneInput(std::move(inputData))
+        explicit ExternalUnlockPhone(std::vector<unsigned> inputData) : UnlockPhoneInput(std::move(inputData))
         {}
     };
 
@@ -120,21 +120,6 @@ namespace locks
         [[nodiscard]] auto getAvailability() const noexcept
         {
             return value;
-        }
-    };
-
-    class ExternalUnLockPhoneInfo : public sys::DataMessage
-    {
-      private:
-        unsigned int attemptsLeft;
-
-      public:
-        explicit ExternalUnLockPhoneInfo(unsigned int attemptsLeft) : attemptsLeft(attemptsLeft)
-        {}
-
-        [[nodiscard]] auto getAttemptsLeft() const noexcept
-        {
-            return attemptsLeft;
         }
     };
 } // namespace locks

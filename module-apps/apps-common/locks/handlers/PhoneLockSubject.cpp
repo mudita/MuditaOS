@@ -54,6 +54,6 @@ namespace locks
 
     void PhoneLockSubject::verifyInput(LockInput inputData)
     {
-        owner->bus.sendUnicast(std::make_shared<UnLockPhoneInput>(inputData), service::name::appmgr);
+        owner->bus.sendUnicast(std::make_shared<UnlockPhoneInput>(inputData), service::name::appmgr);
     }
 } // namespace locks

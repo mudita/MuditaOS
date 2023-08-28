@@ -34,12 +34,10 @@ namespace gui
 
     void PhoneLockedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        auto notificationsModel = wallpaperPresenter->getNotificationsModel();
-        auto notificationData   = dynamic_cast<app::manager::actions::NotificationsChangedParams *>(data);
-        if (notificationData) {
-            notificationsModel->updateData(notificationData);
-        }
-        else {
+        const auto notificationsModel = wallpaperPresenter->getNotificationsModel();
+        const auto notificationData   = dynamic_cast<app::manager::actions::NotificationsChangedParams *>(data);
+
+        if (notificationData == nullptr) {
             navBar->setActive(nav_bar::Side::Left, false);
             navBar->setActive(nav_bar::Side::Center, false);
             navBar->setActive(nav_bar::Side::Right, false);
@@ -47,11 +45,11 @@ namespace gui
             return;
         }
 
+        notificationsModel->updateData(notificationData);
+
         if (notificationsModel->isPhoneTimeLock()) {
             wallpaperPresenter->forceClockWallpaper();
-            if (notificationData) {
-                notificationsModel->updateData(notificationData);
-            }
+            notificationsModel->updateData(notificationData);
 
             if (!refreshedOnPhoneLockTimeLock) {
                 application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
@@ -63,7 +61,7 @@ namespace gui
             navBar->setActive(nav_bar::Side::Right, false);
         }
         else {
-            if (wallpaperPresenter->switchBackWallpaper() && notificationData) {
+            if (wallpaperPresenter->switchBackWallpaper()) {
                 notificationsModel->updateData(notificationData);
             }
             navBar->setActive(nav_bar::Side::Left, false);
@@ -104,7 +102,6 @@ namespace gui
     bool PhoneLockedWindow::processLongReleaseEvent(const InputEvent &inputEvent)
     {
         if (inputEvent.is(KeyCode::KEY_RF)) {
-
             application->switchWindow(gui::popup::window::power_off_window);
         }
         return true;
@@ -120,14 +117,16 @@ namespace gui
         if (inputEvent.isLongRelease()) {
             return processLongReleaseEvent(inputEvent);
         }
-        else if (inputEvent.isShortRelease() && navBar->isActive(nav_bar::Side::Center)) {
+
+        if (inputEvent.isShortRelease() && navBar->isActive(nav_bar::Side::Center)) {
             const auto requiredStage = (inputEvent.is(KeyCode::KEY_ENTER)) ? PhoneLockedInfoData::Stage::Waiting
                                                                            : PhoneLockedInfoData::Stage::Idle;
             application->switchWindow(gui::popup::window::phone_lock_info_window,
                                       std::make_unique<PhoneLockedInfoData>(requiredStage));
             return true;
         }
-        else if (inputEvent.isShortRelease(KeyCode::KEY_LF) && navBar->isActive(nav_bar::Side::Left)) {
+
+        if (inputEvent.isShortRelease(KeyCode::KEY_LF) && navBar->isActive(nav_bar::Side::Left)) {
             app::manager::Controller::sendAction(application,
                                                  app::manager::actions::EmergencyDial,
                                                  std::make_unique<SwitchData>(),

@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <vector>
 #include <string>
 #include <functional>
@@ -31,12 +32,12 @@ namespace locks
         {
             return lockState;
         }
-        [[nodiscard]] unsigned int getMaxInputSize() const noexcept
+        [[nodiscard]] unsigned getMaxInputSize() const noexcept
         {
             return maxInputSize;
         }
         /// returns current position of a Input character to be inserted
-        [[nodiscard]] unsigned int getCharCount() const noexcept
+        [[nodiscard]] unsigned getCharCount() const noexcept
         {
             return inputValue.size();
         }
@@ -48,11 +49,11 @@ namespace locks
         {
             return getCharCount() >= minInputSize;
         }
-        [[nodiscard]] std::vector<unsigned int> getInput() const
+        [[nodiscard]] std::vector<unsigned> getInput() const
         {
             return inputValue;
         }
-        [[nodiscard]] unsigned int getAttemptsLeft() const noexcept
+        [[nodiscard]] unsigned getAttemptsLeft() const noexcept
         {
             return attemptsLeft;
         }
@@ -70,7 +71,7 @@ namespace locks
         }
         void setNextUnlockAttemptFormattedTime(const std::string &time);
 
-        void putNextChar(unsigned int c);
+        void putNextChar(unsigned c);
         /// removes a last character passed to Lock via putNextChar. The last character can not be popped
         void popChar();
         /// clear all characters passed to the Lock
@@ -78,24 +79,24 @@ namespace locks
         /// consumes LockState::InputInvalid state and LockState::NewInputInvalid
         void consumeState() noexcept;
 
-        explicit Lock(LockState state, unsigned int attemptsLeft = unlimitedNumOfAttempts)
+        explicit Lock(LockState state, unsigned attemptsLeft = unlimitedNumOfAttempts)
             : lockState{state}, attemptsLeft{attemptsLeft}
         {}
 
       private:
         std::string lockName;
         LockState lockState       = LockState::Unlocked;
-        unsigned int attemptsLeft = 0;
+        unsigned attemptsLeft     = 0;
         std::string nextUnlockAttemptFormattedTime;
 
-        std::vector<unsigned int> inputValue;
-        unsigned int maxInputSize = defaultInputSize;
-        unsigned int minInputSize = defaultInputSize;
+        std::vector<unsigned> inputValue;
+        unsigned maxInputSize = defaultInputSize;
+        unsigned minInputSize = defaultInputSize;
 
-        static constexpr unsigned int defaultInputSize       = 4;
-        static constexpr unsigned int unlimitedNumOfAttempts = std::numeric_limits<unsigned int>::max();
+        static constexpr unsigned defaultInputSize       = 4;
+        static constexpr unsigned unlimitedNumOfAttempts = std::numeric_limits<unsigned>::max();
 
-        void setInputSizeBounds(unsigned int _minInputSize, unsigned int _maxInputSize)
+        void setInputSizeBounds(unsigned _minInputSize, unsigned _maxInputSize)
         {
             minInputSize = _minInputSize;
             maxInputSize = _maxInputSize;
@@ -104,5 +105,4 @@ namespace locks
         friend class PhoneLockHandler;
         friend class SimLockHandler;
     };
-
 } // namespace locks

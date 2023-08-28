@@ -107,7 +107,7 @@ namespace sdesktop::endpoints
 
         if (passCode.size() == PasscodeLength) {
             try {
-                auto msg = std::make_shared<locks::ExternalUnLockPhone>(passCodeArrayToVecOfInts(passCode));
+                auto msg = std::make_shared<locks::ExternalUnlockPhone>(passCodeArrayToVecOfInts(passCode));
                 status   = owner->bus.sendUnicast(std::move(msg), service::name::appmgr)
                                ? http::Code::NoContent
                                : http::Code::InternalServerError;

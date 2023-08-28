@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Lock.hpp"
@@ -69,14 +69,12 @@ namespace gui
         LockWindow->pinLabelsBox->setVisible(true);
 
         switch (type) {
-        case LockBox::InputActionType::ProvideInput: {
+        case LockBox::InputActionType::ProvideInput:
             LockWindow->setText(textForInputRequired, LockInputWindow::TextType::Primary);
             break;
-        }
-        case LockBox::InputActionType::ProvideNewInput: {
+        case LockBox::InputActionType::ProvideNewInput:
             LockWindow->setText(textForProvideNewInput, LockInputWindow::TextType::Primary);
             break;
-        }
         case LockBox::InputActionType::ConfirmNewInput:
             LockWindow->setText(textForConfirmNewInput, LockInputWindow::TextType::Primary);
             break;
@@ -90,7 +88,6 @@ namespace gui
     {
         switch (type) {
         case LockBox::InputErrorType::InvalidInput:
-
             LockWindow->setText(textForInvalidInput,
                                 LockInputWindow::TextType::Primary,
                                 {{LockWindow->getToken(LockInputWindow::Token::Attempts), static_cast<int>(value)}});
