@@ -301,7 +301,7 @@
     "app_messages_no_messages": "<text align='center' color='4'>Noch keine Nachrichten.<p>Zum Hinzuf\u00fcgen <b>linken Pfeil</b> dr\u00fccken.</p></text>",
     "app_messages_no_sim": "Keine SIM-Karte.\n\nZum Senden einer SMS\nSIM-Karte einsetzen.",
     "app_messages_no_templates": "<text align='center'>Noch keine Vorlagen.<p><b>Erstellen Sie eine neue Vorlage</b></p><p>im Mudita Center, um sie in Ihrem</p><p>Pure zu verwenden.</p></text>",
-    "app_messages_old_messages": "Alte Nachrichten",
+    "app_messages_old_messages": "Vorherige Nachrichten",
     "app_messages_templates": "Vorlagen",
     "app_messages_thread_delete_confirmation": "Dieses Gespr\u00e4ch l\u00f6schen?",
     "app_messages_thread_draft": "Entwurf: ",

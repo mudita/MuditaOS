@@ -293,7 +293,7 @@
     "app_messages_no_messages": "<text align='center' color='4'>Nie ma jeszcze \u017cadnych wiadomo\u015bci.<p>Wci\u015bnij <b>lew\u0105 strza\u0142k\u0119</b>, by doda\u0107 now\u0105.</p></text>",
     "app_messages_no_sim": "Brak SIM.\n\nAby wys\u0142a\u0107 SMS,\nw\u0142\u00f3\u017c kart\u0119 SIM.",
     "app_messages_no_templates": "<text align='center'>Nie ma jeszcze \u017cadnych szablon\u00f3w.<p><b>Stw\u00f3rz nowy szablon</b> w Mudita</p><p>Center, aby u\u017cy\u0107 go w swoim Pure.</p></text>",
-    "app_messages_old_messages": "Stare Wiadomo\u015bci",
+    "app_messages_old_messages": "Poprzednie wiadomo\u015bci",
     "app_messages_templates": "Szablony",
     "app_messages_thread_delete_confirmation": "Usun\u0105\u0107 t\u0119 rozmow\u0119?",
     "app_messages_thread_draft": "Wersja robocza: ",

@@ -300,7 +300,7 @@
     "app_messages_no_messages": "<text align='center' color='4'>No hay mensajes.<p>Pulsa la <b>flecha izquierda</b> para a\u00f1adir uno.</p></text>",
     "app_messages_no_sim": "No hay SIM.\n\nPara enviar un SMS,\ndebes insertar una tarjeta SIM.",
     "app_messages_no_templates": "<text align='center'>A\u00fan no hay plantillas.<p><b>Crea una nueva plantilla</b> en Mudita</p><p>Center para usar en tu Pure.</p></text>",
-    "app_messages_old_messages": "Mensajes antiguos",
+    "app_messages_old_messages": "Mensajes anteriores",
     "app_messages_templates": "Plantillas",
     "app_messages_thread_delete_confirmation": "\u00bfEliminar esta conversaci\u00f3n?",
     "app_messages_thread_draft": "Borrador: ",

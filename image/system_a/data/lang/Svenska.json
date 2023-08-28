@@ -163,7 +163,7 @@
     "app_messages_no_messages": "<text align='center' color='4'>Inga meddelanden \u00e4n.<p>Tryck <b>v\u00e4nsterpil</b> f\u00f6r att b\u00f6rja skriva ett.</p></text>",
     "app_messages_no_sim": "F\u00f6r att skicka ett SMS,\ns\u00e4tt i ett SIM-kort.",
     "app_messages_no_templates": "<text align='center'>Inga mallar \u00e4nnu.<p><b>Skapa en ny mall</b> i Mudita</p><p>Center som du kan anv\u00e4nda i din Pure.</p></text>",
-    "app_messages_old_messages": "Gamla meddelanden",
+    "app_messages_old_messages": "Tidigare meddelanden",
     "app_messages_templates": "Mallar",
     "app_messages_thread_delete_confirmation": "Radera konversation?",
     "app_messages_thread_draft": "Utkast: ",
