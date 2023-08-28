@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Lock.hpp"
@@ -18,7 +18,7 @@ namespace locks
         }
     }
 
-    void Lock::putNextChar(unsigned int c)
+    void Lock::putNextChar(unsigned c)
     {
         if (maxInputSize > inputValue.size()) {
             inputValue.push_back(c);
@@ -41,5 +41,4 @@ namespace locks
     {
         nextUnlockAttemptFormattedTime = time;
     }
-
 } // namespace locks

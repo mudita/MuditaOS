@@ -181,51 +181,56 @@ namespace app::manager
         });
 
         // PhoneLock connects
-        connect(typeid(locks::LockPhone),
-                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleLockRequest(); });
-        connect(typeid(locks::UnlockPhone),
-                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleUnlockRequest(); });
-        connect(typeid(locks::UnlockPhoneForMTP), [&](sys::Message *request) -> sys::MessagePointer {
-            return phoneLockHandler.handleUnlockRequest(locks::PhoneLockHandler::ReasonForRequest::MTPUnlock);
+        connect(typeid(locks::LockPhone), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleLockRequest();
         });
-        connect(typeid(locks::CancelUnlockPhone), [&](sys::Message *request) -> sys::MessagePointer {
+        connect(typeid(locks::UnlockPhone), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleUnlockRequest();
+        });
+        connect(typeid(locks::UnlockPhoneForMTP), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleUnlockRequest(locks::PhoneLockHandler::RequestReason::MTPUnlock);
+        });
+        connect(typeid(locks::CancelUnlockPhone), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
             return phoneLockHandler.handleUnlockCancelRequest();
         });
-        connect(typeid(locks::UnLockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<locks::UnLockPhoneInput *>(request);
+        connect(typeid(locks::UnlockPhoneInput), [&](sys::Message *request) -> sys::MessagePointer {
+            const auto data = static_cast<locks::UnlockPhoneInput *>(request);
             return phoneLockHandler.handlePhoneLockInput(data->getInputData());
         });
-        connect(typeid(locks::EnablePhoneLock),
-                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleEnablePhoneLock(); });
-        connect(typeid(locks::DisablePhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
+        connect(typeid(locks::EnablePhoneLock), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleEnablePhoneLock();
+        });
+        connect(typeid(locks::DisablePhoneLock), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
             return phoneLockHandler.handleDisablePhoneLock();
         });
-        connect(typeid(locks::UnlockedPhone), [&](sys::Message *request) -> sys::MessagePointer {
+        connect(typeid(locks::UnlockedPhone), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
             autoLockTimer.start();
             return simLockHandler.askForSimUnlocking();
         });
-        connect(typeid(locks::ChangePhoneLock),
-                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleChangePhoneLock(); });
-        connect(typeid(locks::SetPhoneLock),
-                [&](sys::Message *request) -> sys::MessagePointer { return phoneLockHandler.handleSetPhoneLock(); });
-        connect(typeid(locks::SkipSetPhoneLock), [&](sys::Message *request) -> sys::MessagePointer {
+        connect(typeid(locks::ChangePhoneLock), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleChangePhoneLock();
+        });
+        connect(typeid(locks::SetPhoneLock), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
+            return phoneLockHandler.handleSetPhoneLock();
+        });
+        connect(typeid(locks::SkipSetPhoneLock), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
             return phoneLockHandler.handleSkipSetPhoneLock();
         });
         connect(typeid(locks::PhoneLockTimeUpdate), [&](sys::Message *request) -> sys::MessagePointer {
-            auto req = static_cast<locks::PhoneLockTimeUpdate *>(request);
+            const auto req = static_cast<locks::PhoneLockTimeUpdate *>(request);
             notificationProvider.handle(req);
             return sys::msgHandled();
         });
         connect(typeid(SetAutoLockTimeoutRequest), [&](sys::Message *request) -> sys::MessagePointer {
-            auto req = static_cast<SetAutoLockTimeoutRequest *>(request);
+            const auto req = static_cast<SetAutoLockTimeoutRequest *>(request);
             return handleAutoLockSetRequest(req);
         });
-        connect(typeid(locks::ExternalUnLockPhone), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<locks::ExternalUnLockPhone *>(request);
+        connect(typeid(locks::ExternalUnlockPhone), [&](sys::Message *request) -> sys::MessagePointer {
+            const auto data = static_cast<locks::ExternalUnlockPhone *>(request);
             return phoneLockHandler.handleExternalUnlockRequest(data->getInputData());
         });
         connect(typeid(locks::ExternalPhoneLockAvailabilityChange), [&](sys::Message *request) -> sys::MessagePointer {
-            auto data = static_cast<locks::ExternalPhoneLockAvailabilityChange *>(request);
+            const auto data = static_cast<locks::ExternalPhoneLockAvailabilityChange *>(request);
             return phoneLockHandler.handleExternalAvailabilityChange(data->getAvailability());
         });
 

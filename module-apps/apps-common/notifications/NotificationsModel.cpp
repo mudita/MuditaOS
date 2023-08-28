@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsModel.hpp"
@@ -8,7 +8,6 @@ using namespace gui;
 
 namespace
 {
-
     bool hasTetheringNotification(app::manager::actions::NotificationsChangedParams *params)
     {
         const auto &notifications = params->getNotifications();
@@ -38,7 +37,7 @@ NotificationsModel::NotificationsModel(NotificationsListPlacement listPlacement)
 
 void NotificationsModel::attachPresenter(std::shared_ptr<NotificationsPresenter> notificationsPresenter)
 {
-    this->notificationsPresenter = notificationsPresenter;
+    this->notificationsPresenter = std::move(notificationsPresenter);
 }
 
 bool NotificationsModel::hasDismissibleNotification() const noexcept
