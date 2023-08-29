@@ -61,11 +61,6 @@ class EventManagerCommon : public sys::Service
 
     LogDumpFunction logDumpFunction;
 
-    /// @return: < 0 - error occured during log flush
-    /// @return:   0 - log flush did not happen
-    /// @return:   1 - log flush successflul
-    int dumpLogsToFile();
-
   protected:
     std::function<void(const time_t)> onMinuteTick;
     virtual void handleKeyEvent(sys::Message *msg);
@@ -83,4 +78,9 @@ class EventManagerCommon : public sys::Service
     // ID of alarm waiting to trigger
     uint32_t alarmID;
     const EventManagerParams eventManagerParams;
+
+    /// @return: < 0 - error occured during log flush
+    /// @return:   0 - log flush did not happen
+    /// @return:   1 - log flush successflul
+    int dumpLogsToFile();
 };
