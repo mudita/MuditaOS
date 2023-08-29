@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,7 +11,7 @@ class ResetSequence : public GenericLongPressSequence<KeyMap::Back, KeyMap::Fron
   public:
     explicit ResetSequence(sys::Service &service)
         : GenericLongPressSequence<KeyMap::Back, KeyMap::Frontlight>{sys::TimerFactory::createSingleShotTimer(
-              &service, "rseq", std::chrono::milliseconds{10000}, [this](auto &) { handleTimer(); })}
+              &service, "rseq", std::chrono::milliseconds{5500}, [this](auto &) { handleTimer(); })}
 
     {}
 };

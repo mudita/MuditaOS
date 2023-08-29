@@ -31,6 +31,7 @@
 * Added extended information to log filename
 * Added Harmony version information in about section
 * Added system shutdown if there is no user activity for 180 seconds on the language selection screen
+* Added a log when manual reset is performed
 
 ### Changed / Improved
 
