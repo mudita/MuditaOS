@@ -44,6 +44,7 @@ namespace gui
             inline constexpr auto tethering_confirmation_window     = "TetheringConfirmationPopup";
             inline constexpr auto tethering_phonemode_change_window = "TetheringPhoneModeChangeProhibitedPopup";
             inline constexpr auto tethering_off_window              = "TetheringOffPopup";
+            inline constexpr auto tethering_menu_window             = "TetheringMenuPopup";
             inline constexpr auto bluetooth_authenticate            = "BluetoothAuthenticatePopup";
             inline constexpr auto bluetooth_info                    = "BluetoothInfoPopup";
             inline constexpr auto phone_lock_window                 = "PhoneLockPopup";

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Dialog.hpp"
@@ -31,8 +31,8 @@ void Dialog::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
         auto title = metadata->get().title;
-        if (size_t crLfPos = title.find_first_of("\r\n"); crLfPos != title.npos) {
-            auto lengthToReplace = title.size() - crLfPos;
+        if (const auto crLfPos = title.find_first_of("\r\n"); crLfPos != title.npos) {
+            const auto lengthToReplace = title.size() - crLfPos;
             title.replace(crLfPos, lengthToReplace, "...");
         }
         setTitle(title);
@@ -48,10 +48,7 @@ DialogConfirm::DialogConfirm(app::ApplicationCommon *app, const std::string &nam
     navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::ok));
     setFocusItem(icon);
     icon->inputCallback = [=](Item &, const InputEvent &inputEvent) -> bool {
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
-            return true;
-        }
-        return false;
+        return inputEvent.isShortRelease(gui::KeyCode::KEY_RF);
     };
     setTitle("");
 }
@@ -60,7 +57,7 @@ void DialogConfirm::onBeforeShow(ShowMode mode, SwitchData *data)
 {
     if (auto metadata = dynamic_cast<DialogMetadataMessage *>(data); metadata != nullptr) {
         Dialog::onBeforeShow(mode, metadata);
-        auto foo                = metadata->get().action;
+        const auto foo          = metadata->get().action;
         icon->activatedCallback = [foo](Item &) -> bool { return foo(); };
     }
 }

@@ -3,11 +3,9 @@
 
 #include "TetheringOffPopup.hpp"
 
-#include <log/log.hpp>
 #include <messages/DialogMetadataMessage.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <system/messages/TetheringStateRequest.hpp>
-#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
@@ -28,7 +26,7 @@ namespace gui
         return appConfiguration;
     }
 
-    void TetheringOffPopup::onBeforeShow(ShowMode mode, SwitchData *data)
+    void TetheringOffPopup::onBeforeShow(ShowMode mode, [[maybe_unused]] SwitchData *data)
     {
         DialogMetadata metadata;
         metadata.action = [this]() {
@@ -40,8 +38,7 @@ namespace gui
         metadata.title = utils::translate("tethering");
         metadata.text  = utils::translate("tethering_turn_off_question");
         metadata.icon  = "tethering_128px_W_G";
-        auto msg       = std::make_unique<DialogMetadataMessage>(std::move(metadata));
+        const auto msg = std::make_unique<DialogMetadataMessage>(std::move(metadata));
         DialogYesNo::onBeforeShow(mode, msg.get());
     }
-
 } /* namespace gui */

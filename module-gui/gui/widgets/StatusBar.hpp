@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -207,7 +207,7 @@ namespace gui::status_bar
         bool updateNetworkAccessTechnology();
 
         /// Update tethering widget state depending on the current configuration
-        bool updateTetheringState(const sys::phone_modes::Tethering state);
+        bool updateTetheringState(sys::phone_modes::Tethering state);
 
         /// Accepts GuiVisitor to update the status bar
         void accept(GuiVisitor &visitor) override;

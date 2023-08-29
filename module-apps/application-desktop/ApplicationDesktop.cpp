@@ -15,6 +15,7 @@
 #include <apps-common/messages/AppMessage.hpp>
 #include <module-gui/gui/widgets/status-bar/SIM.hpp>
 #include <popups/TetheringOffPopup.hpp>
+#include <popups/TetheringMenuPopup.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <system/messages/SystemManagerMessage.hpp>
@@ -166,9 +167,10 @@ namespace app
         windowsFactory.attach(desktop_mmi_internal, [](ApplicationCommon *app, const std::string newname) {
             return std::make_unique<gui::MmiInternalMsgWindow>(app, desktop_mmi_internal);
         });
-        windowsFactory.attach(gui::window::name::dialog_confirm, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::DialogConfirm>(app, name);
-        });
+        windowsFactory.attach(gui::popup::window::tethering_menu_window,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::TetheringMenuPopup>(app, name);
+                              });
         windowsFactory.attach(
             gui::popup::window::tethering_off_window, [](ApplicationCommon *app, const std::string &name) {
                 return std::make_unique<gui::TetheringOffPopup>(app, gui::popup::window::tethering_off_window);
