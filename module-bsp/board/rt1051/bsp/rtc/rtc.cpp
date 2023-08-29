@@ -298,7 +298,9 @@ namespace bsp::rtc
 
     ErrorCode setMinuteAlarm(time_t timestamp)
     {
-        const auto secondsToMinute = 60 - (timestamp % 60);
+        constexpr auto secondsIn10Minutes = 60 * 1;
+
+        const auto secondsToMinute = secondsIn10Minutes - (timestamp % secondsIn10Minutes);
 
         struct tm date
         {};
