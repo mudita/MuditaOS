@@ -35,6 +35,7 @@
 * Added Harmony version information in about section
 * Added system shutdown if there is no user activity for 180 seconds on the language selection screen
 * Files not fully transferred via Center will be now removed when USB cable is unplugged
+* Added a log when manual reset is performed
 
 ### Changed / Improved
 
