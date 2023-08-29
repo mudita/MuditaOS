@@ -173,8 +173,8 @@ void EventManager::buildKeySequences()
 
     auto resetSeq      = std::make_unique<ResetSequence>(*this);
     resetSeq->onAction = [this]() {
-        app::manager::Controller::sendAction(
-            this, app::manager::actions::ShowPopup, std::make_unique<RebootPopupRequestParams>());
+        LOG_INFO("Incoming manual reset caused by user!");
+        EventManagerCommon::dumpLogsToFile();
     };
     collection.emplace_back(std::move(resetSeq));
 
