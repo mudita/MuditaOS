@@ -5,7 +5,6 @@ target_include_directories(apps-common
 )
 
 target_sources(apps-common
-
 	PRIVATE
 		HomeModesWindow.cpp
 		Popups.cpp
@@ -15,6 +14,7 @@ target_sources(apps-common
 		TetheringNotificationPopup.cpp
 		TetheringPhoneModePopup.cpp
 		TetheringOffPopup.cpp
+		TetheringMenuPopup.cpp
 		BluetoothAuthenticatePopup.cpp
 		BluetoothInfoPopup.cpp
 		VolumeWindow.cpp
@@ -44,6 +44,7 @@ target_sources(apps-common
 		TetheringConfirmationPopup.hpp
 		TetheringNotificationPopup.hpp
 		TetheringPhoneModePopup.hpp
+		TetheringMenuPopup.hpp
 		BluetoothAuthenticatePopup.hpp
 		BluetoothInfoPopup.hpp
 		VolumeWindow.hpp
@@ -65,5 +66,4 @@ target_sources(apps-common
 		presenter/PowerOffPresenter.hpp
 		presenter/QuotesPresenter.hpp
 		presenter/WallpaperPresenter.hpp
-
 )

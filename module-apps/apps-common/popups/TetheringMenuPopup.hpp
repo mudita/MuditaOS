@@ -4,15 +4,14 @@
 #pragma once
 
 #include <string>
-
 #include "TetheringNotificationPopup.hpp"
 
 namespace gui
 {
-    class TetheringPhoneModePopup : public TetheringNotificationPopup
+    class TetheringMenuPopup : public TetheringNotificationPopup
     {
       public:
-        TetheringPhoneModePopup(app::ApplicationCommon *app, const std::string &name);
+        TetheringMenuPopup(app::ApplicationCommon *app, const std::string &name);
 
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };

@@ -19,7 +19,6 @@ target_include_directories(application-desktop
 target_sources(application-desktop
 	PRIVATE
 		ApplicationDesktop.cpp
-		data/DesktopData.hpp
 		data/Mmi.hpp
 		models/ActiveNotificationsListPresenter.cpp
 		models/ActiveNotificationsListPresenter.hpp

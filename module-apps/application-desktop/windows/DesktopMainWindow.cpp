@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationDesktop.hpp"
-#include "DesktopData.hpp"
 #include "DesktopMainWindow.hpp"
 
 #include <application-call/data/CallSwitchData.hpp>
@@ -10,7 +9,6 @@
 #include <messages/DialogMetadataMessage.hpp>
 #include <notifications/NotificationsModel.hpp>
 #include <service-appmgr/Controller.hpp>
-#include <service-time/ServiceTime.hpp>
 #include <service-time/TimeMessage.hpp>
 #include <time/time_conversion_factory.hpp>
 #include <windows/Dialog.hpp>
@@ -31,12 +29,7 @@ namespace gui
 
         activatedCallback = [this]([[maybe_unused]] Item &item) {
             if (notificationsModel->isTetheringOn()) {
-                showInformationPopup(
-                    [this]() {
-                        app::manager::Controller::sendAction(application, app::manager::actions::Home);
-                        return true;
-                    },
-                    utils::translate("tethering_menu_access_decline"));
+                application->switchWindow(popup::window::tethering_menu_window);
             }
             else {
                 application->switchWindow(app::window::name::desktop_menu);
@@ -219,26 +212,13 @@ namespace gui
         return RefreshModes::GUI_REFRESH_FAST;
     }
 
-    bool DesktopMainWindow::showInformationPopup(std::function<bool()> action, const std::string &notification)
-    {
-        DialogMetadata meta;
-        meta.icon       = "info_128px_W_G";
-        meta.text       = notification;
-        meta.action     = std::move(action);
-        auto switchData = std::make_unique<DialogMetadataMessage>(std::move(meta));
-        application->switchWindow(window::name::dialog_confirm, std::move(switchData));
-        return true;
-    }
-
     bool DesktopMainWindow::resolveDialAction(const std::string &number)
     {
         if (notificationsModel->isTetheringOn()) {
             return false;
         }
-        else {
-            return app::manager::Controller::sendAction(
-                application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>(number));
-        }
+        return app::manager::Controller::sendAction(
+            application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>(number));
     }
 
 } /* namespace gui */
