@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSdata.hpp"
@@ -113,7 +113,7 @@ std::list<gui::Option> newMessageWindowOptions(app::ApplicationMessages *app,
         return true;
     });
 
-    if (Clipboard::getInstance().gotData()) {
+    if (Clipboard::getInstance().hasData()) {
         options.emplace_back(utils::translate("sms_paste"), [=](gui::Item &item) {
             text->addText(Clipboard::getInstance().paste(), gui::AdditionType::perBlock);
             app->returnToPreviousWindow();

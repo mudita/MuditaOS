@@ -18,6 +18,8 @@
 
 #include <ctime>
 
+#include <Clipboard.hpp>
+
 namespace app::notes
 {
     namespace
@@ -80,9 +82,12 @@ namespace app::notes
                 application->getCurrentWindow()->startInputModeRestoreTimer(std::move(restoreFunction));
             }));
         edit->setTextChangedCallback([this](Item &, const UTF8 &text) {
-            const auto count = text.length();
-            setCharactersCount(count);
-            onCharactersCountChanged(count);
+            const auto textLength        = text.length();
+            const auto optionsLabelState = (textLength != 0) || Clipboard::getInstance().hasData();
+            navBar->setActive(gui::nav_bar::Side::Left, optionsLabelState);
+
+            setCharactersCount(textLength);
+            onCharactersCountChanged(textLength);
         });
         edit->setTextLimitType(gui::TextLimitType::MaxSignsCount, MaxCharactersCount);
 
@@ -117,9 +122,9 @@ namespace app::notes
         edit              = nullptr;
     }
 
-    void NoteEditWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    void NoteEditWindow::onBeforeShow([[maybe_unused]] gui::ShowMode mode, gui::SwitchData *data)
     {
-        auto editData = dynamic_cast<NoteSwitchData *>(data);
+        const auto editData = dynamic_cast<NoteSwitchData *>(data);
         if (editData == nullptr) {
             return;
         }
@@ -144,10 +149,10 @@ namespace app::notes
                 switchData->ignoreCurrentWindowOnStack = true;
                 application->switchWindow(gui::name::window::note_preview, std::move(switchData));
             }
-            if (inputEvent.is(gui::KeyCode::KEY_LF)) {
+            if (inputEvent.is(gui::KeyCode::KEY_LF) && navBar->isActive(gui::nav_bar::Side::Left)) {
                 application->switchWindow(
                     window::name::option_window,
-                    std::make_unique<gui::OptionsWindowOptions>(noteEditOptions(application, *notesRecord, edit)));
+                    std::make_unique<gui::OptionsWindowOptions>(noteEditOptions(application, edit)));
             }
         }
         return AppWindow::onInput(inputEvent);
@@ -158,11 +163,10 @@ namespace app::notes
         notesRecord->date    = std::time(nullptr);
         notesRecord->snippet = edit->getText();
         presenter->save(notesRecord);
-        LOG_INFO("Note saved.");
     }
 
     bool NoteEditWindow::isNoteEmpty() const noexcept
     {
-        return edit != nullptr ? edit->isEmpty() : true;
+        return (edit != nullptr) ? edit->isEmpty() : true;
     }
 } // namespace app::notes

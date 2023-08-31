@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesOptions.hpp"
@@ -22,7 +22,7 @@ namespace app::notes
                        std::function<bool(gui::Item &)> onClickCallback,
                        std::list<gui::Option> &options)
         {
-            options.emplace_back(utils::translate(translationId), onClickCallback);
+            options.emplace_back(utils::translate(translationId), std::move(onClickCallback));
         }
 
         void removeNote(const NotesRecord &record,
@@ -52,7 +52,7 @@ namespace app::notes
         std::list<gui::Option> options;
         addOption(
             {"app_notes_delete_note"},
-            [application, record, &notesRepository](gui::Item &item) {
+            [application, record, &notesRepository]([[maybe_unused]] gui::Item &item) {
                 removeNote(record, application, notesRepository);
                 return true;
             },
@@ -68,7 +68,7 @@ namespace app::notes
         std::list<gui::Option> options;
         addOption(
             {"common_text_copy"},
-            [application, textWidget](gui::Item &item) {
+            [application, textWidget]([[maybe_unused]] gui::Item &item) {
                 if (textWidget != nullptr) {
                     Clipboard::getInstance().copy(textWidget->getText());
                 }
@@ -78,7 +78,7 @@ namespace app::notes
             options);
         addOption(
             {"app_notes_delete_note"},
-            [application, record, &notesRepository](gui::Item &item) {
+            [application, record, &notesRepository]([[maybe_unused]] gui::Item &item) {
                 removeNote(record, application, notesRepository);
                 return true;
             },
@@ -86,26 +86,28 @@ namespace app::notes
         return options;
     }
 
-    std::list<gui::Option> noteEditOptions(ApplicationCommon *application,
-                                           const NotesRecord &record,
-                                           gui::Text *textWidget)
+    std::list<gui::Option> noteEditOptions(ApplicationCommon *application, gui::Text *textWidget)
     {
         std::list<gui::Option> options;
-        addOption(
-            {"common_text_copy"},
-            [application, textWidget](gui::Item &item) {
-                if (textWidget != nullptr) {
-                    Clipboard::getInstance().copy(textWidget->getText());
-                }
-                application->returnToPreviousWindow();
-                return true;
-            },
-            options);
 
-        if (Clipboard::getInstance().gotData()) {
+        if (textWidget != nullptr) {
+            const auto &noteText = textWidget->getText();
+            if (!noteText.empty()) {
+                addOption(
+                    {"common_text_copy"},
+                    [application, noteText]([[maybe_unused]] gui::Item &item) {
+                        Clipboard::getInstance().copy(noteText);
+                        application->returnToPreviousWindow();
+                        return true;
+                    },
+                    options);
+            }
+        }
+
+        if (Clipboard::getInstance().hasData()) {
             addOption(
                 {"common_text_paste"},
-                [application, textWidget](gui::Item &item) {
+                [application, textWidget]([[maybe_unused]] gui::Item &item) {
                     if (textWidget != nullptr) {
                         textWidget->addText(Clipboard::getInstance().paste(), gui::AdditionType::perBlock);
                     }

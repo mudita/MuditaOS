@@ -75,7 +75,7 @@ namespace gui
                 inputText->setFont(style::window::font::mediumbold);
 
                 if (this->navBarSetOptionsLabel) {
-                    const auto optionsLabelState = !inputText->isEmpty() || Clipboard::getInstance().gotData();
+                    const auto optionsLabelState = !inputText->isEmpty() || Clipboard::getInstance().hasData();
                     this->navBarSetOptionsLabel(utils::translate(style::strings::common::options), optionsLabelState);
                 }
             }
@@ -95,12 +95,12 @@ namespace gui
             const auto result = inputText->onInput(event);
 
             if (!event.is(KeyCode::KEY_AST) && this->navBarSetOptionsLabel) {
-                const auto optionsLabelState = !inputText->isEmpty() || Clipboard::getInstance().gotData();
+                const auto optionsLabelState = !inputText->isEmpty() || Clipboard::getInstance().hasData();
                 this->navBarSetOptionsLabel(utils::translate(style::strings::common::options), optionsLabelState);
             }
 
             if (event.isShortRelease(gui::KeyCode::KEY_LF) &&
-                (!inputText->isEmpty() || Clipboard::getInstance().gotData())) {
+                (!inputText->isEmpty() || Clipboard::getInstance().hasData())) {
                 if (this->inputOptions) {
                     this->inputOptions(inputText);
                 }

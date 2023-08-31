@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -45,7 +45,7 @@ namespace app::notes
 
         std::unique_ptr<NoteEditWindowContract::Presenter> presenter;
         std::shared_ptr<NotesRecord> notesRecord;
-        gui::Label *charactersCounter;
-        gui::Text *edit;
+        gui::Label *charactersCounter = nullptr;
+        gui::Text *edit               = nullptr;
     };
 } // namespace app::notes
