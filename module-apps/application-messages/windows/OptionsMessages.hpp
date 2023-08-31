@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,11 +11,10 @@
 
 namespace gui
 {
-
     class SmsWindowOptions : public OptionWindow
     {
       public:
-        explicit SmsWindowOptions(app::ApplicationCommon *app, std::string windowName);
+        SmsWindowOptions(app::ApplicationCommon *app, const std::string &windowName);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
       private:
@@ -25,7 +24,6 @@ namespace gui
         std::list<gui::Option> smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record);
         gui::option::OptionRecordValidity getRecordValid();
     };
-
 } // namespace gui
 
 /// @brief options for New Message Window
