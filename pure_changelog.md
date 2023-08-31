@@ -35,6 +35,7 @@
 * Fixed Alarm disappearance during end of call window
 * Fixed passcode behavior when blocked from Mudita Center
 * Fixed missing tethering icon on "Tethering is on" window
+* Fixed showing "Copy text" option in empty note
 
 ## [1.7.2 2023-07-28]
 

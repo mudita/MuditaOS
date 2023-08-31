@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,7 +22,5 @@ namespace app::notes
                                               const NotesRecord &record,
                                               AbstractNotesRepository &notesRepository,
                                               gui::Text *textWidget);
-    std::list<gui::Option> noteEditOptions(ApplicationCommon *application,
-                                           const NotesRecord &record,
-                                           gui::Text *textWidget);
+    std::list<gui::Option> noteEditOptions(ApplicationCommon *application, gui::Text *textWidget);
 } // namespace app::notes

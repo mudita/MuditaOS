@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <mutex.hpp>
-
 #include <string>
 
 class Clipboard
@@ -25,7 +24,7 @@ class Clipboard
     void copy(const std::string &);
     std::string paste();
 
-    bool gotData() const
+    bool hasData() const
     {
         return validData;
     }

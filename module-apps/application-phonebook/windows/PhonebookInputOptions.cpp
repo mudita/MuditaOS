@@ -33,7 +33,7 @@ namespace gui
             });
         }
 
-        if (Clipboard::getInstance().gotData()) {
+        if (Clipboard::getInstance().hasData()) {
             options.emplace_back(utils::translate("common_text_paste"), [=](gui::Item &item) {
                 /* Single line text ellipsis implementation doesn't properly support
                  * text that consists of multiple blocks - use character addition

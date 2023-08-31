@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NoteCreateWindow.hpp"
@@ -25,6 +25,6 @@ namespace app::notes
     void NoteCreateWindow::onCharactersCountChanged(std::uint32_t count)
     {
         NoteEditWindow::onCharactersCountChanged(count);
-        navBar->setActive(gui::nav_bar::Side::Center, count != 0U);
+        navBar->setActive(gui::nav_bar::Side::Center, count != 0);
     }
 } // namespace app::notes

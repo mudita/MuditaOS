@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-notes/ApplicationNotes.hpp>
@@ -20,18 +20,19 @@
 
 #include <utility>
 
+namespace
+{
+    constexpr auto applicationNotesStackSize = 1024 * 4;
+}
+
 namespace app
 {
-    namespace
-    {
-        constexpr auto NotesStackSize = 4096U;
-    } // namespace
-
     ApplicationNotes::ApplicationNotes(std::string name,
                                        std::string parent,
                                        StatusIndicators statusIndicators,
                                        StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, NotesStackSize)
+        : Application(
+              std::move(name), std::move(parent), statusIndicators, startInBackground, applicationNotesStackSize)
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
