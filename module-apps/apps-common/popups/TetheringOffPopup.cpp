@@ -6,6 +6,7 @@
 #include <messages/DialogMetadataMessage.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <system/messages/TetheringStateRequest.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
@@ -32,7 +33,7 @@ namespace gui
         metadata.action = [this]() {
             application->bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::Off),
                                          service::name::system_manager);
-            application->returnToPreviousWindow();
+            app::manager::Controller::sendAction(application, app::manager::actions::Home);
             return true;
         };
         metadata.title = utils::translate("tethering");
