@@ -17,13 +17,13 @@
 namespace gui
 {
 
-    SmsWindowOptions::SmsWindowOptions(app::ApplicationCommon *app, std::string windowName)
+    SmsWindowOptions::SmsWindowOptions(app::ApplicationCommon *app, const std::string &windowName)
         : OptionWindow(app, windowName)
     {}
 
-    void SmsWindowOptions::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    void SmsWindowOptions::onBeforeShow([[maybe_unused]] gui::ShowMode mode, gui::SwitchData *data)
     {
-        if (auto message = dynamic_cast<SMSSwitchData *>(data)) {
+        if (const auto message = dynamic_cast<SMSSwitchData *>(data)) {
             record = message->getRecord();
         }
 
@@ -43,10 +43,10 @@ namespace gui
 
     gui::option::OptionRecordValidity SmsWindowOptions::getRecordValid()
     {
-        auto contact = DBServiceAPI::MatchContactByPhoneNumber(application, record.number);
-        return contact == nullptr ? gui::option::OptionRecordValidity::Invalid
-                                  : (contact->isTemporary() ? gui::option::OptionRecordValidity::Invalid
-                                                            : gui::option::OptionRecordValidity::Valid);
+        const auto contact = DBServiceAPI::MatchContactByPhoneNumber(application, record.number);
+        return (contact == nullptr) ? gui::option::OptionRecordValidity::Invalid
+                                    : (contact->isTemporary() ? gui::option::OptionRecordValidity::Invalid
+                                                              : gui::option::OptionRecordValidity::Valid);
     }
 
     std::list<Option> SmsWindowOptions::smsWindowOptions(app::ApplicationMessages *app, const SMSRecord &record)
@@ -59,7 +59,7 @@ namespace gui
 
         std::list<gui::Option> options;
         if (record.type == SMSType::FAILED) {
-            options.emplace_back(utils::translate("sms_resend_failed"), [=, &record](gui::Item &item) {
+            options.emplace_back(utils::translate("sms_resend_failed"), [=, &record]([[maybe_unused]] gui::Item &item) {
                 app->resendSms(record);
                 app->returnToPreviousWindow();
                 return true;
@@ -81,20 +81,20 @@ namespace gui
                 std::make_unique<gui::option::Contact>(app, gui::option::ContactOperation::Details, *contact)});
         }
 
-        options.emplace_back(UTF8(utils::translate("sms_forward_message")), [=](gui::Item &item) {
+        options.emplace_back(UTF8(utils::translate("sms_forward_message")), [=]([[maybe_unused]] gui::Item &item) {
             std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTextData>(record.body);
             app->switchWindow(gui::name::window::new_sms, std::move(data));
             return true;
         });
 
-        options.emplace_back(UTF8(utils::translate("sms_copy")), [=](gui::Item &item) {
+        options.emplace_back(UTF8(utils::translate("sms_copy")), [=]([[maybe_unused]] gui::Item &item) {
             Clipboard::getInstance().copy(record.body);
             app->returnToPreviousWindow();
             return true;
         });
 
         options.emplace_back(UTF8(utils::translate("sms_delete_message")),
-                             [=](gui::Item &item) { return app->removeSms(record); });
+                             [=]([[maybe_unused]] gui::Item &item) { return app->removeSms(record); });
 
         return options;
     }
@@ -107,15 +107,29 @@ std::list<gui::Option> newMessageWindowOptions(app::ApplicationMessages *app,
 {
     std::list<gui::Option> options;
 
-    options.emplace_back(UTF8(utils::translate("sms_use_template")), [=](gui::Item &item) {
-        std::unique_ptr<gui::SwitchData> data = std::make_unique<SMSTemplateRequest>(requestingWindow);
-        app->switchWindow(gui::name::window::sms_templates, std::move(data));
-        return true;
-    });
+    options.emplace_back(UTF8(utils::translate("sms_use_template")),
+                         [app, requestingWindow]([[maybe_unused]] gui::Item &item) {
+                             auto data = std::make_unique<SMSTemplateRequest>(requestingWindow);
+                             app->switchWindow(gui::name::window::sms_templates, std::move(data));
+                             return true;
+                         });
+
+    if (text != nullptr) {
+        const auto &messageContent = text->getText();
+        if (!messageContent.empty()) {
+            options.emplace_back(utils::translate("sms_copy"), [app, messageContent]([[maybe_unused]] gui::Item &item) {
+                Clipboard::getInstance().copy(messageContent);
+                app->returnToPreviousWindow();
+                return true;
+            });
+        }
+    }
 
     if (Clipboard::getInstance().hasData()) {
-        options.emplace_back(utils::translate("sms_paste"), [=](gui::Item &item) {
-            text->addText(Clipboard::getInstance().paste(), gui::AdditionType::perBlock);
+        options.emplace_back(utils::translate("sms_paste"), [app, text]([[maybe_unused]] gui::Item &item) {
+            if (text != nullptr) {
+                text->addText(Clipboard::getInstance().paste(), gui::AdditionType::perBlock);
+            }
             app->returnToPreviousWindow();
             return true;
         });
