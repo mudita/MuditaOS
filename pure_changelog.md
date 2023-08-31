@@ -29,7 +29,6 @@
 * Fixed ability to create contact with 2 same numbers
 * Fixed diacritics in translations
 * Fixed issues with file uploads with low disk space.
-* Fixed data losing because switching tethering via tethering popup
 * Fixed hard fault handling
 * Fixed issue with uneven first screen redraw after turning the phone on
 * Fixed issue with bypassing phone lock window after unplugging USB cable on tethering popup

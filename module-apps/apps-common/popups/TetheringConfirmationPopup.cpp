@@ -6,6 +6,7 @@
 #include "ApplicationCommon.hpp"
 
 #include <system/messages/TetheringQuestionRequest.hpp>
+#include <service-appmgr/Controller.hpp>
 
 namespace gui
 {
@@ -22,7 +23,7 @@ namespace gui
         metadata.action = [this]() {
             application->bus.sendUnicast(std::make_shared<sys::TetheringEnabledResponse>(),
                                          service::name::system_manager);
-            application->returnToPreviousWindow();
+            app::manager::Controller::sendAction(application, app::manager::actions::Home);
             return true;
         };
         auto msg = std::make_unique<DialogMetadataMessage>(std::move(metadata));
