@@ -83,8 +83,8 @@ namespace app::notes
             }));
         edit->setTextChangedCallback([this](Item &, const UTF8 &text) {
             const auto textLength        = text.length();
-            const auto optionsLabelState = (textLength != 0) || Clipboard::getInstance().hasData();
-            navBar->setActive(gui::nav_bar::Side::Left, optionsLabelState);
+            optionsLabelEnabled          = (textLength != 0) || Clipboard::getInstance().hasData();
+            navBar->setActive(gui::nav_bar::Side::Left, optionsLabelEnabled);
 
             setCharactersCount(textLength);
             onCharactersCountChanged(textLength);
@@ -143,13 +143,13 @@ namespace app::notes
     bool NoteEditWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease()) {
-            if (inputEvent.is(gui::KeyCode::KEY_ENTER)) {
+            if (inputEvent.is(gui::KeyCode::KEY_ENTER) && !edit->getText().empty()) {
                 saveNote();
                 auto switchData                        = std::make_unique<NoteSwitchData>(notesRecord);
                 switchData->ignoreCurrentWindowOnStack = true;
                 application->switchWindow(gui::name::window::note_preview, std::move(switchData));
             }
-            if (inputEvent.is(gui::KeyCode::KEY_LF) && navBar->isActive(gui::nav_bar::Side::Left)) {
+            if (inputEvent.is(gui::KeyCode::KEY_LF) && optionsLabelEnabled) {
                 application->switchWindow(
                     window::name::option_window,
                     std::make_unique<gui::OptionsWindowOptions>(noteEditOptions(application, edit)));

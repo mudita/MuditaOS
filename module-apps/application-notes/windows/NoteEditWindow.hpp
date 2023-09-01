@@ -47,5 +47,6 @@ namespace app::notes
         std::shared_ptr<NotesRecord> notesRecord;
         gui::Label *charactersCounter = nullptr;
         gui::Text *edit               = nullptr;
+        bool optionsLabelEnabled      = false;
     };
 } // namespace app::notes
