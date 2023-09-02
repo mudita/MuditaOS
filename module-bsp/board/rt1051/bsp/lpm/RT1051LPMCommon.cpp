@@ -8,7 +8,11 @@
 #include "Oscillator.hpp"
 #include "drivers/semc/DriverSEMC.hpp"
 #include <hal/boot_reason.h>
-#include <critical.hpp>
+//#include <critical.hpp>
+//#include <fsl_dcdc.h>
+//#include "LDO.hpp"
+//#include "Bandgap.hpp"
+#include "DCDC.hpp"
 
 // namespace
 //{
@@ -65,10 +69,10 @@ namespace bsp
         Down
     };
 
-    CpuFrequencyMHz RT1051LPMCommon::onChangeUp(CpuFrequencyMHz freq, CpuFrequencyMHz newFrequency)
+    void RT1051LPMCommon::onChangeUp(CpuFrequencyMHz freq, CpuFrequencyMHz newFrequency)
     {
         if ((freq <= CpuFrequencyMHz::Level_1) && (newFrequency > CpuFrequencyMHz::Level_1)) {
-            // Switch to external crystal oscillator
+            /* Switch to external crystal oscillator */
             SwitchOscillatorSource(LowPowerMode::OscillatorSource::External);
 
             // Enable regular 2P5 and 1P1 LDO, turn off weak 2P5 and 1P1 LDO
@@ -79,22 +83,21 @@ namespace bsp
                 driverSEMC->SwitchToPLL2ClockSource();
             }
         }
-        return newFrequency;
     }
 
     void RT1051LPMCommon::onChangeDown(CpuFrequencyMHz newFrequency)
     {
         if (newFrequency <= CpuFrequencyMHz::Level_1) {
-            // Switch external RAM clock source to OSC
+            /* Switch to internal RC oscillator */
+            SwitchOscillatorSource(LowPowerMode::OscillatorSource::Internal);
+
+            /* Switch external RAM clock source to OSC */
             if (driverSEMC) {
                 driverSEMC->SwitchToPeripheralClockSource();
             }
 
             // Enable weak 2P5 and 1P1 LDO, turn off regular 2P5 and 1P1 LDO
             //            SwitchToLowPowerModeLDO();
-
-            // Switch to internal RC oscillator
-            SwitchOscillatorSource(LowPowerMode::OscillatorSource::Internal);
         }
     }
 
@@ -104,9 +107,16 @@ namespace bsp
             return;
         }
 
+        /* Switch to overdrive config for any frequency change above 12MHz */
+        const auto isChangeAbove12MHz =
+            (currentFrequency > CpuFrequencyMHz::Level_1) || (freq > CpuFrequencyMHz::Level_1);
+        if (isChangeAbove12MHz) {
+            dcdc::SwitchToOverdriveConfig();
+        }
+
         const auto changeDirection = (currentFrequency < freq) ? Change::Up : Change::Down;
         if (Change::Up == changeDirection) {
-            freq = onChangeUp(currentFrequency, freq);
+            onChangeUp(currentFrequency, freq);
         }
 
         switch (freq) {
@@ -131,6 +141,11 @@ namespace bsp
         case CpuFrequencyMHz::Level_6:
             CpuFreq->SetCpuFrequency(CpuFreqLPM::CpuClock::CpuClock_Pll2_528_Mhz);
             break;
+        }
+
+        /* Switch back to regular config after clock change is done */
+        if (isChangeAbove12MHz) {
+            dcdc::SwitchToRegularConfig();
         }
 
         if (Change::Down == changeDirection) {

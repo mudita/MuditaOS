@@ -23,8 +23,8 @@ namespace bsp
         void LowPowerLDOMode();
 
       private:
-        CpuFrequencyMHz onChangeUp(CpuFrequencyMHz freq, CpuFrequencyMHz newFrequency);
-        void onChangeDown(bsp::CpuFrequencyMHz freq);
+        void onChangeUp(CpuFrequencyMHz freq, CpuFrequencyMHz newFrequency);
+        void onChangeDown(CpuFrequencyMHz freq);
 
         std::unique_ptr<bsp::CpuFreqLPM> CpuFreq;
         std::shared_ptr<drivers::DriverSEMC> driverSEMC;

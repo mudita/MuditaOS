@@ -6,26 +6,40 @@
 #include "board/rt1051/bsp/lpm/CpuFreqLPM.hpp"
 #include "board/rt1051/bsp/lpm/Bandgap.hpp"
 #include "board/rt1051/bsp/lpm/LDO.hpp"
-#include <fsl_dcdc.h>
+#include "board/rt1051/bsp/lpm/DCDC.hpp"
 
 namespace drivers
 {
     RT1051DriverPLL2::RT1051DriverPLL2() noexcept
     {
         if (!IsPLL2Enabled()) {
-            // Switch DCDC to CCM mode to improve stability
-            DCDC_BootIntoCCM(DCDC);
 
-            // Set VDD_SOC_IN to 1.15V required to safely start PLL2
-            DCDC_AdjustTargetVoltage(DCDC, bsp::VDDRun_1150_mV, bsp::VDDStandby_925_mV);
+            //            LOG_ERROR("Enabling PLL2 with:");
+            //            LOG_ERROR("\t> DCDC mode: %s",  (DCDC->REG0 & DCDC_REG0_PWD_ZCD_MASK) ? "CCM" : "DCM");
+            //            LOG_ERROR("\t> core voltage: %lumV", 800 + 25 * (DCDC->REG3 & DCDC_REG3_TRG_MASK));
+            //            LOG_ERROR("\t> bandgap mode: %s", (CCM_ANALOG->MISC0 & CCM_ANALOG_MISC0_REFTOP_PWD_MASK) ?
+            //            "low power" : "regular"); LOG_ERROR("\t> LDO 2P5 mode: %s", (PMU->REG_2P5 &
+            //            PMU_REG_2P5_ENABLE_LINREG_MASK) ? "regular" : "low power"); LOG_ERROR("\t> LDO 1P1 mode: %s",
+            //            (PMU->REG_1P1 & PMU_REG_1P1_ENABLE_LINREG_MASK) ? "regular" : "low power");
 
-            // Switch to regular bandgap
+            /* Check if switching conditions already met */
+            const auto isCurrentVoltageOverdrive = ((DCDC->REG3 & DCDC_REG3_TRG_MASK) >= bsp::VDDRun_1275_mV);
+            if (!isCurrentVoltageOverdrive) {
+                bsp::dcdc::SwitchToOverdriveConfig();
+            }
+
+            /* Switch to regular bandgap */
             bsp::bandgap::SwitchToRegularMode();
 
-            // Switch to regular LDO
+            /* Switch to regular LDO */
             bsp::ldo::SwitchToRegularMode();
 
-            // Enable PLL2
+            /* Switch back to regular config */
+            if (!isCurrentVoltageOverdrive) {
+                bsp::dcdc::SwitchToRegularConfig();
+            }
+
+            /* Enable PLL2 */
             clkPLL2setup(CLK_ENABLE);
         }
     }
@@ -37,19 +51,24 @@ namespace drivers
             !bsp::IsClockEnabled(kCLOCK_Lpspi4) && !bsp::IsClockEnabled(kCLOCK_Usdhc1) &&
             !bsp::IsClockEnabled(kCLOCK_Usdhc2)) {
 
-            // Disable PLL2
+            //            LOG_ERROR("Disabling PLL2 with:");
+            //            LOG_ERROR("\t> DCDC mode: %s",  (DCDC->REG0 & DCDC_REG0_PWD_ZCD_MASK) ? "CCM" : "DCM");
+            //            LOG_ERROR("\t> core voltage: %lumV", 800 + 25 * (DCDC->REG3 & DCDC_REG3_TRG_MASK));
+            //            LOG_ERROR("\t> bandgap mode: %s", (CCM_ANALOG->MISC0 & CCM_ANALOG_MISC0_REFTOP_PWD_MASK) ?
+            //            "low power" : "regular"); LOG_ERROR("\t> LDO 2P5 mode: %s", (PMU->REG_2P5 &
+            //            PMU_REG_2P5_ENABLE_LINREG_MASK) ? "regular" : "low power"); LOG_ERROR("\t> LDO 1P1 mode: %s",
+            //            (PMU->REG_1P1 & PMU_REG_1P1_ENABLE_LINREG_MASK) ? "regular" : "low power");
+
+            /* Disable PLL2 */
             clkPLL2setup(CLK_DISABLE);
 
-            // After turning off PLL2 and with CPU @4MHZ VDD_SOC_IN can be set to 950mV
-            DCDC_AdjustTargetVoltage(DCDC, bsp::VDDRun_950_mV, bsp::VDDStandby_925_mV);
+            /* Switch DCDC to low power config */
+            bsp::dcdc::SwitchToLowPowerConfig();
 
-            // Switch DCDC to DCM mode to reduce current consumption
-            DCDC_BootIntoDCM(DCDC);
-
-            // Switch to low power LDO
+            /* Switch to low power LDO */
             bsp::ldo::SwitchToLowPowerMode();
 
-            // Switch to low power bandgap
+            /* Switch to low power bandgap */
             bsp::bandgap::SwitchToLowPowerMode();
         }
     }

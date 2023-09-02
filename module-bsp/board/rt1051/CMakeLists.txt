@@ -28,6 +28,7 @@ target_sources(module-bsp
 		bsp/lpm/RT1051LPMCommon.cpp
 		bsp/lpm/Bandgap.cpp
 		bsp/lpm/LDO.cpp
+		bsp/lpm/DCDC.cpp
 		bsp/magnetometer/ALS31300.cpp
 		bsp/pit/pit.cpp
 		bsp/trng/trng.cpp

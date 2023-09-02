@@ -179,17 +179,17 @@ namespace bsp
         //        SNVS->LPGPR[0] = rebootCode::rebootFailedToBoot;
         // TODO: Here we can implement boot-time fail detection
 
-        // Set internal DCDC to CCM mode, DCM is allowed ONLY in low power modes (see AN12085, 5.3.9, p.33)
-        DCDC_BootIntoCCM(DCDC);
-
-        // Set VDD_SOC_IN to 1.15V
-        DCDC_AdjustTargetVoltage(DCDC, 0x0E, 0x01); // TODO magic numbers
-
-        // Disconnect DCDC internal load resistor
-        DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
-
-        // Enable hysteresis in DCDC analog comparators
-        DCDC->REG1 |= DCDC_REG1_LOOPCTRL_EN_HYST_MASK;
+//        // Set internal DCDC to CCM mode, DCM is allowed ONLY in low power modes (see AN12085, 5.3.9, p.33)
+//        DCDC_BootIntoCCM(DCDC);
+//
+//        // Set VDD_SOC_IN to 1.15V
+//        DCDC_AdjustTargetVoltage(DCDC, 0x0E, 0x01); // TODO magic numbers
+//
+//        // Disconnect DCDC internal load resistor
+//        DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
+//
+//        // Enable hysteresis in DCDC analog comparators
+//        DCDC->REG1 |= DCDC_REG1_LOOPCTRL_EN_HYST_MASK;
 
         PrintSystemClocks();
         clearAndPrintBootReason();
@@ -199,6 +199,9 @@ namespace bsp
                      SNVS->LPGPR[1]);
             SNVS->LPGPR[1] = 0;
         }
+
+//        LOG_INFO("Test...");
+
     }
 
     //! Board PowerOff function by cutdown power

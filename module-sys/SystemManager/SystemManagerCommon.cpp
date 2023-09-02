@@ -750,7 +750,7 @@ namespace sys
 
     void SystemManagerCommon::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency)
     {
-        if (newFrequency <= bsp::CpuFrequencyMHz::Level_1) {
+        if (newFrequency <= bsp::CpuFrequencyMHz::Level_2) {
             purefs::subsystem::disk_mgr()->pm_control(purefs::blkdev::pm_state::suspend);
         }
         else {
