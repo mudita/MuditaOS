@@ -25,6 +25,9 @@ namespace bsp
         currentFrequency = freq;
     }
 
+    void LinuxLPM::SetHighestCoreVoltage()
+    {}
+
     uint32_t LinuxLPM::GetCpuFrequency() const noexcept
     {
         return 0;
@@ -37,6 +40,12 @@ namespace bsp
     {}
 
     void LinuxLPM::DisableDcdcPowerSaveMode()
+    {}
+
+    void LinuxLPM::DisconnectInternalLoadResistor()
+    {}
+
+    void LinuxLPM::ConnectInternalLoadResistor()
     {}
 
     void LinuxLPM::SwitchToRegularModeLDO()

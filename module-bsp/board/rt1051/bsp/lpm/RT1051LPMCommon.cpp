@@ -5,7 +5,6 @@
 
 #include <log/log.hpp>
 #include <fsl_clock.h>
-#include <fsl_dcdc.h>
 #include <bsp/bsp.hpp>
 #include "Oscillator.hpp"
 #include "critical.hpp"
@@ -14,6 +13,7 @@
 
 namespace bsp
 {
+
     using namespace drivers;
 
     RT1051LPMCommon::RT1051LPMCommon()
@@ -65,16 +65,22 @@ namespace bsp
     CpuFrequencyMHz RT1051LPMCommon::onChangeUp(CpuFrequencyMHz freq, bsp::CpuFrequencyMHz newFrequency)
     {
         if ((freq <= CpuFrequencyMHz::Level_1) && (newFrequency > CpuFrequencyMHz::Level_1)) {
-            // Switch DCDC to CCM mode to improve stability
-            DCDC_BootIntoCCM(DCDC);
-            // Switch external RAM clock source to PLL2
+            // connect internal load resistor
+            ConnectInternalLoadResistor();
+            // Switch DCDC to full throttle during oscillator switch
+            SetHighestCoreVoltage();
+            // Enable regular 2P5 and 1P1 LDO and Turn off weak 2P5 and 1P1 LDO
+            SwitchToRegularModeLDO();
+            // switch oscillator source
+            SwitchOscillatorSource(LowPowerMode::OscillatorSource::External);
+            // then switch external RAM clock source
             if (driverSEMC) {
                 driverSEMC->SwitchToPLL2ClockSource();
             }
-            // Enable regular 2P5 and 1P1 LDO, turn off weak 2P5 and 1P1 LDO
-            SwitchToRegularModeLDO();
-            // Switch to external crystal oscillator
-            SwitchOscillatorSource(LowPowerMode::OscillatorSource::External);
+            // Add intermediate step in frequency
+            if (newFrequency > CpuFrequencyMHz::Level_4) {
+                return CpuFrequencyMHz::Level_4;
+            }
         }
         return newFrequency;
     }
@@ -82,16 +88,17 @@ namespace bsp
     void RT1051LPMCommon::onChangeDown(CpuFrequencyMHz newFrequency)
     {
         if (newFrequency <= bsp::CpuFrequencyMHz::Level_1) {
-            // Switch to internal RC oscillator
-            SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
-            // Enable weak 2P5 and 1P1 LDO, turn off regular 2P5 and 1P1 LDO
+            // Enable weak 2P5 and 1P1 LDO and Turn off regular 2P5 and 1P1 LDO
             SwitchToLowPowerModeLDO();
-            // Switch external RAM clock source to OSC
+            // then switch osc source
+            SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource::Internal);
+            // and switch external RAM clock source
             if (driverSEMC) {
                 driverSEMC->SwitchToPeripheralClockSource();
             }
-            // Switch DCDC to DCM mode to reduce current consumption
-            DCDC_BootIntoDCM(DCDC);
+
+            // disconnect internal load resistor
+            DisconnectInternalLoadResistor();
         }
     }
 
@@ -135,7 +142,12 @@ namespace bsp
         currentFrequency = freq;
     }
 
-    std::uint32_t RT1051LPMCommon::GetCpuFrequency() const noexcept
+    void RT1051LPMCommon::SetHighestCoreVoltage()
+    {
+        CpuFreq->SetHighestCoreVoltage();
+    }
+
+    uint32_t RT1051LPMCommon::GetCpuFrequency() const noexcept
     {
         return CLOCK_GetCpuClkFreq();
     }
@@ -152,6 +164,16 @@ namespace bsp
             bsp::EnableExternalOscillator();
             cpp_freertos::CriticalSection::Exit();
         }
+    }
+
+    void RT1051LPMCommon::DisconnectInternalLoadResistor()
+    {
+        DCDC->REG1 &= ~DCDC_REG1_REG_RLOAD_SW_MASK;
+    }
+
+    void RT1051LPMCommon::ConnectInternalLoadResistor()
+    {
+        DCDC->REG1 |= DCDC_REG1_REG_RLOAD_SW_MASK;
     }
 
     void RT1051LPMCommon::RegularLDOMode()

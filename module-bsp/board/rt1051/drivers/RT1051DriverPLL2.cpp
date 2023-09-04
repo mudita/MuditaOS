@@ -12,7 +12,7 @@ namespace drivers
     RT1051DriverPLL2::RT1051DriverPLL2() noexcept
     {
         if (!IsPLL2Enabled()) {
-            // Set VDD_SOC_IN to 1.15V required to safely start PLL2
+            // Set VDD_SOC_IN required to safely start PLL2
             DCDC_AdjustTargetVoltage(DCDC, bsp::VDDRun_1150_mV, bsp::VDDStandby_925_mV);
 
             // Switch to regular bandgap
@@ -36,8 +36,8 @@ namespace drivers
             // Switch to low power bandgap
             bsp::bandgap::SwitchToLowPowerMode();
 
-            // After turning off PLL2 and with CPU @4MHZ VDD_SOC_IN can be set to 950mV
-            DCDC_AdjustTargetVoltage(DCDC, bsp::VDDRun_950_mV, bsp::VDDStandby_925_mV);
+            // After turning off PLL2 and with CPU @4MHZ VDD_SOC_IN can be set to 950mV, 975mV to be safe
+            DCDC_AdjustTargetVoltage(DCDC, bsp::VDDRun_975_mV, bsp::VDDStandby_925_mV);
         }
     }
 

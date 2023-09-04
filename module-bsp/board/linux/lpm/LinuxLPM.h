@@ -15,11 +15,15 @@ namespace bsp
         int32_t PowerOff() override final;
         int32_t Reboot(RebootType reason) override final;
         void SetCpuFrequency(CpuFrequencyMHz freq) final;
+        void SetHighestCoreVoltage() final;
         [[nodiscard]] uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
 
         void EnableDcdcPowerSaveMode() final;
         void DisableDcdcPowerSaveMode() final;
+
+        void DisconnectInternalLoadResistor() final;
+        void ConnectInternalLoadResistor() final;
 
         void SwitchToRegularModeLDO() final;
         void SwitchToLowPowerModeLDO() final;
