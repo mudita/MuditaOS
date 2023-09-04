@@ -22,7 +22,7 @@ namespace drivers
     void RT1051DriverSEMC::SwitchToPLL2ClockSource()
     {
         cpp_freertos::CriticalSection::Enter();
-        if (pll2Driver == nullptr) {
+        if (!pll2Driver) {
             pll2Driver = std::make_shared<RT1051DriverPLL2>();
         }
         CLOCK_SetMux(kCLOCK_SemcMux, SemcMuxPLL2Clock);

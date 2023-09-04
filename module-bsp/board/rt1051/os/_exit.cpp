@@ -68,6 +68,7 @@ static void __attribute__((noreturn)) stop_system(void)
 
 void __attribute__((noreturn, used)) _exit_backtrace(int code, bool bt_dump)
 {
+    LOG_INFO("_exit %d", code);
     if (bt_dump && !isIRQ()) {
         _StackTrace_Dump_And_Abort();
     }
