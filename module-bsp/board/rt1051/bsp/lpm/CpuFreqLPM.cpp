@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CpuFreqLPM.hpp"
+#include <log/log.hpp>
 #include "fsl_dcdc.h"
 
 namespace bsp
@@ -20,7 +21,7 @@ namespace bsp
             /* Set AHB_PODF. */
             CLOCK_SetDiv(kCLOCK_AhbDiv, 1); // CBCDR
 
-            DCDC_AdjustTargetVoltage(DCDC, VDDRun_975_mV, VDDStandby_925_mV);
+            DCDC_AdjustTargetVoltage(DCDC, VDDRun_900_mV, VDDStandby_925_mV);
             break;
         case CpuClock::CpuClock_Osc_12_Mhz:
             /* Set PERIPH_CLK2_PODF. */
@@ -28,7 +29,7 @@ namespace bsp
             /* Set AHB_PODF. */
             CLOCK_SetDiv(kCLOCK_AhbDiv, 1); // CBCDR
 
-            DCDC_AdjustTargetVoltage(DCDC, VDDRun_975_mV, VDDStandby_925_mV);
+            DCDC_AdjustTargetVoltage(DCDC, VDDRun_900_mV, VDDStandby_925_mV);
             break;
         case CpuClock::CpuClock_Osc_24_Mhz:
             /* Set PERIPH_CLK2_PODF. */
