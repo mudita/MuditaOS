@@ -118,8 +118,6 @@ namespace gui
                                                                    const std::string &phoneNumber)
     {
         std::list<gui::Option> optList;
-
-        const auto &simText = (phoneNumber.empty() ? simStr : (simStr + " / " + phoneNumber));
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(
             utils::translate("app_settings_network_active_card"),
             [=](gui::Item &item) { return createSwitchSimAction(sim); },
@@ -127,7 +125,7 @@ namespace gui
             this,
             gui::option::SettingRightItem::Text,
             false,
-            simText,
+            simStr + " / " + phoneNumber,
             true));
 
         optList.emplace_back(std::make_unique<gui::option::OptionSettings>(

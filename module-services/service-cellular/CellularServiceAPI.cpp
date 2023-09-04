@@ -198,7 +198,6 @@ bool CellularServiceAPI::GetCSQ(sys::Service *serv, std::string &response)
     }
     return false;
 }
-
 bool CellularServiceAPI::GetCREG(sys::Service *serv, std::string &response)
 {
     auto msg = std::make_shared<cellular::GetCregMessage>();
@@ -212,7 +211,6 @@ bool CellularServiceAPI::GetCREG(sys::Service *serv, std::string &response)
     }
     return false;
 }
-
 bool CellularServiceAPI::GetQNWINFO(sys::Service *serv, std::string &response)
 {
     auto msg = std::make_shared<cellular::GetNwinfoMessage>();

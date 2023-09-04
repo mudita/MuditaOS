@@ -46,15 +46,15 @@ namespace Store
         return ptr;
     }
 
-    void GSM::setSignalStrength(const SignalStrength &newSignalStrength)
+    void GSM::setSignalStrength(const SignalStrength &signalStrength)
     {
         cpp_freertos::LockGuard lock(mutex);
         LOG_INFO("Setting signal strength to rssi = %d dBm (%d) : %d bars",
-                 newSignalStrength.rssidBm,
-                 newSignalStrength.rssi,
-                 static_cast<int>(newSignalStrength.rssiBar));
+                 signalStrength.rssidBm,
+                 signalStrength.rssi,
+                 static_cast<int>(signalStrength.rssiBar));
 
-        signalStrength = newSignalStrength;
+        this->signalStrength = signalStrength;
     }
 
     SignalStrength GSM::getSignalStrength() const
@@ -63,10 +63,10 @@ namespace Store
         return signalStrength;
     }
 
-    void GSM::setNetwork(const Network &newNetwork)
+    void GSM::setNetwork(const Network &network)
     {
         cpp_freertos::LockGuard lock(mutex);
-        network = newNetwork;
+        this->network = network;
     }
 
     Network GSM::getNetwork() const
@@ -80,25 +80,21 @@ namespace Store
         cpp_freertos::LockGuard lock(mutex);
         return (sim == SIM::SIM1 || sim == SIM::SIM2);
     }
-
     void GSM::setNetworkOperatorName(const std::string &newNetworkOperatorName)
     {
         cpp_freertos::LockGuard lock(mutex);
         networkOperatorName = newNetworkOperatorName;
     }
-
     std::string GSM::getNetworkOperatorName() const
     {
         cpp_freertos::LockGuard lock(mutex);
         return networkOperatorName;
     }
-
-    void GSM::setTethering(const Tethering &newTethering)
+    void GSM::setTethering(const Tethering &tethering)
     {
         cpp_freertos::LockGuard lock(mutex);
-        tethering = newTethering;
+        this->tethering = tethering;
     }
-
     Tethering GSM::getTethering() const
     {
         cpp_freertos::LockGuard lock(mutex);

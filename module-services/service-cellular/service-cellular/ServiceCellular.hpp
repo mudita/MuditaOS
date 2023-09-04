@@ -93,7 +93,6 @@ class ServiceCellular : public sys::Service
      * @return true when succeed, false when fails
      */
     bool getIMSI(std::string &destination, bool fullNumber = false);
-    bool getQNWINFO(std::string &destination);
     std::vector<std::string> getNetworkInfo();
 
     void externalUSSDRequestHandled();

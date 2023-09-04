@@ -1166,23 +1166,6 @@ bool ServiceCellular::getIMSI(std::string &destination, bool fullNumber)
     return false;
 }
 
-bool ServiceCellular::getQNWINFO(std::string &destination)
-{
-    const auto channel = cmux->get(CellularMux::Channel::Commands);
-    if (channel == nullptr) {
-        LOG_ERROR("No cmux channel provided");
-        return false;
-    }
-
-    auto result = channel->cmd(at::AT::QNWINFO);
-    if (result.code != at::Result::Code::OK) {
-        LOG_ERROR("Failed to get QNWINFO");
-        return false;
-    }
-
-    return at::response::parseQNWINFO(result.response[0], destination);
-}
-
 std::vector<std::string> ServiceCellular::getNetworkInfo()
 {
     std::vector<std::string> data;
@@ -1753,6 +1736,7 @@ void ServiceCellular::apnListChanged(const std::string &value)
 auto ServiceCellular::handleCellularAnswerIncomingCallMessage([[maybe_unused]] CellularMessage *msg)
     -> std::shared_ptr<cellular::ResponseMessage>
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
     auto ret = ongoingCall->handle(call::event::Answer{});
     return std::make_shared<cellular::ResponseMessage>(ret);
 }
@@ -1788,6 +1772,7 @@ namespace
 auto ServiceCellular::handleCellularCallRequestMessage(cellular::CallRequestMessage *msg)
     -> std::shared_ptr<cellular::ResponseMessage>
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
     auto channel = cmux->get(CellularMux::Channel::Commands);
     if (channel == nullptr) {
         LOG_WARN("commands channel not ready");
@@ -1823,6 +1808,7 @@ auto ServiceCellular::handleCellularCallRequestMessage(cellular::CallRequestMess
 
 void ServiceCellular::handleCellularHangupCallMessage([[maybe_unused]] cellular::HangupCallMessage *msg)
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
     if (!ongoingCall->handle(call::event::Reject{})) {
         LOG_ERROR("Failed to end ongoing call");
     }
@@ -1888,6 +1874,7 @@ auto ServiceCellular::handleDBNotificationMessage(db::NotificationMessage *msg) 
 auto ServiceCellular::handleCellularRingingMessage(cellular::RingingMessage *msg)
     -> std::shared_ptr<sys::ResponseMessage>
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
     return std::make_shared<cellular::ResponseMessage>(
         ongoingCall->handle(call::event::StartCall{CallType::CT_OUTGOING, msg->number}));
 }
@@ -2092,7 +2079,6 @@ auto ServiceCellular::handlePowerUpProcedureCompleteNotification([[maybe_unused]
     }
     return std::make_shared<cellular::ResponseMessage>(true);
 }
-
 auto ServiceCellular::handlePowerDownDeregisteringNotification([[maybe_unused]] sys::Message *msg)
     -> std::shared_ptr<sys::ResponseMessage>
 {
@@ -2102,14 +2088,12 @@ auto ServiceCellular::handlePowerDownDeregisteringNotification([[maybe_unused]] 
     }
     return std::make_shared<cellular::ResponseMessage>(false);
 }
-
 auto ServiceCellular::handlePowerDownDeregisteredNotification([[maybe_unused]] sys::Message *msg)
     -> std::shared_ptr<sys::ResponseMessage>
 {
     priv->state->set(State::ST::PowerDownWaiting);
     return std::make_shared<cellular::ResponseMessage>(true);
 }
-
 auto ServiceCellular::handleNewIncomingSMSNotification(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
     auto message      = static_cast<cellular::NewIncomingSMSNotification *>(msg);
@@ -2124,48 +2108,15 @@ auto ServiceCellular::handleSmsDoneNotification([[maybe_unused]] sys::Message *m
     auto resp = handleTextMessagesInit();
     return std::make_shared<cellular::ResponseMessage>(resp);
 }
-
 auto ServiceCellular::handleSignalStrengthUpdateNotification([[maybe_unused]] sys::Message *msg)
     -> std::shared_ptr<sys::ResponseMessage>
 {
     return std::make_shared<cellular::ResponseMessage>(false);
 }
-
 auto ServiceCellular::handleNetworkStatusUpdateNotification([[maybe_unused]] sys::Message *msg)
     -> std::shared_ptr<sys::ResponseMessage>
 {
-    constexpr auto mccLength = 3;
-
-    if (Store::GSM::get()->getNetwork().status != Store::Network::Status::RegisteredRoaming) {
-        return std::make_shared<cellular::ResponseMessage>(true);
-    }
-
-    std::string simCardMcc{};
-    if (!getIMSI(simCardMcc)) {
-        LOG_ERROR("Failed to get SIM card's MCC code!");
-        return std::make_shared<cellular::ResponseMessage>(false);
-    }
-
-    std::string qnwinfo{};
-    if (!getQNWINFO(qnwinfo)) {
-        LOG_ERROR("Failed to get QNWINFO!");
-        return std::make_shared<cellular::ResponseMessage>(false);
-    }
-
-    const auto operatorMcc = at::response::qnwinfo::parseOperatorCode(qnwinfo).substr(0, mccLength);
-    if (operatorMcc.empty()) {
-        LOG_ERROR("Failed to get operator's MCC code!");
-        return std::make_shared<cellular::ResponseMessage>(false);
-    }
-
-    if (simCardMcc == operatorMcc) {
-        LOG_INFO("SIM card MCC is the same as operator MCC (%s), phone is in domestic roaming", operatorMcc.c_str());
-
-        auto network   = Store::GSM::get()->getNetwork();
-        network.status = Store::Network::Status::RegisteredHomeNetwork;
-        Store::GSM::get()->setNetwork(network);
-    }
-    return std::make_shared<cellular::ResponseMessage>(true);
+    return std::make_shared<cellular::ResponseMessage>(false);
 }
 
 auto ServiceCellular::handleUrcIncomingNotification([[maybe_unused]] sys::Message *msg)
@@ -2192,6 +2143,7 @@ auto ServiceCellular::handleCellularSetFlightModeMessage(sys::Message *msg) -> s
 auto ServiceCellular::handleCellularRingNotification([[maybe_unused]] sys::Message *msg)
     -> std::shared_ptr<sys::ResponseMessage>
 {
+    LOG_INFO("%s", __PRETTY_FUNCTION__);
     ongoingCall->handle(call::event::RING{});
     return std::make_shared<cellular::ResponseMessage>(true);
 }
