@@ -5,14 +5,15 @@
 
 #include "OperatorInfo.hpp"
 #include <string>
+#include <optional>
 
 namespace cellular::service
 {
-    class VolteAllowedListInterface
+    class ImsiParserInteface
     {
       public:
-        virtual ~VolteAllowedListInterface() = default;
+        virtual ~ImsiParserInteface() = default;
 
-        auto virtual isVolteAllowed(const OperatorInfo &operatorInfo) -> bool = 0;
+        virtual auto parse(const std::string &imsi) -> std::optional<OperatorInfo> = 0;
     };
 } // namespace cellular::service

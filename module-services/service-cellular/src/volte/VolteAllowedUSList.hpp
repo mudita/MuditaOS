@@ -3,14 +3,14 @@
 
 #pragma once
 
-#include "ImsiParser.hpp"
+#include "VolteAllowedListInterface.hpp"
+#include "OperatorInfo.hpp"
 
 namespace cellular::service
 {
-    struct ImsiParserDK : ImsiParser
+    class VolteAllowedUSList : public VolteAllowedListInterface
     {
-        explicit ImsiParserDK()
-            : ImsiParser(std::vector<std::string>{"23801", "23802", "23806", "23820", "23866", "28801", "28802"})
-        {}
+      public:
+        auto isVolteAllowed(const OperatorInfo &operatorInfo) -> bool final;
     };
 } // namespace cellular::service

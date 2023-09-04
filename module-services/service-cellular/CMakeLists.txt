@@ -17,9 +17,9 @@ set(SOURCES
     src/CSQHandler.cpp
 
     src/volte/VolteCapabilityHandler.cpp
+    src/volte/ImsiParserUS.cpp
+    src/volte/VolteAllowedUSList.cpp
     src/volte/VolteCapabilityHandlerCellular.cpp
-    src/volte/ImsiParser.cpp
-    src/volte/VolteAllowedList.cpp
 
     src/ussd/USSDHandler.cpp
 
@@ -52,9 +52,7 @@ set(SOURCES
     requests/ColpRequest.cpp
     requests/CallWaitingRequest.cpp
     requests/CallBarringRequest.cpp
-    handler/RawATHandler.cpp
-    src/volte/VolteAllowedList.hpp
-)
+    handler/RawATHandler.cpp)
 
 
 add_library(${PROJECT_NAME} STATIC ${SOURCES})
