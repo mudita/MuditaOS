@@ -44,6 +44,7 @@
 * Fixed the ability to create a contact with the same primary and secondary phone number, which resulted in mismatching
 * Fixed losing drafted message and recipient number in new message windows
 * Fixed misleading "Save" button behavior in "Date and time" window
+* Fixed losing unsaved user data when tethering is switching on
 
 ## [1.7.2 2023-07-28]
 

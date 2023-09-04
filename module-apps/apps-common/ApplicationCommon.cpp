@@ -1015,6 +1015,11 @@ namespace app
         return window;
     }
 
+    std::size_t ApplicationCommon::getSizeOfWindowsStack()
+    {
+        return windowsStack().getSize();
+    }
+
     bool ApplicationCommon::isCurrentWindow(const std::string &windowName) const noexcept
     {
         if (const auto &window = windowsStack().get(topWindow); window.has_value()) {
