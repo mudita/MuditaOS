@@ -156,7 +156,7 @@ namespace app::notes
                     std::make_unique<gui::OptionsWindowOptions>(noteEditOptions(application, edit)));
             }
         }
-        if (isCurrentTextDifferentThanSaved() &&
+        if (isAnyUnsavedUserDataInWindow() &&
             (inputEvent.isShortRelease(gui::KeyCode::KEY_RF) || inputEvent.isLongRelease(gui::KeyCode::KEY_RF))) {
 
             // Show a popup warning about possible data loss
@@ -189,7 +189,7 @@ namespace app::notes
         return (edit != nullptr) ? edit->isEmpty() : true;
     }
 
-    bool NoteEditWindow::isCurrentTextDifferentThanSaved()
+    bool NoteEditWindow::isAnyUnsavedUserDataInWindow() const
     {
         return notesRecord->snippet != edit->getText();
     }

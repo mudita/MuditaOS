@@ -151,7 +151,7 @@ namespace gui
             return true;
         }
         else if (!inputEvent.isShortRelease(KeyCode::KEY_RF) || !shouldCurrentAppBeIgnoredOnSwitchBack()) {
-            if (areUnsavedChanges()) {
+            if (isAnyUnsavedUserDataInWindow()) {
                 if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF) || inputEvent.isLongRelease(gui::KeyCode::KEY_RF)) {
                     showDialogUnsavedChanges([this]() {
                         application->returnToPreviousWindow();
@@ -171,7 +171,7 @@ namespace gui
                        : true;
         };
 
-        if (areUnsavedChanges()) {
+        if (isAnyUnsavedUserDataInWindow()) {
             showDialogUnsavedChanges(returnWhenCurrentAppShouldBeIgnoredOnSwitchBack);
             return true;
         }
@@ -336,7 +336,8 @@ namespace gui
                contactByID->front().primaryName.empty() and contactByID->front().alternativeName.empty() and
                contactByID->front().numbers.empty();
     }
-    bool PhonebookNewContact::areUnsavedChanges() const
+
+    bool PhonebookNewContact::isAnyUnsavedUserDataInWindow() const
     {
         return newContactModel->isAnyUnsavedChange(contact);
     }

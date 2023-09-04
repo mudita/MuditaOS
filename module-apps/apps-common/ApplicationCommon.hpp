@@ -379,6 +379,9 @@ namespace app
         /// if there is none - returns default window
         /// @ingrup AppWindowStack
         gui::AppWindow *getCurrentWindow();
+        /// getter for size of windows stack
+        /// @ingrup AppWindowStack
+        std::size_t getSizeOfWindowsStack();
         /// @ingrup AppWindowStack
         bool isCurrentWindow(const std::string &windowName) const noexcept;
         bool isPreviousWindow(const std::string &windowName) const noexcept;

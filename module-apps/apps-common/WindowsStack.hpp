@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -51,6 +51,7 @@ namespace app
         std::map<std::string, std::unique_ptr<gui::AppWindow>>::const_iterator begin() const;
         std::map<std::string, std::unique_ptr<gui::AppWindow>>::const_iterator end() const;
         [[nodiscard]] bool isEmpty() const noexcept;
+        [[nodiscard]] std::size_t getSize() const noexcept;
 
         /// add window on top of stack
         void push(const std::string &name,

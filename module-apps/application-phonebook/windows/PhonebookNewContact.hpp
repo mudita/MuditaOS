@@ -43,7 +43,7 @@ namespace gui
         void setSaveButtonVisible(bool visible);
         void showContactDeletedNotification();
         bool checkIfContactWasDeletedDuringEditProcess() const;
-        bool areUnsavedChanges() const;
+        bool isAnyUnsavedUserDataInWindow() const override;
 
         std::shared_ptr<ContactRecord> contact           = nullptr;
         std::shared_ptr<NewContactModel> newContactModel = nullptr;
