@@ -50,7 +50,9 @@ namespace gui
         std::unique_ptr<gui::TextBackup> state;
     };
 
-    std::unique_ptr<NewMessageWindow::MessageMemento> NewMessageWindow::memento =
+    std::unique_ptr<NewMessageWindow::MessageMemento> NewMessageWindow::mementoMessage =
+        std::make_unique<NewMessageWindow::MessageMemento>();
+    std::unique_ptr<NewMessageWindow::MessageMemento> NewMessageWindow::mementoRecipient =
         std::make_unique<NewMessageWindow::MessageMemento>();
 
     NewMessageWindow::NewMessageWindow(app::ApplicationCommon *app)
@@ -72,7 +74,8 @@ namespace gui
 
     void NewMessageWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        memento->restoreState(message);
+        mementoMessage->restoreState(message);
+        mementoRecipient->restoreState(recipient);
         if (data == nullptr) {
             return;
         }
@@ -236,6 +239,9 @@ namespace gui
                     return true;
                 }
             }
+            if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+                onClose(CloseReason::WindowSwitch);
+            }
             return false;
         };
         recipient->setTextChangedCallback([this]([[maybe_unused]] Item &item, const UTF8 &text) {
@@ -295,7 +301,8 @@ namespace gui
             if (event.isShortRelease(KeyCode::KEY_LF)) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
-                memento->setState(message);
+                mementoMessage->setState(message);
+                mementoRecipient->setState(recipient);
                 return app->newMessageOptions(getName(), message);
             }
             if (event.isShortRelease(KeyCode::KEY_RF)) {
@@ -321,7 +328,8 @@ namespace gui
         }
 
         if (reason != CloseReason::ApplicationClose) {
-            memento->setState(message);
+            mementoMessage->setState(message);
+            mementoRecipient->setState(recipient);
             message->clear();
             return;
         }
