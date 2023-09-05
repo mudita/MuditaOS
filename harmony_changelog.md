@@ -3,6 +3,21 @@
 ## Unreleased
 
 ### Fixed
+* Fixed hard fault handling
+* Fixed meditation countdown timer when a deep press is performed
+* Fixed "turn off" window display time
+* Fixed uneven screen refresh when turning on the device
+
+### Added
+* Files not fully transferred via Center will be now removed when USB cable is unplugged
+* Added a log when manual reset is performed
+
+### Changed / Improved
+* Hardware faults during device startup now result in shutdown and more user friendly message
+
+## [2.1.0 2023-08-30]
+
+### Fixed
 
 * Fixed problem with an unresponsive device after playing specific WAV files.
 * Fixed problem with deleting files during Relaxation session.
@@ -20,11 +35,7 @@
 * Fixed problem with sounds in relaxation and power nap applications
 * Fixed the logic in onboarding screens
 * Fixed issues with file uploads with low disk space.
-* Fixed hard fault handling
-* Fixed meditation countdown timer when a deep press is performed
-* Fixed "turn off" window display time
 * Fixed information about next alarm ring
-* Fixed uneven screen refresh when turning on the device
 
 ### Added
 
@@ -34,8 +45,6 @@
 * Added extended information to log filename
 * Added Harmony version information in about section
 * Added system shutdown if there is no user activity for 180 seconds on the language selection screen
-* Files not fully transferred via Center will be now removed when USB cable is unplugged
-* Added a log when manual reset is performed
 
 ### Changed / Improved
 
@@ -43,7 +52,6 @@
 * General improvement in Eink display and error handling
 * Changed the "Turn off Harmony" popup display time to 10 seconds
 * The default year has been updated to 2023
-* Hardware faults during device startup now result in shutdown and more user friendly message
 
 ## [2.0.0 2023-06-29]
 
