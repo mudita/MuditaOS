@@ -14,3 +14,4 @@ dataclasses_json==0.5.4
 tqdm==4.62.2
 eyed3==0.9.6
 ghapi
+requests
