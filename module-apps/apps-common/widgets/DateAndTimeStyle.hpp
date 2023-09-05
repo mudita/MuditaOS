@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,7 +11,7 @@ namespace style::window::date_and_time
     inline constexpr auto separator        = 30;
     inline constexpr auto time_input_12h_w = 120;
     inline constexpr auto time_input_24h_w = 195;
-    inline constexpr auto hBox_h           = height - 1.25 * topMargin;
+    inline constexpr auto hBox_h           = static_cast<int>(height - 1.25f * topMargin);
     inline constexpr auto listView_x       = style::window::default_left_margin;
     inline constexpr auto listView_y       = style::window::default_vertical_pos;
     inline constexpr auto listView_w       = style::listview::body_width_with_scroll;

@@ -39,6 +39,7 @@
 * Fixed "Copy" option missing from the options list in "New message" window
 * Fixed losing unsaved data on go back
 * Fixed disabled screen autolock in meditation app
+* Fixed multiple issues with input fields in "New alarm" window
 
 ## [1.7.2 2023-07-28]
 

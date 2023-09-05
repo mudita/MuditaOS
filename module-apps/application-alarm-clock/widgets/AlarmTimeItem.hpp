@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,6 +10,11 @@ namespace gui
 {
     class AlarmTimeItem : public AlarmInternalListItem
     {
+      public:
+        explicit AlarmTimeItem(std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                               std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
+
+      private:
         gui::HBox *hBox          = nullptr;
         gui::Label *colonLabel   = nullptr;
         gui::Text *hourInput     = nullptr;
@@ -25,14 +30,7 @@ namespace gui
         void onInputCallback(gui::Text &textItem);
         void prepareForTimeMode();
         [[nodiscard]] bool isPm(const std::string &text) const;
-        void validateHour();
 
-        template <typename T>
-        UTF8 timeValueToPaddedString(const T &value);
-
-      public:
-        AlarmTimeItem(std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
-                      std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
+        void clearTimeFieldsIfFull(Item *focusedItem);
     };
-
 } /* namespace gui */

@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include "Split.hpp"
 #include <log/log.hpp>
 #include <magic_enum.hpp>
@@ -16,8 +17,7 @@
 
 namespace utils
 {
-    inline constexpr auto WHITESPACE       = " \n\r\t\f\v";
-    constexpr unsigned int secondsInMinute = 60;
+    inline constexpr auto WHITESPACE = " \n\r\t\f\v";
 
     template <typename T>
     inline constexpr bool is_byte_v = std::is_integral_v<T> && sizeof(T) == sizeof(std::uint8_t);
@@ -126,6 +126,12 @@ namespace utils
         }
         constexpr auto leadingDigit = '0';
         base.insert(0, minStringLength - base.length(), leadingDigit);
+        return base;
+    }
+
+    static inline std::string removeLeadingZeros(std::string base)
+    {
+        base.erase(0, std::min(base.find_first_not_of('0'), base.size() - 1));
         return base;
     }
 
@@ -324,7 +330,9 @@ namespace utils
     static inline std::string stringToLowercase(const std::string &inputString)
     {
         std::string outputString;
-        std::for_each(inputString.begin(), inputString.end(), [&](char ch) { outputString += std::tolower(ch); });
+        std::transform(inputString.cbegin(), inputString.cend(), std::back_inserter(outputString), [](const auto ch) {
+            return std::tolower(ch);
+        });
         return outputString;
     }
 
