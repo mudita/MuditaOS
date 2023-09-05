@@ -41,6 +41,7 @@
 * Fixed disabled screen autolock in meditation app
 * Fixed multiple issues with input fields in "New alarm" window
 * Fixed the ability to create a contact with the same primary and secondary phone number, which resulted in mismatching
+* Fixed losing drafted message and recipient number in new message windows
 
 ## [1.7.2 2023-07-28]
 

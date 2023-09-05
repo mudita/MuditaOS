@@ -50,6 +50,7 @@ namespace gui
         /// MessageMemento shall be used whenever there is a need for temporary window switch in normal (uninterrupted)
         /// flow of new message preparation, such as using options or recipient selection.
         class MessageMemento;
-        static std::unique_ptr<MessageMemento> memento;
+        static std::unique_ptr<MessageMemento> mementoMessage;
+        static std::unique_ptr<MessageMemento> mementoRecipient;
     };
 } /* namespace gui */
