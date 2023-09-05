@@ -14,7 +14,7 @@ namespace gui
     class MeditationWindow : public AppWindow
     {
       public:
-        MeditationWindow(app::ApplicationCommon *app, const MeditationParams params);
+        MeditationWindow(app::ApplicationCommon *app, const MeditationParams &params);
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
 

@@ -42,8 +42,7 @@ namespace app
             return {{manager::actions::Launch,
                      manager::actions::PhoneModeChanged,
                      manager::actions::BluetoothModeChanged,
-                     manager::actions::AlarmClockStatusChanged},
-                    locks::AutoLockPolicy::PreventPermanently};
+                     manager::actions::AlarmClockStatusChanged}};
         }
     };
 } // namespace app
