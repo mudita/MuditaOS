@@ -18,23 +18,24 @@ namespace app
                                                  std::string parent,
                                                  StatusIndicators statusIndicators,
                                                  StartInBackground startInBackground)
-        : Application{name, parent, statusIndicators, startInBackground}
+        : Application{std::move(name), std::move(parent), statusIndicators, startInBackground}
     {}
 
     auto ApplicationMeditation::InitHandler() -> sys::ReturnCodes
     {
         const auto ret = Application::InitHandler();
-        if (ret != sys::ReturnCodes::Success)
+        if (ret != sys::ReturnCodes::Success) {
             return ret;
+        }
 
-        auto counterVisible =
+        const auto counterVisible =
             getLocalSettingsValue(settings::Meditation::showCounter, Constants::Params::defaultCounterVisible);
         auto counterVisibleOnChangeCallback = [this](bool newValue) {
             settings->setValue(
                 settings::Meditation::showCounter, utils::to_string(newValue), settings::SettingsScope::AppLocal);
         };
 
-        auto preparationTime                 = std::chrono::seconds(getLocalSettingsValue(
+        const auto preparationTime           = std::chrono::seconds(getLocalSettingsValue(
             settings::Meditation::preparationTime, Constants::Params::defaultPreparationTime.count()));
         auto preparationTimeOnChangeCallback = [this](std::chrono::seconds newValue) {
             settings->setValue(settings::Meditation::preparationTime,
@@ -42,8 +43,8 @@ namespace app
                                settings::SettingsScope::AppLocal);
         };
         gui::OptionsData::OptionParams params = {
-            .preparationTime{std::move(preparationTime), std::move(preparationTimeOnChangeCallback)},
-            .showCounter{std::move(counterVisible), std::move(counterVisibleOnChangeCallback)}};
+            .preparationTime{preparationTime, std::move(preparationTimeOnChangeCallback)},
+            .showCounter{counterVisible, std::move(counterVisibleOnChangeCallback)}};
 
         state = std::make_unique<gui::OptionsData>(std::move(params));
 
@@ -55,7 +56,7 @@ namespace app
     auto ApplicationMeditation::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
         -> sys::MessagePointer
     {
-        auto retMsg = Application::DataReceivedHandler(msgl);
+        const auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
         if (retMsg && (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success)) {
             return retMsg;
@@ -64,7 +65,7 @@ namespace app
         return handleAsyncResponse(resp);
     }
 
-    auto ApplicationMeditation::SwitchPowerModeHandler(sys::ServicePowerMode mode) -> sys::ReturnCodes
+    auto ApplicationMeditation::SwitchPowerModeHandler([[maybe_unused]] sys::ServicePowerMode mode) -> sys::ReturnCodes
     {
         return sys::ReturnCodes::Success;
     }
@@ -73,13 +74,13 @@ namespace app
     {
         windowsFactory.attach(
             app::window::name::meditation_main_window, [&](ApplicationCommon *app, const std::string &name) {
-                auto durationInitValue =
+                const auto durationInitValue =
                     getLocalSettingsValue(settings::Meditation::duration, Constants::Params::defaultMeditationDuration);
                 auto durationOnChangeCallback = [this](std::int32_t newValue) {
                     settings->setValue(
                         settings::Meditation::duration, utils::to_string(newValue), settings::SettingsScope::AppLocal);
                 };
-                auto intervalChimeInitValue        = std::chrono::minutes(getLocalSettingsValue(
+                const auto intervalChimeInitValue  = std::chrono::minutes(getLocalSettingsValue(
                     settings::Meditation::intervalChime, Constants::Params::defaultChimeInterval.count()));
                 auto intervalChimeOnChangeCallback = [this](std::chrono::minutes newValue) {
                     settings->setValue(settings::Meditation::intervalChime,
@@ -87,9 +88,9 @@ namespace app
                                        settings::SettingsScope::AppLocal);
                 };
                 MeditationParams params = {
-                    .meditationDuration{.initValue        = std::move(durationInitValue),
+                    .meditationDuration{.initValue        = durationInitValue,
                                         .onChangeCallback = std::move(durationOnChangeCallback)},
-                    .intervalChime{.initValue        = std::move(intervalChimeInitValue),
+                    .intervalChime{.initValue        = intervalChimeInitValue,
                                    .onChangeCallback = std::move(intervalChimeOnChangeCallback)}};
 
                 return std::make_unique<gui::MeditationWindow>(app, std::move(params));
@@ -121,7 +122,7 @@ namespace app
     template <typename T>
     T ApplicationMeditation::getLocalSettingsValue(const std::string &variableName, T defaultValue)
     {
-        const std::string value = settings->getValue(variableName, settings::SettingsScope::AppLocal);
+        const auto &value = settings->getValue(variableName, settings::SettingsScope::AppLocal);
         return value.empty() ? defaultValue : utils::getNumericValue<T>(value);
     }
 } // namespace app

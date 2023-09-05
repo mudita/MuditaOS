@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LockPolicyHandler.hpp"
@@ -47,10 +47,12 @@ void LockPolicyHandler::setPreventsAutoLockByStateCallback(
 {
     preventsAutoLockByStateCallback = std::move(_preventsAutoLockByStateCallback);
 }
+
 bool LockPolicyHandler::preventsAutoLockByWindow()
 {
     return owner->getCurrentWindow()->preventsAutoLocking();
 }
+
 bool LockPolicyHandler::preventsAutoLockByState() const
 {
     Expects(preventsAutoLockByStateCallback != nullptr);

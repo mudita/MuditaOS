@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FontManager.hpp"
@@ -167,7 +167,6 @@ namespace gui
 
     FontManager &FontManager::getInstance()
     {
-
         static FontManager instance;
         if (!instance.initialized) {
             LOG_WARN("Using uninitialized font manager will result in no font loaded");

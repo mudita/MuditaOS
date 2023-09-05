@@ -38,6 +38,7 @@
 * Fixed showing "Copy text" option in empty note
 * Fixed "Copy" option missing from the options list in "New message" window
 * Fixed losing unsaved data on go back
+* Fixed disabled screen autolock in meditation app
 
 ## [1.7.2 2023-07-28]
 

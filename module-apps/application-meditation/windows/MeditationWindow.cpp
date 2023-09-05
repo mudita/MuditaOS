@@ -16,7 +16,7 @@
 
 namespace gui
 {
-    MeditationWindow::MeditationWindow(app::ApplicationCommon *app, const MeditationParams params)
+    MeditationWindow::MeditationWindow(app::ApplicationCommon *app, const MeditationParams &params)
         : AppWindow{app, name::window::main_window}, meditationParams(params)
     {
         MeditationWindow::buildInterface();
