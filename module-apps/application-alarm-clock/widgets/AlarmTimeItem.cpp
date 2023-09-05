@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmTimeItem.hpp"
@@ -9,6 +9,12 @@
 #include <time/time_constants.hpp>
 #include <time/time_date_validation.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
+#include <Utils.hpp>
+
+namespace
+{
+    constexpr auto maxTimeFieldLength = 2;
+}
 
 namespace gui
 {
@@ -46,9 +52,11 @@ namespace gui
         focusChangedCallback = [&](Item &item) {
             setFocusItem(focus ? hBox : nullptr);
             if (!item.focus) {
-                hourInput->setText(timeValueToPaddedString<UTF8>(hourInput->getText()));
-                minuteInput->setText(timeValueToPaddedString<UTF8>(minuteInput->getText()));
-                validateHour();
+                if (hourInput->getText().empty()) {
+                    hourInput->setText("0");
+                }
+                hourInput->setText(utils::removeLeadingZeros(hourInput->getText()));
+                minuteInput->setText(utils::addLeadingZeros(minuteInput->getText(), maxTimeFieldLength));
             }
             return true;
         };
@@ -70,8 +78,8 @@ namespace gui
 
     void AlarmTimeItem::applyInputCallbacks()
     {
-        inputCallback = [&](Item &item, const InputEvent &event) {
-            auto focusedItem = getFocusItem();
+        inputCallback = [&]([[maybe_unused]] Item &item, const InputEvent &event) {
+            const auto focusedItem = getFocusItem();
             if (!event.isShortRelease()) {
                 return false;
             }
@@ -79,8 +87,12 @@ namespace gui
                 return false;
             }
 
+            if (event.isDigit()) {
+                clearTimeFieldsIfFull(focusedItem);
+            }
+
             if (focusedItem->onInput(event)) {
-                uint32_t hours;
+                int hours;
                 try {
                     hours = std::stoi(hourInput->getText().c_str());
                 }
@@ -88,7 +100,12 @@ namespace gui
                     LOG_INFO("AlarmTimeItem hours not valid: %s", e.what());
                     hours = 0;
                 }
-                uint32_t minutes;
+                if ((mode24H && hours > utils::time::hoursInday - 1) ||
+                    (!mode24H && hours > utils::time::hoursInday / 2)) {
+                    hourInput->setText(std::to_string(hours % 10));
+                }
+
+                int minutes;
                 try {
                     minutes = std::stoi(minuteInput->getText().c_str());
                 }
@@ -96,25 +113,22 @@ namespace gui
                     LOG_INFO("AlarmTimeItem minutes not valid: %s", e.what());
                     minutes = 0;
                 }
-
-                if (mode24H && hours > utils::time::hoursInday - 1) {
-                    hourInput->setText("0");
-                }
-                else if (!mode24H && hours > utils::time::hoursInday / 2) {
-                    hourInput->setText("12");
-                }
                 if (minutes > utils::time::minutesInHour - 1) {
-                    minuteInput->setText("0");
+                    minuteInput->setText(std::to_string(minutes % 10));
                 }
+
                 return true;
             }
             else if (hBox->onInput(event)) {
                 switch (event.getKeyCode()) {
                 case gui::KeyCode::KEY_RIGHT:
-                    hourInput->setText(timeValueToPaddedString<UTF8>(hourInput->getText()));
+                    if (hourInput->getText().empty()) {
+                        hourInput->setText("0");
+                    }
+                    hourInput->setText(utils::removeLeadingZeros(hourInput->getText()));
                     break;
                 case gui::KeyCode::KEY_LEFT:
-                    minuteInput->setText(timeValueToPaddedString<UTF8>(minuteInput->getText()));
+                    minuteInput->setText(utils::addLeadingZeros(minuteInput->getText(), maxTimeFieldLength));
                     break;
                 default:
                     break;
@@ -127,7 +141,13 @@ namespace gui
 
         onSaveCallback = [&](std::shared_ptr<AlarmEventRecord> record) {
             using namespace utils::time;
-            validateHour();
+
+            if (hourInput->getText().empty()) {
+                hourInput->setText("0");
+            }
+            if (minuteInput->getText().empty()) {
+                minuteInput->setText("00");
+            }
 
             const auto now     = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
             const auto newTime = std::localtime(&now);
@@ -156,11 +176,11 @@ namespace gui
 
     void AlarmTimeItem::onInputCallback(gui::Text &textItem)
     {
-        textItem.inputCallback = [&](Item &item, const InputEvent &event) {
+        textItem.inputCallback = [&]([[maybe_unused]] Item &item, const InputEvent &event) {
             if (!event.isShortRelease()) {
                 return false;
             }
-            if (textItem.getText().length() > 1 && !event.is(gui::KeyCode::KEY_LEFT) &&
+            if ((textItem.getText().length() >= maxTimeFieldLength) && !event.is(gui::KeyCode::KEY_LEFT) &&
                 !event.is(gui::KeyCode::KEY_RIGHT) && !event.is(gui::KeyCode::KEY_PND) &&
                 !event.is(gui::KeyCode::KEY_UP) && !event.is(gui::KeyCode::KEY_DOWN)) {
                 return true;
@@ -180,7 +200,7 @@ namespace gui
             mode12hInput->setPenFocusWidth(style::window::default_border_focus_w);
             mode12hInput->setPenWidth(style::window::default_border_rect_no_focus);
             mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
-            mode12hInput->inputCallback = [&](Item &item, const InputEvent &event) {
+            mode12hInput->inputCallback = [&]([[maybe_unused]] Item &item, const InputEvent &event) {
                 if (!event.isShortRelease()) {
                     return false;
                 }
@@ -198,6 +218,7 @@ namespace gui
             mode12hInput->focusChangedCallback = [&](Item &item) {
                 if (item.focus) {
                     navBarTemporaryMode(utils::translate("common_switch"));
+                    minuteInput->setText(utils::addLeadingZeros(minuteInput->getText(), maxTimeFieldLength));
                 }
                 else {
                     navBarRestoreFromTemporaryMode();
@@ -205,7 +226,7 @@ namespace gui
                 return true;
             };
 
-            auto elemWidth = (timeItem::width - (2 * timeItem::separator)) / 3;
+            const auto elemWidth = (timeItem::width - (2 * timeItem::separator)) / 3;
             mode12hInput->setMinimumSize(elemWidth, timeItem::height);
             mode12hInput->setMargins(gui::Margins(timeItem::separator, 0, 0, 0));
             hourInput->setMinimumSize(elemWidth, timeItem::height);
@@ -216,43 +237,39 @@ namespace gui
                 const auto time12H = date::make12(hours);
                 const auto isPM    = date::is_pm(hours);
 
-                hourInput->setText(timeValueToPaddedString<uint32_t>(time12H.count()));
-                minuteInput->setText(timeValueToPaddedString<uint32_t>(alarm->alarmTime.minuteOfHour.count()));
+                hourInput->setText(std::to_string(time12H.count()));
+                minuteInput->setText(
+                    utils::addLeadingZeros(std::to_string(alarm->alarmTime.minuteOfHour.count()), maxTimeFieldLength));
 
                 isPM ? mode12hInput->setText(utils::translate(utils::time::Locale::getPM()))
                      : mode12hInput->setText(utils::translate(utils::time::Locale::getAM()));
             };
         }
         else {
-            auto elemWidth = (timeItem::width - timeItem::separator) / 2;
+            const auto elemWidth = (timeItem::width - timeItem::separator) / 2;
             hourInput->setMinimumSize(elemWidth, timeItem::height);
             minuteInput->setMinimumSize(elemWidth, timeItem::height);
 
             onLoadCallback = [&](std::shared_ptr<AlarmEventRecord> alarm) {
-                hourInput->setText(timeValueToPaddedString<uint32_t>(alarm->alarmTime.hourOfDay.count()));
-                minuteInput->setText(timeValueToPaddedString<uint32_t>(alarm->alarmTime.minuteOfHour.count()));
+                hourInput->setText(std::to_string(alarm->alarmTime.hourOfDay.count()));
+                minuteInput->setText(
+                    utils::addLeadingZeros(std::to_string(alarm->alarmTime.minuteOfHour.count()), maxTimeFieldLength));
             };
         }
     }
 
     bool AlarmTimeItem::isPm(const std::string &text) const
     {
-        return !(text == utils::translate(utils::time::Locale::getAM()));
+        return (text != utils::translate(utils::time::Locale::getAM()));
     }
 
-    void AlarmTimeItem::validateHour()
+    void AlarmTimeItem::clearTimeFieldsIfFull(Item *focusedItem)
     {
-        if (!utils::time::validateTime(hourInput->getText(), minuteInput->getText(), !mode24H)) {
-            hourInput->setText("0");
-            minuteInput->setText("00");
+        if ((focusedItem == hourInput) && (hourInput->getText().length() >= maxTimeFieldLength)) {
+            hourInput->clear();
         }
-    }
-
-    template <typename T>
-    UTF8 AlarmTimeItem::timeValueToPaddedString(const T &value)
-    {
-        std::ostringstream oss;
-        oss << std::setw(2) << std::setfill('0') << value;
-        return UTF8(oss.str());
+        else if ((focusedItem == minuteInput) && (minuteInput->getText().length() >= maxTimeFieldLength)) {
+            minuteInput->clear();
+        }
     }
 } /* namespace gui */

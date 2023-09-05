@@ -2,9 +2,9 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TagsFetcher.hpp"
-#include <Utils.hpp>
 #include <riff/wav/wavproperties.h>
 #include "fileref.h"
+#include <time/time_constants.hpp>
 
 namespace tags::fetcher
 {
@@ -60,9 +60,9 @@ namespace tags::fetcher
                 }
 
                 const uint32_t total_duration_s = properties->length();
-                const uint32_t duration_min     = total_duration_s / utils::secondsInMinute;
-                const uint32_t duration_hour    = duration_min / utils::secondsInMinute;
-                const uint32_t duration_sec     = total_duration_s % utils::secondsInMinute;
+                const uint32_t duration_min     = total_duration_s / utils::time::secondsInMinute;
+                const uint32_t duration_hour    = duration_min / utils::time::secondsInMinute;
+                const uint32_t duration_sec     = total_duration_s % utils::time::secondsInMinute;
                 const uint32_t sample_rate      = properties->sampleRate();
                 const uint32_t num_channel      = properties->channels();
                 const uint32_t bitrate          = properties->bitrate();
