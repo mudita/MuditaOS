@@ -12,7 +12,7 @@
 namespace gui
 {
     ChangeDateAndTimeWindow::ChangeDateAndTimeWindow(app::ApplicationCommon *app, std::string name)
-        : AppWindow(app, name), dateAndTimeModel{std::make_shared<DateAndTimeModel>(this->application)}
+        : AppWindow(app, std::move(name)), dateAndTimeModel{std::make_shared<DateAndTimeModel>(this->application)}
     {
         buildInterface();
     }
@@ -50,6 +50,7 @@ namespace gui
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             dateAndTimeModel->saveData(fromTillDate);
             sendRtcUpdateTimeMessage();
+            application->returnToPreviousWindow();
             return true;
         }
 
