@@ -592,21 +592,18 @@ namespace sys
         connect(typeid(sys::DeviceRegistrationMessage), [this](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::DeviceRegistrationMessage *>(message);
             deviceManager->RegisterNewDevice(msg->getDevice());
-
             return sys::MessageNone{};
         });
 
         connect(typeid(sys::SentinelRegistrationMessage), [this](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::SentinelRegistrationMessage *>(message);
             powerManager->RegisterNewSentinel(msg->getSentinel());
-
             return sys::MessageNone{};
         });
 
         connect(typeid(sys::SentinelRemovalMessage), [this](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::SentinelRemovalMessage *>(message);
             powerManager->RemoveSentinel(msg->getSentinelName());
-
             return std::make_shared<sys::ResponseMessage>();
         });
 
@@ -622,22 +619,21 @@ namespace sys
         connect(typeid(sys::ReleaseCpuFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::ReleaseCpuFrequencyMessage *>(message);
             powerManager->ResetCpuFrequencyRequest(msg->getName());
-
             return sys::MessageNone{};
         });
 
-        connect(typeid(sys::IsCpuPernament), [this](sys::Message *message) -> sys::MessagePointer {
-            return std::make_shared<sys::IsCpuPernamentResponse>(powerManager->IsCpuPernamentFrequency());
+        connect(typeid(sys::IsCpuPermanent), [this](sys::Message *message) -> sys::MessagePointer {
+            return std::make_shared<sys::IsCpuPermanentResponse>(powerManager->IsCpuPermanentFrequency());
         });
 
         connect(typeid(sys::HoldCpuFrequencyPermanentlyMessage), [this](sys::Message *message) -> sys::MessagePointer {
             auto msg = static_cast<sys::HoldCpuFrequencyPermanentlyMessage *>(message);
-            powerManager->SetPernamentFrequency(msg->request);
+            powerManager->SetPermanentFrequency(msg->request);
             return std::make_shared<sys::HoldCpuFrequencyPermanentlyResponse>();
         });
 
         connect(typeid(sys::ReleaseCpuPermanentFrequencyMessage), [this](sys::Message *message) -> sys::MessagePointer {
-            powerManager->ResetPernamentFrequency();
+            powerManager->ResetPermanentFrequency();
             return std::make_shared<sys::HoldCpuFrequencyPermanentlyResponse>();
         });
 
@@ -754,7 +750,7 @@ namespace sys
 
     void SystemManagerCommon::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency)
     {
-        if (newFrequency <= bsp::CpuFrequencyMHz::Level_1) {
+        if (newFrequency <= bsp::CpuFrequencyMHz::Level_2) {
             purefs::subsystem::disk_mgr()->pm_control(purefs::blkdev::pm_state::suspend);
         }
         else {

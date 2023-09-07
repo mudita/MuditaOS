@@ -37,6 +37,7 @@
 * General improvement in Eink display and error handling
 * Changed the "Turn off Harmony" popup display time to 10 seconds
 * The default year has been updated to 2023
+* Improved device stability related to frequency scaling
 
 ## [2.0.0 2023-06-29]
 

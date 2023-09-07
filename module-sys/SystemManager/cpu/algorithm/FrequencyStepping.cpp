@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FrequencyStepping.hpp"
@@ -23,9 +23,7 @@ namespace sys::cpu
         case bsp::CpuFrequencyMHz::Level_3:
             return bsp::CpuFrequencyMHz::Level_2;
         case bsp::CpuFrequencyMHz::Level_2:
-            [[fallthrough]];
         case bsp::CpuFrequencyMHz::Level_1:
-            [[fallthrough]];
         case bsp::CpuFrequencyMHz::Level_0:
             return profile.minimalFrequency;
         }

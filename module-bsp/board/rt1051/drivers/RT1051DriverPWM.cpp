@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverPWM.hpp"
 #include "RT1051DriverPWMhelper.hpp"
 #include <log/log.hpp>
-#include "../board.h"
 #include <algorithm>
 
 namespace drivers
@@ -155,7 +154,6 @@ namespace drivers
                                            unsigned numOfChannels,
                                            std::uint32_t _clockFrequency)
     {
-        pwm_mode_t pwmMode = kPWM_SignedCenterAligned;
         PWM_SetupPwm(base, pwmModule, config, numOfChannels, pwmMode, parameters.frequency, _clockFrequency);
     }
 
@@ -174,7 +172,7 @@ namespace drivers
     void RT1051DriverPWM::UpdateClockFrequency(bsp::CpuFrequencyMHz newFrequency)
     {
         cpp_freertos::LockGuard lock(frequencyChangeMutex);
-        std::uint32_t convertedFrequency = static_cast<std::uint32_t>(newFrequency) * bsp::MHz_frequency_multiplier;
+        const auto convertedFrequency = static_cast<std::uint32_t>(newFrequency) * bsp::HzPerMHz;
 
         if (clockFrequency != convertedFrequency) {
             SetupPWMInstance(pwmSignalsConfig.data(), enabledChannels.size(), convertedFrequency);

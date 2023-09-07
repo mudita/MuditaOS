@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CpuFreqLPM.hpp"
-#include "fsl_dcdc.h"
+#include <fsl_dcdc.h>
 
 namespace bsp
 {

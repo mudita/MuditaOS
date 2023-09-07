@@ -239,21 +239,21 @@ void SDRAM_SEMC_Init(void)
     reg_val |= 0x00000002;
     MEM_WriteU32(SEMC_MCR, reg_val);
 
-    /* Configure queues for AXI bus:
+    /* Configure queues for AXI bus as suggested in https://community.nxp.com/t5/i-MX-RT/i-MXRT1060-SEMC-SDRAM-Data-Corruption/m-p/11696908:
      * Queue A:
-     * WQOS = 4;
-     * WAGE = 2;
-     * WSH = 3;
-     * WRWS = 5 */
-    MEM_WriteU32(SEMC_BMCR0, 0x00030524);
+     * WQOS = 1;
+     * WAGE = 8;
+     * WSH = 0;
+     * WRWS = 0 */
+    MEM_WriteU32(SEMC_BMCR0, 0x00000081);
 
     /* Queue B:
-     * WQOS = 4;
-     * WAGE = 2;
-     * WPH = 3;
-     * WRWS = 5;
-     * WBR = 6 */
-    MEM_WriteU32(SEMC_BMCR1, 0x06050324);
+     * WQOS = 1;
+     * WAGE = 8;
+     * WPH = 0;
+     * WRWS = 0;
+     * WBR = 0 */
+    MEM_WriteU32(SEMC_BMCR1, 0x00000081);
 
     /* Configure MCR:
      * set bus timeout cycles to 0x10;
