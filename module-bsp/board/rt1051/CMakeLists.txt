@@ -1,7 +1,6 @@
 # Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-
 target_sources(module-bsp
 	PRIVATE
 		bluetooth/BlueKitchen.cpp
@@ -28,6 +27,8 @@ target_sources(module-bsp
 		bsp/lpm/Oscillator.cpp
 		bsp/lpm/RT1051LPMCommon.cpp
 		bsp/lpm/Bandgap.cpp
+		bsp/lpm/LDO.cpp
+		bsp/lpm/DCDC.cpp
 		bsp/magnetometer/ALS31300.cpp
 		bsp/pit/pit.cpp
 		bsp/trng/trng.cpp
@@ -73,6 +74,8 @@ set_source_files_properties(
 )
 
 target_compile_definitions(module-bsp PUBLIC USB_STACK_FREERTOS)
+
+target_compile_definitions(module-bsp PRIVATE BOARD_${PRODUCT}=1)
 
 add_subdirectory(common/fsl_drivers)
 add_subdirectory(os)
