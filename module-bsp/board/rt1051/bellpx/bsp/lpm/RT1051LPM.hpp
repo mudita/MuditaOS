@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <bsp/lpm/RT1051LPMCommon.hpp>
 
 namespace bsp
@@ -11,9 +12,5 @@ namespace bsp
       public:
         void EnableDcdcPowerSaveMode() final;
         void DisableDcdcPowerSaveMode() final;
-
-        void SwitchToRegularModeLDO() final;
-        void SwitchToLowPowerModeLDO() final;
     };
-
 } // namespace bsp

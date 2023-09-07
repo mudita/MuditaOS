@@ -1,36 +1,31 @@
 // Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-//
-// Created by mati on 09.09.2019.
-//
-
 #include "LinuxLPM.h"
 
 namespace bsp
 {
-
-    int32_t LinuxLPM::PowerOff()
+    std::int32_t LinuxLPM::PowerOff()
     {
         return 0;
     }
 
-    int32_t LinuxLPM::Reboot(RebootType)
+    std::int32_t LinuxLPM::Reboot([[maybe_unused]] RebootType reason)
     {
         return 0;
     }
 
-    void LinuxLPM::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
+    void LinuxLPM::SetCpuFrequency(CpuFrequencyMHz freq)
     {
         currentFrequency = freq;
     }
 
-    uint32_t LinuxLPM::GetCpuFrequency() const noexcept
+    std::uint32_t LinuxLPM::GetCpuFrequency() const noexcept
     {
         return 0;
     }
 
-    void LinuxLPM::SwitchOscillatorSource(bsp::LowPowerMode::OscillatorSource source)
+    void LinuxLPM::SwitchOscillatorSource(LowPowerMode::OscillatorSource source)
     {}
 
     void LinuxLPM::EnableDcdcPowerSaveMode()
@@ -38,11 +33,4 @@ namespace bsp
 
     void LinuxLPM::DisableDcdcPowerSaveMode()
     {}
-
-    void LinuxLPM::SwitchToRegularModeLDO()
-    {}
-
-    void LinuxLPM::SwitchToLowPowerModeLDO()
-    {}
-
 } // namespace bsp

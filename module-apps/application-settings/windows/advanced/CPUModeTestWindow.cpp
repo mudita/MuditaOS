@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CPUModeTestWindow.hpp"
@@ -134,9 +134,9 @@ namespace gui
         permanentFreqSpinner = new gui::TextSpinnerBox(permanentFreqBody, {"OFF", "ON"}, Boundaries::Continuous);
         permanentFreqSpinner->setMinimumSize(100, 30);
         auto ret =
-            application->async_call<sys::IsCpuPernament, sys::IsCpuPernamentResponse>(service::name::system_manager);
+            application->async_call<sys::IsCpuPermanent, sys::IsCpuPermanentResponse>(service::name::system_manager);
         application->sync(ret);
-        permanentFreqSpinner->setCurrentValue(ret.getResult().pernament ? "ON" : "OFF");
+        permanentFreqSpinner->setCurrentValue(ret.getResult().permanent ? "ON" : "OFF");
 
         permanentFreqBody->inputCallback = [&](Item &item, const InputEvent &event) {
             auto ret = permanentFreqSpinner->onInput(event);
@@ -193,10 +193,10 @@ namespace gui
         newFreqBody->inputCallback = [&](Item &item, const InputEvent &event) {
             auto ret = currentFreqSpinner->onInput(event);
 
-            auto async = application->async_call<sys::IsCpuPernament, sys::IsCpuPernamentResponse>(
+            auto async = application->async_call<sys::IsCpuPermanent, sys::IsCpuPermanentResponse>(
                 service::name::system_manager);
             application->sync(async);
-            if (async.getResult().pernament) {
+            if (async.getResult().permanent) {
                 application->bus.sendUnicastSync(
                     std::make_shared<sys::HoldCpuFrequencyPermanentlyMessage>(
                         magic_enum::enum_cast<bsp::CpuFrequencyMHz>(std::stoi(currentFreqSpinner->getCurrentValue()))

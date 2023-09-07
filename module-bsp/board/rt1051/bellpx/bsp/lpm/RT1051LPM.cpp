@@ -2,8 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051LPM.hpp"
-#include <board.h>
-#include <board/BoardDefinitions.hpp>
 
 namespace bsp
 {
@@ -12,17 +10,4 @@ namespace bsp
 
     void RT1051LPM::DisableDcdcPowerSaveMode()
     {}
-
-    void RT1051LPM::SwitchToRegularModeLDO()
-    {
-        RT1051LPMCommon::RegularLDOMode();
-        NVIC_ClearPendingIRQ(ANATOP_EVENT0_IRQn);
-        EnableIRQ(ANATOP_EVENT0_IRQn);
-    }
-
-    void RT1051LPM::SwitchToLowPowerModeLDO()
-    {
-        DisableIRQ(ANATOP_EVENT0_IRQn);
-        RT1051LPMCommon::LowPowerLDOMode();
-    }
 } // namespace bsp
