@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-music-player/ApplicationMusicPlayer.hpp>
@@ -75,22 +75,22 @@ namespace app
         lockPolicyHandler.setPreventsAutoLockByStateCallback(std::move(stateLockCallback));
 
         connect(typeid(AudioStopNotification), [&](sys::Message *msg) -> sys::MessagePointer {
-            auto notification = static_cast<AudioStopNotification *>(msg);
+            const auto notification = static_cast<AudioStopNotification *>(msg);
             music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
             return audioNotificationHandler.handleAudioStopNotification(notification);
         });
         connect(typeid(AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
-            auto notification = static_cast<AudioStopNotification *>(msg);
+            const auto notification = static_cast<AudioStopNotification *>(msg);
             music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
             return audioNotificationHandler.handleAudioEofNotification(notification);
         });
         connect(typeid(AudioPausedNotification), [&](sys::Message *msg) -> sys::MessagePointer {
-            auto notification = static_cast<AudioPausedNotification *>(msg);
+            const auto notification = static_cast<AudioPausedNotification *>(msg);
             music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
             return audioNotificationHandler.handleAudioPausedNotification(notification);
         });
         connect(typeid(AudioResumedNotification), [&](sys::Message *msg) -> sys::MessagePointer {
-            auto notification = static_cast<AudioResumedNotification *>(msg);
+            const auto notification = static_cast<AudioResumedNotification *>(msg);
             music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
             return audioNotificationHandler.handleAudioResumedNotification(notification);
         });
@@ -101,7 +101,7 @@ namespace app
     sys::MessagePointer ApplicationMusicPlayer::DataReceivedHandler(sys::DataMessage *msgl,
                                                                     [[maybe_unused]] sys::ResponseMessage *resp)
     {
-        auto retMsg = Application::DataReceivedHandler(msgl);
+        const auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
         if (static_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
@@ -113,7 +113,7 @@ namespace app
     // Invoked during initialization
     sys::ReturnCodes ApplicationMusicPlayer::InitHandler()
     {
-        auto ret = Application::InitHandler();
+        const auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }

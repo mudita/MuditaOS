@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -50,6 +50,7 @@ namespace app::music_player
             virtual bool playPrevious()                    = 0;
 
             virtual void songsStateRequest()                                      = 0;
+            virtual void progressStateRequest()                                   = 0;
             virtual void setPlayingStateCallback(OnPlayingStateChangeCallback cb) = 0;
             virtual bool handleAudioStopNotifiaction(audio::Token token)          = 0;
             virtual bool handleAudioEofNotification(audio::Token token)           = 0;
@@ -78,6 +79,7 @@ namespace app::music_player
         bool playPrevious() override;
 
         void songsStateRequest() override;
+        void progressStateRequest() override;
         void setPlayingStateCallback(std::function<void(app::music::SongState)> cb) override;
         bool handleAudioStopNotifiaction(audio::Token token) override;
         bool handleAudioEofNotification(audio::Token token) override;
@@ -90,8 +92,7 @@ namespace app::music_player
 
       private:
         void updateViewSongState();
-        void updateViewProgresState();
-        void updateViewSongTitleAndArtist(const std::string &title, const std::string &artist);
+        void updateViewProgressState();
         void refreshView();
         void updateTrackProgressRatio();
         void resetTrackProgressRatio();

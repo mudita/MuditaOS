@@ -45,6 +45,7 @@
 * Fixed losing drafted message and recipient number in new message windows
 * Fixed misleading "Save" button behavior in "Date and time" window
 * Fixed losing unsaved user data when tethering is switching on
+* Fixed invalid elapsed time in music player after playing and pausing track from songs list view
 
 ## [1.7.2 2023-07-28]
 
