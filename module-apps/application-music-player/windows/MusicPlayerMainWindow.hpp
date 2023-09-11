@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -23,7 +23,7 @@ namespace gui
     {
       public:
         /// number of vertical items in track's progress bar
-        static constexpr uint8_t progressBarSize = 27;
+        static constexpr std::uint8_t progressBarSize = 27;
 
         /// current view mode (switching with up / down arrow)
         enum class ViewMode
@@ -36,7 +36,7 @@ namespace gui
         explicit MusicPlayerMainWindow(app::ApplicationCommon *app,
                                        std::shared_ptr<app::music_player::SongsContract::Presenter> presenter);
 
-        void onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         void rebuild() override;
         void buildInterface() override;
@@ -81,9 +81,9 @@ namespace gui
         Label *descriptionText                   = nullptr;
         Image *progressBarItems[progressBarSize] = {nullptr};
 
-        float currentProgress            = 0.f;
-        uint32_t currentTotalTime        = 0;
-        uint8_t currentProgressBarsBlack = 0;
+        float currentProgress                 = 0.0f;
+        std::uint32_t currentTotalTime        = 0;
+        std::uint8_t currentProgressBarsBlack = 0;
         std::string currentTitle;
         std::string currentArtist;
         std::string currentTimeString;
@@ -91,5 +91,4 @@ namespace gui
         bool isPermissionToChangeViewMode = false;
         bool needToDeepRedrawScreen       = false;
     };
-
 } /* namespace gui */

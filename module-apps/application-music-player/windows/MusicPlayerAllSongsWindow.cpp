@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MusicPlayerAllSongsWindow.hpp"
@@ -6,18 +6,15 @@
 #include <data/MusicPlayerStyle.hpp>
 
 #include <Style.hpp>
-#include <cassert>
 #include <i18n/i18n.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
 #include <gui/widgets/ListView.hpp>
 #include <gui/widgets/Icon.hpp>
 
 namespace gui
 {
-
     MusicPlayerAllSongsWindow::MusicPlayerAllSongsWindow(
         app::ApplicationCommon *app, std::shared_ptr<app::music_player::SongsContract::Presenter> windowPresenter)
-        : AppWindow(app, gui::name::window::all_songs_window), presenter{windowPresenter}
+        : AppWindow(app, gui::name::window::all_songs_window), presenter{std::move(windowPresenter)}
     {
         buildInterface();
     }
@@ -64,11 +61,15 @@ namespace gui
         presenter->createData();
     }
 
-    void MusicPlayerAllSongsWindow::updateSongsState(std::optional<db::multimedia_files::MultimediaFilesRecord> record,
-                                                     RecordState state)
+    void MusicPlayerAllSongsWindow::updateSongsState(
+        [[maybe_unused]] std::optional<db::multimedia_files::MultimediaFilesRecord> record,
+        [[maybe_unused]] RecordState state)
     {
         songsList->rebuildList(gui::listview::RebuildType::InPlace);
     }
+
+    void MusicPlayerAllSongsWindow::updateSongProgress([[maybe_unused]] float progress)
+    {}
 
     void MusicPlayerAllSongsWindow::refreshWindow()
     {
@@ -87,10 +88,6 @@ namespace gui
 
     bool MusicPlayerAllSongsWindow::onInput(const InputEvent &inputEvent)
     {
-        if (AppWindow::onInput(inputEvent)) {
-            return true;
-        }
-
-        return false;
+        return AppWindow::onInput(inputEvent);
     }
 } /* namespace gui */

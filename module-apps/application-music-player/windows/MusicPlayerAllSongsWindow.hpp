@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,15 +17,14 @@ namespace gui
         explicit MusicPlayerAllSongsWindow(app::ApplicationCommon *app,
                                            std::shared_ptr<app::music_player::SongsContract::Presenter> presenter);
 
-        void onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;
 
         void updateSongsState(std::optional<db::multimedia_files::MultimediaFilesRecord> record,
                               RecordState state) override;
-        void updateSongProgress(float progres) override
-        {}
+        void updateSongProgress(float progress) override;
         void refreshWindow() override;
         void setNavBarTemporaryMode(const std::string &text) override;
         void restoreFromNavBarTemporaryMode() override;
@@ -35,5 +34,4 @@ namespace gui
         ListView *songsList = nullptr;
         Icon *emptyListIcon = nullptr;
     };
-
 } /* namespace gui */

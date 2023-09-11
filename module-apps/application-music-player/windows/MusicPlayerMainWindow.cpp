@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MusicPlayerMainWindow.hpp"
@@ -6,7 +6,6 @@
 #include <application-music-player/ApplicationMusicPlayer.hpp>
 #include <apps-common/options/type/OptionSetting.hpp>
 
-#include <service-audio/AudioServiceAPI.hpp>
 #include <gui/widgets/ThreeBox.hpp>
 #include <gui/widgets/ImageBox.hpp>
 #include <gui/widgets/ListView.hpp>
@@ -16,13 +15,39 @@
 #include <Style.hpp>
 #include <time/time_constants.hpp>
 
-#include <cassert>
+namespace
+{
+    std::string secondsToTimeString(std::uint32_t seconds)
+    {
+        constexpr auto maxTimeStringLength = 10;
+        char timeStringBuffer[maxTimeStringLength];
+
+        if (seconds < utils::time::secondsInHour) {
+            const auto minutes          = seconds / utils::time::secondsInMinute;
+            const auto secondsRemainder = seconds % utils::time::secondsInMinute;
+            snprintf(timeStringBuffer, sizeof(timeStringBuffer), "%" PRIu32 ":%02" PRIu32, minutes, secondsRemainder);
+        }
+        else {
+            const auto hours            = seconds / utils::time::secondsInHour;
+            const auto minutes          = (seconds % utils::time::secondsInHour) / utils::time::secondsInMinute;
+            const auto secondsRemainder = seconds % utils::time::secondsInMinute;
+            snprintf(timeStringBuffer,
+                     sizeof(timeStringBuffer),
+                     "%" PRIu32 ":%02" PRIu32 ":%02" PRIu32,
+                     hours,
+                     minutes,
+                     secondsRemainder);
+        }
+
+        return std::string(timeStringBuffer);
+    };
+} // namespace
 
 namespace gui
 {
     MusicPlayerMainWindow::MusicPlayerMainWindow(
         app::ApplicationCommon *app, std::shared_ptr<app::music_player::SongsContract::Presenter> windowPresenter)
-        : OptionWindow(app, name::window::track_info_window), presenter{windowPresenter}
+        : OptionWindow(app, name::window::track_info_window), presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();
@@ -37,7 +62,7 @@ namespace gui
     void MusicPlayerMainWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        updateSongProgress(currentProgress);
+        presenter->progressStateRequest();
 
         if (myViewMode == ViewMode::START) {
             buildInterfaceStartMode();
@@ -58,12 +83,12 @@ namespace gui
         auto mainBox = new VBox(this, 0, 0, style::window_width, style::window_height);
         mainBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
-        ImageBox *note = new ImageBox(mainBox, 0, 0, 0, 0, new Image("mp_note", musicPlayerStyle::common::imageType));
+        auto note = new ImageBox(mainBox, 0, 0, 0, 0, new Image("mp_note", musicPlayerStyle::common::imageType));
         note->setMinimumSize(startScreen::noteSize, startScreen::noteSize);
         note->setMargins(Margins(0, startScreen::noteUpMargin, 0, startScreen::noteDownMargin));
         note->setEdges(RectangleEdge::None);
 
-        Text *desc = new Text(mainBox, 0, 0, 0, 0);
+        auto desc = new Text(mainBox, 0, 0, 0, 0);
         desc->setMinimumSize(startScreen::descriptionWidth, startScreen::descriptionHeight);
         desc->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         desc->setTextType(TextType::MultiLine);
@@ -137,40 +162,41 @@ namespace gui
 
         buildTrackInfoInterface(mainBox);
 
-        ImageBox *swipe =
+        auto swipe =
             new ImageBox(mainBox, 0, 0, 0, 0, new Image("mp_line_arrow_up", musicPlayerStyle::common::imageType));
         swipe->setMinimumSizeToFitImage();
         swipe->setMargins(Margins(0, musicLibraryScreen::topArrowMargin, 0, musicLibraryScreen::bottomArrowMargin));
         swipe->setEdges(RectangleEdge::None);
 
         options.clear();
-        auto addOption = [this](UTF8 name, const std::string &window = "", bool permissionToChangeViewMode = false) {
-            options.emplace_back(std::make_unique<option::OptionSettings>(
-                name,
-                [=](Item &item) {
-                    if (window.empty()) {
+        auto addOption =
+            [this](const UTF8 &name, const std::string &window = "", bool permissionToChangeViewMode = false) {
+                options.emplace_back(std::make_unique<option::OptionSettings>(
+                    name,
+                    [=]([[maybe_unused]] Item &item) {
+                        if (window.empty()) {
+                            return true;
+                        }
+                        LOG_INFO("switching to window %s", window.c_str());
+                        application->switchWindow(window, nullptr);
                         return true;
-                    }
-                    LOG_INFO("switching to window %s", window.c_str());
-                    application->switchWindow(window, nullptr);
-                    return true;
-                },
-                [=](Item &item) {
-                    if (!item.focus) {
+                    },
+                    [=](Item &item) {
+                        if (!item.focus) {
+                            return true;
+                        }
+                        isPermissionToChangeViewMode = permissionToChangeViewMode;
+                        if (window.empty()) {
+                            clearNavBarText(nav_bar::Side::Center);
+                        }
+                        else {
+                            navBar->setText(nav_bar::Side::Center, utils::translate("common_select"));
+                        }
                         return true;
-                    }
-                    isPermissionToChangeViewMode = permissionToChangeViewMode;
-                    if (window.empty()) {
-                        clearNavBarText(nav_bar::Side::Center);
-                    }
-                    else {
-                        navBar->setText(nav_bar::Side::Center, utils::translate("common_select"));
-                    }
-                    return true;
-                },
-                this,
-                window.empty() ? option::SettingRightItem::Disabled : option::SettingRightItem::ArrowWhite));
-        };
+                    },
+                    this,
+                    window.empty() ? option::SettingRightItem::Disabled : option::SettingRightItem::ArrowWhite));
+            };
 
         addOption(utils::translate("app_music_player_all_songs"), name::window::all_songs_window, true);
         addOption(utils::translate("app_music_player_artists"));
@@ -203,7 +229,7 @@ namespace gui
         using namespace musicPlayerStyle::mainWindow;
 
         using Box3    = HThreeBox<HBox, HBox, HBox>;
-        Box3 *buttons = new Box3(parent);
+        auto buttons  = new Box3(parent);
         buttons->setMinimumSize(playButtons::width, playButtons::height);
         buttons->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         buttons->setEdges(RectangleEdge::None);
@@ -241,7 +267,7 @@ namespace gui
     {
         using namespace musicPlayerStyle::mainWindow;
 
-        Text *musicLib = new Text(parent, 0, 0, 0, 0);
+        auto musicLib = new Text(parent, 0, 0, 0, 0);
         musicLib->setMinimumSize(lineArrow::textWidth, lineArrow::textHeight);
         musicLib->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         musicLib->setTextType(TextType::SingleLine);
@@ -250,7 +276,7 @@ namespace gui
         musicLib->setRichText(utils::translate("app_music_player_music_library"));
         musicLib->setMargins(Margins(0, 0, 0, lineArrow::internalMargin));
 
-        ImageBox *swipe =
+        auto swipe =
             new ImageBox(parent, 0, 0, 0, 0, new Image("mp_line_arrow_down", musicPlayerStyle::common::imageType));
         swipe->setMinimumSizeToFitImage();
         swipe->setEdges(RectangleEdge::None);
@@ -271,7 +297,7 @@ namespace gui
         topBox->setMinimumSize(trackProgress::barWidth, trackProgress::barHeight);
         topBox->setEdges(RectangleEdge::None);
 
-        unsigned spacerWidth =
+        const auto spacerWidth =
             (trackProgress::barWidth - progressBarSize * trackProgress::barThickness) / (progressBarSize - 1);
         for (auto i = 0; i < progressBarSize; ++i) {
             if (i < currentProgressBarsBlack) {
@@ -319,7 +345,7 @@ namespace gui
     {
         using namespace musicPlayerStyle::mainWindow;
 
-        HBox *songData = new HBox(parent);
+        auto songData = new HBox(parent);
         songData->setMinimumSize(trackInfo::width, trackInfo::height);
         songData->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
         songData->setMargins(Margins(0, trackInfo::topMargin, 0, 0));
@@ -331,7 +357,7 @@ namespace gui
         stateImageBox->setEdges(RectangleEdge::None);
         stateImageBox->setMargins(Margins(0, 0, trackInfo::internalMargin, 0));
 
-        HBox *textBox = new HBox(songData);
+        auto textBox = new HBox(songData);
         textBox->setMinimumSize(trackInfo::width - trackInfo::internalMargin - trackInfo::height, trackInfo::height);
         textBox->setEdges(RectangleEdge::None);
         textBox->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Center));
@@ -360,7 +386,7 @@ namespace gui
 
         stateImageBox   = nullptr;
         descriptionText = nullptr;
-        memset(progressBarItems, 0, progressBarSize * sizeof(Image *));
+        std::memset(progressBarItems, 0, progressBarSize * sizeof(Image *));
 
         optionsList = nullptr;
     }
@@ -376,12 +402,14 @@ namespace gui
     {
         if (record) {
             currentTitle = record->tags.title;
-            if (currentTitle.empty())
+            if (currentTitle.empty()) {
                 currentTitle = utils::translate("app_music_player_uknown_title");
+            }
 
             currentArtist = record->tags.album.artist;
-            if (currentArtist.empty())
+            if (currentArtist.empty()) {
                 currentArtist = utils::translate("app_music_player_uknown_artist");
+            }
 
             currentTotalTime = record->audioProperties.songLength;
             if (myViewMode == ViewMode::START) {
@@ -403,7 +431,7 @@ namespace gui
 
     void MusicPlayerMainWindow::updateSongProgress(float progress)
     {
-        progress        = std::clamp(progress, 0.f, 1.f);
+        progress        = std::clamp(progress, 0.0f, 1.0f);
         currentProgress = progress;
 
         updateVisibleProgressData();
@@ -444,25 +472,31 @@ namespace gui
 
     void MusicPlayerMainWindow::updateVisibleTrackData(RecordState state) noexcept
     {
-        auto isPlaying = state == RecordState::Playing;
-        auto isPaused  = state == RecordState::Paused;
+        const auto isPlaying = (state == RecordState::Playing);
+        const auto isPaused  = (state == RecordState::Paused);
 
-        if (titleText != nullptr)
+        if (titleText != nullptr) {
             titleText->setText(currentTitle);
-        if (artistText != nullptr)
+        }
+        if (artistText != nullptr) {
             artistText->setText(currentArtist);
+        }
 
-        if (totalTimeText != nullptr)
+        if (totalTimeText != nullptr) {
             totalTimeText->setRichText(currentTotalTimeString);
-        if (rewImageBox != nullptr)
+        }
+        if (rewImageBox != nullptr) {
             rewImageBox->setImage((isPlaying || isPaused) ? "mp_prev" : "mp_prev_gray",
                                   musicPlayerStyle::common::imageType);
-        if (pauseImageBox != nullptr)
+        }
+        if (pauseImageBox != nullptr) {
             pauseImageBox->setImage(isPlaying ? "mp_pause" : ((isPaused) ? "mp_play" : "mp_pause_gray"),
                                     musicPlayerStyle::common::imageType);
-        if (ffImageBox != nullptr)
+        }
+        if (ffImageBox != nullptr) {
             ffImageBox->setImage((isPlaying || isPaused) ? "mp_next" : "mp_next_gray",
                                  musicPlayerStyle::common::imageType);
+        }
 
         if (stateImageBox != nullptr) {
             stateImageBox->setImage(isPlaying
@@ -489,24 +523,22 @@ namespace gui
         }
     }
 
-    void MusicPlayerMainWindow::updateVisibleProgressData(void) noexcept
+    void MusicPlayerMainWindow::updateVisibleProgressData() noexcept
     {
         if (myViewMode != ViewMode::TRACK) {
             return;
         }
-        constexpr auto maxTimeToDisplaySize{10};
-        char timeToDisplay[maxTimeToDisplaySize];
 
-        uint8_t passedBarsNumber = std::round(currentProgress * progressBarSize);
+        const auto passedBarsNumber = static_cast<std::uint8_t>(std::round(currentProgress * progressBarSize));
         if (passedBarsNumber != currentProgressBarsBlack) {
-
             if (passedBarsNumber < currentProgressBarsBlack) {
                 needToDeepRedrawScreen = true;
             }
             currentProgressBarsBlack = passedBarsNumber;
             for (auto i = 0; i < progressBarSize; ++i) {
-                if (progressBarItems[i] == nullptr)
+                if (progressBarItems[i] == nullptr) {
                     continue;
+                }
 
                 if (i < currentProgressBarsBlack) {
                     progressBarItems[i]->set("mp_bar", musicPlayerStyle::common::imageType);
@@ -517,32 +549,15 @@ namespace gui
             }
         }
 
-        auto secsToStr = [&](int secs) {
-            if (secs < utils::time::secondsInHour) {
-                snprintf(timeToDisplay,
-                         maxTimeToDisplaySize,
-                         "%d:%02d",
-                         static_cast<int>(secs / utils::time::secondsInMinute),
-                         static_cast<int>(secs) % utils::time::secondsInMinute);
-            }
-            else {
-                snprintf(timeToDisplay,
-                         maxTimeToDisplaySize,
-                         "%d:%02d:%02d",
-                         static_cast<int>(secs) / utils::time::secondsInHour,
-                         static_cast<int>((secs) % utils::time::secondsInHour) / utils::time::secondsInMinute,
-                         static_cast<int>(secs) % utils::time::secondsInMinute);
-            }
-            return timeToDisplay;
-        };
+        currentTotalTimeString = secondsToTimeString(currentTotalTime);
+        currentTimeString      = secondsToTimeString(static_cast<std::uint32_t>(currentTotalTime * currentProgress));
 
-        currentTotalTimeString = secsToStr(currentTotalTime);
-        currentTimeString      = secsToStr(static_cast<uint32_t>(currentTotalTime * currentProgress));
-
-        if (totalTimeText != nullptr)
+        if (totalTimeText != nullptr) {
             totalTimeText->setRichText(currentTotalTimeString);
-        if (currentTimeText != nullptr)
+        }
+        if (currentTimeText != nullptr) {
             currentTimeText->setRichText(currentTimeString);
+        }
     }
 
     bool MusicPlayerMainWindow::onInput(const InputEvent &inputEvent)
