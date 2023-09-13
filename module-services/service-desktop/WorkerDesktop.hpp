@@ -47,6 +47,7 @@ class WorkerDesktop : public sys::Worker
     bool handleSignallingQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
 
     std::atomic<bool> initialized = false;
+    std::atomic<bool> configured  = false;
 
     xQueueHandle receiveQueue;
     xQueueHandle irqQueue;
