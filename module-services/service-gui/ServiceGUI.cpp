@@ -87,6 +87,7 @@ namespace service::gui
         worker = std::make_unique<WorkerGUI>(this);
         worker->init(queueInfo);
         worker->run();
+        stateManager.setState(ServiceGUIState::Running);
         return sys::ReturnCodes::Success;
     }
 
@@ -98,12 +99,13 @@ namespace service::gui
 
     void ServiceGUI::ProcessCloseReason(sys::CloseReason closeReason)
     {
-        if (not isDisplaying and not isRendering) {
+        if (stateManager.isInState(RenderingState::Idle) and stateManager.isInState(DisplayingState::Idle)) {
             sendCloseReadyMessage(this);
+            stateManager.setState(ServiceGUIState::Closed);
             return;
         }
         else {
-            isClosing = true;
+            stateManager.setState(ServiceGUIState::Closing);
         }
     }
 
@@ -145,7 +147,7 @@ namespace service::gui
     void ServiceGUI::notifyRenderer(std::list<std::unique_ptr<::gui::DrawCommand>> &&commands,
                                     ::gui::RefreshModes refreshMode)
     {
-        isRendering = true;
+        stateManager.setState(RenderingState::Rendering);
         enqueueDrawCommands(DrawCommandsQueue::QueueItem{std::move(commands), refreshMode});
         worker->notify(WorkerGUI::Signal::Render);
     }
@@ -172,12 +174,12 @@ namespace service::gui
 
     sys::MessagePointer ServiceGUI::handleGUIRenderingFinished(sys::Message *message)
     {
-        isRendering          = false;
+        stateManager.setState(RenderingState::Idle);
         auto finishedMsg     = static_cast<service::gui::RenderingFinished *>(message);
         const auto contextId = finishedMsg->getContextId();
         auto refreshMode     = finishedMsg->getRefreshMode();
 
-        if (not isDisplaying) {
+        if (stateManager.isInState(DisplayingState::Idle)) {
             if (cache.isRenderCached()) {
                 refreshMode = getMaxRefreshMode(cache.getCachedRender()->refreshMode, refreshMode);
                 cache.invalidate();
@@ -201,8 +203,7 @@ namespace service::gui
 
     void ServiceGUI::sendOnDisplay(::gui::Context *context, int contextId, ::gui::RefreshModes refreshMode)
     {
-        isDisplaying = true;
-
+        stateManager.setState(DisplayingState::Displaying);
         auto msg = std::make_shared<service::eink::ImageMessage>(contextId, context, refreshMode);
         bus.sendUnicast(std::move(msg), service::name::eink);
         scheduleContextRelease(contextId);
@@ -229,7 +230,7 @@ namespace service::gui
 
     sys::MessagePointer ServiceGUI::handleImageDisplayedNotification(sys::Message *message)
     {
-        isDisplaying         = false;
+        stateManager.setState(DisplayingState::Idle);
         const auto msg       = static_cast<eink::ImageDisplayedNotification *>(message);
         const auto contextId = msg->getContextId();
         contextPool->returnContext(contextId);
@@ -240,8 +241,9 @@ namespace service::gui
         if (isNextFrameReady() and not isAnyFrameBeingRenderedOrDisplayed()) {
             trySendNextFrame();
         }
-        else if (isClosing) {
+        else if (stateManager.isInState(ServiceGUIState::Closing)) {
             sendCloseReadyMessage(this);
+            stateManager.setState(ServiceGUIState::Closed);
         }
         return sys::MessageNone{};
     }

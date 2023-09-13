@@ -6,12 +6,14 @@ target_sources(service-gui
         DrawCommandsQueue.cpp
         RenderCache.cpp
         ServiceGUI.cpp
+        ServiceGUIStateManager.cpp
         SynchronizationMechanism.cpp
         WorkerGUI.cpp
         messages/DrawMessage.cpp
     INTERFACE
         service-gui/ServiceGUIName.hpp
         service-gui/ServiceGUI.hpp
+        service-gui/ServiceGUIStateManager.hpp
         service-gui/messages/ChangeColorScheme.hpp
         service-gui/messages/DrawMessage.hpp
         service-gui/messages/GUIMessage.hpp

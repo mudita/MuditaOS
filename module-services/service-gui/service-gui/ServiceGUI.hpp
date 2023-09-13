@@ -8,7 +8,7 @@
 #include "RenderCache.hpp"
 #include "messages/RenderingFinished.hpp"
 #include "ServiceGUIDependencies.hpp"
-
+#include "ServiceGUIStateManager.hpp"
 #include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
@@ -22,6 +22,7 @@ namespace gui
 {
     class Context;
     class DrawCommand;
+
 } // namespace gui
 
 namespace service::gui
@@ -46,10 +47,6 @@ namespace service::gui
         sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override;
 
       private:
-        bool isRendering{};
-        bool isDisplaying{};
-        bool isClosing{};
-
         static void initAssetManagers();
         void registerMessageHandlers();
 
@@ -76,6 +73,7 @@ namespace service::gui
         std::unique_ptr<::gui::ColorScheme> colorSchemeUpdate;
         RenderCache cache;
         sys::TimerHandle contextReleaseTimer;
+        ServiceGUIStateManager stateManager{};
     };
 } // namespace service::gui
 
