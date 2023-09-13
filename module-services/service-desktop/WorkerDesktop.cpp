@@ -77,7 +77,7 @@ void WorkerDesktop::closeWorker(void)
 
     bsp::usbDeinit();
 
-    this->close();
+    close();
 
     cpuSentinel->ReleaseMinimumFrequency();
     auto sentinelRemoveMsg = std::make_shared<sys::SentinelRemovalMessage>("WorkerDesktop");
@@ -93,6 +93,8 @@ void WorkerDesktop::closeWorker(void)
 void WorkerDesktop::reset()
 {
     initialized = false;
+    configured  = false;
+
     bsp::usbDeinit();
 
     const bsp::usbInitParams initParams = {receiveQueue,
@@ -166,6 +168,7 @@ bool WorkerDesktop::handleReceiveQueueMessage(std::shared_ptr<sys::WorkerQueue> 
     delete receivedMsg;
     return true;
 }
+
 bool WorkerDesktop::handleSendQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue)
 {
     if (!initialized) {
@@ -179,12 +182,13 @@ bool WorkerDesktop::handleSendQueueMessage(std::shared_ptr<sys::WorkerQueue> &qu
 
     const std::uint32_t dataSent = bsp::usbCDCSend(sendMsg);
     if (dataSent != sendMsg->length()) {
-        LOG_ERROR("Data not sent! Data sent: %" PRIu32 "B, Msg length: %zuB", dataSent, sendMsg->length());
+        LOG_ERROR("Data not sent! Data sent: %" PRIu32 "B, msg length: %zuB", dataSent, sendMsg->length());
     }
 
     delete sendMsg;
     return true;
 }
+
 bool WorkerDesktop::handleServiceQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue)
 {
     if (!initialized) {
@@ -205,6 +209,7 @@ bool WorkerDesktop::handleServiceQueueMessage(std::shared_ptr<sys::WorkerQueue> 
     }
     return true;
 }
+
 bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue)
 {
     bsp::USBDeviceStatus notification = bsp::USBDeviceStatus::Disconnected;
@@ -224,12 +229,14 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
         LOG_DEBUG("USB status: Configured");
         ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConfigured>(),
                                         sys::BusChannel::USBNotifications);
+        configured = true;
         break;
 
     case bsp::USBDeviceStatus::Disconnected:
         LOG_DEBUG("USB status: Disconnected");
         ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBDisconnected>(),
                                         sys::BusChannel::USBNotifications);
+        configured = false;
         break;
 
     case bsp::USBDeviceStatus::DataReceived:
@@ -238,6 +245,9 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
 
     case bsp::USBDeviceStatus::Reset:
         LOG_DEBUG("USB status: Reset");
+        if (configured) {
+            reset();
+        }
         break;
 
     default:
