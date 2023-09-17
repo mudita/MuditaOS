@@ -15,9 +15,11 @@ namespace gui
     InputBoxWithLabelAndIconWidget::InputBoxWithLabelAndIconWidget(
         phonebookInternals::ListItemName listItemName,
         std::function<void(const UTF8 &)> navBarTemporaryMode,
-        std::function<void()> navBarRestoreFromTemporaryMode)
+        std::function<void()> navBarRestoreFromTemporaryMode,
+        std::function<void(const UTF8 &text)> navBarSetRFKeyLabel)
         : listItemName(listItemName), navBarTemporaryMode(std::move(navBarTemporaryMode)),
-          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode))
+          navBarRestoreFromTemporaryMode(std::move(navBarRestoreFromTemporaryMode)),
+          navBarSetRFKeyLabel(std::move(navBarSetRFKeyLabel))
     {
         setMinimumSize(phonebookStyle::inputBoxWithLabelAndIconIWidget::w,
                        phonebookStyle::inputBoxWithLabelAndIconIWidget::h);

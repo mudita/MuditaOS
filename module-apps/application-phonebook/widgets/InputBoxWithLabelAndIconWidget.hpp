@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,7 +22,8 @@ namespace gui
       public:
         InputBoxWithLabelAndIconWidget(phonebookInternals::ListItemName listItemName,
                                        std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
-                                       std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
+                                       std::function<void()> navBarRestoreFromTemporaryMode      = nullptr,
+                                       std::function<void(const UTF8 &text)> navBarSetRFKeyLabel = nullptr);
         ~InputBoxWithLabelAndIconWidget() override = default;
         gui::HBox *hBox                            = nullptr;
         gui::Label *inputBoxLabel                  = nullptr;
@@ -33,6 +34,7 @@ namespace gui
       private:
         std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr;
         std::function<void()> navBarRestoreFromTemporaryMode      = nullptr;
+        std::function<void(const UTF8 &text)> navBarSetRFKeyLabel = nullptr;
 
         void applyItemNameSpecificSettings();
 

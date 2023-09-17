@@ -18,13 +18,14 @@ namespace gui
       public:
         explicit InputLinesWithLabelWidget(
             phonebookInternals::ListItemName listItemName,
-            const std::function<void(const UTF8 &text, bool emptyOthers)> &navBarTemporaryMode = nullptr,
-            const std::function<void()> &navBarRestoreFromTemporaryMode                        = nullptr,
-            const std::function<void(const UTF8 &text, bool active)> &navBarSetOptionsLabel    = nullptr,
-            const std::function<void()> &selectSpecialCharacter                                = nullptr,
-            const std::function<void(std::function<void()> restoreFunction)> &restoreInputMode = nullptr,
-            const std::function<void(Text *text)> &inputOptions                                = nullptr,
-            unsigned int lines                                                                 = 1);
+            const std::function<void(const UTF8 &text, bool emptyOthers)> &navBarTemporaryMode            = nullptr,
+            const std::function<void()> &navBarRestoreFromTemporaryMode                                   = nullptr,
+            const std::function<void(const UTF8 &text, bool isRFKeyFunctionAsClear)> &navBarSetRFKeyLabel = nullptr,
+            const std::function<void(const UTF8 &text, bool active)> &navBarSetOptionsLabel               = nullptr,
+            const std::function<void()> &selectSpecialCharacter                                           = nullptr,
+            const std::function<void(std::function<void()> restoreFunction)> &restoreInputMode            = nullptr,
+            const std::function<void(Text *text)> &inputOptions                                           = nullptr,
+            std::uint32_t lines                                                                           = 1);
 
         VBox *vBox               = nullptr;
         Label *titleLabel        = nullptr;
@@ -33,11 +34,13 @@ namespace gui
       private:
         phonebookInternals::ListItemName listItemName;
         void applyItemNameSpecificSettings();
+        void setRightFunctionKayLabel();
 
-        std::function<void(const UTF8 &text, bool emptyOthers)> navBarTemporaryMode = nullptr;
-        std::function<void()> navBarRestoreFromTemporaryMode                        = nullptr;
-        std::function<void(const UTF8 &text, bool active)> navBarSetOptionsLabel    = nullptr;
-        std::function<void(Text *text)> inputOptions                                = nullptr;
+        std::function<void(const UTF8 &text, bool emptyOthers)> navBarTemporaryMode            = nullptr;
+        std::function<void()> navBarRestoreFromTemporaryMode                                   = nullptr;
+        std::function<void(const UTF8 &text, bool isRFKeyFunctionAsClear)> navBarSetRFKeyLabel = nullptr;
+        std::function<void(const UTF8 &text, bool active)> navBarSetOptionsLabel               = nullptr;
+        std::function<void(Text *text)> inputOptions                                           = nullptr;
 
         void firstNameHandler();
         void secondNameHandler();

@@ -29,7 +29,8 @@ namespace gui
         unsigned int cursorPos;
     };
 
-    constexpr KeyCode removeKey = KeyCode::KEY_PND;
+    constexpr KeyCode removeKey         = KeyCode::KEY_PND;
+    constexpr KeyCode removeKeyForPhone = KeyCode::KEY_RF;
 
     ///  @brief Widget that holds multiple lines of text.
     ///
@@ -171,6 +172,7 @@ namespace gui
 
         /// move ownership of mode ptr to Text
         void setInputMode(InputMode *&&mode);
+        bool isInputMode(InputMode::Mode mode);
         std::string getInputModeKeyMap();
         InputMode::Mode detectInputMode();
 
@@ -209,6 +211,7 @@ namespace gui
 
         bool addChar(std::uint32_t utf8);
         bool removeChar();
+        bool removeWholeText();
         void onTextChanged();
         void setTextChangedCallback(TextChangedCallback &&callback);
     };

@@ -151,7 +151,7 @@ namespace gui
             return true;
         }
         else if (!inputEvent.isShortRelease(KeyCode::KEY_RF) || !shouldCurrentAppBeIgnoredOnSwitchBack()) {
-            if (isAnyUnsavedUserDataInWindow()) {
+            if (!newContactModel->isRightFunctionKeyForClearFunction() && isAnyUnsavedUserDataInWindow()) {
                 if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF) || inputEvent.isLongRelease(gui::KeyCode::KEY_RF)) {
                     showDialogUnsavedChanges([this]() {
                         application->returnToPreviousWindow();

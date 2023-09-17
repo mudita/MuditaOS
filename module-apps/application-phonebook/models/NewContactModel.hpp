@@ -5,6 +5,8 @@
 
 #include "application-phonebook/data/PhonebookItemData.hpp"
 #include "application-phonebook/widgets/ContactListItem.hpp"
+#include "application-phonebook/widgets/InputBoxWithLabelAndIconWidget.hpp"
+#include "application-phonebook/widgets/InputLinesWithLabelWidget.hpp"
 #include "InternalModel.hpp"
 #include "Application.hpp"
 
@@ -16,6 +18,7 @@ class NewContactModel : public app::InternalModel<gui::ContactListItem *>, publi
   private:
     app::ApplicationCommon *application        = nullptr;
     PhonebookItemData::RequestType requestType = PhonebookItemData::RequestType::Internal;
+    bool isRFKeyForClearFunction               = false; // By default, is for BACK function
 
     void openTextOptions(gui::Text *text);
 
@@ -29,6 +32,7 @@ class NewContactModel : public app::InternalModel<gui::ContactListItem *>, publi
     bool verifyData();
     bool emptyData();
     bool isAnyUnsavedChange(std::shared_ptr<ContactRecord> contactRecord);
+    bool isRightFunctionKeyForClearFunction();
     [[nodiscard]] auto getRequestType() -> PhonebookItemData::RequestType;
 
     [[nodiscard]] auto requestRecordsCount() -> unsigned int override;
