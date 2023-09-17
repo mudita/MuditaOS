@@ -4,7 +4,7 @@
 
 ### Added
 
-* Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
+* Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria, Egypt (Vodafone,Orange)
 * Added extended information to crashdump filename
 * Added extended information to log filename
 * Added GUI screens informing about failed MMI/USSD request
