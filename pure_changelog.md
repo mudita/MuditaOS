@@ -47,6 +47,7 @@
 * Fixed losing unsaved user data when tethering is switching on
 * Fixed invalid elapsed time in music player after playing and pausing track from songs list view
 * Fixed disappearing "Call" label in Phonebook app
+* Fixed phone number input style unification
 
 ## [1.7.2 2023-07-28]
 

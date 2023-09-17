@@ -4,9 +4,6 @@
 #include "NewContactModel.hpp"
 
 #include "apps-common/windows/AppWindow.hpp"
-#include "application-phonebook/widgets/ContactListItem.hpp"
-#include "application-phonebook/widgets/InputBoxWithLabelAndIconWidget.hpp"
-#include "application-phonebook/widgets/InputLinesWithLabelWidget.hpp"
 #include "application-phonebook/ApplicationPhonebook.hpp"
 
 #include <messages/DialogMetadataMessage.hpp>
@@ -37,13 +34,18 @@ auto NewContactModel::getItem(gui::Order order) -> gui::ListItem *
 
 void NewContactModel::createData()
 {
-    constexpr auto navBarOptionsLabelSide = gui::nav_bar::Side::Left;
-    auto app = application;
+    constexpr auto navBarOptionsLabelSide     = gui::nav_bar::Side::Left;
+    constexpr auto navBarClearOrBackLabelSide = gui::nav_bar::Side::Right;
+    auto app                                  = application;
 
     internalData.push_back(new gui::InputLinesWithLabelWidget(
         phonebookInternals::ListItemName::FirstName,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app, this](const UTF8 &text, bool isRFKeyFunctionAsClear) {
+            app->getCurrentWindow()->setNavBarText(text, navBarClearOrBackLabelSide);
+            isRFKeyForClearFunction = isRFKeyFunctionAsClear;
+        },
         [app](const UTF8 &text, bool active) {
             app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
             app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
@@ -58,6 +60,10 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::SecondName,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app, this](const UTF8 &text, bool isRFKeyFunctionAsClear) {
+            app->getCurrentWindow()->setNavBarText(text, navBarClearOrBackLabelSide);
+            isRFKeyForClearFunction = isRFKeyFunctionAsClear;
+        },
         [app](const UTF8 &text, bool active) {
             app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
             app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
@@ -72,6 +78,10 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::Number,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app, this](const UTF8 &text, bool isRFKeyFunctionAsClear) {
+            app->getCurrentWindow()->setNavBarText(text, navBarClearOrBackLabelSide);
+            isRFKeyForClearFunction = isRFKeyFunctionAsClear;
+        },
         [app](const UTF8 &text, bool active) {
             app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
             app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
@@ -86,6 +96,10 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::SecondNumber,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app, this](const UTF8 &text, bool isRFKeyFunctionAsClear) {
+            app->getCurrentWindow()->setNavBarText(text, navBarClearOrBackLabelSide);
+            isRFKeyForClearFunction = isRFKeyFunctionAsClear;
+        },
         [app](const UTF8 &text, bool active) {
             app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
             app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
@@ -100,6 +114,10 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::Email,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app, this](const UTF8 &text, bool isRFKeyFunctionAsClear) {
+            app->getCurrentWindow()->setNavBarText(text, navBarClearOrBackLabelSide);
+            isRFKeyForClearFunction = isRFKeyFunctionAsClear;
+        },
         [app](const UTF8 &text, bool active) {
             app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
             app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
@@ -129,6 +147,10 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::Address,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app, this](const UTF8 &text, bool isRFKeyFunctionAsClear) {
+            app->getCurrentWindow()->setNavBarText(text, navBarClearOrBackLabelSide);
+            isRFKeyForClearFunction = isRFKeyFunctionAsClear;
+        },
         [app](const UTF8 &text, bool active) {
             app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
             app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
@@ -144,6 +166,10 @@ void NewContactModel::createData()
         phonebookInternals::ListItemName::Note,
         [app](const UTF8 &text, bool emptyOthers) { app->getCurrentWindow()->navBarTemporaryMode(text, emptyOthers); },
         [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); },
+        [app, this](const UTF8 &text, bool isRFKeyFunctionAsClear) {
+            app->getCurrentWindow()->setNavBarText(text, navBarClearOrBackLabelSide);
+            isRFKeyForClearFunction = isRFKeyFunctionAsClear;
+        },
         [app](const UTF8 &text, bool active) {
             app->getCurrentWindow()->setNavBarText(text, navBarOptionsLabelSide);
             app->getCurrentWindow()->setNavBarActive(navBarOptionsLabelSide, active);
@@ -238,6 +264,10 @@ void NewContactModel::openTextOptions(gui::Text *text)
 bool NewContactModel::isAnyUnsavedChange(std::shared_ptr<ContactRecord> contactRecord)
 {
     for (const auto &item : internalData) {
+        if (auto itemInputWiget = dynamic_cast<gui::InputLinesWithLabelWidget *>(item)) {
+
+            itemInputWiget->inputText->isInputMode(InputMode::phone);
+        }
         if (item->onCheckUnsavedChangeCallback) {
             if (item->onCheckUnsavedChangeCallback(contactRecord)) {
                 return true;
@@ -245,4 +275,8 @@ bool NewContactModel::isAnyUnsavedChange(std::shared_ptr<ContactRecord> contactR
         }
     }
     return false; // there is no change between already provided data and saved ones
+}
+bool NewContactModel::isRightFunctionKeyForClearFunction()
+{
+    return isRFKeyForClearFunction;
 }
