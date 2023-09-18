@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,15 +19,6 @@ namespace gui
     class SnoozeTimer : public HBox
     {
       public:
-        enum class Status
-        {
-            UNKNOWN,
-            RINGING,
-            ACTIVATED,
-            DEACTIVATED,
-            SNOOZE
-        };
-
         explicit SnoozeTimer(Item *parent = nullptr, Position x = 0U, Position y = 0U, Length w = 0U, Length h = 0U);
 
         auto setFont(std::string newFontName) noexcept -> void;
@@ -39,7 +30,6 @@ namespace gui
       private:
         TimeSetFmtSpinner *timeSpinner = nullptr;
 
-        Status alarmStatus   = Status::DEACTIVATED;
         std::string fontName = style::window::font::largelight;
     };
 } /* namespace gui */

@@ -7,6 +7,7 @@
 * Fixed meditation countdown timer when a deep press is performed
 * Fixed "turn off" window display time
 * Fixed uneven screen refresh when turning on the device
+* Fixed not disappearing snooze icon when an alarm is deactivated
 
 ### Added
 * Files not fully transferred via Center will be now removed when USB cable is unplugged
