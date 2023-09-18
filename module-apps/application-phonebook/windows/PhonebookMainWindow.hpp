@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,14 +16,13 @@
 
 namespace gui
 {
-
     class PhonebookMainWindow : public AppWindow
     {
       private:
-        std::shared_ptr<SearchRequestModel> model = nullptr;
+        std::shared_ptr<SearchRequestModel> model;
 
       protected:
-        std::shared_ptr<PhonebookModel> phonebookModel = nullptr;
+        std::shared_ptr<PhonebookModel> phonebookModel;
         ListView *contactsList                         = nullptr;
         gui::Icon *emptyListIcon                       = nullptr;
 
@@ -52,5 +51,4 @@ namespace gui
 
         void HandleFilteringByLetter(const InputEvent &inputEvent);
     };
-
 } /* namespace gui */

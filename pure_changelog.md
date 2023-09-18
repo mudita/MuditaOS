@@ -46,6 +46,7 @@
 * Fixed misleading "Save" button behavior in "Date and time" window
 * Fixed losing unsaved user data when tethering is switching on
 * Fixed invalid elapsed time in music player after playing and pausing track from songs list view
+* Fixed disappearing "Call" label in Phonebook app
 
 ## [1.7.2 2023-07-28]
 

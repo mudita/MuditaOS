@@ -87,9 +87,9 @@ namespace gui
         destroyInterface();
     }
 
-    void PhonebookMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void PhonebookMainWindow::onBeforeShow([[maybe_unused]] ShowMode mode, SwitchData *data)
     {
-        auto contactRequest = dynamic_cast<PhonebookSearchRequest *>(data);
+        const auto contactRequest = dynamic_cast<PhonebookSearchRequest *>(data);
         model->setRequested(contactRequest != nullptr);
         if (model->requestedSearch()) {
             enableNewContact = false;
@@ -100,22 +100,27 @@ namespace gui
 
             header->navigationIndicatorRemove(gui::header::BoxSelection::Left);
         }
+        else if (!contactsList->isEmpty()) {
+            navBar->setText(nav_bar::Side::Left, utils::translate(style::strings::common::call));
+            navBar->setActive(nav_bar::Side::Left, true);
+        }
     }
 
     void PhonebookMainWindow::HandleFilteringByLetter(const InputEvent &inputEvent)
     {
-        auto code = translator.handle(inputEvent.getRawKey(), inputMode ? inputMode->get() : "");
+        const auto code = translator.handle(inputEvent.getRawKey(), inputMode ? inputMode->get() : "");
         if (code != Profile::none_key) {
-            LOG_INFO("char=' %c'", static_cast<char>(code));
-            char letter = static_cast<char>(code);
+            const auto letter = static_cast<char>(code);
+            LOG_INFO("char=' %c'", letter);
+
             std::string filterLetter;
             filterLetter.push_back(letter);
 
             LOG_DEBUG("Number of favourites contacts : %" PRIu32, phonebookModel->letterMap.favouritesCount);
-            uint32_t dataOffset = phonebookModel->letterMap.firstLetterDictionary[filterLetter];
+            const auto dataOffset = phonebookModel->letterMap.firstLetterDictionary[filterLetter];
             if (dataOffset != phonebookContactsMap::NO_MATCH_FOUND) {
                 LOG_DEBUG("PhoneBook Data Offset : %" PRIu32, dataOffset);
-                phonebookModel->setDisplayMode(static_cast<uint32_t>(ContactDisplayMode::SortedByLetter));
+                phonebookModel->setDisplayMode(static_cast<std::uint32_t>(ContactDisplayMode::SortedByLetter));
                 contactsList->rebuildList(gui::listview::RebuildType::OnOffset, dataOffset);
             }
         }
@@ -124,21 +129,32 @@ namespace gui
     bool PhonebookMainWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease()) {
-            if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
+            switch (inputEvent.getKeyCode()) {
+            case gui::KeyCode::KEY_LEFT:
                 if (enableNewContact) {
-                    std::unique_ptr<gui::SwitchData> data = std::make_unique<PhonebookItemData>();
+                    auto data = std::make_unique<PhonebookItemData>();
                     application->switchWindow(
                         gui::window::name::new_contact, gui::ShowMode::GUI_SHOW_INIT, std::move(data));
                     return true;
                 }
-            }
-            else if (inputEvent.is(gui::KeyCode::KEY_RIGHT) &&
-                     header->navigationIndicatorVisible(gui::header::BoxSelection::Right)) {
-                application->switchWindow(gui::window::name::search);
-                return true;
-            }
-            else {
+                break;
+
+            case gui::KeyCode::KEY_RIGHT:
+                if (header->navigationIndicatorVisible(gui::header::BoxSelection::Right)) {
+                    application->switchWindow(gui::window::name::search);
+                    return true;
+                }
+                break;
+
+            case gui::KeyCode::KEY_LF:
+                if (!navBar->isActive(nav_bar::Side::Left)) {
+                    return true;
+                }
+                break;
+
+            default:
                 HandleFilteringByLetter(inputEvent);
+                break;
             }
         }
         return AppWindow::onInput(inputEvent);
@@ -146,20 +162,13 @@ namespace gui
 
     bool PhonebookMainWindow::onDatabaseMessage(sys::Message *msgl)
     {
-        auto *msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
-        if (msgNotification != nullptr) {
-            if (msgNotification->interface == db::Interface::Name::Contact) {
-
-                if (msgNotification->dataModified()) {
-
-                    phonebookModel->letterMap = phonebookModel->requestLetterMap();
-                    rebuild();
-
-                    return true;
-                }
-            }
+        const auto msgNotification = dynamic_cast<db::NotificationMessage *>(msgl);
+        if ((msgNotification != nullptr) && (msgNotification->interface == db::Interface::Name::Contact) &&
+            msgNotification->dataModified()) {
+            phonebookModel->letterMap = phonebookModel->requestLetterMap();
+            rebuild();
+            return true;
         }
-
         return false;
     }
 
@@ -178,7 +187,7 @@ namespace gui
 
     void PhonebookMainWindow::onListFilled()
     {
-        if (not model->requestedSearch()) {
+        if (!model->requestedSearch()) {
             navBar->setActive(gui::nav_bar::Side::Left, true);
             navBar->setActive(gui::nav_bar::Side::Center, true);
             header->navigationIndicatorAdd(new gui::header::SearchAction(), gui::header::BoxSelection::Right);
