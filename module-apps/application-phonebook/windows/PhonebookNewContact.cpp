@@ -115,7 +115,7 @@ namespace gui
         return true;
     }
 
-    void PhonebookNewContact::showDialogUnsavedChanges(std::function<bool()> whereToGoOnYes)
+    void PhonebookNewContact::showDialogUnsavedChanges(const std::function<bool()> &whereToGoOnYes)
     {
         // Show a popup warning about possible data loss
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
