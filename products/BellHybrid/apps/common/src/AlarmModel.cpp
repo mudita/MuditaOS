@@ -80,14 +80,11 @@ namespace app
             return;
         }
         alarmEventPtr->enabled = value;
-        updateAlarm(*alarmEventPtr);
-        if (value) {
-            alarmStatus = alarms::AlarmStatus::Activated;
-        }
-        else {
-            alarmStatus = alarms::AlarmStatus::Deactivated;
+        if (isSnoozeActive()) {
             disableSnooze(*alarmEventPtr);
         }
+        updateAlarm(*alarmEventPtr);
+        alarmStatus = value ? alarms::AlarmStatus::Activated : alarms::AlarmStatus::Deactivated;
     }
     void AlarmModel::updateAlarm(AlarmEventRecord &alarm)
     {

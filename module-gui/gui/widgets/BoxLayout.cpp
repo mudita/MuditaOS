@@ -5,7 +5,6 @@
 #include "BoxLayoutSizeStore.hpp"
 #include <InputEvent.hpp>
 #include <Label.hpp>
-#include <log/log.hpp>
 #include "assert.h"
 
 namespace gui
@@ -203,7 +202,7 @@ namespace gui
         resizeItems();
     }
 
-    // space left distposition `first is better` tactics
+    // space left disposition `first is better` tactics
     // there could be other i.e. socialism: each element take in equal part up to it's max size
     // not needed now == not implemented
     template <Axis axis>

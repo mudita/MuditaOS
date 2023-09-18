@@ -182,18 +182,20 @@ namespace gui
             alarm->setVisible(false);
             alarm->setAlarmTimeVisible(false);
             snoozeTimer->setVisible(false);
+            snoozeTimer->setTimerVisible(false);
             alarm->informContentChanged();
             break;
         case HeaderViewMode::AlarmIconAndTime:
+            snoozeTimer->setVisible(false);
+            snoozeTimer->informContentChanged();
             alarm->setVisible(true);
             alarm->setAlarmTimeVisible(true);
-            snoozeTimer->setVisible(false);
             alarm->informContentChanged();
             break;
         case HeaderViewMode::AlarmIcon:
+            snoozeTimer->setVisible(false);
             alarm->setVisible(true);
             alarm->setAlarmTimeVisible(false);
-            snoozeTimer->setVisible(false);
             alarm->informContentChanged();
             break;
         case HeaderViewMode::SnoozeIconAndTime:
