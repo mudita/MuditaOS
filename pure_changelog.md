@@ -48,6 +48,8 @@
 * Fixed invalid elapsed time in music player after playing and pausing track from songs list view
 * Fixed disappearing "Call" label in Phonebook app
 * Fixed phone number input style unification
+* Fixed disappearing selections when setting custom alarm after popup is shown
+* Fixed alarm preview playback behavior
 
 ## [1.7.2 2023-07-28]
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -48,8 +48,8 @@ namespace app::alarmClock
         void clearData() override;
         void createData();
 
-        [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
-        [[nodiscard]] unsigned int requestRecordsCount() override;
+        [[nodiscard]] unsigned getMinimalItemSpaceRequired() const override;
+        [[nodiscard]] unsigned requestRecordsCount() override;
         [[nodiscard]] gui::ListItem *getItem(gui::Order order) override;
         void requestRecords(uint32_t offset, uint32_t limit) override;
     };

@@ -2,8 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmMusicOptionsItem.hpp"
-
-#include <service-audio/AudioServiceAPI.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 namespace gui
@@ -20,12 +18,13 @@ namespace gui
 
         alarmSoundList = getMusicFilesList();
         std::vector<UTF8> printOptions;
-        for (const auto &musicFile : getMusicFilesList()) {
+        printOptions.reserve(alarmSoundList.size());
+        for (const auto &musicFile : alarmSoundList) {
             printOptions.push_back(musicFile.title);
         }
-        optionSpinner->setData({printOptions});
+        optionSpinner->setData(printOptions);
 
-        inputCallback = [=](gui::Item &item, const gui::InputEvent &event) {
+        inputCallback = [=]([[maybe_unused]] gui::Item &item, const gui::InputEvent &event) {
             if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                 if (!player->previouslyPlayed(getFilePath(optionSpinner->getCurrentValue())) ||
                     player->isInState(SoundsPlayer::State::Stopped)) {
@@ -43,9 +42,15 @@ namespace gui
                 }
             }
 
-            // stop preview playback when we go back
+            /* Stop preview playback when going back */
             if (player->isInState(SoundsPlayer::State::Playing) && event.isShortRelease(gui::KeyCode::KEY_RF)) {
                 player->stop();
+            }
+
+            /* Stop preview playback when manually locking the phone */
+            if (player->isInState(SoundsPlayer::State::Playing) && event.isLongRelease(KeyCode::KEY_PND)) {
+                player->stop();
+                this->navBarTemporaryMode(utils::translate(style::strings::common::play));
             }
 
             const auto actionHandled = optionSpinner->onInput(event);
@@ -56,7 +61,7 @@ namespace gui
             return actionHandled;
         };
 
-        focusChangedCallback = [=](Item &item) {
+        focusChangedCallback = [=]([[maybe_unused]] Item &item) {
             setFocusItem(focus ? optionSpinner : nullptr);
 
             if (focus) {

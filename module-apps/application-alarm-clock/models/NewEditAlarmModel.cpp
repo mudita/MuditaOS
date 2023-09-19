@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditAlarmModel.hpp"
@@ -23,12 +23,12 @@ namespace app::alarmClock
           rRulePresenter(std::move(rRulePresenter))
     {}
 
-    unsigned int NewEditAlarmModel::requestRecordsCount()
+    unsigned NewEditAlarmModel::requestRecordsCount()
     {
         return internalData.size();
     }
 
-    unsigned int NewEditAlarmModel::getMinimalItemSpaceRequired() const
+    unsigned NewEditAlarmModel::getMinimalItemSpaceRequired() const
     {
         return style::text_spinner_label::h;
     }
@@ -70,7 +70,7 @@ namespace app::alarmClock
             [app]() { app->getCurrentWindow()->navBarRestoreFromTemporaryMode(); });
         internalData.push_back(repeatOption);
 
-        for (auto &item : internalData) {
+        for (auto item : internalData) {
             item->deleteByList = false;
         }
     }
@@ -88,7 +88,7 @@ namespace app::alarmClock
         rRulePresenter->loadRecord(record);
         createData();
 
-        for (auto &item : internalData) {
+        for (auto item : internalData) {
             if (item->onLoadCallback) {
                 item->onLoadCallback(record);
             }
@@ -106,7 +106,7 @@ namespace app::alarmClock
 
     void NewEditAlarmModel::saveData(std::shared_ptr<AlarmEventRecord> alarm, AlarmAction action)
     {
-        for (auto &item : internalData) {
+        for (auto item : internalData) {
             if (item->onSaveCallback) {
                 item->onSaveCallback(alarm);
             }

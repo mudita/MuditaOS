@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CustomRepeatWindow.hpp"
@@ -10,7 +10,6 @@
 
 namespace app::alarmClock
 {
-
     CustomRepeatWindow::CustomRepeatWindow(app::ApplicationCommon *app,
                                            std::unique_ptr<CustomRepeatWindowContract::Presenter> &&windowPresenter)
         : AppWindow(app, style::alarmClock::window::name::customRepeat), presenter{std::move(windowPresenter)}
@@ -36,19 +35,28 @@ namespace app::alarmClock
                                  style::alarmClock::window::listView_h,
                                  presenter->getItemProvider(),
                                  gui::listview::ScrollBarType::None);
+        list->setBoundaries(gui::Boundaries::Continuous);
+
         setFocusItem(list);
     }
 
     void CustomRepeatWindow::onClose(gui::Window::CloseReason reason)
     {
-        if (reason != CloseReason::PhoneLock) {
+        switch (reason) {
+        case CloseReason::ApplicationClose:
+        case CloseReason::WindowSwitch:
             presenter->eraseProviderData();
+            break;
+        default:
+            break;
         }
     }
 
-    void CustomRepeatWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    void CustomRepeatWindow::onBeforeShow(gui::ShowMode mode, [[maybe_unused]] gui::SwitchData *data)
     {
-        presenter->loadData();
+        if (mode == gui::ShowMode::GUI_SHOW_INIT) {
+            presenter->loadData();
+        }
     }
 
     bool CustomRepeatWindow::onInput(const gui::InputEvent &inputEvent)

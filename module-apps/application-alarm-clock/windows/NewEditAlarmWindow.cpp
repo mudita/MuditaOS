@@ -1,11 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NewEditAlarmWindow.hpp"
 
 namespace app::alarmClock
 {
-
     NewEditAlarmWindow::NewEditAlarmWindow(app::ApplicationCommon *app,
                                            std::unique_ptr<AlarmClockEditWindowContract::Presenter> &&windowPresenter)
         : AppWindow(app, style::alarmClock::window::name::newEditAlarm), presenter{std::move(windowPresenter)}
@@ -45,7 +44,7 @@ namespace app::alarmClock
         }
 
         if (mode == gui::ShowMode::GUI_SHOW_INIT) {
-            auto rec = dynamic_cast<AlarmRecordData *>(data);
+            const auto rec = dynamic_cast<AlarmRecordData *>(data);
             if (rec != nullptr) {
                 alarmRecord = rec->getData();
             }

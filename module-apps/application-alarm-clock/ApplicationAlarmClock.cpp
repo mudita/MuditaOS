@@ -12,19 +12,16 @@
 #include "windows/AppWindow.hpp"
 #include "windows/OptionWindow.hpp"
 #include <service-db/DBNotificationMessage.hpp>
-#include <service-db/QueryMessage.hpp>
-#include <service-time/api/TimeSettingsApi.hpp>
 #include <service-audio/AudioServiceAPI.hpp>
 
 namespace app
 {
-
     ApplicationAlarmClock::ApplicationAlarmClock(std::string name,
                                                  std::string parent,
                                                  StatusIndicators statusIndicators,
                                                  uint32_t stackDepth,
                                                  sys::ServicePriority priority)
-        : Application(name, parent, statusIndicators, false, stackDepth, priority),
+        : Application(std::move(name), std::move(parent), statusIndicators, false, stackDepth, priority),
           soundsPlayer{std::make_shared<SoundsPlayer>(this)}
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
@@ -126,5 +123,4 @@ namespace app
         soundsPlayer->stop(notification->token);
         return sys::MessageNone{};
     }
-
 } /* namespace app */

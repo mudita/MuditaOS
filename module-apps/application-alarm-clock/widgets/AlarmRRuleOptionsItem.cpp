@@ -18,10 +18,10 @@ namespace gui
     {
         printOptions();
 
-        inputCallback = [&](gui::Item &item, const gui::InputEvent &event) {
-            auto ret = optionSpinner->onInput(event);
+        inputCallback = [&]([[maybe_unused]] gui::Item &item, const gui::InputEvent &event) {
+            const auto ret = optionSpinner->onInput(event);
 
-            if (getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom) {
+            if (isCurrentSpinnerOptionCustom()) {
                 this->navBarTemporaryMode(utils::translate(style::strings::common::edit));
                 if (event.isShortRelease(gui::KeyCode::KEY_LF)) {
                     this->app->switchWindow(style::alarmClock::window::name::customRepeat);
@@ -34,10 +34,10 @@ namespace gui
             return ret;
         };
 
-        focusChangedCallback = [&](Item &item) {
+        focusChangedCallback = [&]([[maybe_unused]] Item &item) {
             setFocusItem(focus ? optionSpinner : nullptr);
 
-            if (focus && (getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom)) {
+            if (focus && isCurrentSpinnerOptionCustom()) {
                 this->navBarTemporaryMode(utils::translate(style::strings::common::edit));
             }
             else {
@@ -48,7 +48,7 @@ namespace gui
         };
 
         onSaveCallback = [&]([[maybe_unused]] std::shared_ptr<AlarmEventRecord> alarm) {
-            if (getRRuleOption(optionSpinner->getCurrentValue()) != RRule::Custom) {
+            if (!isCurrentSpinnerOptionCustom()) {
                 getPresenter()->setOption(getRRuleOption(optionSpinner->getCurrentValue()));
             }
         };
@@ -56,13 +56,15 @@ namespace gui
         onLoadCallback = [&]([[maybe_unused]] std::shared_ptr<AlarmEventRecord> alarm) {
             checkCustomOption(getPresenter()->getDescription());
             optionSpinner->setCurrentValue(getPresenter()->getDescription());
-            if (optionSpinner->focus && getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom) {
-                this->navBarTemporaryMode(utils::translate(style::strings::common::edit));
-            }
-            else {
-                this->navBarRestoreFromTemporaryMode();
-            }
 
+            if (optionSpinner->focus) {
+                if (isCurrentSpinnerOptionCustom()) {
+                    this->navBarTemporaryMode(utils::translate(style::strings::common::edit));
+                }
+                else {
+                    this->navBarRestoreFromTemporaryMode();
+                }
+            }
         };
     }
 
@@ -101,9 +103,15 @@ namespace gui
     void AlarmRRuleOptionsItem::printOptions()
     {
         std::vector<UTF8> printOptions;
+        printOptions.reserve(rRuleOptions.size());
         for (auto const &option : rRuleOptions) {
             printOptions.push_back(option.second);
         }
-        optionSpinner->setData({printOptions});
+        optionSpinner->setData(printOptions);
+    }
+
+    bool AlarmRRuleOptionsItem::isCurrentSpinnerOptionCustom()
+    {
+        return (getRRuleOption(optionSpinner->getCurrentValue()) == RRule::Custom);
     }
 } /* namespace gui */
