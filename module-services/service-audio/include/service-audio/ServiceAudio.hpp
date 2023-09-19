@@ -39,6 +39,14 @@ class ServiceAudio : public sys::Service
         Continuous
     };
 
+    enum class InternalOperationState
+    {
+        AudioIdle,
+        OperationIdle,
+        Paused,
+        Active
+    };
+
     audio::AudioMux audioMux;
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
     audio::AudioMux::VibrationStatus vibrationMotorStatus = audio::AudioMux::VibrationStatus::Off;
@@ -96,7 +104,7 @@ class ServiceAudio : public sys::Service
     std::string GetSound(const audio::PlaybackType &plType);
     constexpr auto IsResumable(const audio::PlaybackType &type) const -> bool;
     constexpr auto ShouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool;
-    auto GetOperationState() -> audio::Operation::State;
+    auto GetOperationState() -> InternalOperationState;
     auto IsSystemSound(const audio::PlaybackType &type) -> bool;
     audio::PlaybackType generatePlayback(const audio::PlaybackType &type,
                                          const audio::Setting &setting = audio::Setting::Volume);
@@ -128,7 +136,7 @@ class ServiceAudio : public sys::Service
     auto handleSingleVibrationStart() -> sys::MessagePointer;
 
     void notifyAboutNewRoutingIfRouterAvailable();
-    void updateMinimumCpuFrequency(audio::Operation::State operationState);
+    void updateMinimumCpuFrequency(ServiceAudio::InternalOperationState operationState);
 };
 
 namespace sys

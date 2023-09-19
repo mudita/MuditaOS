@@ -623,14 +623,23 @@ void ServiceAudio::MuteCurrentOperation()
     }
 }
 
-Operation::State ServiceAudio::GetOperationState()
+ServiceAudio::InternalOperationState ServiceAudio::GetOperationState()
 {
     for (const auto &input : audioMux.GetAllInputs()) {
         if (input.audio->GetCurrentState() != Audio::State::Idle) {
-            return input.audio->GetCurrentOperation().GetState();
+            switch (input.audio->GetCurrentOperation().GetState()) {
+            case audio::Operation::State::Idle:
+                return ServiceAudio::InternalOperationState::OperationIdle;
+            case audio::Operation::State::Paused:
+                return ServiceAudio::InternalOperationState::Paused;
+            case audio::Operation::State::Active:
+                return ServiceAudio::InternalOperationState::Active;
+            default:
+                break;
+            }
         }
     }
-    return Operation::State::Idle;
+    return ServiceAudio::InternalOperationState::AudioIdle;
 }
 
 sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -918,17 +927,18 @@ void ServiceAudio::notifyAboutNewRoutingIfRouterAvailable()
     }
 }
 
-void ServiceAudio::updateMinimumCpuFrequency(Operation::State operationState)
+void ServiceAudio::updateMinimumCpuFrequency(ServiceAudio::InternalOperationState operationState)
 {
     switch (operationState) {
-    case audio::Operation::State::Idle:
+    case ServiceAudio::InternalOperationState::AudioIdle:
         cpuSentinel->ReleaseMinimumFrequency();
         break;
-    case audio::Operation::State::Paused:
+    case ServiceAudio::InternalOperationState::OperationIdle:
+    case ServiceAudio::InternalOperationState::Paused:
         cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_2); // Required to keep PLL2 running, so that
                                                                           // bandgap used also by PLL4 remains turned on
         break;
-    case audio::Operation::State::Active:
+    case ServiceAudio::InternalOperationState::Active:
         cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_5);
         break;
     }
