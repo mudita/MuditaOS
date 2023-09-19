@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,11 +24,11 @@ namespace gui
         std::vector<tags::fetcher::Tags> getMusicFilesList();
 
       public:
-        explicit AlarmMusicOptionsItem(app::ApplicationCommon *app,
-                                       const std::string &description,
-                                       std::shared_ptr<SoundsPlayer> player,
-                                       std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
-                                       std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
+        AlarmMusicOptionsItem(app::ApplicationCommon *app,
+                              const std::string &description,
+                              std::shared_ptr<SoundsPlayer> player,
+                              std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                              std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
 
       private:
         [[nodiscard]] std::string getTitle(const std::string &filePath);

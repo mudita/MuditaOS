@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -28,12 +28,13 @@ namespace gui
         [[nodiscard]] RRule getRRuleOption(const std::string &selectedOption);
         void checkCustomOption(const std::string &selectedOption);
         void printOptions();
+        bool isCurrentSpinnerOptionCustom();
 
       public:
-        explicit AlarmRRuleOptionsItem(app::ApplicationCommon *app,
-                                       const std::string &description,
-                                       std::shared_ptr<app::alarmClock::AlarmRRulePresenter> presenter,
-                                       std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
-                                       std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
+        AlarmRRuleOptionsItem(app::ApplicationCommon *app,
+                              const std::string &description,
+                              std::shared_ptr<app::alarmClock::AlarmRRulePresenter> presenter,
+                              std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
+                              std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
     };
 } /* namespace gui */

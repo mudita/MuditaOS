@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CustomRepeatModel.hpp"
@@ -12,7 +12,7 @@ namespace app::alarmClock
 {
     CustomRepeatModel::CustomRepeatModel(app::ApplicationCommon *app,
                                          std::shared_ptr<alarmClock::AlarmRRulePresenter> rRulePresenter)
-        : application(app), rRulePresenter(rRulePresenter)
+        : application(app), rRulePresenter(std::move(rRulePresenter))
     {}
 
     unsigned int CustomRepeatModel::requestRecordsCount()
