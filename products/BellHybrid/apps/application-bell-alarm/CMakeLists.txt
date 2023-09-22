@@ -29,6 +29,7 @@ target_include_directories(application-bell-alarm
 target_link_libraries(application-bell-alarm
     PRIVATE
         app
+        bell::appmgr
         bell::app-main
         bell::app-common
         module-gui
