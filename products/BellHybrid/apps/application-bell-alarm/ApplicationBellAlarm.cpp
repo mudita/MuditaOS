@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellAlarm.hpp"
@@ -8,6 +8,7 @@
 #include "windows/BellAlarmSetWindow.hpp"
 
 #include <common/models/AlarmModel.hpp>
+#include <appmgr/messages/AlarmMessage.hpp>
 #include <common/models/TimeModel.hpp>
 
 namespace app
@@ -18,7 +19,17 @@ namespace app
                                                StartInBackground startInBackground,
                                                uint32_t stackDepth)
         : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth)
-    {}
+    {
+        bus.channels.push_back(sys::BusChannel::AlarmNotifications);
+        connect(typeid(AlarmDeactivated), [this](sys::Message *request) -> sys::MessagePointer {
+            alarmModel->activate(false);
+            return sys::msgHandled();
+        });
+        connect(typeid(AlarmActivated), [this](sys::Message *request) -> sys::MessagePointer {
+            alarmModel->activate(true);
+            return sys::msgHandled();
+        });
+    }
     ApplicationBellAlarm::~ApplicationBellAlarm() = default;
 
     sys::ReturnCodes ApplicationBellAlarm::InitHandler()

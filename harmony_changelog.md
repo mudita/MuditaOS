@@ -8,6 +8,7 @@
 * Fixed "turn off" window display time
 * Fixed uneven screen refresh when turning on the device
 * Fixed not disappearing snooze icon when an alarm is deactivated
+* Fixed incorrect message after new alarm setting in some scenarios
 
 ### Added
 * Files not fully transferred via Center will be now removed when USB cable is unplugged
