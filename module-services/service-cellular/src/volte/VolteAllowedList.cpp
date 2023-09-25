@@ -11,7 +11,8 @@
 #include "ImsiParser_Canada.hpp"
 #include "ImsiParser_Austria.hpp"
 
-#include "module-utils/log/Logger.hpp"
+#include <log/log.hpp>
+#include <magic_enum.hpp>
 
 namespace
 {
@@ -35,6 +36,20 @@ namespace cellular::service
 
         LOG_ERROR("MCC not supported, VoLTE not allowed.");
         return false;
+    }
+
+    auto VolteAllowedList::getSupportStatus(const std::string &imsi) const -> ImsiParser::SupportStatus
+    {
+        for (const auto &country : allowedList) {
+            if (country.isAllowed(imsi)) {
+                const auto supportStatus = country.getSupportStatus();
+                LOG_INFO("MCC supported with status %s.", magic_enum::enum_name(supportStatus).data());
+                return supportStatus;
+            }
+        }
+
+        LOG_ERROR("MCC not supported.");
+        return ImsiParser::SupportStatus::Unsupported;
     }
 
     void VolteAllowedList::buildList()

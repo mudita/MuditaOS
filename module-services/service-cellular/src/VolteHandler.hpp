@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -29,14 +29,14 @@ namespace cellular::service
 
     struct QcfgImsResult : Result
     {
-        QcfgImsResult(Result &rhs) : Result{std::move(rhs)}
+        explicit QcfgImsResult(Result &rhs) : Result{std::move(rhs)}
         {}
     };
 
     template <typename CmuxChannel, typename ModemResponseParser>
     struct VolteHandler : private NonCopyable
     {
-        bool switchVolte(CmuxChannel &channel, bool permit, bool enable)
+        auto switchVolte(CmuxChannel &channel, bool permit, bool enable) -> bool
         {
             if (!permit) {
                 if (enable) {
@@ -111,6 +111,12 @@ namespace cellular::service
 
             volteState.permitted = permit;
             return alreadyConfigured;
+        }
+
+        auto switchVolte(CmuxChannel &channel, bool permit, bool enable, bool beta) -> bool
+        {
+            volteState.beta = beta;
+            return switchVolte(channel, permit, enable);
         }
 
         auto getVolteState() -> cellular::VolteState

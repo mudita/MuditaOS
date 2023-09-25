@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,15 +14,16 @@ namespace gui
 {
     class NetworkWindow : public BaseSettingsWindow
     {
-      private:
-        auto buildOptionsList() -> std::list<Option> override;
-        app::settingsInterface::OperatorsSettings *operatorsSettings;
-
-        OptionWindowDestroyer rai_destroyer = OptionWindowDestroyer(*this);
-
       public:
         NetworkWindow(app::ApplicationCommon *app, app::settingsInterface::OperatorsSettings *operatorsSettings);
-
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
+
+      private:
+        auto buildOptionsList() -> std::list<Option> override;
+        auto getVolteLabel() -> std::string;
+        auto getRightItemSetting() -> option::SettingRightItem;
+
+        app::settingsInterface::OperatorsSettings *operatorsSettings = nullptr;
+        OptionWindowDestroyer rai_destroyer                          = OptionWindowDestroyer(*this);
     };
 } // namespace gui

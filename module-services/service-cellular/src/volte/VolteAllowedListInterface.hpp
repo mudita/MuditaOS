@@ -4,6 +4,7 @@
 #pragma once
 
 #include <string>
+#include "ImsiParser.hpp"
 
 namespace cellular::service
 {
@@ -13,5 +14,6 @@ namespace cellular::service
         virtual ~VolteAllowedListInterface() = default;
 
         virtual auto isVolteAllowed(const std::string &imsi) const -> bool = 0;
+        virtual auto getSupportStatus(const std::string &imsi) const -> ImsiParser::SupportStatus = 0;
     };
 } // namespace cellular::service

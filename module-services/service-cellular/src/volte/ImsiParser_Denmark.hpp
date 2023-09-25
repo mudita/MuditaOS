@@ -9,8 +9,9 @@ namespace cellular::service
 {
     struct ImsiParserDK : ImsiParser
     {
-        explicit ImsiParserDK()
-            : ImsiParser(std::vector<std::string>{"23801", "23802", "23806", "23820", "23866", "28801", "28802"})
+        ImsiParserDK()
+            : ImsiParser(std::vector<std::string>{"23801", "23802", "23806", "23820", "23866", "28801", "28802"},
+                         SupportStatus::Beta)
         {}
     };
 } // namespace cellular::service

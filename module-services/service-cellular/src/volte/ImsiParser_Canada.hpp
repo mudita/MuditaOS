@@ -9,9 +9,18 @@ namespace cellular::service
 {
     struct ImsiParserCA : ImsiParser
     {
-        explicit ImsiParserCA()
-            : ImsiParser(std::vector<std::string>{
-                  "302220", "302270", "302300", "302310", "302490", "302510", "302500", "302610", "302720", "302780"})
+        ImsiParserCA()
+            : ImsiParser(std::vector<std::string>{"302220",
+                                                  "302270",
+                                                  "302300",
+                                                  "302310",
+                                                  "302490",
+                                                  "302510",
+                                                  "302500",
+                                                  "302610",
+                                                  "302720",
+                                                  "302780"},
+                         SupportStatus::Beta)
         {}
     };
 } // namespace cellular::service

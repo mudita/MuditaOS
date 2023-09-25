@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DisplayAndKeypadWindow.hpp"
 
 #include <application-settings/windows/WindowNames.hpp>
-
 #include <OptionSetting.hpp>
 
 namespace gui
@@ -21,10 +20,10 @@ namespace gui
     {
         std::list<gui::Option> optionList;
 
-        auto addMenu = [&](UTF8 name, std::string window) {
+        auto addMenu = [&](const UTF8 &name, const std::string &window) {
             optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 name,
-                [=](gui::Item &item) {
+                [=]([[maybe_unused]] gui::Item &item) {
                     if (window.empty()) {
                         return false;
                     }
@@ -42,7 +41,7 @@ namespace gui
                 gui::option::SettingRightItem::ArrowWhite));
         };
 
-        auto addOnOffOption = [&](const UTF8 &text, std::function<bool(gui::Item &)> onActivated) {
+        auto addOnOffOption = [&](const UTF8 &text, const std::function<bool(gui::Item &)> &onActivated) {
             optionList.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 text,
                 [=](gui::Item &item) mutable { return onActivated(item); },
@@ -63,10 +62,14 @@ namespace gui
         addMenu(utils::translate("app_settings_display_wallpaper"), gui::window::name::wallpaper);
         addMenu(utils::translate("app_settings_display_keypad_light"), gui::window::name::keypad_light);
         addMenu(utils::translate("app_settings_display_input_language"), gui::window::name::input_language);
-        addOnOffOption(utils::translate("app_settings_display_dark_mode"), [this](gui::Item & /*item*/) {
+
+        const auto &darkModeLabelText = "<text>" + utils::translate("app_settings_display_dark_mode") + " <b>" +
+                                        utils::translate("common_beta") + "</b></text>";
+        addOnOffOption(darkModeLabelText, [this](gui::Item & /*item*/) {
             switchDisplayMode();
             return true;
         });
+
         return optionList;
     }
 

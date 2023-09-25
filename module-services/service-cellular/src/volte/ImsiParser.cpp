@@ -3,9 +3,9 @@
 
 #include "ImsiParser.hpp"
 
-namespace cellular
+namespace cellular::service
 {
-    auto service::ImsiParser::isAllowed(const std::string &imsi) const -> bool
+    auto ImsiParser::isAllowed(const std::string &imsi) const -> bool
     {
         if (operatorCodes.empty()) {
             return false;
@@ -20,7 +20,12 @@ namespace cellular
         return false;
     }
 
-    auto service::ImsiParser::textStartsWith(std::string_view text, std::string_view prefix) const -> bool
+    auto ImsiParser::getSupportStatus() const -> SupportStatus
+    {
+        return supportStatus;
+    }
+
+    auto ImsiParser::textStartsWith(std::string_view text, std::string_view prefix) const -> bool
     {
         return !text.empty() && !prefix.empty() && std::equal(prefix.begin(), prefix.end(), text.begin());
     }

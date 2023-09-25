@@ -9,9 +9,11 @@ namespace cellular::service
 {
     struct ImsiParserDE : ImsiParser
     {
-        explicit ImsiParserDE()
-            : ImsiParser(std::vector<std::string>{
-                  "26201", "26206", "26202", "26204", "26209", "26203", "26205", "26208", "26223"})
+        ImsiParserDE()
+            : ImsiParser(
+                  std::vector<std::string>{
+                      "26201", "26206", "26202", "26204", "26209", "26203", "26205", "26208", "26223"},
+                  SupportStatus::Beta)
         {}
     };
 } // namespace cellular::service

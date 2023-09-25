@@ -16,6 +16,7 @@ namespace cellular::service
         }
 
         auto isVolteAllowed(const std::string &imsi) const -> bool final;
+        auto getSupportStatus(const std::string &imsi) const -> ImsiParser::SupportStatus final;
 
       private:
         void buildList();

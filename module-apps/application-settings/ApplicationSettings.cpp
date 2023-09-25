@@ -93,6 +93,11 @@
 #include <i18n/i18n.hpp>
 #include <service-bluetooth/messages/SyncDevices.hpp>
 
+namespace
+{
+    constexpr auto applicationSettingsStackSize = 1024 * 6;
+}
+
 namespace app
 {
     namespace settings
@@ -100,13 +105,12 @@ namespace app
         constexpr inline auto operators_on = "operators_on";
     } // namespace settings
 
-    static constexpr auto settingStackDepth = 1024 * 6; // 6Kb stack size
-
     ApplicationSettings::ApplicationSettings(std::string name,
                                              std::string parent,
                                              StatusIndicators statusIndicators,
                                              StartInBackground startInBackground)
-        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, settingStackDepth),
+        : Application(
+              std::move(name), std::move(parent), statusIndicators, startInBackground, applicationSettingsStackSize),
           AsyncCallbackReceiver{this}, soundsPlayer{std::make_shared<SoundsPlayer>(this)}
     {
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);

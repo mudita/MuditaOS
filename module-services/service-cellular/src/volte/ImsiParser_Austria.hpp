@@ -7,12 +7,11 @@
 
 namespace cellular::service
 {
-    ;
-
     struct ImsiParserAT : ImsiParser
     {
-        explicit ImsiParserAT()
-            : ImsiParser(std::vector<std::string>{"23201", "23203", "23213", "23205", "23210", "23207", "23208"})
+        ImsiParserAT()
+            : ImsiParser(std::vector<std::string>{"23201", "23203", "23213", "23205", "23210", "23207", "23208"},
+                         SupportStatus::Beta)
         {}
     };
 } // namespace cellular::service

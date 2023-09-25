@@ -4,13 +4,12 @@
 #pragma once
 
 #include "ImsiParser.hpp"
-#include <vector>
 
 namespace cellular::service
 {
     struct ImsiParserUS : ImsiParser
     {
-        explicit ImsiParserUS()
+        ImsiParserUS()
             : ImsiParser(std::vector<std::string>{"310053",
                                                   "310120",
                                                   "310260",
@@ -22,7 +21,8 @@ namespace cellular::service
                                                   "311882",
                                                   "312190",
                                                   "312250",
-                                                  "312530"})
+                                                  "312530"},
+                         SupportStatus::Normal)
         {}
     };
 } // namespace cellular::service

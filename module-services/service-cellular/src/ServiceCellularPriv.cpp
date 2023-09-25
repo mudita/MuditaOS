@@ -63,13 +63,17 @@ namespace cellular::internal
             state->set(State::ST::Ready);
 
             auto channel     = owner->cmux->get(CellularMux::Channel::Commands);
-            auto permitVolte = volteCapability->isVolteAllowed(*channel);
-            auto enableVolte =
-                owner->settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global) == "1";
+
+            const auto permitVolte = volteCapability->isVolteAllowed(*channel);
+            const auto enableVolte =
+                (owner->settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global) == "1");
+            const auto isVolteBeta =
+                (volteCapability->getSupportStatus(*channel) != service::ImsiParser::SupportStatus::Normal);
+
             auto volteNeedReset = false;
 
             try {
-                volteNeedReset    = !volteHandler->switchVolte(*channel, permitVolte, enableVolte);
+                volteNeedReset    = !volteHandler->switchVolte(*channel, permitVolte, enableVolte, isVolteBeta);
                 auto notification = std::make_shared<cellular::VolteStateNotification>(volteHandler->getVolteState());
                 owner->bus.sendMulticast(std::move(notification), sys::BusChannel::ServiceCellularNotifications);
             }
@@ -83,17 +87,15 @@ namespace cellular::internal
             }
             owner->bus.sendMulticast<notification::SimReady>();
         };
-        simCard->onNeedPin = [this](unsigned int attempts) {
+        simCard->onNeedPin = [this](unsigned attempts) {
             owner->bus.sendMulticast<notification::SimNeedPin>(attempts);
         };
-        simCard->onNeedPuk = [this](unsigned int attempts) {
+        simCard->onNeedPuk = [this](unsigned attempts) {
             owner->bus.sendMulticast<notification::SimNeedPuk>(attempts);
         };
         simCard->onSimBlocked   = [this]() { owner->bus.sendMulticast<notification::SimBlocked>(); };
         simCard->onSimEvent     = [this]() { owner->bus.sendMulticast<notification::SimStateUpdate>(); };
-        simCard->onUnhandledCME = [this](unsigned int code) {
-            owner->bus.sendMulticast<notification::UnhandledCME>(code);
-        };
+        simCard->onUnhandledCME = [this](unsigned code) { owner->bus.sendMulticast<notification::UnhandledCME>(code); };
         simCard->onSimNotPresent = [this]() { owner->bus.sendMulticast<notification::SimNotInserted>(); };
         simCard->onSimSelected   = [this]() {
             owner->connectionManager->onPhoneModeChange(owner->phoneModeObserver->getCurrentPhoneMode());
