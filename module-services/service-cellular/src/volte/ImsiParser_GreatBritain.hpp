@@ -9,7 +9,7 @@ namespace cellular::service
 {
     struct ImsiParserGB : ImsiParser
     {
-        explicit ImsiParserGB()
+        ImsiParserGB()
             : ImsiParser(std::vector<std::string>{"23401",
                                                   "23410",
                                                   "23411",
@@ -28,7 +28,8 @@ namespace cellular::service
                                                   "346001",
                                                   "346140",
                                                   "750001",
-                                                  "26601"})
+                                                  "26601"},
+                         SupportStatus::Beta)
         {}
     };
 } // namespace cellular::service

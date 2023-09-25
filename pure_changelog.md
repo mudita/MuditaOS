@@ -5,6 +5,7 @@
 ### Added
 
 * Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
+* Added "beta" label to VoLTE switch for selected countries
 
 ### Changed / Improved
 

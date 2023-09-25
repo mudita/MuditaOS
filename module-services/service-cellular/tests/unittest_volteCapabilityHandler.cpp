@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -50,12 +50,20 @@ TEST_CASE("VoLTE Capability handler")
         }
     };
 
-    SECTION("VolteCapabilityHandler succes = TMobileUS")
+    SECTION("VolteCapabilityHandler success = TMobileUS")
     {
         using namespace cellular::service;
         VolteCapabilityHandler handler{std::make_unique<VolteAllowedList>(), std::make_unique<MockTMobileUS>()};
         auto result = handler.isVolteAllowed(baseChannelStub);
         REQUIRE(result == true);
+    }
+
+    SECTION("VolteCapabilityHandler support normal = TMobileUS")
+    {
+        using namespace cellular::service;
+        VolteCapabilityHandler handler{std::make_unique<VolteAllowedList>(), std::make_unique<MockTMobileUS>()};
+        auto result = handler.getSupportStatus(baseChannelStub);
+        REQUIRE(result == ImsiParser::SupportStatus::Normal);
     }
 
     class MockNotAllowedIMSI : public cellular::service::VolteCapabilityCellularInterface
@@ -74,6 +82,22 @@ TEST_CASE("VoLTE Capability handler")
         REQUIRE(result == false);
     }
 
+    class MockAllowedBetaIMSI : public cellular::service::VolteCapabilityCellularInterface
+    {
+        auto getImsi(at::BaseChannel &) -> std::optional<std::string>
+        {
+            return "260032137213769"; // Orange PL HNI
+        }
+    };
+
+    SECTION("VolteCapabilityHandler support beta = Orange PL")
+    {
+        using namespace cellular::service;
+        VolteCapabilityHandler handler{std::make_unique<VolteAllowedList>(), std::make_unique<MockAllowedBetaIMSI>()};
+        auto result = handler.getSupportStatus(baseChannelStub);
+        REQUIRE(result == ImsiParser::SupportStatus::Beta);
+    }
+
     class MockFailedToGetImsi : public cellular::service::VolteCapabilityCellularInterface
     {
         auto getImsi(at::BaseChannel &) -> std::optional<std::string>
@@ -82,11 +106,19 @@ TEST_CASE("VoLTE Capability handler")
         }
     };
 
-    SECTION("VolteCapabilityHandler failure = failed to get imsi")
+    SECTION("VolteCapabilityHandler failure = failed to get IMSI")
     {
         using namespace cellular::service;
         VolteCapabilityHandler handler{std::make_unique<VolteAllowedList>(), std::make_unique<MockFailedToGetImsi>()};
         auto result = handler.isVolteAllowed(baseChannelStub);
         REQUIRE(result == false);
+    }
+
+    SECTION("VolteCapabilityHandler support unknown = failed to get IMSI")
+    {
+        using namespace cellular::service;
+        VolteCapabilityHandler handler{std::make_unique<VolteAllowedList>(), std::make_unique<MockFailedToGetImsi>()};
+        auto result = handler.getSupportStatus(baseChannelStub);
+        REQUIRE(result == ImsiParser::SupportStatus::Unsupported);
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -188,7 +188,6 @@ namespace app
         void sendVolteChangeRequest(bool enable);
 
       private:
-        void attachQuotesWindows();
         void switchToAllDevicesViaBtErrorPrompt(std::shared_ptr<sys::DataMessage> msg, const std::string &errorMsg);
 
         auto handleSimNotification() -> sys::MessagePointer;

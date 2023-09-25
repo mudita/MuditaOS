@@ -12,12 +12,23 @@ namespace cellular::service
     class ImsiParser
     {
       public:
-        explicit ImsiParser(std::vector<std::string> &&operatorList) : operatorCodes{operatorList}
+        enum class SupportStatus
+        {
+            Normal,
+            Beta,
+            Unsupported
+        };
+
+        explicit ImsiParser(std::vector<std::string> &&operatorList, SupportStatus supportStatus)
+            : operatorCodes{operatorList}, supportStatus{supportStatus}
         {}
         auto isAllowed(const std::string &imsi) const -> bool;
+        auto getSupportStatus() const -> SupportStatus;
 
       private:
         std::vector<std::string> operatorCodes;
+        SupportStatus supportStatus;
+
         inline auto textStartsWith(std::string_view text, std::string_view prefix) const -> bool;
     };
 } // namespace cellular::service
