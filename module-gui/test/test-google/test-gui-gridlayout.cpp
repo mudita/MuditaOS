@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
@@ -267,7 +267,7 @@ TEST_F(GridLayoutTesting, Navigate_Test_ActiveItems_2_BorderCallback)
 }
 
 ///> TODO: Enable this test when issue with setFocus will be resolved
-TEST_F(GridLayoutTesting, DISABLED_Border_Callback_Test)
+TEST_F(GridLayoutTesting, Border_Callback_Test)
 {
     ///> Test for grid layout with 46 elements
     ///> | 1  | 2  | 3  | 4  | 5  | 6  | 7  | 8  | 9  | 10 | 11 | 12 |
