@@ -93,6 +93,7 @@ namespace gui
         }
         if (item == focusItem) {
             focusItem = nullptr;
+            focus     = false;
         }
 
         auto fi = std::find(children.begin(), children.end(), item);
