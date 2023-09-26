@@ -216,5 +216,6 @@ namespace sys
 
         taskStatistics.Update();
         taskStatistics.LogCpuUsage();
+        cpuGovernor->PrintActiveSentinels();
     }
 } // namespace sys

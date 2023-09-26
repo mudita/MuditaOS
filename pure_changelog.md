@@ -50,6 +50,7 @@
 * Fixed phone number input style unification
 * Fixed disappearing selections when setting custom alarm after popup is shown
 * Fixed alarm preview playback behavior
+* Fixed frequency lock during user activity
 
 ## [1.7.2 2023-07-28]
 

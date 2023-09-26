@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -39,6 +39,7 @@ namespace sys
         auto RemoveSentinel(std::string sentinelName) -> void;
         [[nodiscard]] auto GetNumberOfRegisteredSentinels() const noexcept -> uint32_t;
         void PrintAllSentinels() const noexcept;
+        void PrintActiveSentinels() const noexcept;
 
         void SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request);
         void ResetCpuFrequencyRequest(const std::string &sentinelName);
@@ -47,8 +48,6 @@ namespace sys
         void InformSentinelsAboutCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency) noexcept;
 
       private:
-        static void PrintName(const GovernorSentinelPointer &element);
-
         /// this could be set - set is sorted :)
         GovernorSentinelsVector sentinels;
     };

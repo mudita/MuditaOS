@@ -9,6 +9,7 @@
 * Fixed uneven screen refresh when turning on the device
 * Fixed not disappearing snooze icon when an alarm is deactivated
 * Fixed incorrect message after new alarm setting in some scenarios
+* Fixed frequency lock during user activity
 
 ### Added
 * Files not fully transferred via Center will be now removed when USB cable is unplugged

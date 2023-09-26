@@ -1,12 +1,53 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/CpuGovernor.hpp>
 #include <algorithm>
 #include <log/log.hpp>
 #include "GovernorSentinelOperations.hpp"
+#include <sstream>
+
 namespace sys
 {
+    namespace
+    {
+        std::string FormatDuration(std::chrono::milliseconds ms)
+        {
+            using namespace std::chrono;
+            auto secs = duration_cast<seconds>(ms);
+            auto mins = duration_cast<minutes>(secs);
+            secs -= duration_cast<seconds>(mins);
+            auto hour = duration_cast<hours>(mins);
+            mins -= duration_cast<minutes>(hour);
+
+            std::stringstream ss;
+            ss << hour.count() << " Hours : " << mins.count() << " Minutes : " << secs.count() << " Seconds";
+            return ss.str();
+        }
+        void PrintSentinelName(const GovernorSentinelPointer &element)
+        {
+            auto sentinelWeakPointer = element->GetSentinel();
+            if (!sentinelWeakPointer.expired()) {
+                std::shared_ptr<CpuSentinel> sharedResource = sentinelWeakPointer.lock();
+                LOG_INFO("Sentinel %s", sharedResource->GetName().c_str());
+            }
+        }
+        void PrintActiveSentinel(const GovernorSentinelPointer &element)
+        {
+            auto sentinelWeakPointer = element->GetSentinel();
+            if (!sentinelWeakPointer.expired()) {
+                std::shared_ptr<CpuSentinel> sharedResource = sentinelWeakPointer.lock();
+                const auto frequencyToHold                  = element->GetRequestedFrequency();
+                if (frequencyToHold != bsp::CpuFrequencyMHz::Level_0) {
+                    LOG_INFO(
+                        "Sentinel %s holds %d MHz for %s",
+                        sharedResource->GetName().c_str(),
+                        static_cast<int>(frequencyToHold),
+                        FormatDuration(static_cast<std::chrono::milliseconds>(sharedResource->getHoldTicks())).c_str());
+                }
+            }
+        }
+    } // namespace
 
     GovernorSentinel::GovernorSentinel(std::shared_ptr<CpuSentinel> newSentinel)
         : sentinelPtr(newSentinel), requestedFrequency(bsp::CpuFrequencyMHz::Level_0)
@@ -76,7 +117,12 @@ namespace sys
 
     void CpuGovernor::PrintAllSentinels() const noexcept
     {
-        std::for_each(std::begin(sentinels), std::end(sentinels), PrintName);
+        std::for_each(std::begin(sentinels), std::end(sentinels), PrintSentinelName);
+    }
+
+    void CpuGovernor::PrintActiveSentinels() const noexcept
+    {
+        std::for_each(std::begin(sentinels), std::end(sentinels), PrintActiveSentinel);
     }
 
     void CpuGovernor::SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request)
@@ -136,14 +182,5 @@ namespace sys
         };
 
         for_each_sentinel(sentinels, foo);
-    }
-
-    void CpuGovernor::PrintName(const GovernorSentinelPointer &element)
-    {
-        auto sentinelWeakPointer = element->GetSentinel();
-        if (!sentinelWeakPointer.expired()) {
-            std::shared_ptr<CpuSentinel> sharedResource = sentinelWeakPointer.lock();
-            LOG_INFO("Sentinel %s", sharedResource->GetName().c_str());
-        }
     }
 } // namespace sys
