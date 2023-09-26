@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/CpuSentinel.hpp>
@@ -7,6 +7,7 @@
 #include "system/Constants.hpp"
 #include <Timers/TimerFactory.hpp>
 #include <memory>
+#include <Utils.hpp>
 
 namespace sys
 {
@@ -28,6 +29,7 @@ namespace sys
 
     void CpuSentinel::HoldMinimumFrequency(bsp::CpuFrequencyMHz frequencyToHold)
     {
+        holdTicks = xTaskGetTickCount();
         if (currentFrequencyToHold != frequencyToHold) {
             auto msg =
                 std::make_shared<sys::HoldCpuFrequencyMessage>(GetName(), frequencyToHold, xTaskGetCurrentTaskHandle());
@@ -67,6 +69,21 @@ namespace sys
         currentFrequency = frequencyHz;
     }
 
+    TaskHandle_t CpuSentinel::getTask()
+    {
+        return owner->GetHandle();
+    }
+
+    std::string CpuSentinel::getReason()
+    {
+        return currentReason;
+    }
+
+    TickType_t CpuSentinel::getHoldTicks() const noexcept
+    {
+        return utils::computeIncrease(xTaskGetTickCount(), holdTicks);
+    }
+
     TimedCpuSentinel::TimedCpuSentinel(std::string name, sys::Service *service)
         : CpuSentinel(name, service), timerHandle{sys::TimerFactory::createSingleShotTimer(
                                           owner, "holdFrequencyTimer", defaultHoldFrequencyTime, [this](sys::Timer &) {
@@ -90,13 +107,4 @@ namespace sys
         }
     }
 
-    TaskHandle_t CpuSentinel::getTask()
-    {
-        return owner->GetHandle();
-    }
-
-    std::string CpuSentinel::getReason()
-    {
-        return currentReason;
-    }
 } // namespace sys

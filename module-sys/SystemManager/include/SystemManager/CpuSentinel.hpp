@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -36,6 +36,9 @@ namespace sys
         void ReadRegistrationData(bsp::CpuFrequencyMHz frequencyHz);
         TaskHandle_t getTask();
         std::string getReason();
+
+        TickType_t getHoldTicks() const noexcept;
+
         virtual ~CpuSentinel() = default;
 
       protected:
@@ -43,6 +46,7 @@ namespace sys
         bsp::CpuFrequencyMHz currentFrequencyToHold{bsp::CpuFrequencyMHz::Level_0};
         std::atomic<bsp::CpuFrequencyMHz> currentFrequency{bsp::CpuFrequencyMHz::Level_0};
         sys::Service *owner{nullptr};
+        TickType_t holdTicks;
 
         /// function called from the PowerManager context
         /// to update resources immediately

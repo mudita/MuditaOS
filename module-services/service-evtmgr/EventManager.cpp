@@ -37,7 +37,6 @@
 #include <list>
 #include <ctime>
 #include <apps-common/messages/AppMessage.hpp>
-#include <system/messages/SentinelRegistrationMessage.hpp>
 #include <EventStore.hpp>
 #include <ticks.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -182,10 +181,6 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
     EventWorker = createEventWorker();
     EventWorker->init(settings, eventManagerParams);
     EventWorker->run();
-
-    cpuSentinel                  = std::make_shared<sys::TimedCpuSentinel>(service::name::evt_manager, this);
-    auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
-    bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
 
     return sys::ReturnCodes::Success;
 }

@@ -44,7 +44,7 @@ EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &n
                           .voltage{.shutdown            = constants::shutdownVoltageThreshold,
                                    .measurementMaxCount = constants::measurementThreshold}},
                          name),
-      backlightHandler(settings, this), userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
+      backlightHandler(settings, this), userActivityHandler(this)
 {
     buildKeySequences();
 

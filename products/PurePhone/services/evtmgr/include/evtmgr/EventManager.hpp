@@ -22,7 +22,7 @@ class EventManager : public EventManagerCommon
                         .measurementMaxCount = constants::measurementThreshold}},
               name),
           vibrator(std::make_unique<vibra_handle::Vibra>(this)), backlightHandler(settings, this),
-          userActivityHandler(std::make_shared<sys::CpuSentinel>(name, this), this)
+          userActivityHandler(this)
     {}
 
   private:
