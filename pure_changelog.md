@@ -5,43 +5,17 @@
 ### Added
 
 * Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
-* Added extended information to crashdump filename
-* Added extended information to log filename
-* Added GUI screens informing about failed MMI/USSD request
-* Files not fully transferred via Center will be now removed when USB cable is unplugged
 
 ### Changed / Improved
 
-* General improvement in Eink display and error handling
 * Change roaming indicator to show domestic roaming as home network
-* Optimized ServiceAudio power management
-* Blocked call execution with empty phone number field
 * Improved device stability related to frequency scaling
 
 ### Fixed
 
-* Fixed unsupported character in several quotes
-* Fixed unwanted autolock on template selection window while rejecting call
-* Fixed scenario when Alarm not being handled properly during a phone call
-* Fixed handsfree device still ringing after caller has hung up
-* Fixed missing contact entries when scrolling through the contact list
-* Fixed misunderstanding holes in sms conversations
-* Fixed occasional crash when unplugging Pure from PC when connected with Mudita Center
-* Fixed ability to create contact with 2 same numbers
-* Fixed diacritics in translations
-* Fixed issues with file uploads with low disk space.
-* Fixed hard fault handling
-* Fixed issue with uneven first screen redraw after turning the phone on
-* Fixed issue with bypassing phone lock window after unplugging USB cable on tethering popup
-* Fixed Alarm disappearance during end of call window
-* Fixed passcode behavior when blocked from Mudita Center
-* Fixed missing tethering icon on "Tethering is on" window
-* Fixed showing "Copy text" option in empty note
-* Fixed "Copy" option missing from the options list in "New message" window
 * Fixed losing unsaved data on go back
 * Fixed disabled screen autolock in meditation app
 * Fixed multiple issues with input fields in "New alarm" window
-* Fixed the ability to create a contact with the same primary and secondary phone number, which resulted in mismatching
 * Fixed losing drafted message and recipient number in new message windows
 * Fixed misleading "Save" button behavior in "Date and time" window
 * Fixed losing unsaved user data when tethering is switching on
@@ -51,6 +25,42 @@
 * Fixed disappearing selections when setting custom alarm after popup is shown
 * Fixed alarm preview playback behavior
 * Fixed frequency lock during user activity
+
+## [1.8.0 2023-09-27]
+
+### Added
+
+* Added extended information to crashdump filename.
+* Added extended information to log filename.
+* Added GUI screens informing about failed MMI/USSD request.
+* Files not fully transferred via Center will be now removed when USB cable is unplugged.
+
+### Changed / Improved
+
+* General improvement in Eink display and error handling.
+* Optimized ServiceAudio power management.
+* Blocked call execution with empty phone number field.
+
+### Fixed
+
+* Fixed unsupported character in several quotes.
+* Fixed unwanted autolock on SMS template selection window when rejecting call.
+* Fixed scenario when Alarm not being handled properly during a phone call.
+* Fixed handsfree device still ringing after caller has hung up.
+* Fixed missing contact entries when scrolling through the contacts list.
+* Fixed misleading holes in SMS threads.
+* Fixed occasional crash when unplugging Pure from PC when connected with Center.
+* Fixed ability to create contact with both numbers identical.
+* Fixed diacritics in translations.
+* Fixed issues with file uploads with low disk space.
+* Fixed hard fault handling.
+* Fixed issue with uneven first screen redraw after turning the phone on.
+* Fixed issue with bypassing phone lock window after unplugging USB cable on tethering popup.
+* Fixed Alarm disappearance during end of call window.
+* Fixed passcode behavior when blocked from Center.
+* Fixed missing tethering icon on "Tethering is on" window.
+* Fixed showing "Copy text" option in empty note.
+* Fixed "Copy" option missing from the options list in "New message" window.
 
 ## [1.7.2 2023-07-28]
 
