@@ -3,7 +3,6 @@
 ## Unreleased
 
 ### Fixed
-* Fixed hard fault handling
 * Fixed meditation countdown timer when a deep press is performed
 * Fixed "turn off" window display time
 * Fixed uneven screen refresh when turning on the device
@@ -13,10 +12,24 @@
 
 ### Added
 * Files not fully transferred via Center will be now removed when USB cable is unplugged
-* Added a log when manual reset is performed
 
 ### Changed / Improved
 * Hardware faults during device startup now result in shutdown and more user friendly message
+
+## [2.2.0 2023-09-28]
+
+### Fixed
+
+* Fixed hard fault handling
+
+### Added
+
+* Added a log when manual reset is performed
+
+### Changed / Improved
+
+* Improved device stability related to frequency scaling
+
 
 ## [2.1.0 2023-08-30]
 
