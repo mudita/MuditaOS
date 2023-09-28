@@ -1,5 +1,19 @@
 # MuditaOS changelog - Harmony
 
+## [2.2.0 2023-09-28]
+
+### Fixed
+
+* Fixed hard fault handling
+
+### Added
+
+* Added a log when manual reset is performed
+
+### Changed / Improved
+
+* Improved device stability related to frequency scaling
+
 ## [2.1.0 2023-08-30]
 
 ### Fixed
