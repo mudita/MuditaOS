@@ -198,4 +198,4 @@ if (${ENABLE_TESTS})
     add_subdirectory(test)
 endif ()
 
-target_compile_definitions(tagsfetcher PRIVATE TAGSFETCHER_MAX_TAG_SIZE=SIZE_MAX)
+target_compile_definitions(tagsfetcher PRIVATE TAGSFETCHER_MAX_TAG_SIZE=4*1024*1024) # Arbitrarily set to 4MiB

@@ -26,6 +26,7 @@
 * Fixed disappearing selections when setting custom alarm after popup is shown
 * Fixed alarm preview playback behavior
 * Fixed frequency lock during user activity
+* Fixed crash on transferring audio file with big metadata
 
 ## [1.8.0 2023-09-27]
 
