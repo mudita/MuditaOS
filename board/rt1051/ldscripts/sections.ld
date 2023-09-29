@@ -105,6 +105,12 @@ SECTIONS
         *libusb_stack.a:*(.data*)
     } > SRAM_DTC AT > BOARD_SDRAM_TEXT
 
+    /* space for log buffer */
+    .sensitiveLogBlock (NOLOAD) : ALIGN(4)
+    {
+        KEEP(*(.sensitiveLogSection))
+    } > SRAM_DTC
+
     /* MAIN TEXT SECTION */
     .text : ALIGN(4)
     {

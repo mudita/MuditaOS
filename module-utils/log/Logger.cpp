@@ -124,6 +124,13 @@ namespace Log
                 worker->notify(LoggerWorker::Signal::DumpIntervalBuffer);
             });
         writeLogsTimer.start();
+
+        dumpSensitiveLogsTimer = sys::TimerFactory::createSingleShotTimer(
+            parent, "dumpSensitiveLogsTimer", std::chrono::seconds(3), [this](sys::Timer &) {
+                const auto result = sensitiveLog.dumpToFile(purefs::dir::getLogsPath());
+                LOG_INFO("dump sensitive logs to file: %s", result < 0 ? "fail!" : "success");
+            });
+        dumpSensitiveLogsTimer.start();
     }
 
     int Logger::log(Device device, const char *fmt, va_list args)
@@ -165,6 +172,8 @@ namespace Log
             /* Terminate the line */
             lineBufferCurrentPos +=
                 snprintf(&lineBuffer[lineBufferCurrentPos], lineBufferSizeLeft(), lineTerminationString);
+            /* Write data to special section in RAM */
+            sensitiveLog.put(std::string(lineBuffer, lineBufferCurrentPos));
             /* Write the line to device and to the buffer */
             logToDevice(Device::DEFAULT, lineBuffer, lineBufferCurrentPos);
             buffer.getCurrentBuffer()->put(std::string(lineBuffer, lineBufferCurrentPos));

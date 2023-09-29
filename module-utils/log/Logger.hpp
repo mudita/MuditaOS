@@ -6,6 +6,7 @@
 #include "LoggerBuffer.hpp"
 #include "LoggerWorker.hpp"
 #include "LoggerBufferContainer.hpp"
+#include "SensitiveLog.hpp"
 #include "log_colors.hpp"
 #include "Timers/TimerFactory.hpp"
 #include <log/log.hpp>
@@ -102,9 +103,12 @@ namespace Log
         utils::Rotator<maxLogFilesCount> rotator;
 
         sys::TimerHandle writeLogsTimer;
+        sys::TimerHandle dumpSensitiveLogsTimer;
 
         static Logger *_logger;
         std::unique_ptr<LoggerWorker> worker;
+
+        SensitiveLog sensitiveLog;
     };
 
     const char *getTaskDesc();
