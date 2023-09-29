@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotesTable.hpp"
@@ -125,14 +125,16 @@ std::pair<std::vector<NotesTableRow>, int> NotesTable::getByText(const std::stri
                                                                  unsigned int limit)
 {
 
-    int count     = 0;
-    auto queryRet = db->query("SELECT COUNT(*), INSTR(snippet," str_ ") pos FROM notes WHERE pos > 0;", text.c_str());
+    int count = 0;
+    auto queryRet =
+        db->query("SELECT COUNT(*), INSTR(LOWER(snippet),LOWER(" str_ ")) pos FROM notes WHERE pos > 0;", text.c_str());
     if (queryRet && queryRet->getRowCount() != 0) {
         count = (*queryRet)[0].getUInt32();
     }
 
-    std::string queryText = "SELECT *, INSTR(snippet,'" + text + "') pos FROM notes WHERE pos > 0 LIMIT " +
-                            std::to_string(limit) + " offset " + std::to_string(offset) + " ;";
+    std::string queryText = "SELECT *, INSTR(LOWER(snippet),LOWER('" + text +
+                            "')) pos FROM notes WHERE pos > 0 LIMIT " + std::to_string(limit) + " offset " +
+                            std::to_string(offset) + " ;";
     auto retQuery = db->query(queryText.c_str());
 
     if (retQuery == nullptr || retQuery->getRowCount() == 0) {
