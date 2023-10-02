@@ -20,7 +20,10 @@
 
 namespace sdesktop::endpoints
 {
-    constexpr auto chunkSize = 1024 * 128;
+    namespace
+    {
+        constexpr auto chunkSize = 1024 * 128;
+    }
 
     struct UpdatePackageEntries
     {
@@ -56,7 +59,7 @@ namespace sdesktop::endpoints
         std::string err;
         const auto versionJson = json11::Json::parse(buffer.str(), err);
         if (!err.empty()) {
-            LOG_ERROR("Parsing '%s' failed", path.c_str());
+            LOG_ERROR("Parsing '%s' failed, error message: '%s'", path.c_str(), err.c_str());
             return std::nullopt;
         }
         return versionJson;
@@ -85,7 +88,7 @@ namespace sdesktop::endpoints
         }
 
         std::fclose(fd);
-        return md5.getHash() == hash;
+        return (md5.getHash() == hash);
     }
 
     bool removeDirectory(const std::filesystem::path &path)
@@ -112,7 +115,7 @@ namespace sdesktop::endpoints
             tar::unpack(path, where);
         }
         catch (const std::filesystem::filesystem_error &err) {
-            LOG_ERROR("Unpacking tar '%s' failed with %s", path.c_str(), err.what());
+            LOG_ERROR("Unpacking tar '%s' failed with '%s'", path.c_str(), err.what());
             return false;
         }
         return true;
@@ -141,7 +144,13 @@ namespace sdesktop::endpoints
             return false;
         }
 
-        const auto requiredSpace = std::filesystem::file_size(updatePackage);
+        std::error_code fileSizeError;
+        const auto requiredSpace = std::filesystem::file_size(updatePackage, fileSizeError);
+        if (fileSizeError) {
+            LOG_ERROR("File size check failed, error message: '%s'", fileSizeError.message().c_str());
+            return false;
+        }
+
         const auto freeSpace = (static_cast<std::uint64_t>(stat.f_bfree) * static_cast<std::uint64_t>(stat.f_bsize));
         LOG_INFO("Checking available space: %" PRIu64 " bytes, required: %" PRIu64 " bytes",
                  freeSpace,
@@ -156,7 +165,7 @@ namespace sdesktop::endpoints
         return std::filesystem::exists(path);
     }
 
-    void UpdateHelper::preProcess(http::Method method, Context &context)
+    void UpdateHelper::preProcess(http::Method method, [[maybe_unused]] Context &context)
     {
         LOG_INFO("In UpdateHelper - requesting %d", static_cast<int>(method));
     }
@@ -197,5 +206,4 @@ namespace sdesktop::endpoints
     UpdateHelper::UpdateHelper(sys::Service *p)
         : BaseHelper(p), updatePackagePath{purefs::dir::getTemporaryPath() / "update"}, binariesPath{get_binary_dir()}
     {}
-
 } // namespace sdesktop::endpoints
