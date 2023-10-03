@@ -171,6 +171,7 @@ namespace sys
 
     void PowerManager::SetCpuFrequency(bsp::CpuFrequencyMHz freq)
     {
+        LOG_ERROR("Changing the CPU frequency to %d MHz", static_cast<int>(freq));
         UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
         while (lowPowerControl->GetCurrentFrequencyLevel() != freq) {
             lowPowerControl->SetCpuFrequency(freq);
