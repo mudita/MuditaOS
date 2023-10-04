@@ -78,7 +78,7 @@ namespace gui::factory
 
     std::string getDefaultLayout()
     {
-        return gui::layout::ClassicWithBattery;
+        return gui::layout::ClassicWithDate;
     }
 
 } // namespace gui::factory

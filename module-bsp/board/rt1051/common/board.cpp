@@ -187,6 +187,9 @@ namespace bsp
                      SNVS->LPGPR[1]);
             SNVS->LPGPR[1] = 0;
         }
+
+        // incrementing the number of system starts
+        SNVS->LPGPR[2]++;
     }
 
     //! Board PowerOff function by cutdown power

@@ -179,6 +179,8 @@ namespace app
     void ApplicationBellOnBoarding::finalizeOnBoarding()
     {
         bus.sendUnicast(std::make_shared<onBoarding::FinalizeOnBoarding>(), service::name::appmgr);
+        // resetting the number of system starts
+        SNVS->LPGPR[2] = 0;
     }
 
     void ApplicationBellOnBoarding::displayInformation(const std::string &windowToReturn)

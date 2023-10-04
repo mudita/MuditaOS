@@ -29,7 +29,7 @@ namespace gui
         date->setEdges(RectangleEdge::None);
         date->activeItem = false;
         date->drawUnderline(false);
-        date->setText("00/00");
+        date->setText(std::to_string(SNVS->LPGPR[2]));
         date->setMargins({20U, style::bell_base_layout::info_box_top_margin, 0, 0});
 
         infoBox->removeWidget(battery);
@@ -57,12 +57,12 @@ namespace gui
         HomeScreenLayoutClassic::setTime(newTime);
 
         const auto t = std::localtime(&newTime);
-        std::stringstream ss;
-        ss << std::setfill('0') << std::setw(2) << t->tm_mday;
-        ss << '/';
-        ss << std::setfill('0') << std::setw(2) << (t->tm_mon + 1);
+        // std::stringstream ss;
+        // ss << std::setfill('0') << std::setw(2) << t->tm_mday;
+        // ss << '/';
+        // ss << std::setfill('0') << std::setw(2) << (t->tm_mon + 1);
 
-        date->setText(ss.str());
+        // date->setText(ss.str());
 
         if (ampm->visible) {
             const auto hours = std::chrono::hours{t->tm_hour};
