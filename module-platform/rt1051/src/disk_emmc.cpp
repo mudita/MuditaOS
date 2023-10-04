@@ -5,39 +5,55 @@
 
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
 #include "board/BoardDefinitions.hpp"
+#include "board/pin_mux.h"
 #include <log/log.hpp>
 #include <Utils.hpp>
 
 #include <cstring>
 #include <task.h>
 
+namespace
+{
+    constexpr uint32_t BOARD_SDMMC_MMC_HOST_SUPPORT_HS200_FREQ = 180000000U;
+    constexpr uint32_t DMA_BUFFER_WORD_SIZE                    = 1024U;
+    constexpr uint32_t USDHC_IRQ_PRIORITY                      = 6U;
+} // namespace
+
 namespace purefs::blkdev
 {
-    AT_NONCACHEABLE_SECTION_ALIGN(uint32_t s_sdmmcHostDmaBuffer[32U], SDMMCHOST_DMA_DESCRIPTOR_BUFFER_ALIGN_SIZE);
+    AT_NONCACHEABLE_SECTION_ALIGN(uint32_t s_sdmmcHostDmaBuffer[DMA_BUFFER_WORD_SIZE],
+                                  SDMMCHOST_DMA_DESCRIPTOR_BUFFER_ALIGN_SIZE);
 
     disk_emmc::disk_emmc()
         : initStatus(kStatus_Success), mmcCard(std::make_unique<_mmc_card>()), mmcHost(std::make_unique<sdmmchost_t>())
     {
         assert(mmcCard.get());
+        assert(mmcHost.get());
         std::memset(mmcCard.get(), 0, sizeof(_mmc_card));
+        std::memset(mmcHost.get(), 0, sizeof(sdmmchost_t));
         mmcCard->host = mmcHost.get();
 
         mmcHost->dmaDesBuffer         = s_sdmmcHostDmaBuffer;
-        mmcHost->dmaDesBufferWordsNum = 32U;
+        mmcHost->dmaDesBufferWordsNum = DMA_BUFFER_WORD_SIZE;
         mmcHost->enableCacheControl   = kSDMMCHOST_CacheControlRWBuffer;
-#if defined SDMMCHOST_ENABLE_CACHE_LINE_ALIGN_TRANSFER && SDMMCHOST_ENABLE_CACHE_LINE_ALIGN_TRANSFER
-        s_host.cacheAlignBuffer     = s_sdmmcCacheLineAlignBuffer;
-        s_host.cacheAlignBufferSize = BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U;
+#if defined SDmmc_host_ENABLE_CACHE_LINE_ALIGN_TRANSFER && SDmmc_host_ENABLE_CACHE_LINE_ALIGN_TRANSFER
+        mmcHost->cacheAlignBuffer     = s_sdmmcCacheLineAlignBuffer;
+        mmcHost->cacheAlignBufferSize = BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U;
 #endif
-
         mmcCard->busWidth                   = kMMC_DataBusWidth8bit;
-        mmcCard->busTiming                  = kMMC_HighSpeedTiming;
+        mmcCard->busTiming                  = kMMC_HighSpeed200Timing;
         mmcCard->enablePreDefinedBlockCount = true;
         mmcCard->host->hostController.base  = USDHC2;
         mmcCard->host->hostController.sourceClock_Hz =
             CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
-        mmcCard->hostVoltageWindowVCC  = kMMC_VoltageWindows270to360;
-        mmcCard->hostVoltageWindowVCCQ = kMMC_VoltageWindows270to360;
+        mmcCard->usrParam.ioStrength   = emmc_pin_config;
+        mmcCard->usrParam.maxFreq      = BOARD_SDMMC_MMC_HOST_SUPPORT_HS200_FREQ;
+        mmcCard->hostVoltageWindowVCCQ = kMMC_VoltageWindow120;
+        mmcCard->hostVoltageWindowVCC  = kMMC_VoltageWindow170to195;
+        /* card detect type */
+#if defined DEMO_SDCARD_POWER_CTRL_FUNCTION_EXIST
+        g_sd.usrParam.pwr = &s_sdCardPwrCtrl;
+#endif
 
         driverUSDHC = drivers::DriverUSDHC::Create(
             "EMMC", static_cast<drivers::USDHCInstances>(BoardDefinitions::EMMC_USDHC_INSTANCE));
@@ -54,7 +70,7 @@ namespace purefs::blkdev
             initStatus = err;
             return initStatus;
         }
-
+        NVIC_SetPriority(USDHC2_IRQn, USDHC_IRQ_PRIORITY);
         LOG_INFO("\neMMC card info:\n%s", get_emmc_info_str().c_str());
 
         return statusBlkDevSuccess;
