@@ -4,12 +4,6 @@
 #include "VolteAllowedList.hpp"
 #include "ImsiParser_Poland.hpp"
 #include "ImsiParser_UnitedStates.hpp"
-#include "ImsiParser_Netherlands.hpp"
-#include "ImsiParser_Germany.hpp"
-#include "ImsiParser_Denmark.hpp"
-#include "ImsiParser_GreatBritain.hpp"
-#include "ImsiParser_Canada.hpp"
-#include "ImsiParser_Austria.hpp"
 
 #include <log/log.hpp>
 #include <magic_enum.hpp>
@@ -54,14 +48,6 @@ namespace cellular::service
 
     void VolteAllowedList::buildList()
     {
-        pushBack(allowedList,
-                 ImsiParserPL(),
-                 ImsiParserUS(),
-                 ImsiParserDK(),
-                 ImsiParserDE(),
-                 ImsiParserNL(),
-                 ImsiParserGB(),
-                 ImsiParserCA(),
-                 ImsiParserAT());
+        pushBack(allowedList, ImsiParserPL(), ImsiParserUS());
     }
 } // namespace cellular::service
