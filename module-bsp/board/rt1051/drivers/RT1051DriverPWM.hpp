@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,18 +13,19 @@
 #include <vector>
 #include <map>
 #include <array>
+
 namespace drivers
 {
-    class RT1051DriverPWM : public DriverPWM
+    class RT1051DriverPWM final : public DriverPWM
     {
       public:
         RT1051DriverPWM(PWMInstances inst, PWMModules mod, const DriverPWMParams &params);
 
-        ~RT1051DriverPWM() final;
+        ~RT1051DriverPWM();
 
         void InitNextChannel(const DriverPWMParams &params) final;
 
-        void SetDutyCycle(std::uint8_t dutyCyclePercent, PWMChannel channel) final;
+        void SetDutyCycle(float dutyCyclePercent, PWMChannel channel) final;
 
         void Start(PWMChannel channel) final;
 
@@ -39,6 +40,26 @@ namespace drivers
         };
 
       private:
+        struct PwmSignalConfig
+        {
+          public:
+            pwm_channels_t pwmChannel;
+            float dutyCyclePercent;
+            pwm_level_select_t level;
+            std::uint16_t deadtimeValue;
+            pwm_fault_state_t faultState;
+
+            pwm_signal_param_t getFslConfig()
+            {
+                const pwm_signal_param_t config = {.pwmChannel       = pwmChannel,
+                                                   .dutyCyclePercent = static_cast<std::uint8_t>(dutyCyclePercent),
+                                                   .level            = level,
+                                                   .deadtimeValue    = deadtimeValue,
+                                                   .faultState       = faultState};
+                return config;
+            }
+        };
+
         PwmState GetPwmState();
 
         void SetupPWMChannel(PWMChannel channel);
@@ -51,7 +72,7 @@ namespace drivers
 
         pwm_channels_t getChannelMask(PWMChannel channel);
 
-        bool channelNotEnabled(PWMChannel channel);
+        bool channelEnabled(PWMChannel channel);
 
         bool otherChannelRunning(PWMChannel channel);
 
@@ -65,9 +86,7 @@ namespace drivers
 
         pwm_submodule_t pwmModule = kPWM_Module_0;
 
-        std::uint8_t lastDutyCycle = 0;
-
-        std::array<pwm_signal_param_t, 2> pwmSignalsConfig;
+        std::array<PwmSignalConfig, 2> pwmSignalsConfig;
 
         std::vector<PWMChannel> enabledChannels;
         std::map<PWMChannel, PwmState> pwmChannelState = {
@@ -77,5 +96,4 @@ namespace drivers
 
         std::uint32_t clockFrequency = 0;
     };
-
 } // namespace drivers
