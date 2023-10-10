@@ -66,6 +66,7 @@ namespace Log
         auto fileHandlerCleanup = gsl::finally([&logFile]() { logFile.close(); });
 
         for (std::uint8_t i = 0; i < bufferLength; i++) {
+            buffer[i][lineSize - 1]   = '\0';
             const std::string toWrite = buffer[i];
             logFile.write(toWrite.c_str(), toWrite.size());
         }
