@@ -5,12 +5,13 @@
 #include <cstring>
 #include <fstream>
 #include <LockGuard.hpp>
+#include <gsl/util>
 
 namespace
 {
     inline constexpr int statusSuccess = 1;
-    inline constexpr auto lineSize     = 256;
-    inline constexpr auto bufferLength = 32;
+    inline constexpr auto lineSize     = 224;
+    inline constexpr auto bufferLength = 34;
 
     __attribute__((section(".sensitiveLogSection"))) static char buffer[bufferLength][lineSize];
     std::uint8_t line{0};
@@ -61,6 +62,9 @@ namespace Log
         if (!logFile) {
             return -EIO;
         }
+
+        auto fileHandlerCleanup = gsl::finally([&logFile]() { logFile.close(); });
+
         for (std::uint8_t i = 0; i < bufferLength; i++) {
             const std::string toWrite = buffer[i];
             logFile.write(toWrite.c_str(), toWrite.size());
@@ -68,7 +72,6 @@ namespace Log
         if (logFile.bad()) {
             return -EIO;
         }
-        logFile.close();
 
         // clear buffer
         std::memset(buffer, '\0', sizeof(buffer));
