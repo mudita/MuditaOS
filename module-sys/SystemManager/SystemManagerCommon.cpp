@@ -674,6 +674,9 @@ namespace sys
     {
         LOG_DEBUG("Invoking closing procedure...");
 
+        // decrementing the number of system starts
+        SNVS->LPGPR[2]--;
+
         cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
 
         // In case if other power down request arrive in the meantime
