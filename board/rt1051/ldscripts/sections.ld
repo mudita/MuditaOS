@@ -106,10 +106,11 @@ SECTIONS
     } > SRAM_DTC AT > BOARD_SDRAM_TEXT
 
     /* space for log buffer */
-    .sensitiveLogBlock (NOLOAD) : ALIGN(4)
+    .sensitiveLogSection (NOLOAD) : ALIGN(4)
     {
-        KEEP(*(.sensitiveLogSection))
-    } > SRAM_DTC
+		*(.sensitiveLogSection)
+		*(.sensitiveLogSection.*)
+    } > SRAM_DTC_LOGS
 
     /* MAIN TEXT SECTION */
     .text : ALIGN(4)
