@@ -26,7 +26,7 @@ const CrashCatcherMemoryRegion *CrashCatcher_GetMemoryRegions()
         // SRAM_OC
         {0x20200000, 0x20200000 + 0x10000, CRASH_CATCHER_WORD},
         // SRAM_DTC
-        {0x20000000, 0x20000000 + 0x6E000, CRASH_CATCHER_WORD},
+        {0x20000000, 0x20000000 + 0x70000, CRASH_CATCHER_WORD},
         // intentionally skip text section
         // intentionally skip the heap section
         // end tag

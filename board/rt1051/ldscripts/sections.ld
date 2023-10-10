@@ -110,7 +110,7 @@ SECTIONS
     {
 		*(.sensitiveLogSection)
 		*(.sensitiveLogSection.*)
-    } > SRAM_DTC_LOGS
+    } > BOARD_SDRAM_LOGS
 
     /* MAIN TEXT SECTION */
     .text : ALIGN(4)
