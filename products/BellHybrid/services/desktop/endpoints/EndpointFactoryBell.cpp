@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EndpointFactoryBell.hpp"
@@ -10,6 +10,7 @@
 #include <endpoints/nullEndpoint/NullEndpoint.hpp>
 #include <endpoints/restore/RestoreEndpoint.hpp>
 #include <endpoints/update/UpdateEndpoint.hpp>
+#include <endpoints/msc/MscEndpoint.hpp>
 #include <log/log.hpp>
 
 namespace sdesktop::endpoints
@@ -34,6 +35,8 @@ namespace sdesktop::endpoints
             return std::make_unique<RestoreEndpoint>(ownerServicePtr);
         case EndpointType::factory:
             return std::make_unique<FactoryResetEndpoint>(ownerServicePtr);
+        case EndpointType::msc:
+            return std::make_unique<MscEndpoint>(ownerServicePtr);
         default:
             return std::make_unique<NullEndpoint>(ownerServicePtr);
         }

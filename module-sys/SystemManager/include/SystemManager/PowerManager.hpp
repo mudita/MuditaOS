@@ -49,6 +49,7 @@ namespace sys
 
         int32_t PowerOff();
         int32_t Reboot();
+        int32_t RebootMSC();
         int32_t RebootToRecovery(RecoveryReason reason);
 
         /// called periodically to calculate the CPU requirement

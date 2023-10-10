@@ -84,6 +84,11 @@ namespace sys
         return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::NormalRestart);
     }
 
+    int32_t PowerManager::RebootMSC()
+    {
+        return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToMSC);
+    }
+
     int32_t PowerManager::RebootToRecovery(RecoveryReason reason)
     {
         switch (reason) {
