@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ThreadRecord.hpp"
@@ -196,7 +196,7 @@ std::unique_ptr<db::QueryResult> ThreadRecordInterface::markAsReadQuery(const st
     auto result           = false;
 
     if (record.isValid()) {
-        LOG_DEBUG("query-read %d", static_cast<int>(localQuery->read));
+        LOG_DEBUG("Query read: %d", static_cast<int>(localQuery->read));
         record.unreadMsgCount = localQuery->read == db::query::MarkAsRead::Read::True ? 0 : 1;
         result                = Update(record);
     }

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ImageManager.hpp"
@@ -42,7 +42,7 @@ namespace gui
     void ImageManager::clear()
     {
         for (ImageMap *imageMap : imageMaps) {
-            LOG_INFO("deleting image: %s", imageMap->getName().c_str());
+            LOG_INFO("Deleting image: %s", imageMap->getName().c_str());
             delete imageMap;
         }
         imageMaps.clear();

@@ -57,7 +57,7 @@ namespace gui
     bool EnterNumberWindow::handleSwitchData(SwitchData *data)
     {
         if (data == nullptr) {
-            LOG_ERROR("Received null pointer");
+            LOG_ERROR("No data received");
             return false;
         }
 

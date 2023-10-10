@@ -23,7 +23,7 @@ namespace gui
             optionList.emplace_back(std::make_unique<option::OptionSettings>(
                 utils::translate(name),
                 [=](Item &item) {
-                    LOG_INFO("switching to %s page", window.c_str());
+                    LOG_DEBUG("Switching to %s page", window.c_str());
                     application->switchWindow(window, nullptr);
                     return true;
                 },
@@ -45,7 +45,7 @@ namespace gui
                                                 sys::SystemManagerCommon::FactoryReset(application);
                                                 return true;
                                             }});
-                    LOG_INFO("switching to %s page", window.c_str());
+                    LOG_DEBUG("Switching to %s page", window.c_str());
                     application->switchWindow(window, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
                     return true;
                 },

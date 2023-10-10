@@ -58,7 +58,7 @@ namespace gui
             body->addWidget(smsBubble);
             break;
         case SMSType::DRAFT:
-            LOG_ERROR("Can't handle Draft type message in smsBubble");
+            LOG_ERROR("Can't handle draft type message in smsBubble");
             break;
         default:
             break;
@@ -87,7 +87,6 @@ namespace gui
 
         smsBubble->inputCallback = [application, record](Item &, const InputEvent &event) {
             if (event.isShortRelease(KeyCode::KEY_LF)) {
-                LOG_INFO("Message activated!");
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
                 app->switchWindow(gui::name::window::sms_options, std::make_unique<SMSSwitchData>(*record));

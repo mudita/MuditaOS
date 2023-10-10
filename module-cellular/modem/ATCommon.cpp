@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATCommon.hpp"
@@ -86,7 +86,7 @@ Result Channel::cmd(const std::string &cmd, std::chrono::milliseconds timeout, s
 
     cmdInit();
     std::string cmdFixed = formatCommand(cmd);
-    LOG_DEBUG("start of %s", cmdFixed.c_str());
+    LOG_DEBUG("Start of %s", cmdFixed.c_str());
     cmdSend(cmdFixed);
 
     auto startTime = std::chrono::steady_clock::now();

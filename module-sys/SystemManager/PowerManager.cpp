@@ -205,7 +205,7 @@ namespace sys
         const TickType_t periodTickIncrease = tickCount - lastLogStatisticsTimestamp;
         UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
 
-        std::string log{"last period (total): "};
+        std::string log{"Last period (total): "};
         for (auto &level : cpuFrequencyMonitor) {
             log.append(level.GetName() + ": " + std::to_string(level.GetPeriodRuntimePercentage(periodTickIncrease)) +
                        "% (" + std::to_string(level.GetTotalRuntimePercentage(tickCount)) + "%) ");

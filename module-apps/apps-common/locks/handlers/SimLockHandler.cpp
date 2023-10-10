@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimLockHandler.hpp"
@@ -378,7 +378,7 @@ namespace locks
         case SimInputTypeAction::Error:
             return handleCMEErrorRequest(storedErrorCode);
         default:
-            LOG_WARN("got message of unexpected type: %s", magic_enum::enum_name(simInputTypeAction).data());
+            LOG_WARN("Received message of unexpected type: %s", magic_enum::enum_name(simInputTypeAction).data());
             return sys::msgNotHandled();
         }
     }

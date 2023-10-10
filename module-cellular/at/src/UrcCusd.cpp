@@ -32,7 +32,7 @@ Cusd::Cusd(const std::string &urcBody, const std::string &urcHead) : Urc(urcBody
 
         if (auto status = getStatus();
             status != StatusType::FurtherUserActionRequired && status != StatusType::NoFurtherUserActionRequired) {
-            LOG_WARN("unsupported CUSD status: %d", magic_enum::enum_integer(status));
+            LOG_WARN("Unsupported CUSD status: %d", magic_enum::enum_integer(status));
         }
     }
     catch (std::runtime_error const &exc) {
@@ -109,7 +109,7 @@ auto Cusd::split(const std::string &str) -> void
     }
 
     if (endQuotationMarkPosition == startQuotationMarkPosition + 1) {
-        LOG_WARN("empty CUSD message");
+        LOG_WARN("Empty CUSD message");
     }
     else {
         auto messageStartPosition = startQuotationMarkPosition + 1;

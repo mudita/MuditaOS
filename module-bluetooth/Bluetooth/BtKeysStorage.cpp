@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <algorithm>
@@ -37,17 +37,17 @@ namespace bluetooth
 
     void KeyStorage::openStorage()
     {
-        LOG_INFO("opening storage from API");
+        LOG_INFO("Opening storage from API");
         std::string keysEntry;
         if (settings) {
             keysEntry = std::visit(bluetooth::StringVisitor(), settings->getValue(bluetooth::Settings::BtKeys));
         }
         else {
-            LOG_ERROR("failed opening settings for BT!");
+            LOG_ERROR("Failed opening settings for BT!");
             return;
         }
         if (keysEntry.empty()) {
-            LOG_WARN("opening empty key entry!");
+            LOG_WARN("Opening empty key entry!");
             return;
         }
 
@@ -63,14 +63,14 @@ namespace bluetooth
 
     void KeyStorage::closeStorage()
     {
-        LOG_INFO("closing storage from API");
+        LOG_INFO("Closing storage from API");
         writeSettings();
     }
-    //
+
     auto KeyStorage::getLinkKey(uint8_t *bd_addr, link_key_t link_key, link_key_type_t *type) -> int
     {
         if (type != nullptr && bd_addr != nullptr) {
-            LOG_INFO("getting key from API");
+            LOG_INFO("Getting key from API");
 
             json11::Json finalJson = json11::Json::object{{strings::keys, keys}};
             auto keysEntryDump     = finalJson.dump();
@@ -114,13 +114,12 @@ namespace bluetooth
             settings->onLinkKeyAdded(bd_addr_to_str(bd_addr));
         }
         writeSettings();
-        LOG_INFO("keys written to the file");
         LOG_INFO("Keys in file: %d", (int)keys.size());
     }
     void KeyStorage::deleteLinkKey(uint8_t *bd_addr)
     {
         auto keysSize = keys.size();
-        LOG_INFO("deleting key from API");
+        LOG_INFO("Deleting key from API");
         auto end = std::remove_if(keys.begin(), keys.end(), [&](auto &key) {
             bd_addr_t addr;
             sscanf_bd_addr(key[strings::bd_addr].string_value().c_str(), addr);
@@ -157,7 +156,7 @@ namespace bluetooth
             settings->setValue(bluetooth::Settings::BtKeys, keysEntry);
         }
         else {
-            LOG_ERROR("failed to open settings to write!");
+            LOG_ERROR("Failed to open settings to write!");
             return;
         }
     }

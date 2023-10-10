@@ -177,7 +177,7 @@ namespace gui
                         if (window.empty()) {
                             return true;
                         }
-                        LOG_INFO("switching to window %s", window.c_str());
+                        LOG_DEBUG("Switching to window %s", window.c_str());
                         application->switchWindow(window, nullptr);
                         return true;
                     },

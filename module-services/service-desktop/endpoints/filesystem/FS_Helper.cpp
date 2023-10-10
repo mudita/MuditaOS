@@ -50,7 +50,6 @@ namespace sdesktop::endpoints
 
     auto FS_Helper::processGet(Context &context) -> ProcessResult
     {
-        LOG_DEBUG("Handling GET");
         const auto &body = context.getBody();
         ResponseContext response{};
 
@@ -74,7 +73,6 @@ namespace sdesktop::endpoints
 
     auto FS_Helper::processPut(Context &context) -> ProcessResult
     {
-        LOG_DEBUG("Handling PUT");
         const auto &body = context.getBody();
         auto code        = http::Code::BadRequest;
         ResponseContext response{};
@@ -103,7 +101,6 @@ namespace sdesktop::endpoints
 
     auto FS_Helper::processDelete(Context &context) -> ProcessResult
     {
-        LOG_DEBUG("Handling DEL");
         const auto &body = context.getBody();
         auto code        = http::Code::BadRequest;
 
@@ -191,7 +188,7 @@ namespace sdesktop::endpoints
             dataWithCrc32 = fileOps.getDataForReceiveID(rxID, chunkNo);
         }
         catch (std::exception &e) {
-            LOG_ERROR("%s", e.what());
+            LOG_ERROR("Exception during getting data: %s", e.what());
 
             json11::Json::object response({{json::reason, e.what()}});
             return ResponseContext{.status = http::Code::BadRequest, .body = response};
@@ -233,7 +230,7 @@ namespace sdesktop::endpoints
         LOG_DEBUG("Start sending of file: %s", filePath.c_str());
 
         if (fileSize == 0 || fileCrc32.empty()) {
-            LOG_ERROR("File %s corrupted", filePath.c_str());
+            LOG_ERROR("File '%s' corrupted", filePath.c_str());
 
             return ResponseContext{.status = code};
         }
@@ -248,8 +245,6 @@ namespace sdesktop::endpoints
 
         if (!std::filesystem::exists(filePath)) {
             LOG_DEBUG("Creating file %s", filePath.c_str());
-
-            code = http::Code::Created;
         }
         else {
             LOG_DEBUG("Overwriting file %s", filePath.c_str());
@@ -304,8 +299,7 @@ namespace sdesktop::endpoints
             returnCode = fileOps.sendDataForTransmitID(txID, chunkNo, data);
         }
         catch (std::exception &e) {
-            LOG_ERROR("%s", e.what());
-
+            LOG_ERROR("Exception during sending data: %s", e.what());
             auto code     = http::Code::NotAcceptable;
             auto response = json11::Json::object({{json::reason, e.what()}});
 
@@ -320,8 +314,6 @@ namespace sdesktop::endpoints
                 {{json::fs::txID, static_cast<int>(txID)}, {json::fs::chunkNo, static_cast<int>(chunkNo)}});
         }
         else {
-            LOG_ERROR("FileOperations::sendDataForTransmitID failed");
-
             code     = http::Code::BadRequest;
             response = json11::Json::object(
                 {{json::fs::txID, static_cast<int>(txID)}, {json::fs::chunkNo, static_cast<int>(chunkNo)}});

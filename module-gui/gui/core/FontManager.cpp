@@ -133,7 +133,7 @@ namespace gui
         for (const auto &entry : styleJson.object_items()) {
             auto fontName = entry.second.string_value();
             if (!std::filesystem::is_regular_file(fontFolder + "/" + fontName)) {
-                LOG_ERROR("Could not find font: %s", fontName.c_str());
+                LOG_WARN("Could not find font: %s", fontName.c_str());
             }
             else {
                 LOG_INFO("Add font to list: %s - %s", entry.first.c_str(), fontName.c_str());

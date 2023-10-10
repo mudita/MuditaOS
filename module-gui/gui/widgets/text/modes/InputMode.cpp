@@ -61,7 +61,7 @@ void InputMode::next()
     if (input_mode_list_pos == input_mode_list.size()) {
         input_mode_list_pos = 0;
     }
-    LOG_INFO("%" PRIu32, input_mode_list_pos);
+    LOG_INFO("Position: %" PRIu32, input_mode_list_pos);
     show_input_type();
 }
 

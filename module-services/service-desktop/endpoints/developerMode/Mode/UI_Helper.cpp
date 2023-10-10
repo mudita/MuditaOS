@@ -12,7 +12,7 @@ namespace sdesktop::endpoints
 {
     void UI_Helper::preProcess(http::Method method, Context &context)
     {
-        LOG_INFO("In UI helper - requesting %d", static_cast<int>(method));
+        LOG_INFO("In UI helper: requesting %s", magic_enum::enum_name(method).data());
     }
 
     class UIEvent : public sdesktop::Event

@@ -123,7 +123,7 @@ auto SCO::SCOImpl::audioInitialize(int sampleRate) -> Result
     metadata.samplesPerFrame = audioSamplesPerPacket;
 
     if (sourceQueue == nullptr || sinkQueue == nullptr) {
-        LOG_ERROR("failed to create queue!");
+        LOG_ERROR("Failed to create queue!");
         return Result(Result::Code::SystemError);
     }
 
@@ -179,7 +179,7 @@ void SCO::SCOImpl::receiveCvsd(uint8_t *packet, uint16_t size)
         xQueueSend(sinkQueue, &audioData, 5);
     }
     else {
-        LOG_ERROR("queue is nullptr!");
+        LOG_ERROR("Queue is not initialized!");
     }
 }
 

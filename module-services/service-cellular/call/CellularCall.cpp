@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "call/CellularCall.hpp"
@@ -36,7 +36,7 @@ namespace call
     Call &Call::operator=(Call &&other) noexcept
     {
         if (not other.machine) {
-            LOG_ERROR("operator= on wrong call");
+            LOG_ERROR("On wrong call");
             return *this;
         }
         machine = std::make_unique<StateMachine>(std::move(other.machine->di));

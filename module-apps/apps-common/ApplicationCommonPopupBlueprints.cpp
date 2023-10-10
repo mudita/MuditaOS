@@ -92,7 +92,7 @@ namespace app
         auto phoneLockBlueprint = [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
             auto popupParams = dynamic_cast<gui::PhoneUnlockInputRequestParams *>(params.get());
             if (popupParams == nullptr) {
-                LOG_ERROR("this is most probably due to wrong unique_ptr handling - please check");
+                LOG_ERROR("This is most probably due to wrong unique_ptr handling - please check");
                 return false;
             }
 

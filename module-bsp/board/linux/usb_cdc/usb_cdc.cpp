@@ -170,7 +170,7 @@ namespace bsp
         fd = 0;
         fd = open("/dev/ptmx", O_RDWR | O_NOCTTY);
         if (fd == -1) {
-            LOG_ERROR("bsp::usbInit Failed to open /dev/ptmx, can't allocate new pseudo terminal");
+            LOG_ERROR("Failed to open /dev/ptmx, can't allocate new pseudo terminal");
             return -1;
         }
 
@@ -179,7 +179,7 @@ namespace bsp
 
         pts_name = ptsname(fd);
         if (pts_name == nullptr) {
-            LOG_ERROR("bsp::usbInit ptsname returned NULL, no pseudo terminal allocated");
+            LOG_ERROR("ptsname returned NULL, no pseudo terminal allocated");
             return -1;
         }
 
@@ -187,7 +187,7 @@ namespace bsp
         inotify_add_watch(fdNotify, pts_name, IN_OPEN | IN_CLOSE_WRITE);
 
         writePtsToFile(pts_name);
-        LOG_INFO("bsp::usbInit linux ptsname: %s", pts_name);
+        LOG_INFO("linux ptsname: %s", pts_name);
         struct termios newtio
         {};
         memset(&newtio, 0, sizeof(newtio));
@@ -219,7 +219,7 @@ namespace bsp
                                             &taskHandleReceive);
 
         if (task_error != pdPASS) {
-            LOG_ERROR("bsp::usbInit Failed to start freertos USB_Linux_Receive");
+            LOG_ERROR("Failed to start freertos USB_Linux_Receive");
             return -1;
         }
 

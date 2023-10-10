@@ -76,7 +76,7 @@ namespace sys
         bus.connect();
         enableRunLoop = true;
         if (!Start()) {
-            LOG_FATAL("FATAL ERROR: Start service failed!:%s", GetName().c_str());
+            LOG_FATAL("Start service failed!:%s", GetName().c_str());
             configASSERT(0);
         }
     }

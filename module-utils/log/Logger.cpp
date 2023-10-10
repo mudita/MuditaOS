@@ -316,15 +316,15 @@ namespace Log
         bufferSizeLeft = lineBufferSizeLeft();
         bytesParsed    = snprintf(&lineBuffer[lineBufferCurrentPos],
                                bufferSizeLeft,
-                               "%s%-5s %s[%s] %s%s:%s:%d:%s ",
+                               "%s%-5s %s[%s] %s%s:%d:%s:%s ",
                                logColors->levelColors[level].data(),
                                levelNames[level],
                                logColors->serviceNameColor.data(),
                                getTaskDesc(),
                                logColors->callerInfoColor.data(),
                                file,
-                               function,
                                line,
+                               function,
                                logColors->resetColor.data());
         if (bytesParsed >= 0) {
             lineBufferCurrentPos += std::min(bufferSizeLeft, static_cast<std::size_t>(bytesParsed));

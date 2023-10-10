@@ -19,12 +19,10 @@ namespace service
     ServiceFileIndexer::ServiceFileIndexer(const std::vector<std::string> &paths)
         : sys::Service{service::name::file_indexer, "", fileIndexerServiceStackSize}, mStartupIndexer{paths}
     {
-        LOG_DEBUG("[%s] Initializing", service::name::file_indexer);
     }
 
     ServiceFileIndexer::~ServiceFileIndexer()
     {
-        LOG_INFO("[%s] Cleaning resources", service::name::file_indexer);
     }
 
     sys::MessagePointer ServiceFileIndexer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
@@ -43,12 +41,13 @@ namespace service
             return sys::ReturnCodes::Success;
         }
 
+        LOG_INFO("Initialized");
         return sys::ReturnCodes::Failure;
     }
 
     sys::ReturnCodes ServiceFileIndexer::DeinitHandler()
     {
-        LOG_DEBUG("[%s] Deitializing", service::name::file_indexer);
+        LOG_INFO("Deinitialized");
         return sys::ReturnCodes::Success;
     }
 

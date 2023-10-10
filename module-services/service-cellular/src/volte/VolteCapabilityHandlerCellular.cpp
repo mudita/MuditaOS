@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "VolteCapabilityHandlerCellular.hpp"
@@ -11,7 +11,7 @@ namespace cellular::service
     {
         auto result = channel.cmd(at::AT::CIMI);
         if (not result) {
-            LOG_ERROR("[VoLTE] failed to read IMSI - will disable VoLTE");
+            LOG_ERROR("Failed to read IMSI - will disable VoLTE");
             return std::nullopt;
         }
 

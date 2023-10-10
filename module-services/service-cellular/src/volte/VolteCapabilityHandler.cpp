@@ -16,7 +16,7 @@ namespace cellular::service
     {
         const auto &imsi = cellularInterface->getImsi(channel);
         if (!imsi.has_value()) {
-            LOG_ERROR("[VoLTE] failed to read IMSI - VoLTE not permitted");
+            LOG_ERROR("VoLTE not permitted - failed to read IMSI");
             return false;
         }
 
@@ -27,7 +27,7 @@ namespace cellular::service
     {
         const auto &imsi = cellularInterface->getImsi(channel);
         if (!imsi.has_value()) {
-            LOG_ERROR("[VoLTE] failed to read IMSI - VoLTE not permitted");
+            LOG_ERROR("VoLTE not permitted - failed to read IMSI");
             return ImsiParser::SupportStatus::Unsupported;
         }
 

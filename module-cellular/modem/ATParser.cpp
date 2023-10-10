@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATParser.hpp"
@@ -79,7 +79,7 @@ at::Result ATParser::processNewData(sys::Service *service, const bsp::cellular::
     }
     else if (!ret.empty()) {
         if (ret.size() == 1 && ret[0] == ATParser::Urc::Fota) {
-            LOG_DEBUG("parsing FOTA");
+            LOG_DEBUG("Parsing FOTA");
             cpp_freertos::LockGuard lock(mutex);
             urcBuffer.erase();
         }

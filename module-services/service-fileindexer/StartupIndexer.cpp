@@ -94,7 +94,7 @@ namespace service::detail
         if (isDirectoryFullyTraversed(mSubDirIterator)) {
             if (mTopDirIterator == std::cend(directoriesToScan)) {
                 createLockFile();
-                LOG_INFO("Initial startup indexer - Finished ...");
+                LOG_INFO("Initial startup indexer: Finished");
                 mIdxTimer.stop();
                 return;
             }
@@ -125,7 +125,7 @@ namespace service::detail
     auto StartupIndexer::start(std::shared_ptr<sys::Service> svc, std::string_view svc_name) -> void
     {
         if (!hasLockFile()) {
-            LOG_INFO("Initial startup indexer - Started...");
+            LOG_INFO("Initial startup indexer: Started");
 
             auto query = std::make_unique<db::multimedia_files::query::RemoveAll>();
             DBServiceAPI::GetQuery(svc.get(), db::Interface::Name::MultimediaFiles, std::move(query));
@@ -135,7 +135,7 @@ namespace service::detail
             mForceStop = false;
         }
         else {
-            LOG_INFO("Initial startup indexer - Not needed...");
+            LOG_INFO("Initial startup indexer: Not needed");
         }
     }
 

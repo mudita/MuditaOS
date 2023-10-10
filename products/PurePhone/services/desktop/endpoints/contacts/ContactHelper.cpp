@@ -126,7 +126,7 @@ namespace sdesktop::endpoints
             DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::Contact, std::move(query));
         }
         catch (const std::exception &e) {
-            LOG_ERROR("exception while requesting data from DB");
+            LOG_ERROR("Exception while requesting data from DB");
             return sys::ReturnCodes::Failure;
         }
 

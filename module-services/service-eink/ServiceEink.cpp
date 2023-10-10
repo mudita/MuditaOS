@@ -87,7 +87,6 @@ namespace service::eink
 
     sys::ReturnCodes ServiceEink::InitHandler()
     {
-        LOG_INFO("Initializing Eink");
         if (const auto status = display->reinitAndPowerOn(); status != hal::eink::EinkStatus::EinkOK) {
             LOG_FATAL("Error: Could not initialize Eink display!");
             return sys::ReturnCodes::Failure;
@@ -104,6 +103,7 @@ namespace service::eink
 
         eInkSentinel->HoldMinimumFrequency();
 
+        LOG_INFO("Initialized");
         return sys::ReturnCodes::Success;
     }
 
@@ -128,6 +128,8 @@ namespace service::eink
 
         display->shutdown();
         settings->deinit();
+
+        LOG_INFO("Deinitialized");
         return sys::ReturnCodes::Success;
     }
 
@@ -144,7 +146,6 @@ namespace service::eink
 
     sys::ReturnCodes ServiceEink::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
-        LOG_INFO("PowerModeHandler: %s", c_str(mode));
         switch (mode) {
         case sys::ServicePowerMode::Active:
             enterActiveMode();

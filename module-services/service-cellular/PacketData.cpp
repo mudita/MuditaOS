@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PacketData.hpp"
@@ -197,7 +197,7 @@ namespace packet_data
             contextMap[apnConfig->contextId] = apnConfig;
         }
 
-        LOG_DEBUG("loadAPNSettings");
+        LOG_DEBUG("APN settings loaded");
     }
 
     std::string PacketData::saveAPNSettings() const
@@ -208,14 +208,14 @@ namespace packet_data
         std::transform(contextMap.begin(), contextMap.end(), std::back_inserter(vec), [](auto &apn) {
             return apn.second->to_json();
         });
-        LOG_DEBUG("saveAPNSettings");
+        LOG_DEBUG("APN settings saved");
 
         return json11::Json(vec).dump();
     }
 
     at::Result::Code PacketData::updateAPNSettings(std::uint8_t ctxId)
     {
-        LOG_DEBUG("updateAPNSettings %d", ctxId);
+        LOG_DEBUG("Updating APN settings: %d", ctxId);
         PDPContext pdpCtx(cellularService);
         std::shared_ptr<APN::Config> apnConfig;
         std::shared_ptr<APN::Config> modemApn;
@@ -233,7 +233,7 @@ namespace packet_data
             else {
                 if (!phoneApn->second->compare(modemApn)) {
                     /// rebuild configuration
-                    LOG_DEBUG("Update modem context %d", ctxId);
+                    LOG_DEBUG("Update modem context: %d", ctxId);
                     if (ctxId > internalAPNMaxId) {
                         return pdpCtx.setConfiguration(phoneApn->second);
                     }
@@ -248,7 +248,7 @@ namespace packet_data
             if (!modemApn->isEmpty()) {
                 /** update phone configuration base on modem conf (eg. ims)
                  */
-                LOG_DEBUG("Update modem context %d", ctxId);
+                LOG_DEBUG("Update modem context: %d", ctxId);
                 if (ctxId > internalAPNMaxId) {
                     return pdpCtx.setConfiguration(modemApn, true);
                 }

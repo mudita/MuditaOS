@@ -141,7 +141,7 @@ namespace gui
             return glyph;
         }
 
-        LOG_WARN("unsupported font glyph ID: %" PRIu32, glyph_id);
+        LOG_WARN("Unsupported font glyph ID: %" PRIu32, glyph_id);
         return unsupported.get();
     }
 
@@ -173,7 +173,7 @@ namespace gui
         }
 
         if ((start >= str.length()) || (start + count - 1 >= str.length())) {
-            LOG_ERROR("incorrect string index provided");
+            LOG_ERROR("Incorrect string index provided");
             return 0;
         }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-test/ApplicationTest.hpp"
@@ -15,7 +15,7 @@ namespace app
                                      StartInBackground startInBackground)
         : Application(name, parent, statusIndicators, startInBackground)
     {
-        LOG_INFO("created!");
+        LOG_INFO("Created!");
     }
 
     ApplicationTest::~ApplicationTest()
@@ -25,14 +25,14 @@ namespace app
 
     sys::ReturnCodes ApplicationTest::InitHandler()
     {
-        LOG_INFO("initializing!");
+        LOG_INFO("Initializing!");
         // NOTE
         // this is very important! as it:
         // 1. sets state initializing on app
         // 2. initailizes settigns - every app have settings object by default
         const auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success) {
-            LOG_ERROR("init app failure! %d", int(ret));
+            LOG_ERROR("Init app failure! %d", int(ret));
             return ret;
         }
         createUserInterface();

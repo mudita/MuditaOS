@@ -156,7 +156,7 @@ auto FileOperations::getDataForReceiveID(transfer_id rxID, std::uint32_t chunkNo
     }
 
     if (fileCtx->reachedEOF()) {
-        LOG_INFO("Reached EOF for rxID %u", static_cast<unsigned>(rxID));
+        LOG_DEBUG("Reached EOF for rxID %u", static_cast<unsigned>(rxID));
         fileCrc32 = fileCtx->fileHash();
         writeTransfers.erase(rxID);
     }
@@ -208,7 +208,7 @@ auto FileOperations::sendDataForTransmitID(transfer_id txID, std::uint32_t chunk
     fileCtx->write(*fileData);
 
     if (fileCtx->reachedEOF()) {
-        LOG_INFO("Reached EOF for txID %u", static_cast<unsigned>(txID));
+        LOG_DEBUG("Reached EOF for txID %u", static_cast<unsigned>(txID));
         auto fileOK = fileCtx->crc32Matches();
 
         if (!fileOK) {
@@ -232,7 +232,7 @@ auto FileOperations::cleanUpUndeliveredTransfers() -> void
         return;
     }
 
-    LOG_INFO("Clean up after undelivered transfers");
+    LOG_DEBUG("Clean up after undelivered transfers");
     for (auto &wt : writeTransfers) {
         wt.second->removeFile();
         wt.second.reset();

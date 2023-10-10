@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <UrcQind.hpp>
@@ -70,7 +70,7 @@ auto Qind::validate(enum CSQ check) const noexcept -> bool
         }
     }
     catch (const std::exception &ex) {
-        LOG_FATAL("exception: %s", ex.what());
+        LOG_ERROR("Exception: %s", ex.what());
     }
     return false;
 }

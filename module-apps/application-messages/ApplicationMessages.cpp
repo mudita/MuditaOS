@@ -257,7 +257,7 @@ namespace app
                 switchWindow(gui::name::window::main_window);
                 return true;
             }
-            LOG_ERROR("ThreadRemove id=%" PRIu32 " failed", threadId);
+            LOG_ERROR("Thread remove id=%" PRIu32 " failed", threadId);
             return false;
         });
         task->execute(this, this);
@@ -308,7 +308,7 @@ namespace app
                 task->execute(this, this);
                 return true;
             }
-            LOG_ERROR("sSMSRemove id=%" PRIu32 " failed", record.ID);
+            LOG_ERROR("SMS remove id=%" PRIu32 " failed", record.ID);
             return false;
         });
         task->execute(this, this);

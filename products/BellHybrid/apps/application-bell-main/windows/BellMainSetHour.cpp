@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellMainSetHour.hpp"
@@ -69,7 +69,6 @@ namespace gui
 
     bool BellMainSetHour::onInput(const InputEvent &inputEvent)
     {
-        LOG_INFO("Bell Main Window Input");
         if (inputEvent.isShortRelease()) {
             switch (inputEvent.getKeyCode()) {
             case KeyCode::KEY_RF:

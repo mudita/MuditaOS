@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-appmgr/Controller.hpp>
@@ -20,7 +20,7 @@ namespace gui
     {
         auto *item = dynamic_cast<PhonebookItemData *>(data);
         if (item == nullptr) {
-            LOG_WARN("Received null pointer");
+            LOG_ERROR("Failed to get phonebook data");
             return false;
         }
 

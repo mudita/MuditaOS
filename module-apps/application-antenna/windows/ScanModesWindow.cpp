@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ScanModesWindow.hpp"
@@ -64,7 +64,7 @@ namespace gui
                     mode = std::to_string(el.first);
                 }
                 catch (const std::exception &e) {
-                    LOG_ERROR("ServiceCellular::std::to_string exception %s", e.what());
+                    LOG_ERROR("Parse mode to string exception: %s", e.what());
                 }
                 auto result = CellularServiceAPI::SetScanMode(this->application, mode);
                 if (result) {
@@ -144,7 +144,7 @@ namespace gui
             mode = std::stoi(data);
         }
         catch (const std::exception &e) {
-            LOG_ERROR("ScanModesWindow::updateCurrentMode exception %s", e.what());
+            LOG_ERROR("Update mode failed: %s", e.what());
             return;
         }
         if (mode < modeButtonParams.size()) {

@@ -44,7 +44,6 @@ namespace app
 
     ApplicationCallLog::~ApplicationCallLog()
     {
-        LOG_INFO("ApplicationCallLog::destroy");
     }
 
     // Invoked upon receiving data message
@@ -117,7 +116,7 @@ namespace app
 
     bool ApplicationCallLog::removeCalllogEntry(const CalllogRecord &record)
     {
-        LOG_DEBUG("Removing CalllogRecord: %" PRIu32, record.ID);
+        LOG_DEBUG("Removing call log record: %" PRIu32, record.ID);
         auto metaData = std::make_unique<gui::DialogMetadataMessage>(
             gui::DialogMetadata{record.name,
                                 "delete_128px_W_G",
@@ -125,7 +124,7 @@ namespace app
                                 "",
                                 [=]() -> bool {
                                     if (DBServiceAPI::CalllogRemove(this, record.ID) == false) {
-                                        LOG_ERROR("CalllogRemove id=%" PRIu32 " failed", record.ID);
+                                        LOG_ERROR("Call log remove id=%" PRIu32 " failed", record.ID);
                                         return false;
                                     }
                                     this->switchWindow(calllog::settings::MainWindowStr);

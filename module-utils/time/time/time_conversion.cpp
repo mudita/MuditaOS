@@ -327,7 +327,7 @@ namespace utils::time
         seconds   = (this->duration % secondsInHour) % secondsInMinute;
 
         if (verboseConversion) {
-            LOG_DEBUG("duration %" PRIu64 " - %lu hours %lu minutes %lu seconds",
+            LOG_DEBUG("Duration %" PRIu64 " - %lu hours %lu minutes %lu seconds",
                       static_cast<std::uint64_t>(duration),
                       hours,
                       minutes,

@@ -114,7 +114,6 @@ ServiceAudio::ServiceAudio()
       cpuSentinel(std::make_shared<sys::CpuSentinel>(service::name::audio, this)),
       settingsProvider(std::make_unique<settings::Settings>())
 {
-    LOG_INFO("[ServiceAudio] Initializing");
     bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
@@ -136,7 +135,6 @@ ServiceAudio::ServiceAudio()
 
 ServiceAudio::~ServiceAudio()
 {
-    LOG_INFO("[ServiceAudio] Cleaning resources");
 }
 
 sys::ReturnCodes ServiceAudio::InitHandler()
@@ -151,13 +149,15 @@ sys::ReturnCodes ServiceAudio::InitHandler()
         settingsProvider->registerValueChange(
             setting.first, [this](const std::string &name, const std::string &value) { settingsChanged(name, value); });
     }
-
+    LOG_INFO("Initialized");
     return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes ServiceAudio::DeinitHandler()
 {
+
     settingsProvider->deinit();
+    LOG_INFO("Deinitialized");
     return sys::ReturnCodes::Success;
 }
 
@@ -215,7 +215,6 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Messag
 
 sys::ReturnCodes ServiceAudio::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
-    LOG_FATAL("[ServiceAudio] PowerModeHandler: %s", c_str(mode));
     return sys::ReturnCodes::Success;
 }
 
@@ -756,7 +755,7 @@ std::string ServiceAudio::getSetting(const Setting &setting,
         return set_it->second;
     }
 
-    LOG_ERROR("ServiceAudio::getSetting setting name %s does not exist", path.c_str());
+    LOG_ERROR("Setting '%s' does not exist", path.c_str());
     return std::string{};
 }
 
@@ -847,7 +846,7 @@ void ServiceAudio::settingsChanged(const std::string &name, std::string value)
         s_it->second = value;
         return;
     }
-    LOG_ERROR("ServiceAudio::settingsChanged received notification about not registered setting: %s", name.c_str());
+    LOG_ERROR("Setting '%s' not registered", name.c_str());
 }
 
 void ServiceAudio::onVolumeChanged(const Volume volume, const VolumeChangeRequestSource source)

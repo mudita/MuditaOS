@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsMainWindow.hpp"
@@ -18,7 +18,7 @@ std::list<gui::Option> mainWindowOptionsNew(app::ApplicationCommon *app)
                                        if (window.empty()) {
                                            return false;
                                        }
-                                       LOG_INFO("switching to %s page", window.c_str());
+                                       LOG_DEBUG("Switching to %s page", window.c_str());
                                        app->switchWindow(window, nullptr);
                                        return true;
                                    },

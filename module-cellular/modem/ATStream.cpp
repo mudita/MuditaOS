@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <cstring>
 #include "ATStream.hpp"
@@ -55,7 +55,7 @@ namespace at
                 Result::Code::ERROR; // setup error but in this case error from +CME ERROR with valid errorCode
             auto tmp_ec = magic_enum::enum_cast<EquipmentErrorCode>(errcode);
             if (tmp_ec.has_value()) {
-                LOG_ERROR("%s", utils::enumToString(tmp_ec.value()).c_str());
+                LOG_ERROR("CME error: %s", utils::enumToString(tmp_ec.value()).c_str());
                 result.errorCode = tmp_ec.value();
             }
             else {
@@ -71,7 +71,7 @@ namespace at
             auto atmp_ec = magic_enum::enum_cast<NetworkErrorCode>(errcode);
 
             if (atmp_ec.has_value()) {
-                LOG_ERROR("%s", utils::enumToString(atmp_ec.value()).c_str());
+                LOG_ERROR("CMS error code: %s", utils::enumToString(atmp_ec.value()).c_str());
                 result.errorCode = atmp_ec.value();
             }
             else {

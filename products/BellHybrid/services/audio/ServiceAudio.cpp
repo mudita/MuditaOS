@@ -64,7 +64,6 @@ namespace service
           cpuSentinel(std::make_shared<sys::CpuSentinel>(audioServiceName, this)),
           settingsProvider(std::make_unique<settings::Settings>())
     {
-        LOG_INFO("[%s] Initializing", audioServiceName);
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
 
         auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
@@ -103,7 +102,6 @@ namespace service
     }
     Audio::~Audio()
     {
-        LOG_INFO("[%s] Cleaning resources", audioServiceName);
     }
     sys::MessagePointer Audio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
@@ -113,11 +111,12 @@ namespace service
     {
         settingsProvider->init(service::ServiceProxy(weak_from_this()));
         initializeDatabase();
-
+        LOG_INFO("Initialized");
         return sys::ReturnCodes::Success;
     }
     sys::ReturnCodes Audio::DeinitHandler()
     {
+        LOG_INFO("Deinitialized");
         return sys::ReturnCodes::Success;
     }
     void Audio::ProcessCloseReason([[maybe_unused]] sys::CloseReason closeReason)

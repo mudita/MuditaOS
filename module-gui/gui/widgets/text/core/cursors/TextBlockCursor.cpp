@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextBlockCursor.hpp"
@@ -201,7 +201,7 @@ namespace gui
         }
         auto block = currentBlock();
         if (block == blocksEnd()) {
-            LOG_ERROR("add char to document with no text blocks shouldn't ever happen");
+            LOG_ERROR("Add char to document with no text blocks shouldn't ever happen");
             return;
         }
         if (utf_val == text::newline) {
@@ -246,7 +246,7 @@ namespace gui
     bool BlockCursor::removeChar()
     {
         if (checkNpos()) {
-            LOG_ERROR("cant remove from not initialized/empty cursor");
+            LOG_ERROR("Can't remove from uninitialized/empty cursor");
             return false;
         }
 
@@ -262,7 +262,7 @@ namespace gui
         }
 
         if (block == blocksEnd()) {
-            LOG_ERROR("removing char from document with no TextBlocks");
+            LOG_ERROR("Removing char from document with no TextBlocks");
             return false;
         }
 

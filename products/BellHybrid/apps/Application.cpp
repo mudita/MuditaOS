@@ -32,7 +32,7 @@ namespace app
                         (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
                         (isCurrentWindow(gui::BellTurnOffWindow::name)));
             if (val == true) {
-                LOG_ERROR("block popup - as curent window is in higher order popup");
+                LOG_ERROR("Block popup - as curent window is in higher order popup");
             }
             return val ? gui::popup::FilterType::Ignore : gui::popup::FilterType::Show;
         });

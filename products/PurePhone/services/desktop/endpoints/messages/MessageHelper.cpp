@@ -555,7 +555,7 @@ namespace sdesktop::endpoints
             DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSThread, std::move(query));
         }
         catch (const std::bad_cast &e) {
-            LOG_ERROR("exception while requesting thread");
+            LOG_ERROR("Exception while requesting thread");
             return sys::ReturnCodes::Failure;
         }
         return sys::ReturnCodes::Success;
@@ -642,7 +642,7 @@ namespace sdesktop::endpoints
             DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
         }
         catch (const std::bad_cast &e) {
-            LOG_ERROR("exception while getting message by thread ID");
+            LOG_ERROR("Exception while getting message by thread ID");
             return sys::ReturnCodes::Failure;
         }
         return sys::ReturnCodes::Success;
@@ -721,7 +721,7 @@ namespace sdesktop::endpoints
             DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMS, std::move(query));
         }
         catch (const std::bad_cast &e) {
-            LOG_ERROR("exception while getting message");
+            LOG_ERROR("Exception while getting message");
             return sys::ReturnCodes::Failure;
         }
         return sys::ReturnCodes::Success;
@@ -809,7 +809,7 @@ namespace sdesktop::endpoints
             DBServiceAPI::GetQuery(ownerServicePtr, db::Interface::Name::SMSTemplate, std::move(query));
         }
         catch (const std::bad_cast &e) {
-            LOG_ERROR("exception while getting messages template");
+            LOG_ERROR("Exception while getting messages template");
             return sys::ReturnCodes::Failure;
         }
         return sys::ReturnCodes::Success;

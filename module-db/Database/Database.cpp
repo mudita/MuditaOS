@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Database.hpp"
@@ -74,7 +74,7 @@ Database::Database(const char *name, bool readOnly)
     const int flags = (readOnly) ? (SQLITE_OPEN_READONLY) : (SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE);
     LOG_INFO("Opening database: %s", dbName.c_str());
     if (const auto rc = sqlite3_open_v2(name, &dbConnection, flags, nullptr); rc != SQLITE_OK) {
-        LOG_ERROR("SQLITE INITIALIZATION ERROR! rc=%d dbName=%s", rc, name);
+        LOG_ERROR("SQLITE initialization error! rc=%d dbName=%s", rc, name);
         throw DatabaseInitialisationError{"Failed to initialize the sqlite db"};
     }
     sqlite3_extended_result_codes(dbConnection, enabled);
@@ -207,7 +207,7 @@ auto Database::pragmaQueryForValue(const std::string &pragmaStatement, const std
     auto results = query(pragmaStatement.c_str());
 
     if (!results || results->getRowCount() == 0) {
-        LOG_DEBUG("no results!");
+        LOG_DEBUG("No results!");
         return false;
     }
 
@@ -238,7 +238,7 @@ void Database::pragmaQuery(const std::string &pragmaStatement)
         } while (results->nextRow());
     }
     else {
-        LOG_DEBUG("no results!");
+        LOG_DEBUG("No results!");
     }
 }
 
@@ -249,11 +249,11 @@ bool Database::storeIntoFile(const std::filesystem::path &syncPath)
     // that's why we need to commit it manually
     if (sqlite3_get_autocommit(dbConnection) == 0) {
         if (const auto rc = execute("COMMIT;"); !rc) {
-            LOG_ERROR("failed to execute commit; sqlite3 autocommit after commit: %d",
+            LOG_ERROR("Failed to execute commit; sqlite3 autocommit after commit: %d",
                       sqlite3_get_autocommit(dbConnection));
             return false;
         }
-        LOG_INFO("sqlite3 autocommit after commit: %d", sqlite3_get_autocommit(dbConnection));
+        LOG_INFO("SQLITE3 autocommit after commit: %d", sqlite3_get_autocommit(dbConnection));
     }
 
     LOG_INFO("Store database: %s, into file: %s - STARTED", dbName.c_str(), syncPath.c_str());

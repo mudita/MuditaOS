@@ -51,7 +51,7 @@ namespace app
     {
         const auto [result, id] = DBServiceAPI::GetQuery(application, target, std::move(query));
         if (!result) {
-            LOG_FATAL("cant request!");
+            LOG_FATAL("Failed to send request!");
         }
         return id;
     }
@@ -71,7 +71,7 @@ namespace app
         std::shared_ptr<sys::DataMessage> msg{std::move(message)};
         bool result = application->bus.sendUnicast(msg, serviceName);
         if (!result) {
-            LOG_FATAL("cant request!");
+            LOG_FATAL("Failed to send message!");
         }
         return msg->uniID;
     }

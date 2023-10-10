@@ -74,7 +74,7 @@ void NotificationsModel::updateData(app::manager::actions::NotificationsChangedP
         return;
     }
     if (params == nullptr) {
-        LOG_ERROR("params is nullptr");
+        LOG_ERROR("Params are not provided");
         return;
     }
 

@@ -62,7 +62,7 @@ namespace gui
                     settingsApp->sendVolteChangeRequest(false);
                     break;
                 default:
-                    LOG_INFO("[VoLTE] skip request due to unsettled VoLTE state");
+                    LOG_INFO("VoLTE state is unsettled, skipping request");
                     break;
                 }
 
@@ -131,7 +131,7 @@ namespace gui
         auto labelText = "<text>" + utils::translate("app_settings_network_voice_over_lte");
         if (!volteState.permitted) {
             if (volteState.enablement == cellular::VolteState::Enablement::On) {
-                LOG_ERROR("[VoLTE] still enabled in modem despite not permitted by operator");
+                LOG_ERROR("VoLTE still enabled in modem despite not permitted by operator");
             }
             labelText += ": ";
             labelText += utils::translate("app_settings_network_volte_not_available");

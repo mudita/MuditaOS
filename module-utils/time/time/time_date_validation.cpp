@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -67,7 +67,7 @@ namespace utils
                 m = std::stoi(minute);
             }
             catch (std::exception &e) {
-                LOG_INFO("validateTime exception");
+                LOG_ERROR("Time validate exception");
                 return false;
             }
             return validateTime(h, m, mode12h);

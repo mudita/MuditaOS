@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeWidget.hpp"
@@ -94,7 +94,7 @@ namespace gui
                         hours = std::stoi(hourInput->getText().c_str());
                     }
                     catch (std::exception &e) {
-                        LOG_ERROR("applyInputCallbacks hours: %s", e.what());
+                        LOG_ERROR("Exception during getting hours: %s", e.what());
                         return true;
                     }
 
@@ -218,7 +218,7 @@ namespace gui
     {
         if (type == Type::End) {
             if (secondItem == nullptr) {
-                LOG_ERROR("secondItem not connected!");
+                LOG_ERROR("TimeWidget not connected!");
                 return false;
             }
             std::chrono::hours start_hour;
@@ -235,7 +235,7 @@ namespace gui
                 }
             }
             catch (std::exception &e) {
-                LOG_WARN("start_hour: %s", e.what());
+                LOG_ERROR("Exception while setting start_hour: %s", e.what());
                 return false;
             }
 
@@ -249,7 +249,7 @@ namespace gui
                 }
             }
             catch (std::exception &e) {
-                LOG_ERROR("end_hour: %s", e.what());
+                LOG_ERROR("Exception while setting end_hour: %s", e.what());
                 return false;
             }
 
@@ -257,7 +257,7 @@ namespace gui
                 start_minutes = std::stoi(secondItem->minuteInput->getText().c_str());
             }
             catch (std::exception &e) {
-                LOG_ERROR("start_minutes: %s", e.what());
+                LOG_ERROR("Exception while setting start_minutes: %s", e.what());
                 return false;
             }
 
@@ -265,7 +265,7 @@ namespace gui
                 end_minutes = std::stoi(minuteInput->getText().c_str());
             }
             catch (std::exception &e) {
-                LOG_ERROR("end_minutes: %s", e.what());
+                LOG_ERROR("Exception while setting end_minutes: %s", e.what());
                 return false;
             }
 

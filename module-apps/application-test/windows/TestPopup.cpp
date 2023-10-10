@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LocalStyle.hpp"
@@ -11,7 +11,7 @@ namespace gui
 
     TestPopupWindow::TestPopupWindow(app::ApplicationCommon *app, const std::string &name) : AppWindow(app, name)
     {
-        LOG_INFO("popup build!");
+        LOG_INFO("Pop-up build!");
         buildInterface();
     }
 

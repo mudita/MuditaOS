@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlayAudioActions.hpp"
@@ -57,7 +57,7 @@ namespace alarms
     bool PlayToneAction::execute(const AlarmEventRecord &record)
     {
         const auto tonePath = std::filesystem::path{record.musicTone};
-        LOG_DEBUG("play some music: %s", record.musicTone.c_str());
+        LOG_DEBUG("Play some music: %s", record.musicTone.c_str());
         return play(tonePath);
     }
 } // namespace alarms

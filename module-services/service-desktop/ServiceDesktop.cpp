@@ -22,7 +22,6 @@ ServiceDesktop::ServiceDesktop(const std::filesystem::path &mtpRootPath)
           [this](sys::Timer & /*timer*/) { outboxNotifications.clearNotifications(); })},
       mtpRootPath{mtpRootPath}
 {
-    LOG_INFO("[ServiceDesktop] Initializing");
     bus.channels.push_back(sys::BusChannel::PhoneLockChanges);
     bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     bus.channels.push_back(sys::BusChannel::USBNotifications);
@@ -30,7 +29,6 @@ ServiceDesktop::ServiceDesktop(const std::filesystem::path &mtpRootPath)
 
 ServiceDesktop::~ServiceDesktop()
 {
-    LOG_INFO("[ServiceDesktop] Cleaning resources");
 }
 
 sys::ReturnCodes ServiceDesktop::InitHandler()
@@ -55,11 +53,13 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
 
     checkChargingCondition();
 
+    LOG_INFO("Initialized");
     return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes ServiceDesktop::DeinitHandler()
 {
+    LOG_INFO("Deinitialized");
     return usbWorkerDeinit();
 }
 
@@ -80,11 +80,11 @@ sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage * /*msg
     if (auto queryResponse = dynamic_cast<db::QueryResponse *>(resp)) {
         auto result = queryResponse->getResult();
         if (result == nullptr) {
-            LOG_ERROR("Wrong result - nullptr!");
+            LOG_ERROR("Wrong result: nullptr!");
             return response;
         }
         if (result->hasListener()) {
-            LOG_DEBUG("Handling result...");
+            LOG_DEBUG("Handling result");
             result->handle();
         }
     }
@@ -211,6 +211,7 @@ auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes
     desktopWorker.reset();
     initialized     = false;
     isUsbConfigured = false;
+    LOG_DEBUG("USB worker deinitialized");
     // It must be run after the worker is closed.
     cleanFileSystemEndpointUndeliveredTransfers();
     return sys::ReturnCodes::Success;

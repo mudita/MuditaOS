@@ -31,7 +31,7 @@ namespace sdesktop::endpoints
             const auto diagFileType = parseDiagnosticFileType(requestBody[json::fileList]);
 
             if (!magic_enum::enum_contains<DiagnosticFileType>(diagFileType)) {
-                LOG_ERROR("Bad diagnostic type %d requested", static_cast<unsigned>(diagFileType));
+                LOG_ERROR("Bad diagnostic type '%s' requested", magic_enum::enum_name(diagFileType).data());
                 return http::Code::BadRequest;
             }
 

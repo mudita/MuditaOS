@@ -578,7 +578,7 @@ namespace app::manager
     {
         if (not ApplicationManagerCommon::startApplication(app)) {
             if (ApplicationManagerCommon::isApplicationStarting(app)) {
-                LOG_INFO("%s is starting already...", app.name().c_str());
+                LOG_INFO("%s is starting already", app.name().c_str());
                 return false;
             }
 

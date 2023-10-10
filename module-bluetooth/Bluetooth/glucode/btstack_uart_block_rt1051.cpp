@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <bsp/bluetooth/Bluetooth.hpp>
@@ -73,7 +73,7 @@ extern "C"
     static void uart_rt1051_receive_block(uint8_t *buffer, uint16_t len)
     {
 #ifdef DEBUG_UART
-        LOG_INFO("<-- read: %d", len);
+        LOG_DEBUG("<-- read: %d", len);
 #endif
         BlueKitchen::getInstance()->read(buffer, len);
     }
@@ -81,7 +81,7 @@ extern "C"
     static void uart_rt1051_send_block(const uint8_t *buffer, uint16_t length)
     {
 #ifdef DEBUG_UART
-        LOG_INFO("--> write: %d", length);
+        LOG_DEBUG("--> write: %d", length);
 #endif
         BlueKitchen::getInstance()->write(buffer, length);
     }
@@ -115,7 +115,6 @@ extern "C"
 
     const btstack_uart_block_t *btstack_uart_block_rt1051_instance()
     {
-        LOG_INFO("btstack_uart_block_rt1051_instance");
         return &btstack_uart_posix;
     }
 };

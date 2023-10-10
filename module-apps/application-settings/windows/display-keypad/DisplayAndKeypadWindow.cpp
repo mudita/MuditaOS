@@ -27,7 +27,7 @@ namespace gui
                     if (window.empty()) {
                         return false;
                     }
-                    LOG_INFO("switching to %s page", window.c_str());
+                    LOG_DEBUG("Switching to %s page", window.c_str());
                     application->switchWindow(window, nullptr);
                     return true;
                 },

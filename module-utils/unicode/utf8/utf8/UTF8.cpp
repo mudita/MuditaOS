@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cassert>
@@ -412,7 +412,7 @@ uint32_t UTF8::find(const char *s, uint32_t pos) const
     getStreamLength(s, stringSize, stringCount);
 
     if ((stringCount == 0) && (s[0] != 0)) {
-        LOG_ERROR("corrupted string");
+        LOG_ERROR("Corrupted string");
         return npos;
     }
 
@@ -445,7 +445,7 @@ uint32_t UTF8::findLast(const char *s, uint32_t pos) const
     getStreamLength(s, stringSize, stringCount);
     // check input substring
     if ((stringCount == 0) && (s[0] != 0)) {
-        LOG_ERROR("corrupted string");
+        LOG_ERROR("Corrupted string");
         return npos;
     }
     // check if pos is in range of source string
@@ -639,14 +639,14 @@ bool UTF8::insert(const char *ch, const uint32_t &index)
               *(ch + 3));
 
     if (ch_len == 0) {
-        LOG_FATAL("not UTF8 character insert failed");
+        LOG_FATAL("Not UTF8 character insert failed");
         return false;
     }
 
     // if there is not enough space in string buffer try to expand it by default expansion size.
     if (ch_len + sizeUsed >= sizeAllocated) {
         if (expand() == false) {
-            LOG_FATAL("expand");
+            LOG_FATAL("Expand string buffer failed");
             return false;
         }
     }
@@ -740,7 +740,7 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
             len = 2;
         }
         else {
-            LOG_ERROR("wrong utf8 char");
+            LOG_ERROR("Wrong utf8 char");
             return ret;
         }
     }
@@ -756,7 +756,7 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
             len = 3;
         }
         else {
-            LOG_ERROR("wrong utf8 char");
+            LOG_ERROR("Wrong utf8 char");
             return ret;
         }
     }
@@ -775,7 +775,7 @@ uint32_t UTF8::decode(const char *utf8_char, uint32_t &length)
             len = 4;
         }
         else {
-            LOG_ERROR("wrong utf8 char");
+            LOG_ERROR("Wrong utf8 char");
             return ret;
         }
     }

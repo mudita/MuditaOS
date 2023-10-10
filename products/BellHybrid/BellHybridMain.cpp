@@ -99,7 +99,7 @@ int main()
                 platform->init();
             }
             catch (const std::runtime_error &e) {
-                LOG_FATAL("%s", e.what());
+                LOG_FATAL("Exception during platform initialization: %s", e.what());
                 abort();
             }
 
@@ -135,7 +135,7 @@ int main()
                 platform->deinit();
             }
             catch (const std::runtime_error &e) {
-                LOG_FATAL("%s", e.what());
+                LOG_FATAL("Exception during platform deinit: %s", e.what());
                 abort();
             }
             sys::SystemWatchdog::getInstance().deinit();

@@ -16,7 +16,6 @@ namespace
 
 ServiceDBCommon::ServiceDBCommon() : sys::Service(service::name::db, "", serviceDbStackSize, sys::ServicePriority::Idle)
 {
-    LOG_INFO("[ServiceDB] Initializing");
 }
 
 db::Interface *ServiceDBCommon::getInterface(db::Interface::Name interface)
@@ -65,8 +64,11 @@ sys::MessagePointer ServiceDBCommon::DataReceivedHandler(sys::DataMessage *msgl,
 sys::ReturnCodes ServiceDBCommon::InitHandler()
 {
     if (const auto isSuccess = Database::initialize(); !isSuccess) {
+        LOG_ERROR("Failed to initialize");
+
         return sys::ReturnCodes::Failure;
     }
+    LOG_INFO("Initialized");
     return sys::ReturnCodes::Success;
 }
 
@@ -79,6 +81,8 @@ sys::ReturnCodes ServiceDBCommon::DeinitHandler()
     if (const auto isSuccess = Database::deinitialize(); !isSuccess) {
         return sys::ReturnCodes::Failure;
     }
+    LOG_INFO("Deinitialized");
+
     return sys::ReturnCodes::Success;
 }
 

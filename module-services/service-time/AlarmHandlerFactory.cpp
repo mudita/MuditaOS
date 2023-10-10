@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <map>
@@ -14,7 +14,7 @@ namespace alarms
         if (handlers.count(type) != 0u) {
             return handlers.at(type);
         }
-        LOG_ERROR("no such alarm type handler defined: %d", static_cast<int>(type));
+        LOG_ERROR("Alarm handler: %d is not defined", static_cast<int>(type));
         return nullptr;
     }
 

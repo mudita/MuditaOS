@@ -138,7 +138,7 @@ namespace app::popup
             if (timerHandle.isActive())
                 timerHandle.stop();
         }
-        LOG_DEBUG("Snoozed!");
+        LOG_DEBUG("Alarm snoozed!");
     }
 
     void AlarmPopupPresenter::stopAlarm()
@@ -152,7 +152,7 @@ namespace app::popup
             if (timerHandle.isActive())
                 timerHandle.stop();
         }
-        LOG_DEBUG("Stopped!");
+        LOG_DEBUG("Alarm stopped!");
     }
 
     void AlarmPopupPresenter::skipToNextSnooze()

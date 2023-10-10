@@ -180,11 +180,11 @@ namespace app::call
 
         auto contact = DBServiceAPI::MatchContactByPhoneNumber(application, phoneNumber.getView());
         if (contact && !contact->isTemporary()) {
-            LOG_INFO("number recognized as contact id = %" PRIu32, contact->ID);
+            LOG_INFO("Number recognized as contact id = %" PRIu32, contact->ID);
             callerId = contact->getFormattedName();
         }
         else {
-            LOG_INFO("number was not recognized as any valid contact");
+            LOG_INFO("Number was not recognized as any valid contact");
             callerId = UTF8(phoneNumber.getFormatted());
         }
 

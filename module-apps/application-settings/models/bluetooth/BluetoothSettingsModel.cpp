@@ -97,7 +97,7 @@ auto BluetoothSettingsModel::getActiveDevice() -> std::optional<std::reference_w
         return devices.at(activeDeviceIndex);
     }
     catch (const std::out_of_range &oor) {
-        LOG_WARN("NO DEVICE FOUND!");
+        LOG_WARN("Device not found!");
         return std::nullopt;
     }
 }
@@ -107,7 +107,7 @@ auto BluetoothSettingsModel::getSelectedDevice() -> std::optional<std::reference
         return devices.at(selectedDeviceIndex);
     }
     catch (const std::out_of_range &oor) {
-        LOG_WARN("NO DEVICE FOUND!");
+        LOG_WARN("Device not found!");
         return std::nullopt;
     }
 }

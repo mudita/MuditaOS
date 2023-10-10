@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessagesStyle.hpp"
@@ -35,7 +35,6 @@ auto ThreadsModel::getItem(gui::Order order) -> gui::ListItem *
     auto item = gui::ThreadItem::makeThreadItem(threadStruct);
 
     item->activatedCallback = [this, threadStruct](gui::Item &item) {
-        LOG_INFO("ThreadItem ActivatedCallback");
         if (application) {
             const auto &threadItem = static_cast<gui::ThreadItem &>(item);
             application->switchWindow(

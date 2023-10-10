@@ -57,7 +57,7 @@ std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumb
     cellular::ResponseMessage *response = dynamic_cast<cellular::ResponseMessage *>(ret.second.get());
 
     if (response == nullptr) {
-        LOG_ERROR("CellularServiceAPI::GetIMSI failed");
+        LOG_ERROR("Failed to get IMSI");
         return std::string();
     }
 
@@ -65,7 +65,7 @@ std::string CellularServiceAPI::GetIMSI(sys::Service *serv, bool getFullIMSINumb
         return response->data;
     }
     else {
-        LOG_ERROR("CellularServiceAPI::GetIMSI failed");
+        LOG_ERROR("Failed to get IMSI");
         return std::string();
     }
 }
@@ -176,7 +176,7 @@ bool CellularServiceAPI::GetFirmwareVersion(sys::Service *serv, std::string &res
     if (ret.first == sys::ReturnCodes::Success) {
         auto celResponse = std::dynamic_pointer_cast<cellular::ResponseMessage>(ret.second);
         if ((celResponse != nullptr) && (celResponse->retCode == true)) {
-            LOG_DEBUG("Modem Firmware: %s", celResponse->data.c_str());
+            LOG_DEBUG("Modem firmware: %s", celResponse->data.c_str());
             response = celResponse->data;
             return true;
         }
@@ -249,7 +249,7 @@ bool CellularServiceAPI::IsCallInProgress(sys::Service *serv, bool &response)
     if (ret.first == sys::ReturnCodes::Success) {
         auto celResponse = std::dynamic_pointer_cast<cellular::IsCallActiveResponse>(ret.second);
         if ((celResponse != nullptr) && (celResponse->retCode == sys::ReturnCodes::Success)) {
-            LOG_DEBUG("Is Call in progress: %d", celResponse->active);
+            LOG_DEBUG("Is call in progress: %s", celResponse->active ? "yes" : "no");
             response = celResponse->active;
             return true;
         }
@@ -265,7 +265,7 @@ bool CellularServiceAPI::IsCallStateForCallApplicationActive(sys::Service *serv,
     if (ret.first == sys::ReturnCodes::Success) {
         auto celResponse = std::dynamic_pointer_cast<cellular::IsCallActiveResponse>(ret.second);
         if ((celResponse != nullptr) && (celResponse->retCode == sys::ReturnCodes::Success)) {
-            LOG_DEBUG("Is Call in active for ApplicationCall: %d", celResponse->active);
+            LOG_DEBUG("Is call in active for ApplicationCall: %d", celResponse->active);
             response = celResponse->active;
             return true;
         }

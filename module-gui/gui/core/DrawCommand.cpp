@@ -176,7 +176,7 @@ namespace gui
     inline void DrawImage::checkImageSize(Context *ctx, ImageMap *image) const
     {
         if (image->getHeight() > ctx->getH() || image->getWidth() > ctx->getW()) {
-            LOG_WARN("image %s {w: %d,h %d} > context {w %d,h %d}",
+            LOG_WARN("Image %s {w: %d,h %d} > context {w %d,h %d}",
                      image->getName().c_str(),
                      image->getWidth(),
                      ctx->getW(),

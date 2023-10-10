@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/blkdev/partition_parser.hpp>
@@ -153,7 +153,7 @@ namespace purefs::blkdev::internal
         int error{};
         while (try_count--) {
             if (sector_in_buf != current_sector) {
-                LOG_INFO("extended parse: Read sector %u\n", unsigned(current_sector));
+                LOG_INFO("Read sector %u\n", unsigned(current_sector));
                 error = m_disk->read(sect_buf.data(), current_sector, 1, 0);
                 if (error < 0)
                     break;
@@ -163,7 +163,7 @@ namespace purefs::blkdev::internal
                 const auto b1 = sect_buf[defs::mbr_signature_offs];
                 const auto b2 = sect_buf[defs::mbr_signature_offs + 1];
                 if (b1 != 0x55 || b2 != 0xAA) {
-                    LOG_ERROR("extended_parse: No signature %02x,%02x", b1, b2);
+                    LOG_ERROR("No signature %02x,%02x", b1, b2);
                     break;
                 }
             }

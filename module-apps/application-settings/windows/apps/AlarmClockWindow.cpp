@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmClockWindow.hpp"
@@ -65,7 +65,7 @@ namespace gui
 
     void AlarmClockWindow::setVolume(uint8_t vol)
     {
-        LOG_INFO("setVolume %d", static_cast<int>(vol));
+        LOG_INFO("New volume: %d", vol);
         mAudioModel->setVolume(vol);
     }
 

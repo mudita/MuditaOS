@@ -267,10 +267,10 @@ namespace app
 
         std::string window;
 #if DEBUG_APPLICATION_MANAGEMENT == 1
-        LOG_INFO("switching [%s] to window: %s data description: %s",
-                 GetName().c_str(),
-                 windowName.length() ? windowName.c_str() : default_window.c_str(),
-                 data ? data->getDescription().c_str() : "");
+        LOG_DEBUG("Switching [%s] to window: %s data description: %s",
+                  GetName().c_str(),
+                  windowName.length() ? windowName.c_str() : default_window.c_str(),
+                  data ? data->getDescription().c_str() : "");
 #endif
 
         // case to handle returning to previous application
@@ -434,7 +434,7 @@ namespace app
     sys::MessagePointer ApplicationCommon::handleKBDKeyEvent(sys::Message *msgl)
     {
         if (this->getState() != app::ApplicationCommon::State::ACTIVE_FORGROUND) {
-            LOG_FATAL("!!! Terrible terrible damage! application with no focus grabbed key!");
+            LOG_FATAL("Terrible terrible damage! Application with no focus grabbed key!");
         }
         const auto msg        = static_cast<sevm::KbdMessage *>(msgl);
         const auto inputEvent = keyTranslator->translate(msg->key);
@@ -489,7 +489,7 @@ namespace app
             auto result = actionHandler(std::move(data));
 
             if (getState() == State::ACTIVE_FORGROUND && windowsStack().isEmpty()) {
-                LOG_ERROR("OnAction application switch with no window provided. Fallback to default mainWindow.");
+                LOG_ERROR("Application switch with no window provided. Fallback to default mainWindow.");
                 pushWindow(default_window);
             }
 
@@ -518,8 +518,8 @@ namespace app
     sys::MessagePointer ApplicationCommon::handleApplicationSwitchLaunch(sys::Message *msgl)
     {
         const auto msg = static_cast<AppSwitchMessage *>(msgl);
-        bool handled = false;
-        LOG_DEBUG("AppSwitch: %s", msg->getTargetApplicationName().c_str());
+        bool handled   = false;
+        LOG_DEBUG("Application switch: %s", msg->getTargetApplicationName().c_str());
         // Application is starting or it is in the background. Upon switch command if name is correct it goes
         // foreground
         if ((state == State::ACTIVATING) || (state == State::INITIALIZING) || (state == State::ACTIVE_BACKGROUND)) {
@@ -527,9 +527,9 @@ namespace app
             if (msg->getTargetApplicationName() == this->GetName()) {
                 setState(State::ACTIVE_FORGROUND);
                 if (app::manager::Controller::confirmSwitch(this)) {
-                    LOG_INFO("target Window: %s : target description: %s",
-                             msg->getTargetWindowName().c_str(),
-                             msg->getData() ? msg->getData()->getDescription().c_str() : "");
+                    LOG_DEBUG("Target window: %s : target description: %s",
+                              msg->getTargetWindowName().c_str(),
+                              msg->getData() ? msg->getData()->getDescription().c_str() : "");
                     switchWindow(msg->getTargetWindowName(), std::move(msg->getData()));
                     handled = true;
                 }
@@ -650,7 +650,7 @@ namespace app
             refreshWindow(msg->getRefreshMode());
         }
         else {
-            LOG_ERROR("cant update window: %s in app: %s, params: haveBuilder: %s is_on_top: %s",
+            LOG_ERROR("Can't update window: '%s' in app: '%s', params: haveBuilder: %s is_on_top: %s",
                       msg->getWindowName().c_str(),
                       GetName().c_str(),
                       haveBuilder ? "yes" : "no",
@@ -681,7 +681,7 @@ namespace app
     void ApplicationCommon::checkBlockingRequests()
     {
         if (getState() == State::FINALIZING_CLOSE && !callbackStorage->checkBlockingCloseRequests()) {
-            LOG_INFO("Blocking requests done for [%s]. Closing application.", GetName().c_str());
+            LOG_INFO("Blocking requests done for '%s'. Closing application.", GetName().c_str());
             setState(State::DEACTIVATING);
             app::manager::Controller::confirmClose(this);
         }
@@ -721,7 +721,7 @@ namespace app
         }
         const auto window = getCurrentWindow();
         if (window == nullptr) {
-            LOG_ERROR("No window - can't dump DOM");
+            LOG_ERROR("Failed to get current window");
             return sys::msgNotHandled();
         }
 
@@ -767,7 +767,7 @@ namespace app
     {
         settings->deinit();
         LOG_INFO("Closing an application: %s", GetName().c_str());
-        LOG_INFO("Deleting windows");
+        LOG_DEBUG("Deleting windows");
         windowsStack().clear();
         return sys::ReturnCodes::Success;
     }
@@ -856,16 +856,16 @@ namespace app
 
         const auto topOfWindowsStackId = windowsStack().getWindowData(app::topWindow)->disposition.id;
         if (data->ignoreIfTheSamePopupIsOnTopOfTheStack && id == topOfWindowsStackId) {
-            LOG_WARN("ignoring popup because the same is already on the top of the stack");
+            LOG_WARN("Ignoring popup because the same is already on the top of the stack");
             return;
         }
 
         if (!blueprint) {
-            LOG_ERROR("no blueprint to handle %s popup - fallback", std::string(magic_enum::enum_name(id)).c_str());
+            LOG_ERROR("No blueprint to handle %s popup - fallback", std::string(magic_enum::enum_name(id)).c_str());
             blueprint = popupBlueprintFallback(id);
         }
         if (data->getDisposition().windowtype != gui::popup::Disposition::WindowType::Popup) {
-            LOG_ERROR("setting popup window type from %s to popup - fallback",
+            LOG_ERROR("Setting popup window type from %s to popup - fallback",
                       magic_enum::enum_name(data->getDisposition().windowtype).data());
             data->setDisposition(gui::popup::Disposition{
                 gui::popup::Disposition::Priority::Normal, gui::popup::Disposition::WindowType::Popup, id});
@@ -907,7 +907,7 @@ namespace app
         }
 
         auto const popup = magic_enum::enum_name(id).data();
-        LOG_DEBUG("handling popup: %s", popup);
+        LOG_DEBUG("Handling popup: %s", popup);
         /// request handle actually switches window to popup window
         auto retval = request->handle();
         if (!retval) {
@@ -943,9 +943,9 @@ namespace app
     void ApplicationCommon::requestShutdownWindow(const std::string &windowName)
     {
 #if DEBUG_APPLICATION_MANAGEMENT == 1
-        LOG_INFO("switching [%s] to shutdown window: %s",
-                 GetName().c_str(),
-                 windowName.length() ? windowName.c_str() : default_window.c_str());
+        LOG_DEBUG("Switching [%s] to shutdown window: %s",
+                  GetName().c_str(),
+                  windowName.length() ? windowName.c_str() : default_window.c_str());
 #endif
         if (!windowsFactory.isRegistered(windowName)) {
             LOG_ERROR("Cannot find window %s windowsFactory in application: %s", windowName.c_str(), GetName().c_str());
@@ -985,7 +985,7 @@ namespace app
         // handle if window was already on
         LOG_INFO("App: %s window %s request", GetName().c_str(), newWindow.c_str());
         if (newWindow.empty() && windowsStack().popLastWindow()) {
-            LOG_INFO("Empty window request!");
+            LOG_WARN("Empty window request!");
             return;
         }
         if (windowsStack().pop(newWindow)) {

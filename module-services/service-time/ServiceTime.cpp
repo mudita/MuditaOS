@@ -26,14 +26,12 @@ namespace stm
                                                                          std::make_unique<RTCCommand>(this))},
           alarmOperationsFactory{std::move(alarmOperationsFactory)}
     {
-        LOG_INFO("[ServiceTime] Initializing");
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
         bus.channels.push_back(sys::BusChannel::ServiceEvtmgrNotifications);
     }
 
     ServiceTime::~ServiceTime()
     {
-        LOG_INFO("[ServiceTime] Cleaning resources");
     }
 
     sys::ReturnCodes ServiceTime::InitHandler()
@@ -67,18 +65,21 @@ namespace stm
             [this]() { this->bus.sendUnicast(std::make_shared<SingleVibrationStart>(), service::name::audio); });
         alarmMessageHandler = std::make_unique<alarms::AlarmMessageHandler>(this, std::move(alarmOperations));
         registerMessageHandlers();
+
+        LOG_INFO("Initialized");
         return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes ServiceTime::DeinitHandler()
     {
         settings->deinit();
+
+        LOG_INFO("Deinitialized");
         return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes ServiceTime::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
-        LOG_FATAL("[ServiceTime] PowerModeHandler: %s", c_str(mode));
         return sys::ReturnCodes::Success;
     }
 

@@ -69,7 +69,7 @@ namespace alarms
                         std::stoi(settings.getValue(bell::settings::Bedtime::active, settings::SettingsScope::Global));
                 }
                 catch (const std::exception &e) {
-                    LOG_ERROR("BedtimeSettingsProviderImpl active db record not valid! err: %s", e.what());
+                    LOG_ERROR("Active db record not valid! err: %s", e.what());
                 }
                 return enabled;
             }

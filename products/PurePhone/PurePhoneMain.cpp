@@ -192,7 +192,7 @@ int main()
                 platform->init();
             }
             catch (const std::runtime_error &e) {
-                LOG_FATAL("%s", e.what());
+                LOG_FATAL("Exception during platform init: %s", e.what());
                 abort();
             }
 
@@ -272,7 +272,7 @@ int main()
                 platform->deinit();
             }
             catch (const std::runtime_error &e) {
-                LOG_FATAL("%s", e.what());
+                LOG_FATAL("Exception during platform deinit: %s", e.what());
                 abort();
             }
             sys::SystemWatchdog::getInstance().deinit();
@@ -280,7 +280,7 @@ int main()
         });
 
     LOG_INFO("Launching %s ", ApplicationName);
-    LOG_INFO("commit: %s version: %s branch: %s", GIT_REV, VERSION, GIT_BRANCH);
+    LOG_INFO("Commit: %s version: %s branch: %s", GIT_REV, VERSION, GIT_BRANCH);
     cpp_freertos::Thread::StartScheduler();
     LOG_INFO("Scheduler is terminated properly");
 

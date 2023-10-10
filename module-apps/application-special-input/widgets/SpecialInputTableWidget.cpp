@@ -76,7 +76,7 @@ namespace gui
 
         it->activatedCallback = [=](Item &it) {
             setFocusItem(nullptr);
-            LOG_INFO("handled special char for %s", application->getCurrentWindow()->getName().c_str());
+            LOG_INFO("Handled special char for %s", application->getCurrentWindow()->getName().c_str());
 
             auto switchData =
                 std::make_unique<gui::SwitchSpecialChar>(gui::SwitchSpecialChar::Type::Response, app->requester, str);

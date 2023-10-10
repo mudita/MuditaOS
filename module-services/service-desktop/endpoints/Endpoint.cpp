@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/Endpoint.hpp>
@@ -23,7 +23,7 @@ namespace sdesktop::endpoints
     {
         context.setResponseStatus(http::Code::Forbidden);
         sender::putToSendQueue(context.createSimpleResponse());
-        LOG_INFO("Endpoint #%d secured", static_cast<int>(context.getEndpoint()));
+        LOG_INFO("Endpoint '%s' secured", magic_enum::enum_name(context.getEndpoint()).data());
     }
 
 } // namespace sdesktop::endpoints

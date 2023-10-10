@@ -87,9 +87,9 @@ namespace Quotes
             settings->setValue(
                 settings::Quotes::randomQuotesList, serializer->serialize(list), settings::SettingsScope::Global);
         }
-        LOG_DEBUG("Selected quote ID: %d, type: %d, remaining quotes to next shuffle: %zu",
+        LOG_DEBUG("Selected quote ID: %d, type: %s, remaining quotes to next shuffle: %zu",
                   list.front().second,
-                  static_cast<int>(list.front().first),
+                  magic_enum::enum_name(list.front().first).data(),
                   list.size());
     }
     auto RandomizedQuoteModel::isIdExpired() -> bool
