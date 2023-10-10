@@ -11,7 +11,7 @@ namespace
 {
     inline constexpr int statusSuccess = 1;
     inline constexpr auto lineSize     = 224;
-    inline constexpr auto bufferLength = 34;
+    inline constexpr auto bufferLength = 100;
 
     __attribute__((section(".sensitiveLogSection"))) static char buffer[bufferLength][lineSize];
     std::uint8_t line{0};
