@@ -110,7 +110,7 @@ namespace Quotes
     {
         auto req                  = std::dynamic_pointer_cast<Messages::ReadRandomizedQuoteRequest>(query);
         auto [type, randomizedId] = randomizedQuoteModel.getId();
-        LOG_DEBUG("Randomized id: %d, type: %d", randomizedId, static_cast<int>(type));
+        LOG_DEBUG("Randomized id: %d, type: %s", randomizedId, magic_enum::enum_name(type).data());
         std::unique_ptr<QueryResult> queryResult;
 
         if (type == QuoteType::Predefined) {

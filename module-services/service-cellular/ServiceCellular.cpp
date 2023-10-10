@@ -125,7 +125,6 @@ ServiceCellular::ServiceCellular()
       phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()},
       priv{std::make_unique<internal::ServiceCellularPriv>(this)}
 {
-    LOG_INFO("[ServiceCellular] Initializing");
 
     bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
     bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
@@ -190,7 +189,6 @@ ServiceCellular::ServiceCellular()
 
 ServiceCellular::~ServiceCellular()
 {
-    LOG_INFO("[ServiceCellular] Cleaning resources");
 }
 
 void ServiceCellular::SleepTimerHandler()
@@ -220,7 +218,6 @@ void ServiceCellular::WakeUpHandler()
 
 void ServiceCellular::CallStateTimerHandler()
 {
-    LOG_DEBUG("CallStateTimerHandler");
     auto msg = std::make_shared<cellular::ListCallsMessage>();
     bus.sendUnicast(std::move(msg), ::service::name::cellular);
 }
@@ -255,7 +252,7 @@ sys::ReturnCodes ServiceCellular::InitHandler()
 
     const auto rawVolteSetting = settings->getValue(settings::Cellular::volteEnabled, settings::SettingsScope::Global);
     if (rawVolteSetting.empty()) {
-        LOG_ERROR("[VoLTE] setting missing in database - defaulting to disabled");
+        LOG_ERROR("VoLTE setting missing in database - defaulting to disabled");
         settings->setValue(settings::Cellular::volteEnabled, "0", settings::SettingsScope::Global);
     }
 
@@ -281,12 +278,14 @@ sys::ReturnCodes ServiceCellular::InitHandler()
 
     cmux->registerCellularDevice();
 
+    LOG_INFO("Initialized");
     return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes ServiceCellular::DeinitHandler()
 {
     settings->deinit();
+    LOG_INFO("Deinitialized");
     return sys::ReturnCodes::Success;
 }
 
@@ -295,8 +294,6 @@ void ServiceCellular::ProcessCloseReason(sys::CloseReason closeReason)
 
 sys::ReturnCodes ServiceCellular::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
-    LOG_INFO("[ServiceCellular] PowerModeHandler: %s", c_str(mode));
-
     switch (mode) {
     case sys::ServicePowerMode::Active:
         cmux->exitSleepMode();
@@ -608,7 +605,7 @@ void ServiceCellular::registerMessageHandlers()
         auto message = static_cast<cellular::SwitchVolteOnOffRequest *>(request);
         auto channel = cmux->get(CellularMux::Channel::Commands);
         if (channel == nullptr) {
-            LOG_ERROR("[VoLTE] failed to get channel, skipping request");
+            LOG_ERROR("Skipping VoLTE request, failed to get channel");
             return sys::MessageNone{};
         }
         settings->setValue(
@@ -632,7 +629,7 @@ void ServiceCellular::registerMessageHandlers()
 
     connect(typeid(cellular::msg::notification::SimReady), [&](sys::Message *) {
         if (priv->volteHandler->isFunctionalityResetNeeded()) {
-            LOG_INFO("[VoLTE] first run after switching - functionality reset needed");
+            LOG_INFO("First run after switching VoLTE - functionality reset needed");
             priv->modemResetHandler->performFunctionalityReset();
             return sys::MessageNone{};
         }
@@ -722,7 +719,6 @@ void ServiceCellular::change_state(cellular::StateChange *msg)
 
 bool ServiceCellular::handle_idle()
 {
-    LOG_DEBUG("Idle");
     return true;
 }
 
@@ -782,7 +778,7 @@ bool ServiceCellular::handle_power_up_procedure()
     }
     case bsp::Board::none:
     default:
-        LOG_FATAL("Board not known!");
+        LOG_FATAL("Unknown board!");
         assert(0);
         break;
     }
@@ -889,7 +885,7 @@ bool ServiceCellular::handle_audio_conf_procedure()
 
         if (cmux->startMultiplexer() == CellularMux::ConfState::Success) {
 
-            LOG_DEBUG("[ServiceCellular] Modem is fully operational");
+            LOG_DEBUG("Modem is fully operational");
             // open channel - notifications
             DLCChannel *notificationsChannel = cmux->get(CellularMux::Channel::Notifications);
             if (notificationsChannel != nullptr) {

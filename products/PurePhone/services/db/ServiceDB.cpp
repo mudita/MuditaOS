@@ -37,7 +37,7 @@ ServiceDB::~ServiceDB()
     multimediaFilesDB.reset();
 
     Database::deinitialize();
-    LOG_INFO("[ServiceDB] Cleaning resources");
+    LOG_INFO("Cleaning resources");
 }
 
 db::Interface *ServiceDB::getInterface(db::Interface::Name interface)

@@ -94,7 +94,7 @@ namespace sdesktop::endpoints
     bool removeDirectory(const std::filesystem::path &path)
     {
         if (std::filesystem::is_directory(path)) {
-            LOG_INFO("'%s' exists, removing", path.c_str());
+            LOG_INFO("Removing directory: %s", path.c_str());
             std::error_code errorCode;
             if (std::filesystem::remove_all(path, errorCode) == 0) {
                 return false;
@@ -167,7 +167,7 @@ namespace sdesktop::endpoints
 
     void UpdateHelper::preProcess(http::Method method, [[maybe_unused]] Context &context)
     {
-        LOG_INFO("In UpdateHelper - requesting %d", static_cast<int>(method));
+        LOG_INFO("UpdateHelper requesting: %s", magic_enum::enum_name(method).data());
     }
 
     auto UpdateHelper::processPost(Context &context) -> ProcessResult

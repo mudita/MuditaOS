@@ -40,7 +40,7 @@ namespace cellular::service
         {
             if (!permit) {
                 if (enable) {
-                    LOG_INFO("[VoLTE] requested to enable, but not permitted for this operator - disabling");
+                    LOG_INFO("Requested to enable VoLTE, but not permitted for this operator - disabling");
                 }
 
                 enable = false;
@@ -51,7 +51,7 @@ namespace cellular::service
                 auto voiceDomainAnswer =
                     channel.cmd(factory(at::AT::QNVFW) + NetworkServiceDomain(NetworkServiceDomain::Type::Voice));
                 if (!voiceDomainAnswer) {
-                    throw std::runtime_error("[VoLTE] failed to set voice domain before trying to enable VoLTE");
+                    throw std::runtime_error("Failed to set voice domain before trying to enable VoLTE");
                 }
 
                 auto smsDomainAnswer =

@@ -70,8 +70,6 @@ void WorkerDesktop::closeWorker(void)
     }
 
     initialized = false;
-    LOG_INFO("we can deinit worker now");
-
     /// additional wait to flush on serial - we should wait for data sent...
     vTaskDelay(500);
 
@@ -86,8 +84,6 @@ void WorkerDesktop::closeWorker(void)
         LOG_ERROR("Sentinel %s could not be removed!", cpuSentinel->GetName().c_str());
     }
     cpuSentinel.reset();
-
-    LOG_DEBUG("deinit end");
 }
 
 void WorkerDesktop::reset()
@@ -141,7 +137,7 @@ bool WorkerDesktop::handleMessage(std::uint32_t queueID)
         result = handleSignallingQueueMessage(queue);
     }
     else {
-        LOG_INFO("handleMessage got message on an unhandled queue '%s'!", qname.c_str());
+        LOG_WARN("Unhandled queue '%s'!", qname.c_str());
     }
 
     return result;
@@ -154,7 +150,7 @@ bool WorkerDesktop::handleReceiveQueueMessage(std::shared_ptr<sys::WorkerQueue> 
     }
     std::string *receivedMsg = nullptr;
     if (!queue->Dequeue(&receivedMsg, 0)) {
-        LOG_ERROR("handleMessage xQueueReceive failed for '%s'.", sdesktop::cdcReceiveQueueName);
+        LOG_ERROR("Failed dequeue for '%s'.", sdesktop::cdcReceiveQueueName);
         return false;
     }
 
@@ -176,13 +172,13 @@ bool WorkerDesktop::handleSendQueueMessage(std::shared_ptr<sys::WorkerQueue> &qu
     }
     std::string *sendMsg = nullptr;
     if (!queue->Dequeue(&sendMsg, 0)) {
-        LOG_ERROR("handleMessage xQueueReceive failed for '%s'.", sdesktop::cdcSendQueueName);
+        LOG_ERROR("Failed dequeue for '%s'.", sdesktop::cdcSendQueueName);
         return false;
     }
 
     const std::uint32_t dataSent = bsp::usbCDCSend(sendMsg);
     if (dataSent != sendMsg->length()) {
-        LOG_ERROR("Data not sent! Data sent: %" PRIu32 "B, msg length: %zuB", dataSent, sendMsg->length());
+        LOG_ERROR("Data not sent! (Data sent: %" PRIu32 "B, msg length: %zuB)", dataSent, sendMsg->length());
     }
 
     delete sendMsg;
@@ -198,13 +194,13 @@ bool WorkerDesktop::handleServiceQueueMessage(std::shared_ptr<sys::WorkerQueue> 
 
     sys::WorkerCommand cmd;
     if (serviceQueue.Dequeue(&cmd, 0)) {
-        LOG_DEBUG("Received cmd: %d", static_cast<int>(cmd.command));
+        LOG_DEBUG("Received command: %d", static_cast<int>(cmd.command));
 #if defined(DEBUG)
         assert(false);
 #endif
     }
     else {
-        LOG_ERROR("handleMessage xQueueReceive failed for '%s'.", SERVICE_QUEUE_NAME.c_str());
+        LOG_ERROR("Failed dequeue for '%s'.", SERVICE_QUEUE_NAME.c_str());
         return false;
     }
     return true;
@@ -214,7 +210,7 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
 {
     bsp::USBDeviceStatus notification = bsp::USBDeviceStatus::Disconnected;
     if (!queue->Dequeue(&notification, 0)) {
-        LOG_ERROR("handleMessage xQueueReceive failed for %s.", sdesktop::irqQueueName);
+        LOG_ERROR("Failed dequeue for %s.", sdesktop::irqQueueName);
         return false;
     }
 
@@ -266,7 +262,7 @@ bool WorkerDesktop::handleSignallingQueueMessage(std::shared_ptr<sys::WorkerQueu
 
     sys::WorkerCommand cmd;
     if (!queue->Dequeue(&cmd, 0)) {
-        LOG_ERROR("handleMessage xQueueReceive failed for '%s'.", sdesktop::signallingQueueName);
+        LOG_ERROR("Failed dequeue for '%s'.", sdesktop::signallingQueueName);
         return false;
     }
 

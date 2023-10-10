@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DLCChannel.h"
@@ -35,7 +35,7 @@ DLCChannel::DLCChannel(DLCI_t DLCI, const std::string &name, bsp::Cellular *cell
 bool DLCChannel::init()
 {
     active = establish();
-    LOG_INFO("create channel %s: %s", name.c_str(), active ? "TRUE" : "FALSE");
+    LOG_INFO("Create channel %s: %s", name.c_str(), active ? "TRUE" : "FALSE");
 
     return active;
 }
@@ -173,7 +173,7 @@ at::Result DLCChannel::parseInputData(bsp::cellular::CellularResult *cellularRes
                                 (void *)cellularResult->getSerialized().get(),
                                 cellularResult->getSerializedSize(),
                                 pdMS_TO_TICKS(at::defaultBufferTimeoutMs.count()))) {
-            LOG_DEBUG("[DLC] Message buffer full!");
+            LOG_DEBUG("DLC message buffer full!");
             result.code = at::Result::Code::FULL_MSG_BUFFER;
         }
     }

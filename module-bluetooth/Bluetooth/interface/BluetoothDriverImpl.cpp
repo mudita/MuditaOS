@@ -128,17 +128,19 @@ namespace bluetooth
     }
     void Driver::local_version_information_handler(uint8_t *packet)
     {
-        LOG_INFO("Local version information:");
         uint16_t hci_version    = packet[6];
         uint16_t hci_revision   = little_endian_read_16(packet, 7);
         uint16_t lmp_version    = packet[9];
         uint16_t manufacturer   = little_endian_read_16(packet, 10);
         uint16_t lmp_subversion = little_endian_read_16(packet, 12);
-        LOG_INFO("- HCI Version    0x%04x", hci_version);
-        LOG_INFO("- HCI Revision   0x%04x", hci_revision);
-        LOG_INFO("- LMP Version    0x%04x", lmp_version);
-        LOG_INFO("- LMP Subversion 0x%04x", lmp_subversion);
-        LOG_INFO("- Manufacturer 0x%04x", manufacturer);
+        LOG_INFO("Local version information: HCI Version: 0x%04x, HCI Revision: 0x%04x, LMP Version: 0x%04x, LMP "
+                 "Subversion: 0x%04x, Manufacturer: 0x%04x",
+                 hci_version,
+                 hci_revision,
+                 lmp_version,
+                 lmp_subversion,
+                 manufacturer);
+
         switch (manufacturer) {
         case BLUETOOTH_COMPANY_ID_TEXAS_INSTRUMENTS_INC:
             LOG_INFO("Texas Instruments - CC256x compatible chipset.");

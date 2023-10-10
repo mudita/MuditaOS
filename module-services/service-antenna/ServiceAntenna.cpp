@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <AntennaMessage.hpp>
@@ -57,7 +57,6 @@ ServiceAntenna::ServiceAntenna()
       state{std::make_unique<state::State<antenna::State>>(this)}, phoneModeObserver{
                                                                        std::make_unique<sys::phone_modes::Observer>()}
 {
-    LOG_INFO("[%s] Initializing", service::name::antenna);
     timer = sys::TimerFactory::createPeriodicTimer(
         this, "Antenna", std::chrono::seconds{5}, [this](sys::Timer & /*timer*/) {
             timer.stop();
@@ -87,7 +86,6 @@ ServiceAntenna::ServiceAntenna()
 
 ServiceAntenna::~ServiceAntenna()
 {
-    LOG_INFO("[%s] Cleaning resources", service::name::antenna);
 }
 
 // Invoked upon receiving data message
@@ -104,7 +102,7 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
         if (CellularServiceAPI::GetAntenna(this, antenna)) {
             currentAntenna = antenna;
             if (state->get() == antenna::State::switchAntenna) {
-                LOG_INFO("Antena switched.");
+                LOG_INFO("Antenna switched");
 
                 state->enableStateTimeout(cpp_freertos::Ticks::GetTicks(),
                                           pdMS_TO_TICKS(antenna::connectionStatusTimeout),
@@ -130,28 +128,29 @@ sys::MessagePointer ServiceAntenna::DataReceivedHandler(sys::DataMessage *msgl, 
         break;
     }
 
-    if (handled)
+    if (handled) {
         return std::make_shared<sys::ResponseMessage>();
-    else
-        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
+    }
+    return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
 }
 
 // Invoked during initialization
 sys::ReturnCodes ServiceAntenna::InitHandler()
 {
     registerMessageHandlers();
+    LOG_INFO("Initialized");
     return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes ServiceAntenna::DeinitHandler()
 {
+    LOG_INFO("Deinitialized");
     return sys::ReturnCodes::Success;
 }
 
 sys::ReturnCodes ServiceAntenna::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
-    LOG_FATAL("[ServiceEvtMgr] PowerModeHandler: %s", c_str(mode));
-
+    LOG_INFO("New power mode: %s", c_str(mode));
     suspended = true;
 
     switch (mode) {
@@ -169,25 +168,23 @@ sys::ReturnCodes ServiceAntenna::SwitchPowerModeHandler(const sys::ServicePowerM
 void ServiceAntenna::handleLockRequest(antenna::lockState request)
 {
     auto currentState = state->get();
+    LOG_INFO("Current state: %s, requested stated: %s",
+             magic_enum::enum_name(currentState).data(),
+             magic_enum::enum_name(request).data());
+
     if (request == antenna::lockState::locked) {
-        LOG_INFO("AntennaService lock request.");
         if (currentState != antenna::State::locked) {
             state->set(antenna::State::locked);
             serviceLocked = request;
-            LOG_INFO("AntennaService locked.");
             return;
         }
-        LOG_INFO("AntennaService lock request skipped.");
     }
     else if (request == antenna::lockState::unlocked) {
-        LOG_INFO("AntennaService unlock request. Service state: %s", c_str(state->get()));
         if (currentState == antenna::State::locked) {
             state->set(state->getLast());
             serviceLocked = request;
-            LOG_INFO("AntennaService unlocked. Restoring last state.");
             return;
         }
-        LOG_INFO("AntennaService unlock request skipped.");
     }
 }
 

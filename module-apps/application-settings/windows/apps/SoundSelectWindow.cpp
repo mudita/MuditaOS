@@ -52,7 +52,7 @@ namespace gui
     {
         const auto info = dynamic_cast<SoundSelectData *>(data);
         if (info == nullptr) {
-            LOG_ERROR("Null switch data pointer!");
+            LOG_ERROR("Failed to get a sound data!");
             return;
         }
 

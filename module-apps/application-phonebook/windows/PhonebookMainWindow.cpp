@@ -111,7 +111,7 @@ namespace gui
         const auto code = translator.handle(inputEvent.getRawKey(), inputMode ? inputMode->get() : "");
         if (code != Profile::none_key) {
             const auto letter = static_cast<char>(code);
-            LOG_INFO("char=' %c'", letter);
+            LOG_DEBUG("Filtering by char=' %c'", letter);
 
             std::string filterLetter;
             filterLetter.push_back(letter);
@@ -119,7 +119,7 @@ namespace gui
             LOG_DEBUG("Number of favourites contacts : %" PRIu32, phonebookModel->letterMap.favouritesCount);
             const auto dataOffset = phonebookModel->letterMap.firstLetterDictionary[filterLetter];
             if (dataOffset != phonebookContactsMap::NO_MATCH_FOUND) {
-                LOG_DEBUG("PhoneBook Data Offset : %" PRIu32, dataOffset);
+                LOG_DEBUG("Phonebook data offset : %" PRIu32, dataOffset);
                 phonebookModel->setDisplayMode(static_cast<std::uint32_t>(ContactDisplayMode::SortedByLetter));
                 contactsList->rebuildList(gui::listview::RebuildType::OnOffset, dataOffset);
             }

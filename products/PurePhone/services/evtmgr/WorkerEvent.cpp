@@ -144,7 +144,7 @@ void WorkerEvent::requestSliderPositionRead()
 void WorkerEvent::handleMagnetometerEvent()
 {
     if (const auto &key = bsp::magnetometer::WorkerEventHandler(); key.has_value()) {
-        LOG_DEBUG("magneto IRQ handler: %s", c_str(*key));
+        LOG_DEBUG("Magnetometer IRQ handler: %s", c_str(*key));
         processKeyEvent(bsp::KeyEvents::Moved, *key);
     }
 }

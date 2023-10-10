@@ -42,8 +42,6 @@ namespace app
               std::move(name), std::move(parent), statusIndicators, startInBackground, applicationMusicPlayerStackSize),
           priv{std::make_unique<music_player::internal::MusicPlayerPriv>()}
     {
-        LOG_INFO("ApplicationMusicPlayer creating");
-
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
 
         const auto paths     = std::vector<std::string>{purefs::dir::getUserMediaPath()};

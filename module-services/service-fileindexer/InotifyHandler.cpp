@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-fileindexer/InotifyHandler.hpp>
@@ -41,8 +41,7 @@ namespace service::detail
 
     void InotifyHandler::registerMessageHandlers()
     {
-        if (svc == nullptr) {
-            LOG_ERROR("svc is nullptr");
+        if (!isParentServiceInitialized()) {
             return;
         }
         svc->connect(typeid(purefs::fs::message::inotify), [&](sys::Message *request) -> sys::MessagePointer {
@@ -53,7 +52,7 @@ namespace service::detail
     bool InotifyHandler::addWatch(std::string_view monitoredPath)
     {
         if (mfsNotifier == nullptr) {
-            LOG_ERROR("mfsNotifier is nullptr");
+            LOG_ERROR("Notifier not initialized");
             return false;
         }
         // Wait for close, delete move to or from location
@@ -142,15 +141,14 @@ namespace service::detail
     // On update or create content
     void InotifyHandler::onUpdateOrCreate(std::string_view path)
     {
-        LOG_DEBUG("onUpdateOrCreate: %s", std::string(path).c_str());
-        if (svc == nullptr) {
-            LOG_ERROR("svc is nullptr");
+        LOG_DEBUG("Processing file: %s", std::string(path).c_str());
+        if (!isParentServiceInitialized()) {
             return;
         }
 
         const auto extension = utils::stringToLowercase(fs::path(path).extension());
         if (!isExtSupported(extension)) {
-            LOG_WARN("Not supported extension - %s", extension.c_str());
+            LOG_WARN("Not supported extension: %s", extension.c_str());
             return;
         }
 
@@ -160,27 +158,35 @@ namespace service::detail
             DBServiceAPI::GetQuery(svc.get(), db::Interface::Name::MultimediaFiles, std::move(query));
         }
         else {
-            LOG_INFO("onUpdateOrCreate: skipped file");
+            LOG_WARN("File corrupted, skipping.");
         }
     }
 
     // On remove content
     void InotifyHandler::onRemove(std::string_view path)
     {
-        LOG_DEBUG("onRemove path: %s", std::string(path).c_str());
-        if (svc == nullptr) {
-            LOG_ERROR("svc is nullptr");
+        LOG_DEBUG("Processing file: %s", std::string(path).c_str());
+        if (!isParentServiceInitialized()) {
             return;
         }
 
         const auto extension = utils::stringToLowercase(fs::path(path).extension());
         if (!isExtSupported(extension)) {
-            LOG_WARN("Not supported extension - %s", extension.c_str());
+            LOG_WARN("Not supported extension: %s", extension.c_str());
             return;
         }
 
         auto query = std::make_unique<db::multimedia_files::query::RemoveByPath>(std::string(path));
         DBServiceAPI::GetQuery(svc.get(), db::Interface::Name::MultimediaFiles, std::move(query));
+    }
+
+    bool InotifyHandler::isParentServiceInitialized()
+    {
+        if (svc == nullptr) {
+            LOG_ERROR("Parent service is nullptr, cannot proceed");
+            return false;
+        }
+        return true;
     }
 
 } // namespace service::detail

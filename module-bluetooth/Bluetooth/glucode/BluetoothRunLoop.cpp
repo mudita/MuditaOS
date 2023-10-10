@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothRunLoop.hpp"
@@ -38,7 +38,7 @@ namespace bluetooth
         // task to handle to optimize 'run on main thread'
         btstack_run_loop_task = xTaskGetCurrentTaskHandle();
 
-        LOG_INFO("run loop init, task %p, queue item size %u",
+        LOG_INFO("Run loop init, task %p, queue item size %u",
                  btstack_run_loop_task,
                  static_cast<int>(sizeof(function_call_t)));
     }
@@ -106,7 +106,7 @@ namespace bluetooth
             // don't add timer that's already in there
             auto *next = reinterpret_cast<btstack_timer_source_t *>(it->next);
             if (next == ts) {
-                LOG_ERROR("btstack_run_loop_timer_add error: timer to add already in list!");
+                LOG_ERROR("Timer 'btstack_run_loop_timer' already in list!");
                 return;
             }
             // exit if new timeout before list timeout

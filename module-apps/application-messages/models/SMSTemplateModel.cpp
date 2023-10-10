@@ -41,7 +41,6 @@ gui::ListItem *SMSTemplateModel::getItem(gui::Order order)
     auto item = new gui::SMSTemplateItem();
     item->setTemplate(templ);
     item->activatedCallback = [=](gui::Item &it) {
-        LOG_INFO("activatedCallback");
         if (auto app = dynamic_cast<app::ApplicationMessages *>(application)) {
             if (app->templatesCallback) {
                 return app->templatesCallback(templ);

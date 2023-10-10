@@ -248,7 +248,7 @@ namespace utils
             value = std::stoi(text);
         }
         catch (const std::exception &e) {
-            LOG_ERROR("toNumeric exception %s", e.what());
+            LOG_ERROR("To numeric exception %s", e.what());
             return false;
         }
         return true;
@@ -260,7 +260,7 @@ namespace utils
             return std::stoi(text);
         }
         catch (const std::exception &e) {
-            LOG_ERROR("toNumeric exception %s", e.what());
+            LOG_ERROR("To numeric exception %s", e.what());
             return 0;
         }
     }

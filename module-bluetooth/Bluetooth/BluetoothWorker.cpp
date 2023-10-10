@@ -141,7 +141,7 @@ BluetoothWorker::~BluetoothWorker()
 
 auto BluetoothWorker::run() -> bool
 {
-    LOG_INFO("-> BluetoothWorker run request");
+    LOG_INFO("BluetoothWorker run request");
     if (isRunning) {
         return true;
     }
@@ -155,7 +155,7 @@ auto BluetoothWorker::run() -> bool
 
 auto BluetoothWorker::handleCommand(QueueHandle_t queue) -> bool
 {
-    LOG_INFO("handle bluetooth command(s)");
+    LOG_INFO("Handle bluetooth command(s)");
     xQueueReceive(queue, nullptr, 0);
     while (not workerQueue->empty()) {
         auto command = workerQueue->peek();
@@ -189,7 +189,7 @@ auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
 {
     QueueHandle_t queue = queues[queueID]->GetQueueHandle();
     if (queueID == queueService) {
-        LOG_DEBUG("not interested");
+        LOG_DEBUG("Ignoring message on 'queueService' queue");
         return true;
     }
 
@@ -254,7 +254,7 @@ auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
         LOG_ERROR("Uart error [%d]: %s", notification, bluetooth::MessageCstr(notification));
         break;
     default:
-        LOG_ERROR("ERROR");
+        LOG_ERROR("Unknown message: %d", notification);
     }
 
     return true;

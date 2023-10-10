@@ -23,18 +23,20 @@ namespace AudioServiceAPI
     {
         auto SendAudioRequest(sys::Service *serv, std::shared_ptr<AudioMessage> msg)
         {
-            auto msgType = static_cast<int>(msg->type);
-            LOG_DEBUG("Msg type %d", msgType);
+            LOG_DEBUG("Message type: %s", magic_enum::enum_name(msg->type).data());
             auto ret = serv->bus.sendUnicastSync(msg, service::name::audio, sys::BusProxy::defaultTimeout);
             if (ret.first == sys::ReturnCodes::Success) {
                 if (auto resp = std::dynamic_pointer_cast<AudioResponseMessage>(ret.second)) {
-                    LOG_DEBUG("Msg type %d done", msgType);
+                    LOG_DEBUG("Message processed");
                     return resp;
                 }
-                LOG_ERROR("msgType %d - not AudioResponseMessage", msgType);
+                LOG_ERROR("Response type not AudioResponseMessage, actual type: %s",
+                          magic_enum::enum_name(ret.second->type).data());
                 return std::make_shared<AudioResponseMessage>(audio::RetCode::Failed);
             }
-            LOG_ERROR("Command %d Failed with %d error", msgType, static_cast<int>(ret.first));
+            LOG_ERROR("Command %s Failed with %d error",
+                      magic_enum::enum_name(msg->type).data(),
+                      static_cast<int>(ret.first));
             return std::make_shared<AudioResponseMessage>(audio::RetCode::Failed);
         }
     } // namespace
@@ -189,7 +191,7 @@ namespace AudioServiceAPI
                 std::stoi(GetSetting(serv, audio::Setting::VibrationLevel, PlaybackType::System)));
         }
         catch (const std::logic_error &e) {
-            LOG_ERROR("exception %s", e.what());
+            LOG_ERROR("Setting vibration level failed: %s", e.what());
             return std::nullopt;
         }
     }
@@ -225,7 +227,7 @@ namespace AudioServiceAPI
             return static_cast<audio::Volume>(std::stoi(GetSetting(serv, audio::Setting::Volume, playbackType)));
         }
         catch (const std::logic_error &e) {
-            LOG_ERROR("exception %s", e.what());
+            LOG_ERROR("Cannot get a volume: %s", e.what());
             return std::nullopt;
         }
     }

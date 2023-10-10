@@ -63,12 +63,12 @@ namespace gui
 
         if (!automaticDateAndTimeIsOn) {
             addOption(utils::translate("app_settings_date_and_time_change_time_zone"), [=](Item &item) {
-                LOG_INFO("switching to %s page", window::name::change_time_zone);
+                LOG_DEBUG("Switching to %s page", window::name::change_time_zone);
                 application->switchWindow(window::name::change_time_zone, nullptr);
                 return true;
             });
             addOption(utils::translate("app_settings_date_and_time_change_date_and_time"), [=](Item &item) {
-                LOG_INFO("switching to %s page", changeDateAndTimeWindow.c_str());
+                LOG_DEBUG("Switching to %s page", changeDateAndTimeWindow.c_str());
                 application->switchWindow(changeDateAndTimeWindow, nullptr);
                 return true;
             });

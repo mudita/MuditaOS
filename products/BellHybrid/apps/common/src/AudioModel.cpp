@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/AudioModel.hpp"
@@ -44,7 +44,7 @@ namespace
             if (auto resp = std::dynamic_pointer_cast<service::AudioResponseMessage>(ret.second)) {
                 return resp;
             }
-            LOG_ERROR("msgType %d - not AudioResponseMessage", msgType);
+            LOG_ERROR("Message type [%d] - not AudioResponseMessage", msgType);
             return std::make_shared<service::AudioResponseMessage>(audio::RetCode::Failed);
         }
         LOG_ERROR("Command %d Failed with %d error", msgType, static_cast<int>(ret.first));

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OptionContact.hpp"
@@ -30,7 +30,7 @@ namespace gui::option
             break;
         default:
             text = utils::translate("app_options_invalid_option");
-            LOG_WARN("ContactOperation %d not supported", static_cast<int>(contactOperation));
+            LOG_WARN("Contact operation %d not supported", static_cast<int>(contactOperation));
             break;
         }
 

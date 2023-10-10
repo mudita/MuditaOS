@@ -180,7 +180,7 @@ namespace gui
         }
 
         if (inputEvent.isLongRelease(gui::KeyCode::KEY_RF)) {
-            LOG_INFO("exit to main menu");
+            LOG_INFO("Exit to main menu");
             app::manager::Controller::sendAction(application, app::manager::actions::Home);
         }
 

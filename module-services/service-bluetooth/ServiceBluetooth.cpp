@@ -51,13 +51,11 @@ namespace
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", BluetoothServiceStackDepth)
 {
-    LOG_INFO("[ServiceBluetooth] Initializing");
     bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
 }
 
 ServiceBluetooth::~ServiceBluetooth()
 {
-    LOG_INFO("[ServiceBluetooth] Cleaning resources");
 }
 
 sys::ReturnCodes ServiceBluetooth::InitHandler()
@@ -126,6 +124,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
             settingsHolder->setValue(bluetooth::Settings::State, static_cast<int>(BluetoothStatus::State::Off));
         }
     };
+    LOG_INFO("Initialized");
 
     return sys::ReturnCodes::Success;
 }
@@ -135,6 +134,7 @@ sys::ReturnCodes ServiceBluetooth::DeinitHandler()
     settingsHolder->deinit();
     worker->closeWorker();
     worker.reset();
+    LOG_INFO("Deinitialized");
     return sys::ReturnCodes::Success;
 }
 
@@ -152,7 +152,7 @@ sys::MessagePointer ServiceBluetooth::DataReceivedHandler([[maybe_unused]] sys::
 
 sys::ReturnCodes ServiceBluetooth::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
 {
-    LOG_ERROR("TODO");
+    // Implement power mode handler
     return sys::ReturnCodes::Success;
 }
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ATFactory.hpp"
@@ -136,7 +136,7 @@ namespace at
             assert(g_cmds_map.at(at));
             return *(g_cmds_map.at(at));
         }
-        LOG_ERROR("no such at command defined: %d", static_cast<int>(at));
+        LOG_ERROR("No such at command defined: %d", static_cast<int>(at));
         assert(g_cmds_map.at(AT::AT));
         return *(g_cmds_map.at(AT::AT));
     }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationMessages.hpp"
@@ -103,7 +103,6 @@ namespace gui
 
     void MessagesMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        LOG_INFO("Data: %s", data ? data->getDescription().c_str() : "");
         {
             auto pdata = dynamic_cast<PhonebookSearchRequest *>(data);
             if (pdata != nullptr) {

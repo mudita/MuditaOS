@@ -32,7 +32,7 @@ namespace sdesktop::endpoints
     {
         auto context = ContextFactory::create(messageJson);
 
-        LOG_DEBUG("[MsgHandler]\nmethod: %s\nendpoint: %s\nuuid: %d",
+        LOG_DEBUG("Message details: method: %s, endpoint: %s, uuid: %d",
                   magic_enum::enum_name(context->getMethod()).data(),
                   magic_enum::enum_name(context->getEndpoint()).data(),
                   context->getUuid());
@@ -40,7 +40,7 @@ namespace sdesktop::endpoints
         auto handler = endpointFactory->create(*context, OwnerServicePtr);
 
         if (handler == nullptr) {
-            LOG_ERROR("No way to handle!");
+            LOG_ERROR("Handler not created. Cannot proceed");
             return;
         }
         handler->handle(*context);

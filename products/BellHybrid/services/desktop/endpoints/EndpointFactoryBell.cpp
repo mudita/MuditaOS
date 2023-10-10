@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EndpointFactoryBell.hpp"
@@ -20,7 +20,6 @@ namespace sdesktop::endpoints
 
     std::unique_ptr<Endpoint> EndpointFactoryBell::create(Context &context, sys::Service *ownerServicePtr)
     {
-        LOG_DEBUG("Creating endpoint: %s", magic_enum::enum_name(context.getEndpoint()).data());
         switch (context.getEndpoint()) {
         case EndpointType::update:
             return std::make_unique<UpdateEndpoint>(ownerServicePtr);

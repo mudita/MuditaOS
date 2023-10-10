@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "software_watchdog.hpp"
@@ -51,7 +51,7 @@ namespace bsp::watchdog
 
             // Critical section not required (atomic 32-bit reads)
             if (lastTimeoutTimestamp - lastRefreshTimestamp >= timeoutPeriod) {
-                LOG_FATAL("!!! Software watchdog timeout, exiting !!!");
+                LOG_FATAL("Software watchdog timeout, exiting !!!");
                 exit(EXIT_FAILURE);
             }
         }

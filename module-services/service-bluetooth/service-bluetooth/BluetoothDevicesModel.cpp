@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothDevicesModel.hpp"
@@ -85,7 +85,7 @@ void BluetoothDevicesModel::setInternalDeviceState(const Devicei &device, const 
 {
     auto dev = getDeviceByAddress(device.address);
     if (not dev) {
-        LOG_ERROR("no such device - ignored");
+        LOG_ERROR("Device doesn't exist, ignored");
         return;
     }
     dev.value().get().deviceState = state;

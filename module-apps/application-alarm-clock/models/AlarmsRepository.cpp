@@ -23,7 +23,6 @@ namespace app::alarmClock
         auto cb      = [callback](auto response) {
             auto result = dynamic_cast<alarms::AlarmsGetInRangeResponseMessage *>(response);
             if (result == nullptr) {
-                LOG_ERROR("BAD RESULT");
                 return false;
             }
             if (callback) {
@@ -41,7 +40,6 @@ namespace app::alarmClock
         auto cb   = [callback](auto response) {
             auto result = dynamic_cast<Result *>(response);
             if (result == nullptr) {
-                LOG_ERROR("BAD RESULT");
                 return false;
             }
             if (callback) {

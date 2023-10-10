@@ -425,8 +425,8 @@ namespace bluetooth
             local_seid = a2dp_subevent_stream_established_get_local_seid(packet);
             cid        = a2dp_subevent_stream_established_get_a2dp_cid(packet);
 
-            LOG_INFO("A2DP_SUBEVENT_STREAM_ESTABLISHED: a2dp_cid [expected 0x%02X, received 0x%02X], local_seid "
-                     "[expected 0x%02X, received 0x%02X], remote_seid [expected 0x%02X, received 0x%02X]",
+            LOG_INFO("A2DP subevent stream established: a2dp_cid (expected 0x%02X, received 0x%02X), local_seid "
+                     "(expected 0x%02X, received 0x%02X), remote_seid (expected 0x%02X, received 0x%02X)",
                      AVRCP::mediaTracker.a2dp_cid,
                      cid,
                      AVRCP::mediaTracker.local_seid,

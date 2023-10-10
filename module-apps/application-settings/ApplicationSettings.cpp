@@ -651,26 +651,26 @@ namespace app
 
     void ApplicationSettings::operatorOnChanged(const std::string &value)
     {
-        LOG_DEBUG("[ApplicationSettings::operatorOnChanged] value=%s", value.c_str());
+        LOG_DEBUG("OperatorOn changed: %s", value.c_str());
         if (!value.empty()) {
             operatorsOn = utils::getNumericValue<bool>(value);
         }
     }
     bool ApplicationSettings::getOperatorsOn() const noexcept
     {
-        LOG_DEBUG("[ApplicationSettings::getOperatorsOn] %d", operatorsOn);
+        LOG_DEBUG("OperatorOn: %d", operatorsOn);
         return operatorsOn;
     }
     void ApplicationSettings::setOperatorsOn(bool value)
     {
         operatorsOn = value;
-        LOG_DEBUG("[ApplicationSettings::setOperatorsOn] to %d", operatorsOn);
+        LOG_DEBUG("New OperatorOn: %d", operatorsOn);
         settings->setValue(settings::operators_on, std::to_string(static_cast<int>(value)));
     }
 
     void ApplicationSettings::setOsUpdateVersion(const std::string &value)
     {
-        LOG_DEBUG("[ApplicationSettings::setOsUpdateVersion] to value=%s", value.c_str());
+        LOG_DEBUG("New OS version: %s", value.c_str());
         settings->setValue(::settings::SystemProperties::osUpdateVersion, value, ::settings::SettingsScope::Global);
     }
 

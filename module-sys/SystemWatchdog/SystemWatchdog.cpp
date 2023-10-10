@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemWatchdog/SystemWatchdog.hpp>
@@ -66,7 +66,7 @@ namespace sys
             if (Ticks::GetTicks() - lastRefreshTimestamp >= refreshTimeoutPeriod) {
                 // Allow HW watchdog timeout to occur
                 timeout_occurred = true;
-                LOG_FATAL("!!! System watchdog timeout, system will be resetted soon !!!");
+                LOG_FATAL("System watchdog timeout, system will be reset soon!");
             }
             else {
                 bsp::watchdog::refresh();

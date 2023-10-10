@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DayLabel.hpp"
@@ -95,7 +95,7 @@ namespace gui
             return result;
         }
         catch (std::exception &e) {
-            LOG_ERROR("DayLabel::getDayNumber: %s", e.what());
+            LOG_ERROR("Exception: %s", e.what());
             return 0;
         }
     }

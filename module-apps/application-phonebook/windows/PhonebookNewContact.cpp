@@ -212,7 +212,7 @@ namespace gui
         if (contactAction == ContactAction::Add) {
             auto returnedContact = DBServiceAPI::ContactAdd(application, *contact);
             if (!returnedContact.has_value()) {
-                LOG_ERROR("verifyAndSave failed to ADD contact");
+                LOG_ERROR("Failed to add contact");
                 return false;
             }
             *contact = returnedContact.value();
@@ -225,7 +225,7 @@ namespace gui
                 return false;
             }
             else if (!DBServiceAPI::ContactUpdate(application, *contact)) {
-                LOG_ERROR("verifyAndSave failed to UPDATE contact");
+                LOG_ERROR("Failed to update contact");
                 return false;
             }
         }
@@ -258,7 +258,7 @@ namespace gui
                     contact->ID = oldContactRecord.ID;
                 }
                 if (!DBServiceAPI::ContactUpdate(application, *contact)) {
-                    LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
+                    LOG_ERROR("Failed to update contact (id: %" PRIu32 ")", contact->ID);
                     return false;
                 }
 
@@ -303,7 +303,7 @@ namespace gui
             contact->speeddial,
             [=]() -> bool {
                 if (!DBServiceAPI::ContactUpdate(application, *contact)) {
-                    LOG_ERROR("Contact id=%" PRIu32 " update failed", contact->ID);
+                    LOG_ERROR("Failed to update contact (id: %" PRIu32 ")", contact->ID);
                     return false;
                 }
                 application->switchWindow(gui::name::window::main_window);

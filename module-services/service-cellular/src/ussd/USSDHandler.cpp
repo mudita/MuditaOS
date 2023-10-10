@@ -59,7 +59,7 @@ namespace cellular::ussd
     void USSDHandler::setUSSDTimer()
     {
         if (not onTimerStart || not onTimerStop) {
-            LOG_ERROR("No onTimerStart or onTimerStop callback provided!");
+            LOG_ERROR("No callback provided!");
             return;
         }
         switch (ussdState) {
@@ -98,7 +98,7 @@ namespace cellular::ussd
             setUSSDTimer();
             return true;
         default:
-            LOG_WARN("unexpected URC handling state: %s", magic_enum::enum_name(ussdState).data());
+            LOG_WARN("Unexpected URC handling state: %s", magic_enum::enum_name(ussdState).data());
             return false;
         }
     }
@@ -106,7 +106,7 @@ namespace cellular::ussd
     bool USSDHandler::ussdSessionTimeout()
     {
         if (!onTimerGetState) {
-            LOG_ERROR("No onTimerGetState callback provided!");
+            LOG_ERROR("No callback provided!");
             return false;
         }
 

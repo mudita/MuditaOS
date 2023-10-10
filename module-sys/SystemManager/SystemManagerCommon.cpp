@@ -124,8 +124,7 @@ namespace sys
         case SystemManagerCommon::State::Running:
         case SystemManagerCommon::State::Suspend:
         case SystemManagerCommon::State::Shutdown:
-            LOG_FATAL("State changed after reset/shutdown was requested to: %s! this is terrible failure!",
-                      c_str(state));
+            LOG_FATAL("State changed after reset/shutdown was requested to: %s! Terrible failure!", c_str(state));
             break;
         }
     }
@@ -248,7 +247,7 @@ namespace sys
 
     bool SystemManagerCommon::Restore(Service *s)
     {
-        LOG_DEBUG("trying to enter restore state");
+        LOG_DEBUG("Trying to enter restore state");
         auto ret = s->bus.sendUnicastSync(std::make_shared<SystemManagerCmd>(Code::Restore),
                                           service::name::system_manager,
                                           sys::constants::restoreTimeout);
@@ -365,7 +364,7 @@ namespace sys
                 ++service;
             }
             else {
-                LOG_DEBUG("RequestServiceClose %s", (*service)->GetName().c_str());
+                LOG_DEBUG("Request service to close: %s", (*service)->GetName().c_str());
                 if (!RequestServiceClose((*service)->GetName(), this)) {
                     LOG_ERROR("Service %s did not respond -> to kill", (*service)->GetName().c_str());
                     kill(*service);
@@ -458,10 +457,10 @@ namespace sys
 
             const auto message = static_cast<ReadyToCloseMessage *>(msg);
             if (std::find(servicesToClose.begin(), servicesToClose.end(), message->sender) == servicesToClose.end()) {
-                LOG_ERROR("%s is not on the list. Further processing skipped.", message->sender.c_str());
+                LOG_ERROR("Service '%s' is not on the list. Further processing skipped.", message->sender.c_str());
                 return;
             }
-            LOG_INFO("ready to close %s", message->sender.c_str());
+            LOG_INFO("Ready to close %s", message->sender.c_str());
             servicesToClose.erase(std::remove(servicesToClose.begin(), servicesToClose.end(), message->sender),
                                   servicesToClose.end());
 
@@ -524,7 +523,7 @@ namespace sys
     {
         auto ret = toKill->DeinitHandler();
         if (ret != sys::ReturnCodes::Success) {
-            LOG_DEBUG("deinit handler: %s", c_str(ret));
+            LOG_DEBUG("Deinit handler status: %s", c_str(ret));
         }
         toKill->CloseHandler();
     }
@@ -572,14 +571,14 @@ namespace sys
          * state. */
         connect(sevm::KbdMessage(), [&](Message *) {
             if (state == State::Shutdown) {
-                LOG_INFO("Rebooting phone after shutdown with USB connected...");
+                LOG_INFO("Rebooting phone after shutdown with USB connected");
                 set(State::Reboot);
             }
             return MessageNone{};
         });
 
         connect(sevm::BatteryBrownoutMessage(), [&](Message *) {
-            LOG_INFO("Battery Brownout voltage level reached! Closing system...");
+            LOG_INFO("Battery Brownout voltage level reached! Closing system");
             CloseSystemHandler(CloseReason::SystemBrownout);
             return MessageNone{};
         });
@@ -672,7 +671,7 @@ namespace sys
 
     void SystemManagerCommon::CloseSystemHandler(CloseReason closeReason)
     {
-        LOG_DEBUG("Invoking closing procedure...");
+        LOG_DEBUG("Invoking closing procedure");
 
         cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
 
@@ -733,7 +732,7 @@ namespace sys
 
         DestroyServices(getWhiteListFor(WhiteListType::Restore));
 
-        LOG_INFO("entered restore state");
+        LOG_INFO("Entered restore state");
     }
 
     void SystemManagerCommon::RebootHandler()

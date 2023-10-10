@@ -23,7 +23,7 @@ namespace gui
     {
         auto *item = dynamic_cast<PhonebookItemData *>(data);
         if (item == nullptr) {
-            LOG_WARN("Received null pointer");
+            LOG_WARN("Failed to get phonebook data");
             return false;
         }
         contact     = item->getContact();
@@ -79,7 +79,7 @@ namespace gui
                                 "",
                                 [=]() -> bool {
                                     if (!DBServiceAPI::ContactRemove(this->application, contact->ID)) {
-                                        LOG_ERROR("Contact id=%" PRIu32 "  remove failed", contact->ID);
+                                        LOG_ERROR("Failed to remove contact (id: %" PRIu32 ")", contact->ID);
                                         return false;
                                     }
                                     showNotification(NotificationType::Delete);

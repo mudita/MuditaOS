@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/blkdev/disk_handle.hpp>
 #include <purefs/blkdev/disk.hpp>
@@ -20,7 +20,7 @@ namespace purefs::blkdev::internal
                 }
             }
             else {
-                LOG_ERROR("Unable to get sector count.");
+                LOG_FATAL("Disk handle pointer expired.");
             }
         }
         return m_sectors;

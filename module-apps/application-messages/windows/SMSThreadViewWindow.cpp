@@ -91,7 +91,7 @@ namespace gui
         }
 
         if (const auto pdata = dynamic_cast<SMSThreadData *>(data); pdata != nullptr) {
-            LOG_INFO("Thread data received: %" PRIu32, pdata->thread->ID);
+            LOG_DEBUG("Thread data received: %" PRIu32, pdata->thread->ID);
             saveInfoAboutPreviousAppForProperSwitchBack(data);
 
             smsModel->numberID    = pdata->thread->numberID;
@@ -110,7 +110,7 @@ namespace gui
         }
 
         if (const auto pdata = dynamic_cast<SMSTextData *>(data); pdata != nullptr) {
-            LOG_INFO("received sms templates data");
+            LOG_DEBUG("Received sms templates data");
             if (pdata->concatenate == SMSTextData::Concatenate::True) {
                 smsModel->smsInput->inputText->addText(pdata->text);
             }

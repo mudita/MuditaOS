@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <log/log.hpp>
@@ -49,7 +49,7 @@ namespace gui
         auto _ = gsl::finally([fd] { std::fclose(fd); });
 
         if (err.length() != 0) {
-            LOG_FATAL("%s", err.c_str());
+            LOG_FATAL("Parsing json error: %s", err.c_str());
             return json11::Json();
         }
         return parsedJson;

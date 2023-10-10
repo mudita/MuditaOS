@@ -102,7 +102,7 @@ namespace gui
                 const auto filePath = std::string(musicFolder) + "/" + ent.path().filename().c_str();
                 auto fileTags       = tags::fetcher::fetchTags(filePath);
                 musicFiles.push_back(fileTags);
-                LOG_DEBUG("file: %s found", ent.path().filename().c_str());
+                LOG_DEBUG("File '%s' found", ent.path().filename().c_str());
             }
         }
         LOG_INFO("Total number of music files found: %u", static_cast<unsigned int>(musicFiles.size()));

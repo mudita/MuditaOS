@@ -56,7 +56,7 @@ namespace gui
             setText(transitingText);
             break;
         default:
-            LOG_ERROR("button state '%s' not implemented - defaulting to OFF",
+            LOG_ERROR("Button state '%s' not implemented - defaulting to OFF",
                       magic_enum::enum_name(currentState).data());
             [[fallthrough]];
         case State::Off:

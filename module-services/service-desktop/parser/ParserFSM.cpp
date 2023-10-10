@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ParserFSM.hpp"
@@ -93,8 +93,6 @@ namespace sdesktop::endpoints
             return;
         }
 
-        LOG_DEBUG("Payload length: %lu", payloadLength);
-
         message::removeHeader(receivedMsg);
         parseNewMessage();
     }
@@ -110,7 +108,6 @@ namespace sdesktop::endpoints
             LOG_DEBUG("Header: %s\n", header.c_str());
             payloadLength = message::calcPayloadLength(header);
 
-            LOG_DEBUG("Payload length: %lu\n", payloadLength);
             message::eraseFront(receivedMsg, missingHeaderLength);
 
             parseNewMessage();

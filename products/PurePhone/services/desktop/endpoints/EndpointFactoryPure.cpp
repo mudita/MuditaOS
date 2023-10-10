@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EndpointFactoryPure.hpp"
@@ -23,7 +23,6 @@ namespace sdesktop::endpoints
 
     std::unique_ptr<Endpoint> EndpointFactoryPure::constructEndpoint(Context &context, sys::Service *ownerServicePtr)
     {
-        LOG_DEBUG("Creating endpoint: %d", static_cast<int>(context.getEndpoint()));
         switch (context.getEndpoint()) {
         case EndpointType::update:
             return std::make_unique<UpdateEndpoint>(ownerServicePtr);

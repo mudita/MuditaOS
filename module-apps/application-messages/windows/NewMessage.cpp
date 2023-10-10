@@ -283,7 +283,7 @@ namespace gui
                 return false;
             }
             if (!sendSms()) {
-                LOG_ERROR("sendSms failed");
+                LOG_ERROR("Send SMS failed");
             }
             return true;
         };

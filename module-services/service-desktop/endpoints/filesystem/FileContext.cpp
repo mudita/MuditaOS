@@ -106,7 +106,7 @@ auto FileReadContext::read() -> std::vector<std::uint8_t>
     advanceFileOffset(dataLeft);
 
     if (reachedEOF()) {
-        LOG_INFO("Reached EOF");
+        LOG_DEBUG("Reached EOF");
     }
 
     return buffer;
@@ -134,7 +134,7 @@ auto FileWriteContext::write(const std::vector<std::uint8_t> &data) -> void
     advanceFileOffset(dataLeft);
 
     if (reachedEOF()) {
-        LOG_INFO("Reached EOF of %s", path.c_str());
+        LOG_DEBUG("Reached EOF of %s", path.c_str());
     }
 }
 

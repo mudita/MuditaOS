@@ -62,7 +62,7 @@ namespace sdesktop::endpoints
             using namespace sdesktop::developerMode;
             auto cmd     = body[json::developerMode::AT].string_value();
             auto timeout = std::chrono::milliseconds(body[json::developerMode::timeout].int_value());
-            LOG_DEBUG("at request sent with timeout >%d<", int(timeout.count()));
+            LOG_DEBUG("At request sent with timeout >%d<", int(timeout.count()));
             auto event = std::make_unique<ATResponseEvent>(cmd, timeout);
             auto msg   = std::make_shared<DeveloperModeRequest>(std::move(event));
             code       = toCode(owner->bus.sendUnicast(msg, service::name::cellular));
@@ -273,7 +273,7 @@ namespace sdesktop::endpoints
         case 18:
             return bsp::KeyCodes::SSwitchMid;
         default:
-            LOG_ERROR("invalid keycode");
+            LOG_ERROR("Invalid keycode");
             return bsp::KeyCodes::Undefined;
         };
     }

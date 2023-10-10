@@ -369,7 +369,7 @@ CellularMux::ConfState CellularMux::startMultiplexer()
         auto frameData = data;
 
         if (frameData.size() < 4) {
-            LOG_ERROR("frame too short");
+            LOG_ERROR("Frame too short");
             return;
         }
         switch (frameData[0]) {

@@ -15,7 +15,7 @@ using namespace at::urc;
 
 void CellularUrcHandler::Handle(Clip &urc)
 {
-    LOG_TRACE("incoming call...");
+    LOG_TRACE("Incoming call");
     std::string phoneNumber;
     if (urc.isValid()) {
         phoneNumber = urc.getNumber();
@@ -64,7 +64,7 @@ void CellularUrcHandler::Handle(Creg &urc)
 
 void CellularUrcHandler::Handle(Cmti &urc)
 {
-    LOG_TRACE("received new SMS notification");
+    LOG_TRACE("Received new SMS notification");
     if (urc.isValid()) {
         response = std::make_unique<cellular::NewIncomingSMSNotification>(urc.getIndex());
         urc.setHandled(true);
@@ -127,7 +127,7 @@ void CellularUrcHandler::Handle(Qind &urc)
         // Received signal strength change
         auto rssi = urc.getRSSI();
         if (!rssi) {
-            LOG_INFO("Invalid csq - ignore");
+            LOG_WARN("Invalid csq - ignore");
             AntennaServiceAPI::InvalidCSQNotification(&cellularService);
         }
         else {
@@ -171,7 +171,7 @@ void CellularUrcHandler::Handle(Cpin &urc)
     if (urc.isValid()) {
         auto state = urc.getState();
         if (!state) {
-            LOG_INFO("Invalid cpin - ignore");
+            LOG_WARN("Invalid cpin - ignore");
         }
         else {
             response = std::make_unique<cellular::internal::msg::HandleATSimStateChange>(*state);
@@ -216,7 +216,7 @@ void CellularUrcHandler::Handle(UrcResponse &urc)
 
     for (auto &t : typesToHandle) {
         if (t == urc.getURCResponseType()) {
-            LOG_INFO("call (aborted|missed) type: %s", magic_enum::enum_name(t).data());
+            LOG_INFO("Call (aborted|missed) type: %s", magic_enum::enum_name(t).data());
             response = std::make_unique<cellular::CallAbortedNotification>();
             urc.setHandled(true);
         }

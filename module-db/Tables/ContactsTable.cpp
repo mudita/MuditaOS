@@ -89,7 +89,7 @@ ContactsTableRow ContactsTable::getByIdCommon(std::unique_ptr<QueryResult> retQu
 {
     debug_db_data("%s", __FUNCTION__);
     if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
-        LOG_DEBUG("no results");
+        LOG_DEBUG("No results");
         return ContactsTableRow();
     }
 

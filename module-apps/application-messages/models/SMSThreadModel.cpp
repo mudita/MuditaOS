@@ -108,7 +108,7 @@ void SMSThreadModel::addReturnNumber()
         assert(app != nullptr);
         assert(smsInput->number != nullptr);
         if (!app->handleSendSmsFromThread(*smsInput->number, smsInput->inputText->getText())) {
-            LOG_ERROR("handleSendSmsFromThread failed");
+            LOG_ERROR("Send SMS from thread failed");
         }
         smsInput->clearDraftMessage();
         return true;

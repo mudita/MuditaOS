@@ -88,12 +88,16 @@ namespace service::gui
         worker->init(queueInfo);
         worker->run();
         stateManager.setState(ServiceGUIState::Running);
+
+        LOG_INFO("Initialized");
         return sys::ReturnCodes::Success;
     }
 
     sys::ReturnCodes ServiceGUI::DeinitHandler()
     {
         worker->close();
+
+        LOG_INFO("Deinitialized");
         return sys::ReturnCodes::Success;
     }
 
@@ -116,7 +120,6 @@ namespace service::gui
 
     sys::ReturnCodes ServiceGUI::SwitchPowerModeHandler(const sys::ServicePowerMode mode)
     {
-        LOG_INFO("PowerModeHandler: %s", c_str(mode));
         return sys::ReturnCodes::Success;
     }
 

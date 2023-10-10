@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ModemCallApi.hpp"
@@ -16,13 +16,13 @@ namespace cellular
     bool Api::handleEvent(at::AT modemCommand)
     {
         if (!cellular->cmux) {
-            LOG_INFO("no cmux at this time - ignoring request");
+            LOG_INFO("No cmux at this time - ignoring request");
             return false;
         }
 
         auto channel = cellular->cmux->get(CellularMux::Channel::Commands);
         if (!channel) {
-            LOG_INFO("no cmux command channel at this time - ignoring request");
+            LOG_INFO("No cmux command channel at this time - ignoring request");
             return false;
         }
 

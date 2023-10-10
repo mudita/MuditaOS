@@ -53,7 +53,7 @@ namespace gui::status_bar
     {
         try {
             if (img == nullptr) {
-                LOG_ERROR("SignalStrength Image nullptr");
+                LOG_ERROR("SignalStrength image nullptr");
                 return;
             }
 
@@ -71,7 +71,7 @@ namespace gui::status_bar
             }
         }
         catch (const std::exception &exception) {
-            LOG_ERROR("%s", exception.what());
+            LOG_ERROR("Exception while updating signal image: %s", exception.what());
         }
     }
 } // namespace gui::status_bar

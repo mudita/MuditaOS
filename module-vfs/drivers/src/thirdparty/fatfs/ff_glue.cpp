@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 // ffFAT glue layer code
 
@@ -119,7 +119,7 @@ namespace purefs::fs::drivers::ffat::internal
             }
             const auto res = diskmm->read(diskh, buff, sector, count);
             if (res < 0) {
-                LOG_ERROR("write error %i", res);
+                LOG_ERROR("Read error %i", res);
                 return (res == -ERANGE) ? (RES_PARERR) : (RES_ERROR);
             }
             else {
@@ -139,7 +139,7 @@ namespace purefs::fs::drivers::ffat::internal
             }
             const auto res = diskmm->write(diskh, buff, sector, count);
             if (res < 0) {
-                LOG_ERROR("write error %i", res);
+                LOG_ERROR("Write error %i", res);
                 return (res == -ERANGE) ? (RES_PARERR) : (RES_ERROR);
             }
             else {

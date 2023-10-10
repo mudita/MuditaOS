@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ProfileConfigUtils.hpp"
@@ -52,7 +52,7 @@ namespace audio
         {
             std::ifstream file;
             std::string configString;
-            LOG_DEBUG("Reading %s ...", filePath.c_str());
+            LOG_DEBUG("Reading profile configuration: %s", filePath.c_str());
             file.open(filePath);
             if (not file.is_open()) {
                 LOG_ERROR("Can't open profile configuration file, using defaults!");
@@ -97,7 +97,7 @@ namespace audio
             config.playbackPathGain = playbackPathGain;
         }
         else {
-            LOG_WARN("playbackPathGain value out of range (%u), using fallback value %u!",
+            LOG_WARN("PlaybackPathGain value out of range (%u), using fallback value %u!",
                      playbackPathGain,
                      config.playbackPathGain);
         }
@@ -107,7 +107,7 @@ namespace audio
             config.playbackPathAtten = playbackPathAtten;
         }
         else {
-            LOG_WARN("playbackPathAtten value out of range (%u), using fallback value %u!",
+            LOG_WARN("PlaybackPathAtten value out of range (%u), using fallback value %u!",
                      playbackPathAtten,
                      config.playbackPathAtten);
         }

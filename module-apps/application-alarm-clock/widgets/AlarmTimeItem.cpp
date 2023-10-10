@@ -97,7 +97,7 @@ namespace gui
                     hours = std::stoi(hourInput->getText().c_str());
                 }
                 catch (const std::exception &e) {
-                    LOG_INFO("AlarmTimeItem hours not valid: %s", e.what());
+                    LOG_ERROR("Hours not valid: %s", e.what());
                     hours = 0;
                 }
                 if ((mode24H && hours > utils::time::hoursInday - 1) ||
@@ -110,7 +110,7 @@ namespace gui
                     minutes = std::stoi(minuteInput->getText().c_str());
                 }
                 catch (const std::exception &e) {
-                    LOG_INFO("AlarmTimeItem minutes not valid: %s", e.what());
+                    LOG_ERROR("Minutes not valid: %s", e.what());
                     minutes = 0;
                 }
                 if (minutes > utils::time::minutesInHour - 1) {

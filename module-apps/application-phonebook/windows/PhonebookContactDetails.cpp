@@ -74,7 +74,7 @@ namespace gui
                 contactFlagsWidget->setSpeedDial(true, position);
             }
             catch (std::exception &e) {
-                LOG_ERROR("PhonebookContactDetails::onBeforeShow: %s", e.what());
+                LOG_ERROR("Exception during setting speed dial: %s", e.what());
                 contactFlagsWidget->setSpeedDial(false, 0);
             }
         }

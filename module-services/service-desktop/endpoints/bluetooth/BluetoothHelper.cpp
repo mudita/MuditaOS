@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/bluetooth/BluetoothHelper.hpp>
@@ -42,11 +42,11 @@ namespace sdesktop::endpoints
             const auto &power = state[btConsts::states::power];
             if (power == json::bluetooth::on) {
                 status.state = BluetoothStatus::State::On;
-                LOG_INFO("turning on BT from harness!");
+                LOG_INFO("Turning on BT from harness!");
             }
             else if (power == json::bluetooth::off) {
                 status.state = BluetoothStatus::State::Off;
-                LOG_INFO("turning off BT from harness!");
+                LOG_INFO("Turning off BT from harness!");
             }
             const auto &visibility = state[btConsts::states::visibility];
             status.visibility      = visibility == json::bluetooth::on;

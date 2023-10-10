@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimSwitchingWindow.hpp"
@@ -46,7 +46,7 @@ namespace gui
                     case Store::GSM::SIM::SIM_FAIL:
                     case Store::GSM::SIM::SIM_UNKNOWN:
                         if (std::chrono::steady_clock::now() - startTime >= constants::maxDurationTime) {
-                            LOG_INFO("The SIM switch operation failed. We return to the previous window.");
+                            LOG_WARN("The SIM switch operation failed.");
                             application->getSimLockSubject().simSwitched();
                             application->returnToPreviousWindow();
                         }

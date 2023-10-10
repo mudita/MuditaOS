@@ -254,7 +254,7 @@ namespace app::home_screen
     {
         const auto greetingCollection = utils::translate_array("app_bell_greeting_msg");
         if (greetingCollection.empty()) {
-            LOG_WARN("app_bell_greeting_msg array does not exist, using default string");
+            LOG_WARN("Array 'app_bell_greeting_msg' does not exist, using default string");
             return "app_bell_greeting_msg";
         }
 

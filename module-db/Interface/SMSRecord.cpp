@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SMSRecord.hpp"
@@ -81,7 +81,7 @@ bool SMSRecordInterface::Add(const SMSRecord &rec)
     thread.msgCount++;
     if (rec.type == SMSType::INBOX) {
         thread.unreadMsgCount++;
-        LOG_DEBUG("unreadMsgCount = %" PRIu32 " for thread = %" PRIu32, thread.unreadMsgCount, thread.ID);
+        LOG_DEBUG("Unread messages = %" PRIu32 " for thread = %" PRIu32, thread.unreadMsgCount, thread.ID);
     }
 
     if (!threadInterface.Update(thread)) {

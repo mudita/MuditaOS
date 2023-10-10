@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-desktop/Sync.hpp>
@@ -23,7 +23,7 @@ static bool isValidDirentry(const std::filesystem::directory_entry &direntry)
 Sync::CompletionCode Sync::PrepareSyncPackage(sys::Service *ownerService, std::filesystem::path &path)
 {
     assert(ownerService != nullptr);
-    LOG_INFO("Sync package preparation started...");
+    LOG_DEBUG("Sync package preparation started");
 
     if (!Sync::RemoveSyncDir(path)) {
         return CompletionCode::FSError;
@@ -33,9 +33,8 @@ Sync::CompletionCode Sync::PrepareSyncPackage(sys::Service *ownerService, std::f
         return CompletionCode::FSError;
     }
 
-    LOG_DEBUG("Sync package preparation started...");
     if (!DBServiceAPI::DBPrepareSyncPackage(ownerService, path)) {
-        LOG_ERROR("Sync package preparation, quitting...");
+        LOG_ERROR("Sync package preparation failed, quiting");
         Sync::RemoveSyncDir(path);
         return CompletionCode::DBError;
     }
@@ -51,6 +50,8 @@ Sync::CompletionCode Sync::PrepareSyncPackage(sys::Service *ownerService, std::f
         return CompletionCode::FSError;
     }
 
+    LOG_DEBUG("Sync package preparation finished");
+
     return CompletionCode::Success;
 }
 
@@ -58,11 +59,11 @@ bool Sync::RemoveSyncDir(const std::filesystem::path &path)
 {
     /* prepare directories */
     if (std::filesystem::is_directory(path)) {
-        LOG_INFO("Removing sync directory %s...", path.c_str());
+        LOG_DEBUG("Removing sync directory: %s", path.c_str());
         std::error_code errorCode;
 
         if (std::filesystem::remove_all(path, errorCode) == 0) {
-            LOG_ERROR("Removing sync directory %s failed, error: %d.", path.c_str(), errorCode.value());
+            LOG_ERROR("Removing sync directory '%s' failed, error: %d.", path.c_str(), errorCode.value());
             return false;
         }
     }
@@ -72,7 +73,7 @@ bool Sync::RemoveSyncDir(const std::filesystem::path &path)
 
 bool Sync::CreateSyncDir(const std::filesystem::path &path)
 {
-    LOG_INFO("Creating sync directory %s...", path.c_str());
+    LOG_INFO("Creating sync directory: %s", path.c_str());
     if (std::filesystem::exists(path)) {
         LOG_ERROR("Sync directory already exists!");
         return false;
@@ -88,7 +89,7 @@ bool Sync::CreateSyncDir(const std::filesystem::path &path)
 bool Sync::PackSyncFiles(const std::filesystem::path &path)
 {
     if (std::filesystem::is_empty(path)) {
-        LOG_ERROR("Sync dir is empty, quitting...");
+        LOG_ERROR("Sync dir is empty, quitting");
         return false;
     }
 
@@ -102,11 +103,11 @@ bool Sync::PackSyncFiles(const std::filesystem::path &path)
         }
     });
 
-    LOG_INFO("Opening tar %s file...", tarFilePath.c_str());
+    LOG_INFO("Opening tar %s file", tarFilePath.c_str());
 
     int ret = mtar_open(&tarFile, tarFilePath.c_str(), "w");
     if (ret != MTAR_ESUCCESS) {
-        LOG_ERROR("Opening tar file failed, quitting...");
+        LOG_ERROR("Opening tar file failed, quitting");
         return false;
     }
     isTarFileOpen = true;
@@ -121,8 +122,8 @@ bool Sync::PackSyncFiles(const std::filesystem::path &path)
             continue;
         }
 
-        LOG_INFO("Archiving file ...");
-        LOG_DEBUG("Writing tar header ...");
+        LOG_DEBUG("Archiving file ");
+        LOG_DEBUG("Writing tar header");
 
         if (mtar_write_file_header(&tarFile,
                                    direntry.path().filename().c_str(),
@@ -155,21 +156,21 @@ bool Sync::PackSyncFiles(const std::filesystem::path &path)
             fileStream.read(fileStreamBuffer.get(), readSize);
 
             if (mtar_write_data(&tarFile, fileStreamBuffer.get(), readSize) != MTAR_ESUCCESS) {
-                LOG_ERROR("Writing into sync package failed, quitting...");
+                LOG_ERROR("Writing into sync package failed, quitting");
                 return false;
             }
         }
     }
 
-    LOG_INFO("Finalizing tar file...");
+    LOG_DEBUG("Finalizing tar file");
     if (mtar_finalize(&tarFile) != MTAR_ESUCCESS) {
-        LOG_ERROR("Finalizing tar file failed, quitting....");
+        LOG_ERROR("Finalizing tar file failed, quitting");
         return false;
     }
 
-    LOG_INFO("Closing tar file...");
+    LOG_INFO("Closing tar file");
     if (mtar_close(&tarFile) != MTAR_ESUCCESS) {
-        LOG_ERROR("Closing tar file failed, quitting...");
+        LOG_ERROR("Closing tar file failed, quitting");
         return false;
     }
     isTarFileOpen = false;
