@@ -26,7 +26,7 @@ NotificationsListPresenter::NotificationsListPresenter()
     : app::InternalModel<gui::NotificationListItem *>{}, gui::ListItemProvider{}
 {}
 
-unsigned int NotificationsListPresenter::requestRecordsCount()
+unsigned NotificationsListPresenter::requestRecordsCount()
 {
     return internalData.size();
 }
@@ -36,13 +36,13 @@ gui::ListItem *NotificationsListPresenter::getItem(gui::Order order)
     return getRecord(order);
 }
 
-void NotificationsListPresenter::requestRecords(uint32_t offset, uint32_t limit)
+void NotificationsListPresenter::requestRecords(std::uint32_t offset, std::uint32_t limit)
 {
     setupModel(offset, limit);
     list->onProviderDataUpdate();
 }
 
-unsigned int NotificationsListPresenter::getMinimalItemSpaceRequired() const
+unsigned NotificationsListPresenter::getMinimalItemSpaceRequired() const
 {
     return style::notifications::itemHeight;
 }
@@ -59,13 +59,11 @@ bool NotificationsListPresenter::hasDismissibleNotification() const noexcept
 
 void NotificationsListPresenter::dismissAll()
 {
-    for (auto it = std::begin(internalData); it != std::end(internalData); it++) {
-        if (auto item = *it; item->isDismissible()) {
-            if (item->dismissCallback) {
-                item->dismissCallback();
-            }
+    std::for_each(internalData.cbegin(), internalData.cend(), [](const auto &item) {
+        if (item->isDismissible() && item->dismissCallback) {
+            item->dismissCallback();
         }
-    }
+    });
 }
 
 bool NotificationsListPresenter::isEmpty() const noexcept
@@ -76,7 +74,8 @@ bool NotificationsListPresenter::isEmpty() const noexcept
 auto NotificationsListPresenter::create(const notifications::NotSeenSMSNotification *notification)
     -> NotificationListItem *
 {
-    auto item = new NotificationWithEventCounter(notifications::NotificationType::NotSeenSms, notification->getValue());
+    const auto item =
+        new NotificationWithEventCounter(notifications::NotificationType::NotSeenSms, notification->getValue());
     setNotificationText(item,
                         notification,
                         (notification->getValue() == 1) ? "app_desktop_unread_single_message"
@@ -87,17 +86,17 @@ auto NotificationsListPresenter::create(const notifications::NotSeenSMSNotificat
 auto NotificationsListPresenter::create(const notifications::NotSeenCallNotification *notification)
     -> NotificationListItem *
 {
-    auto item =
+    const auto item =
         new NotificationWithEventCounter(notifications::NotificationType::NotSeenCall, notification->getValue());
     setNotificationText(item, notification, "app_desktop_missed_calls");
     item->deleteByList = false;
     return item;
 }
 
-auto NotificationsListPresenter::create(const notifications::TetheringNotification *notification)
+auto NotificationsListPresenter::create([[maybe_unused]] const notifications::TetheringNotification *notification)
     -> NotificationListItem *
 {
-    auto item =
+    const auto item =
         new NotificationWithOnOffButton(notifications::NotificationType::Tethering, gui::ButtonTriState::State::On);
     item->setName(utils::translate("Tethering"), false);
     item->deleteByList = false;
@@ -107,7 +106,7 @@ auto NotificationsListPresenter::create(const notifications::TetheringNotificati
 auto NotificationsListPresenter::create(const notifications::AlarmSnoozeNotification *notification)
     -> NotificationListItem *
 {
-    auto item =
+    const auto item =
         new NotificationWithEventCounter(notifications::NotificationType::AlarmSnooze, notification->getValue());
     item->setName(utils::translate("app_desktop_alarm_snooze"), true);
     item->deleteByList = false;
@@ -117,10 +116,21 @@ auto NotificationsListPresenter::create(const notifications::AlarmSnoozeNotifica
 auto NotificationsListPresenter::create(const notifications::PhoneLockNotification *notification)
     -> NotificationListItem *
 {
-    auto item = new NotificationListItem(notifications::NotificationType::PhoneLock);
+    const auto item = new NotificationListItem(notifications::NotificationType::PhoneLock);
 
     item->setName(utils::translate("phone_lock_notification"), true, {{"$TIME", notification->getTime()}});
     item->deleteByList = false;
+    return item;
+}
+
+auto NotificationsListPresenter::create([[maybe_unused]] const notifications::BatteryTooHotNotification *notification)
+    -> NotificationListItem *
+{
+    const auto item = new NotificationListItem(notifications::NotificationType::BatteryTooHot);
+
+    item->setName(utils::translate("app_desktop_battery_too_hot"), true);
+    item->deleteByList = false;
+    item->activeItem   = false;
     return item;
 }
 
@@ -129,6 +139,7 @@ void NotificationsListPresenter::updateData(app::manager::actions::Notifications
 {
     if (list == nullptr) {
         LOG_ERROR("ListView object not provided");
+        return;
     }
 
     list->prepareRebuildCallback = [this, toRemove = std::move(internalData)] {
@@ -140,23 +151,28 @@ void NotificationsListPresenter::updateData(app::manager::actions::Notifications
 
     for (const auto &notification : params->getNotifications()) {
         if (typeid(*notification) == typeid(notifications::NotSeenSMSNotification) && callAndSMSVisibility) {
-            auto sms = static_cast<const notifications::NotSeenSMSNotification *>(notification.get());
+            const auto sms = static_cast<const notifications::NotSeenSMSNotification *>(notification.get());
             internalData.push_back(create(sms));
         }
         else if (typeid(*notification) == typeid(notifications::NotSeenCallNotification) && callAndSMSVisibility) {
-            auto call = static_cast<const notifications::NotSeenCallNotification *>(notification.get());
+            const auto call = static_cast<const notifications::NotSeenCallNotification *>(notification.get());
             internalData.push_back(create(call));
         }
         else if (typeid(*notification) == typeid(notifications::TetheringNotification)) {
-            auto tethering = static_cast<const notifications::TetheringNotification *>(notification.get());
+            const auto tethering = static_cast<const notifications::TetheringNotification *>(notification.get());
             internalData.push_back(create(tethering));
         }
         else if (typeid(*notification) == typeid(notifications::PhoneLockNotification)) {
-            auto phoneLock = static_cast<const notifications::PhoneLockNotification *>(notification.get());
+            const auto phoneLock = static_cast<const notifications::PhoneLockNotification *>(notification.get());
             internalData.push_back(create(phoneLock));
         }
+        else if (typeid(*notification) == typeid(notifications::BatteryTooHotNotification)) {
+            const auto batteryTooHot =
+                static_cast<const notifications::BatteryTooHotNotification *>(notification.get());
+            internalData.push_back(create(batteryTooHot));
+        }
         else if (typeid(*notification) == typeid(notifications::AlarmSnoozeNotification)) {
-            auto snooze = static_cast<const notifications::AlarmSnoozeNotification *>(notification.get());
+            const auto snooze = static_cast<const notifications::AlarmSnoozeNotification *>(notification.get());
             internalData.push_back(create(snooze));
         }
     }

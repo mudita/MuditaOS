@@ -161,14 +161,14 @@ download_asset_release_json(json-common-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_common.json
                             ${SYSROOT_PATH}/
                             MuditaOSPublicAssets
-                            0.0.10
+                            0.0.11
                             ${MUDITA_CACHE_DIR}
     )
 download_asset_release_json(json-community-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_community.json
                             ${SYSROOT_PATH}/system_a/
                             MuditaOSPublicAssets
-                            0.0.10
+                            0.0.11
                             ${MUDITA_CACHE_DIR}
     )
 download_asset_json(json-rt1051-target

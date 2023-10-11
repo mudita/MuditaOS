@@ -30,6 +30,7 @@
 #include <service-time/service-time/TimeMessage.hpp>
 #include <service-bluetooth/messages/Status.hpp>
 #include <service-bluetooth/ServiceBluetoothName.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 
 #include <cassert>
 #include <fstream>
@@ -144,6 +145,7 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
             if (!targetApplication.empty()) {
                 bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), targetApplication);
             }
+            bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::appmgr);
             bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::service_desktop);
             bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::bluetooth);
             bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::cellular);

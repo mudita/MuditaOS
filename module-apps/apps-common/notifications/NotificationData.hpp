@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,7 +16,8 @@ namespace notifications
         NotSeenCall,
         Tethering,
         AlarmSnooze,
-        PhoneLock
+        PhoneLock,
+        BatteryTooHot
     };
 
     enum class NotificationPriority
@@ -34,19 +35,19 @@ namespace notifications
 
     class Notification
     {
-        static constexpr auto highestPriority = std::numeric_limits<uint32_t>::max();
+        static constexpr auto highestPriority = std::numeric_limits<std::uint32_t>::max();
         static constexpr auto lowestPriority  = 0;
-        static uint32_t priorityPool;
+        static std::uint32_t priorityPool;
 
         NotificationType type;
-        uint32_t priority;
+        std::uint32_t priority;
 
       protected:
         explicit Notification(NotificationType type, NotificationPriority priorityType = NotificationPriority::Next);
 
       public:
         [[nodiscard]] auto getType() const noexcept -> NotificationType;
-        [[nodiscard]] auto getPriority() const noexcept -> uint32_t;
+        [[nodiscard]] auto getPriority() const noexcept -> std::uint32_t;
 
         virtual ~Notification() = default;
     };
@@ -117,4 +118,9 @@ namespace notifications
         explicit PhoneLockNotification(std::string formattedTime);
     };
 
+    class BatteryTooHotNotification : public Notification
+    {
+      public:
+        BatteryTooHotNotification();
+    };
 } // namespace notifications

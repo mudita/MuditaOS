@@ -82,7 +82,7 @@ namespace app
     // Invoked upon receiving data message
     sys::MessagePointer ApplicationDesktop::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-        auto retMsg = Application::DataReceivedHandler(msgl);
+        const auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
         if (dynamic_cast<sys::ResponseMessage *>(retMsg.get())->retCode == sys::ReturnCodes::Success) {
             return retMsg;
@@ -96,25 +96,22 @@ namespace app
         Application::handleAsyncResponse(resp);
 
         if (resp != nullptr) {
-            if (auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
-                auto result = msg->getResult();
+            if (const auto msg = dynamic_cast<db::QueryResponse *>(resp)) {
+                const auto result = msg->getResult();
                 if (dbNotificationHandler.handle(result.get())) {
                     refreshMenuWindow();
                 }
             }
             return std::make_shared<sys::ResponseMessage>();
         }
-        else {
-            return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
-        }
+        return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
     }
 
     void ApplicationDesktop::handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams)
     {
-        if (auto window = getCurrentWindow()->getName();
-            window == app::window::name::desktop_main_window || window == gui::popup::window::phone_lock_window) {
-
-            auto refreshMode = getRefreshModeFromNotifications(notificationsParams.get());
+        if (const auto window = getCurrentWindow()->getName();
+            (window == app::window::name::desktop_main_window) || (window == gui::popup::window::phone_lock_window)) {
+            const auto refreshMode = getRefreshModeFromNotifications(notificationsParams.get());
             updateCurrentWindow(std::move(notificationsParams), gui::ShowMode::GUI_SHOW_INIT, refreshMode);
         }
     }
@@ -122,7 +119,7 @@ namespace app
     // Invoked during initialization
     sys::ReturnCodes ApplicationDesktop::InitHandler()
     {
-        auto ret = Application::InitHandler();
+        const auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
@@ -130,7 +127,7 @@ namespace app
         createUserInterface();
 
         connect(typeid(db::NotificationMessage), [&](sys::Message *request) {
-            auto notificationMessage = static_cast<db::NotificationMessage *>(request);
+            const auto notificationMessage = static_cast<db::NotificationMessage *>(request);
             dbNotificationHandler.handle(notificationMessage);
             return sys::MessageNone{};
         });
@@ -143,41 +140,42 @@ namespace app
     void ApplicationDesktop::createUserInterface()
     {
         using namespace app::window::name;
+        using namespace gui::popup::window;
+
         windowsFactory.attach(desktop_main_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DesktopMainWindow>(app);
         });
-        windowsFactory.attach(desktop_menu, [this](ApplicationCommon *app, const std::string newname) {
+        windowsFactory.attach(desktop_menu, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::MenuWindow>(app, dbNotificationHandler);
         });
-        windowsFactory.attach(dead_battery, [](ApplicationCommon *app, const std::string newname) {
+        windowsFactory.attach(dead_battery, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::DeadBatteryWindow>(app);
         });
-        windowsFactory.attach(closing_window, [](ApplicationCommon *app, const std::string newname) {
+        windowsFactory.attach(closing_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::ClosingWindow>(app);
         });
-        windowsFactory.attach(charging_battery, [](ApplicationCommon *app, const std::string newname) {
+        windowsFactory.attach(charging_battery, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::ChargingBatteryWindow>(app);
         });
-        windowsFactory.attach(desktop_mmi_pull, [](ApplicationCommon *app, const std::string newname) {
-            return std::make_unique<gui::MmiPullWindow>(app, desktop_mmi_pull);
+        windowsFactory.attach(desktop_mmi_pull, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::MmiPullWindow>(app, name);
         });
-        windowsFactory.attach(desktop_mmi_push, [](ApplicationCommon *app, const std::string newname) {
-            return std::make_unique<gui::MmiPushWindow>(app, desktop_mmi_push);
+        windowsFactory.attach(desktop_mmi_push, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::MmiPushWindow>(app, name);
         });
-        windowsFactory.attach(desktop_mmi_internal, [](ApplicationCommon *app, const std::string newname) {
-            return std::make_unique<gui::MmiInternalMsgWindow>(app, desktop_mmi_internal);
+        windowsFactory.attach(desktop_mmi_internal, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::MmiInternalMsgWindow>(app, name);
         });
-        windowsFactory.attach(gui::popup::window::tethering_menu_window,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::TetheringMenuPopup>(app, name);
-                              });
-        windowsFactory.attach(
-            gui::popup::window::tethering_off_window, [](ApplicationCommon *app, const std::string &name) {
-                return std::make_unique<gui::TetheringOffPopup>(app, gui::popup::window::tethering_off_window);
-            });
+        windowsFactory.attach(tethering_menu_window, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::TetheringMenuPopup>(app, name);
+        });
+        windowsFactory.attach(tethering_off_window, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::TetheringOffPopup>(app, name);
+        });
         windowsFactory.attach(desktop_mmi_confirmation, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::MmiConfirmationWindow>(app, name);
         });
+
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,
                       gui::popup::ID::BluetoothAuthenticate,
@@ -192,7 +190,7 @@ namespace app
 
     bool ApplicationDesktop::refreshMenuWindow()
     {
-        if (auto menuWindow = dynamic_cast<gui::MenuWindow *>(getWindow(app::window::name::desktop_menu));
+        if (const auto menuWindow = dynamic_cast<gui::MenuWindow *>(getWindow(app::window::name::desktop_menu));
             menuWindow != nullptr) {
             menuWindow->refresh();
             return true;
@@ -202,9 +200,9 @@ namespace app
 
     void ApplicationDesktop::handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data)
     {
-        auto lowBatteryState = static_cast<manager::actions::LowBatteryNotificationParams *>(data.get());
+        const auto lowBatteryState = static_cast<manager::actions::LowBatteryNotificationParams *>(data.get());
         blockAllPopups       = lowBatteryState->isActive();
-        auto currentWindow   = getCurrentWindow();
+        const auto currentWindow   = getCurrentWindow();
         if (currentWindow->getName() == app::window::name::dead_battery ||
             currentWindow->getName() == app::window::name::charging_battery) {
             data->ignoreCurrentWindowOnStack = true;

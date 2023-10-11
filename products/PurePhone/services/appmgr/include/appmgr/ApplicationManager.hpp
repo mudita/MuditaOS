@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -30,14 +30,15 @@ namespace app::manager
         void changeBluetoothMode(const ApplicationHandle *app);
         void changeAlarmClockStatus(const ApplicationHandle *app);
         void handleTetheringChanged(sys::phone_modes::Tethering tethering);
-        void changeTetheringState(const sys::phone_modes::Tethering state, const ApplicationHandle *app);
+        void changeTetheringState(sys::phone_modes::Tethering state, const ApplicationHandle *app);
         void handleSnoozeCountChange(unsigned snoozeCount);
+        void handleBatteryStatusChange();
         void processKeypadBacklightState(bsp::keypad_backlight::State keypadLightState);
         void registerMessageHandlers() override;
         void startBackgroundApplications();
         auto handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request) -> std::shared_ptr<sys::ResponseMessage>;
         auto handleDeveloperModeRequest(sys::Message *request) -> sys::MessagePointer override;
-        void lockTimeChanged(std::string value);
+        void lockTimeChanged(const std::string &value);
         /// @brief method is called on auto-locking timer tick event (blockTimer)
         /// @detailed It sends AutoLock action to ApplicationDesktop to lock the screen.
         /// @note AutoLock action is sent only if following conditions are met:

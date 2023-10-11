@@ -26,59 +26,59 @@ namespace bsp::battery_charger
     {
         using Crc32 = std::uint32_t;
 
-        constexpr std::uint32_t i2cSubaddressSize = 1;
+        constexpr std::uint32_t i2cSubaddressSize{1};
 
         const auto cfgFile = purefs::dir::getSystemVarDirPath() / "batteryFuelGaugeConfig.cfg";
 
-        constexpr auto registersToStore              = 0xFF + 1;
+        constexpr auto registersToStore{0xFF + 1};
         constexpr auto configFileSizeWithoutChecksum = registersToStore * sizeof(Register);
         constexpr auto configFileSizeWithChecksum    = configFileSizeWithoutChecksum + sizeof(Crc32);
 
-        constexpr std::uint8_t VSYS_MIN = 0x80; // 3.6V
+        constexpr std::uint8_t VSYS_MIN{0x80}; // 3.6V
 
-        constexpr units::SOC fullyChargedSOC       = 100;
-        constexpr units::SOC dischargingSocDelta   = 5;
-        constexpr units::SOC chargingSocDelta      = 1;
-        constexpr units::SOC maxSocPercentageError = 20;
+        constexpr units::SOC fullyChargedSOC{100};
+        constexpr units::SOC dischargingSocDelta{5};
+        constexpr units::SOC chargingSocDelta{1};
+        constexpr units::SOC maxSocPercentageError{20};
 
-        constexpr std::uint16_t maxVoltagemV = 4400;
-        constexpr std::uint16_t minVoltagemV = 3600;
+        constexpr std::uint16_t maxVoltagemV{4400};
+        constexpr std::uint16_t minVoltagemV{3600};
 
-        constexpr auto currentSenseGain = 0.15625f;  // mA
-        constexpr auto voltageSenseGain = 0.078125f; // mV
+        constexpr auto currentSenseGain{0.15625f};  // mA
+        constexpr auto voltageSenseGain{0.078125f}; // mV
 
-        constexpr std::uint16_t maxMinMilliVoltGain = 20;
+        constexpr std::uint16_t maxMinMilliVoltGain{20};
 
         // NTC calibration values
-        constexpr std::uint16_t temperatureConversionGain   = 0xEE56;
-        constexpr std::uint16_t temperatureConversionOffset = 0x1DA4;
+        constexpr std::uint16_t temperatureConversionGain{0xEE56};
+        constexpr std::uint16_t temperatureConversionOffset{0x1DA4};
 
         namespace fuel_gauge_params
         {
             /// Parameters calculated in in MAXIM EVKIT software
             /// Initial parameters for fuel gauge battery model
-            constexpr std::uint16_t LearnCFG    = 0x2602;
-            constexpr std::uint16_t FilterCFG   = 0xCEA0; // Current filter Tc = 0.7s
-            constexpr std::uint16_t MiscCFG     = 0x01D0;
-            constexpr std::uint16_t RelaxCFG    = 0x2039;
-            constexpr std::uint16_t RCOMP0      = 0x0070;
-            constexpr std::uint16_t TempCo      = 0x263D;
-            constexpr std::uint16_t QResidual00 = 0x2280;
-            constexpr std::uint16_t QResidual10 = 0x1000;
-            constexpr std::uint16_t QResidual20 = 0x0681;
-            constexpr std::uint16_t QResidual30 = 0x0682;
+            constexpr std::uint16_t LearnCFG{0x2602};
+            constexpr std::uint16_t FilterCFG{0xCEA0}; // Current filter Tc = 0.7s
+            constexpr std::uint16_t MiscCFG{0x01D0};
+            constexpr std::uint16_t RelaxCFG{0x2039};
+            constexpr std::uint16_t RCOMP0{0x0070};
+            constexpr std::uint16_t TempCo{0x263D};
+            constexpr std::uint16_t QResidual00{0x2280};
+            constexpr std::uint16_t QResidual10{0x1000};
+            constexpr std::uint16_t QResidual20{0x0681};
+            constexpr std::uint16_t QResidual30{0x0682};
             /// 1600mAh initial battery capacity
-            constexpr std::uint16_t FullCAPNom = 0x0C80;
-            constexpr std::uint16_t FullCAPRep = 0x0C80;
-            constexpr std::uint16_t DesignCap  = 0x0C80;
-            constexpr std::uint16_t dQacc      = 0x00C8;
-            constexpr std::uint16_t dPacc      = 0x0C80;
+            constexpr std::uint16_t FullCAPNom{0x0C80};
+            constexpr std::uint16_t FullCAPRep{0x0C80};
+            constexpr std::uint16_t DesignCap{0x0C80};
+            constexpr std::uint16_t dQacc{0x00C8};
+            constexpr std::uint16_t dPacc{0x0C80};
             /// Charge termination current = 150mA
-            constexpr std::uint16_t ICHGTerm = 0x03C0;
+            constexpr std::uint16_t ICHGTerm{0x03C0};
             /// Empty battery = 3V
-            constexpr std::uint16_t V_empty = 0x965A;
+            constexpr std::uint16_t V_empty{0x965A};
             /// Fully charged threshold = 90%
-            constexpr std::uint16_t FullSOCthr = 0x5A00;
+            constexpr std::uint16_t FullSOCthr{0x5A00};
         } // namespace fuel_gauge_params
 
         enum class FileConfigRetval
@@ -91,15 +91,6 @@ namespace bsp::battery_charger
             WritingRegisterError,
             StoreVerificationError,
             ConfigFuelGaugeModelError
-        };
-
-        enum class TemperatureRanges
-        {
-            Cold,
-            Cdeg1to15,
-            Cdeg15to35,
-            Cdeg35to45,
-            Hot
         };
 
         struct TemperatureThresholds
@@ -138,8 +129,7 @@ namespace bsp::battery_charger
             {TemperatureRanges::Cdeg1to15, {1, 15, 0, 15 + highHysteresis}},
             {TemperatureRanges::Cdeg15to35, {15, 35, 15 - lowHysteresis, 35 + highHysteresis}},
             {TemperatureRanges::Cdeg35to45, {35, 45, 35 - lowHysteresis, 45 + highHysteresis}},
-            {TemperatureRanges::Hot,
-             {45, std::numeric_limits<std::int8_t>::max(), 45 - lowHysteresis, maxAlertDisabled}}};
+            {TemperatureRanges::Hot, {45, std::numeric_limits<std::int8_t>::max(), 45, maxAlertDisabled}}};
 
         std::shared_ptr<drivers::DriverI2C> i2c;
         std::shared_ptr<drivers::DriverGPIO> gpio;
@@ -201,6 +191,11 @@ namespace bsp::battery_charger
             return ret;
         }
 
+        inline constexpr bool isChargerInputValid(std::uint8_t chargerStatus)
+        {
+            return static_cast<bool>(chargerStatus & static_cast<std::uint8_t>(CHG_INT::CHGIN_I));
+        }
+
         units::SOC getBatteryLevelFromRegisterValue(const Register registerValue)
         {
             /// 16 bit result. The high byte indicates 1% per LSB. The low byte reports fractional percent. We don't
@@ -211,7 +206,7 @@ namespace bsp::battery_charger
         int fuelGaugeWrite(Registers registerAddress, std::uint16_t value)
         {
             fuelGaugeAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
-            auto ret = i2c->Write(fuelGaugeAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(value));
+            const auto ret = i2c->Write(fuelGaugeAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(value));
 
             if (ret != sizeof(value)) {
                 return kStatus_Fail;
@@ -222,9 +217,9 @@ namespace bsp::battery_charger
         std::pair<int, std::uint16_t> fuelGaugeRead(Registers registerAddress)
         {
             std::uint16_t value;
-            int status                  = kStatus_Success;
+            auto status                 = kStatus_Success;
             fuelGaugeAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
-            auto ret = i2c->Read(fuelGaugeAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(value));
+            const auto ret = i2c->Read(fuelGaugeAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(value));
 
             if (ret != sizeof(value)) {
                 status = kStatus_Fail;
@@ -235,7 +230,7 @@ namespace bsp::battery_charger
         int chargerWrite(Registers registerAddress, std::uint8_t value)
         {
             batteryChargerAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
-            auto ret = i2c->Write(batteryChargerAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(value));
+            const auto ret = i2c->Write(batteryChargerAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(value));
 
             if (ret != sizeof(value)) {
                 return kStatus_Fail;
@@ -246,9 +241,9 @@ namespace bsp::battery_charger
         std::pair<int, std::uint8_t> chargerRead(Registers registerAddress)
         {
             std::uint8_t value;
-            int status                       = kStatus_Success;
+            auto status                      = kStatus_Success;
             batteryChargerAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
-            auto ret                         = i2c->Read(batteryChargerAddress, &value, sizeof(value));
+            const auto ret                   = i2c->Read(batteryChargerAddress, &value, sizeof(value));
 
             if (ret != sizeof(value)) {
                 status = kStatus_Fail;
@@ -259,7 +254,7 @@ namespace bsp::battery_charger
         int chargerTopControllerWrite(Registers registerAddress, std::uint8_t value)
         {
             topControllerAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
-            auto ret = i2c->Write(topControllerAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(value));
+            const auto ret = i2c->Write(topControllerAddress, reinterpret_cast<std::uint8_t *>(&value), sizeof(value));
 
             if (ret != sizeof(value)) {
                 return kStatus_Fail;
@@ -270,7 +265,7 @@ namespace bsp::battery_charger
         std::pair<int, std::uint8_t> chargerTopControllerRead(Registers registerAddress)
         {
             std::uint8_t value;
-            int status                      = kStatus_Success;
+            auto status                     = kStatus_Success;
             topControllerAddress.subAddress = static_cast<std::uint32_t>(registerAddress);
             const auto ret                  = i2c->Read(topControllerAddress, &value, sizeof(value));
             if (ret != sizeof(value)) {
@@ -360,7 +355,7 @@ namespace bsp::battery_charger
 
         BatteryRetval configureFuelGaugeBatteryModel()
         {
-            int status = fuelGaugeWrite(Registers::LearnCFG_REG, fuel_gauge_params::LearnCFG);
+            auto status = fuelGaugeWrite(Registers::LearnCFG_REG, fuel_gauge_params::LearnCFG);
             status |= fuelGaugeWrite(Registers::FilterCFG_REG, fuel_gauge_params::FilterCFG);
             status |= fuelGaugeWrite(Registers::MiscCFG_REG, fuel_gauge_params::MiscCFG);
             status |= fuelGaugeWrite(Registers::RelaxCFG_REG, fuel_gauge_params::RelaxCFG);
@@ -413,7 +408,7 @@ namespace bsp::battery_charger
             }
 
             for (auto i = 0; i < registersToStore; ++i) {
-                auto regVal = fuelGaugeRead(static_cast<Registers>(i));
+                const auto regVal = fuelGaugeRead(static_cast<Registers>(i));
                 if (regVal.first != kStatus_Success) {
                     file.close();
                     return FileConfigRetval::ReadingRegisterError;
@@ -492,11 +487,11 @@ namespace bsp::battery_charger
         {
             std::vector<Register> storedData(registersToStore);
 
-            if (auto retVal = saveConfigurationFile(storedData); retVal != FileConfigRetval::OK) {
+            if (const auto retVal = saveConfigurationFile(storedData); retVal != FileConfigRetval::OK) {
                 LOG_ERROR("Save configuration file error: %s", magic_enum::enum_name(retVal).data());
                 return retVal;
             }
-            if (auto retVal = verifySavedConfigurationFile(storedData); retVal != FileConfigRetval::OK) {
+            if (const auto retVal = verifySavedConfigurationFile(storedData); retVal != FileConfigRetval::OK) {
                 LOG_ERROR("Verify configuration file error: %s", magic_enum::enum_name(retVal).data());
                 return retVal;
             }
@@ -525,7 +520,7 @@ namespace bsp::battery_charger
             std::vector<Register> readData(registersToStore);
 
             // then we read the battery configuration from the saved file
-            if (auto retVal = readConfigurationFile(readData); retVal != FileConfigRetval::OK) {
+            if (const auto retVal = readConfigurationFile(readData); retVal != FileConfigRetval::OK) {
                 // if there is a problem with reading the data, leave the default configuration and exit
                 LOG_ERROR("Read configuration file error: %s", magic_enum::enum_name(retVal).data());
                 storeConfiguration();
@@ -539,7 +534,7 @@ namespace bsp::battery_charger
             // from the file
             if (batteryLevelAfterDefaultConfiguration.has_value() &&
                 !isSocDataDiscrepancy(batteryLevelAfterDefaultConfiguration.value(), savedBatteryLevel)) {
-                if (auto retVal = storeFuelGaugeRegisters(readData); retVal != FileConfigRetval::OK) {
+                if (const auto retVal = storeFuelGaugeRegisters(readData); retVal != FileConfigRetval::OK) {
                     LOG_ERROR("Store configuration file error: %s", magic_enum::enum_name(retVal).data());
                     return retVal;
                 }
@@ -667,7 +662,7 @@ namespace bsp::battery_charger
             return utils::twosComplimentToInt(temperatureInt);
         }
 
-        void chargingFinishedAction()
+        void onChargingFinished()
         {
             LOG_DEBUG("Charging finished");
         }
@@ -700,6 +695,9 @@ namespace bsp::battery_charger
             case TemperatureRanges::Hot:
                 LOG_DEBUG("Cell temperature too high, charging disabled");
                 disableCharging();
+                break;
+            default:
+                LOG_DEBUG("Unhandled battery temperature range");
                 break;
             }
 
@@ -790,7 +788,7 @@ namespace bsp::battery_charger
 
     std::optional<units::SOC> getBatteryLevel()
     {
-        auto readout = fuelGaugeRead(Registers::RepSOC_REG);
+        const auto readout = fuelGaugeRead(Registers::RepSOC_REG);
         if (readout.first != kStatus_Success) {
             LOG_ERROR("Failed to get battery level");
             return std::nullopt;
@@ -806,6 +804,25 @@ namespace bsp::battery_charger
         return soc;
     }
 
+    TemperatureRanges getTemperatureRange()
+    {
+        const auto temperature = getCellTemperature();
+        if (!temperature.has_value()) {
+            return TemperatureRanges::Unknown;
+        }
+
+        LOG_DEBUG("Cell temperature: %dC", temperature.value());
+
+        for (const auto &[range, thresholds] : temperatureRanges) {
+            if ((temperature > thresholds.lowTemperatureThreshold) &&
+                (temperature <= thresholds.highTemperatureThreshold)) {
+                return range;
+            }
+        }
+
+        return TemperatureRanges::Unknown;
+    }
+
     BatteryRetval getChargeStatus()
     {
         BatteryRetval retVal{};
@@ -816,9 +833,9 @@ namespace bsp::battery_charger
             LOG_ERROR("Failed to read charger INT source");
         }
 
-        const auto summary = chargerRead(Registers::CHG_INT_OK);
-        if (summary.first != kStatus_Success) {
-            LOG_ERROR("Failed to read charger summary");
+        const auto chargerStatus = chargerRead(Registers::CHG_INT_OK);
+        if (chargerStatus.first != kStatus_Success) {
+            LOG_ERROR("Failed to read charger status");
             return BatteryRetval::ChargerError;
         }
 
@@ -829,11 +846,11 @@ namespace bsp::battery_charger
 
         const auto chargingSetup = chargerRead(Registers::CHG_CNFG_00);
         if (chargingSetup.first != kStatus_Success) {
-            LOG_ERROR("Failed to read charging setup!");
+            LOG_ERROR("Failed to read charging setup");
             return BatteryRetval::ChargerError;
         }
 
-        if (static_cast<bool>(summary.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I))) {
+        if (isChargerInputValid(chargerStatus.second)) {
             retVal = BatteryRetval::ChargerCharging;
         }
         else {
@@ -843,13 +860,28 @@ namespace bsp::battery_charger
         switch (static_cast<CHG_DETAILS_01>(chargerDetails.value())) {
         case CHG_DETAILS_01::CHARGER_DONE:
             retVal = BatteryRetval::ChargingDone;
-            chargingFinishedAction();
+            onChargingFinished();
             break;
 
         case CHG_DETAILS_01::CHARGER_OFF:
             if (chargingSetup.second != static_cast<std::uint8_t>(ChargerMode::ChargerOnBuckOn)) {
-                retVal = BatteryRetval::ChargerNotCharging;
+                if (isChargerInputValid(chargerStatus.second)) {
+                    retVal = BatteryRetval::ChargerPluggedNotCharging;
+                }
+                else {
+                    retVal = BatteryRetval::ChargerNotCharging;
+                }
             }
+            break;
+
+        case CHG_DETAILS_01::CHARGER_OFF_OVERHEATED:
+            retVal = BatteryRetval::ChargerNotCharging;
+            LOG_WARN("Not charging due to exceeded junction temperature");
+            break;
+
+        case CHG_DETAILS_01::CHARGER_OFF_WATCHDOG_EXPIRED:
+            retVal = BatteryRetval::ChargerNotCharging;
+            LOG_WARN("Not charging due to expired watchdog timer");
             break;
 
         case CHG_DETAILS_01::CHARGER_PREQUALIFICATION:
@@ -862,6 +894,10 @@ namespace bsp::battery_charger
         case CHG_DETAILS_01::CHARGER_TIMER_FAULT:
         case CHG_DETAILS_01::CHARGER_BATTERY_DETECT:
             retVal = BatteryRetval::ChargerError;
+            break;
+
+        default:
+            LOG_ERROR("Unhandled charger details value: 0x%02X", chargerDetails.value());
             break;
         }
 
@@ -903,20 +939,7 @@ namespace bsp::battery_charger
 
     void checkTemperatureRange()
     {
-        const auto temperature = getCellTemperature();
-        if (!temperature.has_value()) {
-            return;
-        }
-
-        LOG_DEBUG("Cell temperature: %dC", temperature.value());
-
-        for (const auto &[range, thresholds] : temperatureRanges) {
-            if ((temperature > thresholds.lowTemperatureThreshold) &&
-                (temperature <= thresholds.highTemperatureThreshold)) {
-                processTemperatureRange(range);
-                break;
-            }
-        }
+        processTemperatureRange(getTemperatureRange());
     }
 
     std::optional<std::uint8_t> getTopControllerINTSource()
@@ -1000,6 +1023,6 @@ namespace bsp::battery_charger
             LOG_ERROR("Failed to read charger status");
             return false;
         }
-        return static_cast<bool>(chargerStatus.second & static_cast<std::uint8_t>(CHG_INT::CHGIN_I));
+        return isChargerInputValid(chargerStatus.second);
     }
 } // namespace bsp::battery_charger

@@ -39,8 +39,6 @@ namespace app
         // done
         void handleNotificationsChanged(std::unique_ptr<gui::SwitchData> notificationsParams) override;
 
-        void setOsUpdateVersion(const std::string &value);
-
       private:
         bool refreshMenuWindow();
         void handleLowBatteryNotification(manager::actions::ActionParamsPtr &&data);

@@ -9,7 +9,7 @@
 namespace Store
 {
     // if it grows bigger than these few variables - consider moving it to ram with i.e.
-    // delayed construction singletone
+    // delayed construction singleton
     Battery battery;
     bool Battery::updated = true;
 

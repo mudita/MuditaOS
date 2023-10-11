@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsConfiguration.hpp"
@@ -10,7 +10,7 @@ using namespace notifications;
 NotificationsConfiguration::NotificationsConfiguration(std::shared_ptr<sys::phone_modes::Observer> phoneModeObserver,
                                                        std::shared_ptr<settings::Settings> settings,
                                                        const locks::PhoneLockHandler &phoneLockHandler)
-    : phoneModeObserver{phoneModeObserver}, settings{settings}, phoneLockHandler{phoneLockHandler}
+    : phoneModeObserver{std::move(phoneModeObserver)}, settings{std::move(settings)}, phoneLockHandler{phoneLockHandler}
 {}
 
 void NotificationsConfiguration::updateCurrentCall(CallNotificationPolicy &policy)

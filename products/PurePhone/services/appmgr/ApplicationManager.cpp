@@ -34,6 +34,12 @@ namespace app::manager
     namespace
     {
         constexpr auto autoLockTimerName = "AutoLockTimer";
+
+        bool isBatteryTooHotWhilePlugged()
+        {
+            return ((Store::Battery::get().state == Store::Battery::State::PluggedNotCharging) &&
+                    (Store::Battery::get().temperature == Store::Battery::Temperature::TooHigh));
+        }
     } // namespace
 
     ApplicationManager::ApplicationManager(const ApplicationName &serviceName,
@@ -47,6 +53,10 @@ namespace app::manager
     {
         autoLockTimer = sys::TimerFactory::createSingleShotTimer(
             this, autoLockTimerName, sys::timer::InfiniteTimeout, [this](sys::Timer &) { onPhoneLocked(); });
+
+        /* Store state in notificationProvider, but do not propagate notifications yet */
+        constexpr auto updateAllowed = false;
+        notificationProvider.handleBatteryTooHot(isBatteryTooHotWhilePlugged(), updateAllowed);
 
         bus.channels.push_back(sys::BusChannel::BluetoothModeChanges);
         bus.channels.push_back(sys::BusChannel::BluetoothNotifications);
@@ -68,16 +78,16 @@ namespace app::manager
         phoneLockHandler.setPhoneLockHash(
             settings->getValue(settings::SystemProperties::lockPassHash, settings::SettingsScope::Global));
 
-        phoneLockHandler.setPhoneLockTime(utils::getNumericValue<time_t>(
+        phoneLockHandler.setPhoneLockTime(utils::getNumericValue<std::time_t>(
             settings->getValue(settings::SystemProperties::unlockLockTime, settings::SettingsScope::Global)));
 
-        phoneLockHandler.setNextUnlockAttemptLockTime(utils::getNumericValue<time_t>(
+        phoneLockHandler.setNextUnlockAttemptLockTime(utils::getNumericValue<std::time_t>(
             settings->getValue(settings::SystemProperties::unlockAttemptLockTime, settings::SettingsScope::Global)));
 
-        phoneLockHandler.setNoLockTimeAttemptsLeft(utils::getNumericValue<unsigned int>(
+        phoneLockHandler.setNoLockTimeAttemptsLeft(utils::getNumericValue<unsigned>(
             settings->getValue(settings::SystemProperties::noLockTimeAttemptsLeft, settings::SettingsScope::Global)));
 
-        wallpaperModel.setWallpaper(static_cast<gui::WallpaperOption>(utils::getNumericValue<unsigned int>(
+        wallpaperModel.setWallpaper(static_cast<gui::WallpaperOption>(utils::getNumericValue<unsigned>(
             settings->getValue(settings::Wallpaper::option, settings::SettingsScope::Global))));
 
         settings->registerValueChange(
@@ -101,14 +111,13 @@ namespace app::manager
 
         settings->registerValueChange(
             settings::SystemProperties::autoLockTimeInSec,
-            [this](std::string value) { lockTimeChanged(std::move(value)); },
+            [this](const std::string &value) { lockTimeChanged(value); },
             settings::SettingsScope::Global);
 
         settings->registerValueChange(
             settings::Wallpaper::option,
-            [this](std::string value) {
-                wallpaperModel.setWallpaper(
-                    static_cast<gui::WallpaperOption>(utils::getNumericValue<unsigned int>(value)));
+            [this](const std::string &value) {
+                wallpaperModel.setWallpaper(static_cast<gui::WallpaperOption>(utils::getNumericValue<unsigned>(value)));
             },
             settings::SettingsScope::Global);
 
@@ -180,7 +189,7 @@ namespace app::manager
             return sys::msgHandled();
         });
 
-        // PhoneLock connects
+        /* PhoneLock connects */
         connect(typeid(locks::LockPhone), [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
             return phoneLockHandler.handleLockRequest();
         });
@@ -234,7 +243,7 @@ namespace app::manager
             return phoneLockHandler.handleExternalAvailabilityChange(data->getAvailability());
         });
 
-        // SimLock connects
+        /* SimLock connects */
         connect(typeid(cellular::msg::notification::SimNeedPin), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<cellular::msg::notification::SimNeedPin *>(request);
             if (phoneLockHandler.isPhoneLocked()) {
@@ -360,6 +369,7 @@ namespace app::manager
                     return sys::msgNotHandled();
                 });
 
+        /* Bluetooth connects */
         connect(typeid(sys::bluetooth::BluetoothModeChanged), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<sys::bluetooth::BluetoothModeChanged *>(request);
             handleBluetoothModeChanged(data->getBluetoothMode());
@@ -389,6 +399,7 @@ namespace app::manager
             return sys::MessageNone{};
         });
 
+        /* Alarm connects */
         alarms::AlarmServiceAPI::requestRegisterSnoozedAlarmsCountChangeCallback(this);
         connect(typeid(alarms::SnoozedAlarmsCountChangeMessage), [&](sys::Message *request) -> sys::MessagePointer {
             auto data = static_cast<alarms::SnoozedAlarmsCountChangeMessage *>(request);
@@ -403,6 +414,13 @@ namespace app::manager
             return sys::msgHandled();
         });
 
+        /* Battery connects */
+        connect(typeid(sevm::BatteryStatusChangeMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            handleBatteryStatusChange();
+            return sys::msgHandled();
+        });
+
+        /* Handled as actions connects */
         auto convertibleToActionHandler = [this](sys::Message *request) { return handleMessageAsAction(request); };
         connect(typeid(cellular::MMIResultMessage), convertibleToActionHandler);
         connect(typeid(cellular::MMIResponseMessage), convertibleToActionHandler);
@@ -491,6 +509,11 @@ namespace app::manager
         notificationProvider.handleSnooze(snoozeCount);
     }
 
+    void ApplicationManager::handleBatteryStatusChange()
+    {
+        notificationProvider.handleBatteryTooHot(isBatteryTooHotWhilePlugged());
+    }
+
     auto ApplicationManager::handleAutoLockSetRequest(SetAutoLockTimeoutRequest *request)
         -> std::shared_ptr<sys::ResponseMessage>
     {
@@ -515,13 +538,13 @@ namespace app::manager
         return sys::msgNotHandled();
     }
 
-    void ApplicationManager::lockTimeChanged(std::string value)
+    void ApplicationManager::lockTimeChanged(const std::string &value)
     {
         if (value.empty()) {
             LOG_ERROR("No value for auto-locking time period, request ignored");
             return;
         }
-        const auto interval = std::chrono::seconds{utils::getNumericValue<unsigned int>(value)};
+        const auto interval = std::chrono::seconds{utils::getNumericValue<unsigned>(value)};
         if (interval.count() == 0) {
             LOG_ERROR("Invalid auto-locking time period of 0s, request ignored");
             return;

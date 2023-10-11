@@ -144,5 +144,5 @@ void BatteryState::check(const ChargingState state, const float soc)
 }
 
 BatteryState::BatteryState(sys::Service *service, NotifyStateChangedCallback notifyCallback, Thresholds thresholds)
-    : pimpl{std::make_shared<Pimpl>(notifyCallback, thresholds)}
+    : pimpl{std::make_shared<Pimpl>(std::move(notifyCallback), thresholds)}
 {}

@@ -80,6 +80,7 @@ namespace hal::battery
         std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
         ChargerPresence getChargerPresence() const final;
+        TemperatureState getTemperatureState() const final;
 
         static BatteryWorkerQueue &getWorkerQueueHandle();
 
@@ -201,6 +202,11 @@ namespace hal::battery
                                                                   : AbstractBatteryCharger::ChargerPresence::PluggedIn;
     }
 
+    AbstractBatteryCharger::TemperatureState BellBatteryCharger::getTemperatureState() const
+    {
+        return AbstractBatteryCharger::TemperatureState::Normal; // Harmony has no battery temperature sensor
+    }
+
     BellBatteryCharger::BatteryWorkerQueue &BellBatteryCharger::getWorkerQueueHandle()
     {
         return *worker_queue;
@@ -209,6 +215,7 @@ namespace hal::battery
     {
         xQueueSend(this->notification_channel, &event, default_timeout);
     }
+
     BellBatteryCharger::~BellBatteryCharger()
     {
         xTimerDelete(reinit_timer, default_timeout);
@@ -276,5 +283,4 @@ namespace hal::battery
     {
         return std::make_unique<BellBatteryCharger>(irqQueueHandle);
     }
-
 } // namespace hal::battery

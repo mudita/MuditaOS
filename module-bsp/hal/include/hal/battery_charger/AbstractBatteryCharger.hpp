@@ -40,6 +40,14 @@ namespace hal::battery
             Unplugged
         };
 
+        enum class TemperatureState : std::uint8_t
+        {
+            Normal,
+            TooLow,
+            TooHigh,
+            Unknown
+        };
+
         struct Factory
         {
             static std::unique_ptr<AbstractBatteryCharger> create(xQueueHandle);
@@ -51,6 +59,7 @@ namespace hal::battery
         virtual std::optional<SOC> getSOC() const                = 0;
         virtual ChargingStatus getChargingStatus() const         = 0;
         virtual ChargerPresence getChargerPresence() const       = 0;
+        virtual TemperatureState getTemperatureState() const     = 0;
 
         static_assert(sizeof(Events) == sizeof(std::uint8_t),
                       "All events processed by event manager ought to have size of std::uint8_t");
