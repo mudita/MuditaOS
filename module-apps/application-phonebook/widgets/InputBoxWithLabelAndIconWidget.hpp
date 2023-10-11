@@ -22,8 +22,7 @@ namespace gui
       public:
         InputBoxWithLabelAndIconWidget(phonebookInternals::ListItemName listItemName,
                                        std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr,
-                                       std::function<void()> navBarRestoreFromTemporaryMode      = nullptr,
-                                       std::function<void(const UTF8 &text)> navBarSetRFKeyLabel = nullptr);
+                                       std::function<void()> navBarRestoreFromTemporaryMode      = nullptr);
         ~InputBoxWithLabelAndIconWidget() override = default;
         gui::HBox *hBox                            = nullptr;
         gui::Label *inputBoxLabel                  = nullptr;
@@ -34,7 +33,6 @@ namespace gui
       private:
         std::function<void(const UTF8 &text)> navBarTemporaryMode = nullptr;
         std::function<void()> navBarRestoreFromTemporaryMode      = nullptr;
-        std::function<void(const UTF8 &text)> navBarSetRFKeyLabel = nullptr;
 
         void applyItemNameSpecificSettings();
 
