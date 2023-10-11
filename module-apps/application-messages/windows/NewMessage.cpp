@@ -72,7 +72,7 @@ namespace gui
             std::make_unique<app::manager::SwitchBackRequest>(nameOfPreviousApplication.value(), nullptr, true));
     }
 
-    void NewMessageWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void NewMessageWindow::onBeforeShow([[maybe_unused]] ShowMode mode, SwitchData *data)
     {
         mementoMessage->restoreState(message);
         mementoRecipient->restoreState(recipient);
@@ -80,14 +80,14 @@ namespace gui
             return;
         }
 
-        if (auto searchRequest = dynamic_cast<PhonebookSearchRequest *>(data); searchRequest != nullptr) {
+        if (const auto searchRequest = dynamic_cast<PhonebookSearchRequest *>(data); searchRequest != nullptr) {
             LOG_INFO("Received search results");
             saveInfoAboutPreviousAppForProperSwitchBack(data);
             contact        = searchRequest->result;
             selectedNumber = searchRequest->selectedNumber;
             recipient->setText(contact->getFormattedName());
         }
-        else if (auto textData = dynamic_cast<SMSTextData *>(data); textData != nullptr) {
+        else if (const auto textData = dynamic_cast<SMSTextData *>(data); textData != nullptr) {
             const auto &text = textData->text;
             LOG_INFO("Received sms text data");
             if (textData->concatenate == SMSTextData::Concatenate::True) {
@@ -98,7 +98,7 @@ namespace gui
             }
             setFocusItem(message);
         }
-        else if (auto sendRequest = dynamic_cast<SMSSendRequest *>(data); sendRequest != nullptr) {
+        else if (const auto sendRequest = dynamic_cast<SMSSendRequest *>(data); sendRequest != nullptr) {
             LOG_INFO("Received sms send request");
             saveInfoAboutPreviousAppForProperSwitchBack(data);
             phoneNumber = sendRequest->getPhoneNumber();
@@ -129,7 +129,7 @@ namespace gui
 
     bool NewMessageWindow::sendSms()
     {
-        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        const auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
 
         const auto &number = getPhoneNumber();
@@ -155,7 +155,7 @@ namespace gui
     bool NewMessageWindow::switchToThreadWindow(const utils::PhoneNumber::View &number)
     {
         auto query = std::make_unique<db::query::ThreadGetByNumber>(number);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+        const auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
         task->setCallback([this](auto response) {
             const auto result = dynamic_cast<db::query::ThreadGetByNumberResult *>(response);
             if (result == nullptr) {
@@ -205,14 +205,14 @@ namespace gui
         const uint32_t h = this->getHeight() - style::window::default_vertical_pos - navBar->getHeight();
         body = new gui::VBox(this, style::window::default_left_margin, style::window::default_vertical_pos, w, h);
 
-        auto recipientLabel = new Label(body, 0, 0, body->getWidth(), msgStyle::recipientLabel::h);
+        const auto recipientLabel = new Label(body, 0, 0, body->getWidth(), msgStyle::recipientLabel::h);
         recipientLabel->setText(utils::translate("sms_add_rec_num"));
         recipientLabel->activeItem = false;
         recipientLabel->setEdges(gui::RectangleEdge::None);
         recipientLabel->setFont(style::window::font::small);
         recipientLabel->setAlignment(Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Bottom));
 
-        auto recipientHBox = new gui::HBox(body, 0, 0, body->getWidth(), msgStyle::text::h);
+        const auto recipientHBox = new gui::HBox(body, 0, 0, body->getWidth(), msgStyle::text::h);
         recipientHBox->setAlignment(gui::Alignment::Vertical::Center);
         recipientHBox->setEdges(gui::RectangleEdge::Bottom);
         recipientHBox->setPenFocusWidth(style::window::default_border_focus_w);
@@ -244,7 +244,7 @@ namespace gui
             }
             return false;
         };
-        recipient->setTextChangedCallback([this]([[maybe_unused]] Item &item, const UTF8 &text) {
+        recipient->setTextChangedCallback([this]([[maybe_unused]] Item &item, [[maybe_unused]] const UTF8 &text) {
             if (recipient->getText().empty()) {
                 contact = nullptr;
                 phoneNumber.clear();
@@ -252,10 +252,10 @@ namespace gui
             updateNavBar();
         });
 
-        auto img        = new gui::Image(recipientHBox, 0, 0, 0, 0, "phonebook_32px_W_G");
+        const auto img  = new gui::Image(recipientHBox, 0, 0, 0, 0, "phonebook_32px_W_G");
         img->activeItem = false;
 
-        auto labelMessage = new Label(body, 0, 0, body->getWidth(), msgStyle::messageLabel::h);
+        const auto labelMessage = new Label(body, 0, 0, body->getWidth(), msgStyle::messageLabel::h);
         labelMessage->setText(utils::translate("app_messages_message"));
         labelMessage->activeItem = false;
         labelMessage->setEdges(gui::RectangleEdge::None);
@@ -299,7 +299,7 @@ namespace gui
         };
         message->inputCallback = [=](Item &, const InputEvent &event) {
             if (event.isShortRelease(KeyCode::KEY_LF)) {
-                auto app = dynamic_cast<app::ApplicationMessages *>(application);
+                const auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
                 mementoMessage->setState(message);
                 mementoRecipient->setState(recipient);
@@ -331,6 +331,7 @@ namespace gui
             mementoMessage->setState(message);
             mementoRecipient->setState(recipient);
             message->clear();
+            recipient->clear();
             return;
         }
 
@@ -350,7 +351,7 @@ namespace gui
     auto NewMessageWindow::addDraft(const utils::PhoneNumber &number) -> bool
     {
         auto query = std::make_unique<db::query::ThreadGetByNumber>(number.getView());
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
+        const auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMSThread);
         task->setCallback([this, number](auto response) {
             const auto result = dynamic_cast<db::query::ThreadGetByNumberResult *>(response);
             if (result == nullptr) {
@@ -373,14 +374,14 @@ namespace gui
                                                     const UTF8 &text) -> bool
     {
         auto query = std::make_unique<db::query::SMSGetLastByThreadID>(threadId);
-        auto task  = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
-        task->setCallback([this, number](auto response) {
+        const auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::SMS);
+        task->setCallback([this, number](const auto response) {
             const auto result = dynamic_cast<db::query::SMSGetLastByThreadIDResult *>(response);
             if (result == nullptr) {
                 return false;
             }
 
-            auto lastSms = result->record;
+            auto &lastSms = result->record;
             if (lastSms.has_value() && lastSms->type == SMSType::DRAFT) {
                 storeMessageDraft(lastSms.value(), message->getText());
                 return true;
@@ -394,7 +395,7 @@ namespace gui
 
     void NewMessageWindow::storeMessageDraft(const utils::PhoneNumber::View &number, const UTF8 &text)
     {
-        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        const auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
 
         app->createDraft(number, text);
@@ -403,11 +404,10 @@ namespace gui
 
     void NewMessageWindow::storeMessageDraft(SMSRecord &sms, const UTF8 &text)
     {
-        auto app = dynamic_cast<app::ApplicationMessages *>(application);
+        const auto app = dynamic_cast<app::ApplicationMessages *>(application);
         assert(app != nullptr);
 
         app->updateDraft(sms, text);
         message->clear();
     }
-
 } // namespace gui
