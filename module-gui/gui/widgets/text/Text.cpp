@@ -360,19 +360,6 @@ namespace gui
         this->inputMode = mode;
     }
 
-    bool Text::isInputMode(InputMode::Mode mode)
-    {
-        if (inputMode == nullptr) {
-            LOG_WARN("Pointer to inputMode is set as nullptr");
-            return false;
-        }
-
-        if (inputMode->is(mode)) {
-            return true;
-        }
-        return false;
-    }
-
     std::string Text::getInputModeKeyMap()
     {
         if (inputMode == nullptr) {
@@ -559,8 +546,7 @@ namespace gui
 
     auto Text::handleRotateInputMode(const InputEvent &inputEvent) -> bool
     {
-        if (inputMode != nullptr && !inputMode->is(InputMode::phone) &&
-            inputEvent.isShortRelease(gui::KeyCode::KEY_AST)) {
+        if (inputMode != nullptr && inputEvent.isShortRelease(gui::KeyCode::KEY_AST)) {
             inputMode->next();
             return true;
         }
@@ -586,9 +572,6 @@ namespace gui
 
     auto Text::handleActivation(const InputEvent &inputEvent) -> bool
     {
-        if (inputMode && inputMode->is(InputMode::phone)) {
-            return false;
-        }
         return inputEvent.isShortRelease(KeyCode::KEY_AST) && Rect::onActivated(nullptr);
     }
 
@@ -654,13 +637,7 @@ namespace gui
         if (!isMode(EditMode::Edit)) {
             return false;
         }
-
-        if (document->isEmpty() && inputMode->is(InputMode::phone)) {
-            return false;
-        }
-
-        auto removeKeyCode = inputMode->is(InputMode::phone) ? removeKeyForPhone : removeKey;
-        if (inputEvent.isShortRelease(removeKeyCode)) {
+        if (inputEvent.isShortRelease(removeKey)) {
 
             setCursorStartPosition(CursorStartPosition::Offset);
 
@@ -678,9 +655,7 @@ namespace gui
         if (!isMode(EditMode::Edit)) {
             return false;
         }
-
-        auto removeKeyCode = inputMode->is(InputMode::phone) ? removeKeyForPhone : removeKey;
-        if (inputEvent.isLongRelease(removeKeyCode)) {
+        if (inputEvent.isLongRelease(removeKey)) {
             if (!document->isEmpty()) {
                 removeFromCursor();
                 return true;
@@ -1057,16 +1032,6 @@ namespace gui
             return true;
         }
         return false;
-    }
-
-    bool Text::removeWholeText()
-    {
-        bool returnValue = false;
-        while (!document->isEmpty()) {
-            cursor->removeChar();
-            returnValue = true;
-        }
-        return returnValue;
     }
 
     void Text::onTextChanged()
