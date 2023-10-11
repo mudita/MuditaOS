@@ -22,7 +22,6 @@
 * Fixed losing unsaved user data when tethering is switching on
 * Fixed invalid elapsed time in music player after playing and pausing track from songs list view
 * Fixed disappearing "Call" label in Phonebook app
-* Fixed phone number input style unification
 * Fixed disappearing selections when setting custom alarm after popup is shown
 * Fixed alarm preview playback behavior
 * Fixed frequency lock during user activity

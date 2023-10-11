@@ -14,15 +14,14 @@ namespace gui
         phonebookInternals::ListItemName listItemName,
         const std::function<void(const UTF8 &text, bool emptyOthers)> &navBarTemporaryMode,
         const std::function<void()> &navBarRestoreFromTemporaryMode,
-        const std::function<void(const UTF8 &text, bool isRFKeyFunctionAsClear)> &navBarSetRFKeyLabel,
         const std::function<void(const UTF8 &text, bool active)> &navBarSetOptionsLabel,
         const std::function<void()> &selectSpecialCharacter,
         const std::function<void(std::function<void()> restoreFunction)> &restoreInputMode,
         const std::function<void(Text *text)> &inputOptions,
-        std::uint32_t lines)
+        unsigned int lines)
         : listItemName(listItemName), navBarTemporaryMode(navBarTemporaryMode),
-          navBarRestoreFromTemporaryMode(navBarRestoreFromTemporaryMode), navBarSetRFKeyLabel(navBarSetRFKeyLabel),
-          navBarSetOptionsLabel(navBarSetOptionsLabel), inputOptions(inputOptions)
+          navBarRestoreFromTemporaryMode(navBarRestoreFromTemporaryMode), navBarSetOptionsLabel(navBarSetOptionsLabel),
+          inputOptions(inputOptions)
     {
         setMinimumSize(phonebookStyle::inputLinesWithLabelWidget::w,
                        phonebookStyle::inputLinesWithLabelWidget::title_label_h +
@@ -79,8 +78,6 @@ namespace gui
                     const auto optionsLabelState = !inputText->isEmpty() || Clipboard::getInstance().hasData();
                     this->navBarSetOptionsLabel(utils::translate(style::strings::common::options), optionsLabelState);
                 }
-
-                setRightFunctionKayLabel();
             }
             else {
                 inputText->setCursorStartPosition(CursorStartPosition::DocumentBegin);
@@ -109,8 +106,6 @@ namespace gui
                 }
             }
 
-            setRightFunctionKayLabel();
-
             return result;
         };
 
@@ -119,7 +114,6 @@ namespace gui
             return true;
         };
 
-        applyItemNameSpecificSettings();
         setEdges(RectangleEdge::None);
     }
 
@@ -308,16 +302,6 @@ namespace gui
         onCheckUnsavedChangeCallback = [&](std::shared_ptr<ContactRecord> contact) {
             return contact->note != inputText->getText();
         };
-    }
-    void InputLinesWithLabelWidget::setRightFunctionKayLabel()
-    {
-        if (inputText != nullptr && inputText->isInputMode(InputMode::phone) && this->navBarSetRFKeyLabel &&
-            !inputText->isEmpty()) {
-            navBarSetRFKeyLabel(utils::translate(utils::translate("app_call_clear")), true);
-        }
-        else {
-            navBarSetRFKeyLabel(utils::translate(style::strings::common::back), false);
-        }
     }
 
 } /* namespace gui */

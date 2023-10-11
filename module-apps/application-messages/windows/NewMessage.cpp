@@ -46,40 +46,14 @@ namespace gui
             state.reset();
         }
 
-      protected:
-        std::unique_ptr<gui::TextBackup> state;
-    };
-
-    class NewMessageWindow::RecipientMemento : public NewMessageWindow::MessageMemento
-    {
-      public:
-        void setState(const gui::Text *currentState, const std::shared_ptr<ContactRecord> chosenContact)
-        {
-            if (chosenContact != nullptr && !chosenContact->numbers.empty()) {
-                phoneNumberView = std::make_unique<utils::PhoneNumber::View>(chosenContact->numbers.at(0).number);
-            }
-
-            MessageMemento::setState(currentState);
-        }
-
-        void restoreState(gui::Text *currentState, utils::PhoneNumber::View *currentPhoneNumberView)
-        {
-            if (currentPhoneNumberView != nullptr && phoneNumberView != nullptr) {
-                *currentPhoneNumberView = *phoneNumberView;
-                phoneNumberView.reset();
-            }
-
-            MessageMemento::restoreState(currentState);
-        }
-
       private:
-        std::unique_ptr<utils::PhoneNumber::View> phoneNumberView;
+        std::unique_ptr<gui::TextBackup> state;
     };
 
     std::unique_ptr<NewMessageWindow::MessageMemento> NewMessageWindow::mementoMessage =
         std::make_unique<NewMessageWindow::MessageMemento>();
-    std::unique_ptr<NewMessageWindow::RecipientMemento> NewMessageWindow::mementoRecipient =
-        std::make_unique<NewMessageWindow::RecipientMemento>();
+    std::unique_ptr<NewMessageWindow::MessageMemento> NewMessageWindow::mementoRecipient =
+        std::make_unique<NewMessageWindow::MessageMemento>();
 
     NewMessageWindow::NewMessageWindow(app::ApplicationCommon *app)
         : AppWindow(app, name::window::new_sms), app::AsyncCallbackReceiver{app}
@@ -100,10 +74,8 @@ namespace gui
 
     void NewMessageWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        restoreMessageAndRecipientFromMemo();
-        if (!recipient->isEmpty()) {
-            body->setFocusItem(message);
-        }
+        mementoMessage->restoreState(message);
+        mementoRecipient->restoreState(recipient);
         if (data == nullptr) {
             return;
         }
@@ -214,14 +186,10 @@ namespace gui
             navBar->setActive(nav_bar::Side::Left, false);
             if (recipient->getText().empty()) {
                 navBar->setText(nav_bar::Side::Center, utils::translate(style::strings::common::contacts));
-                navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
                 return;
             }
             navBar->setActive(nav_bar::Side::Center, false);
-            navBar->setText(nav_bar::Side::Right, utils::translate("app_call_clear"));
-            return;
         }
-        navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
     }
 
     void NewMessageWindow::buildInterface()
@@ -263,15 +231,15 @@ namespace gui
         };
         recipient->inputCallback = [this]([[maybe_unused]] Item &, const InputEvent &inputEvent) -> bool {
             if (contact != nullptr) {
-                if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+                if (inputEvent.isShortRelease(KeyCode::KEY_PND)) {
                     recipient->clear();
                     return true;
                 }
-                if (inputEvent.isDigit() || inputEvent.is(KeyCode::KEY_AST) || inputEvent.is(KeyCode::KEY_PND)) {
+                if (inputEvent.isDigit()) {
                     return true;
                 }
             }
-            if (inputEvent.isShortRelease(KeyCode::KEY_RF) && recipient->isEmpty()) {
+            if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
                 onClose(CloseReason::WindowSwitch);
             }
             return false;
@@ -320,7 +288,6 @@ namespace gui
             return true;
         };
         message->focusChangedCallback = [=](Item &) -> bool {
-            navBar->setText(nav_bar::Side::Right, utils::translate(style::strings::common::back));
             if (recipient->getText().empty()) {
                 navBar->setActive(nav_bar::Side::Center, false);
             }
@@ -334,7 +301,8 @@ namespace gui
             if (event.isShortRelease(KeyCode::KEY_LF)) {
                 auto app = dynamic_cast<app::ApplicationMessages *>(application);
                 assert(app != nullptr);
-                storeMessageAndRecipientInMemo();
+                mementoMessage->setState(message);
+                mementoRecipient->setState(recipient);
                 return app->newMessageOptions(getName(), message);
             }
             if (event.isShortRelease(KeyCode::KEY_RF)) {
@@ -344,8 +312,7 @@ namespace gui
         };
         body->addWidget(message);
         body->addWidget(new Span(Axis::Y, body->getHeight()));
-        recipient->setText(""); // to clean up before load from memo
-        message->setText("");   // to clean up before load from memo
+        message->setText(""); // to set actual size of Text
 
         body->setEdges(gui::RectangleEdge::None);
         body->setVisible(true);
@@ -355,8 +322,14 @@ namespace gui
 
     void NewMessageWindow::onClose(CloseReason reason)
     {
+        if (message->getText().empty()) {
+            // Nothing to do if text is empty.
+            return;
+        }
+
         if (reason != CloseReason::ApplicationClose) {
-            storeMessageAndRecipientInMemo();
+            mementoMessage->setState(message);
+            mementoRecipient->setState(recipient);
             message->clear();
             return;
         }
@@ -435,30 +408,6 @@ namespace gui
 
         app->updateDraft(sms, text);
         message->clear();
-    }
-
-    void NewMessageWindow::storeMessageAndRecipientInMemo()
-    {
-        mementoMessage->setState(message);
-        mementoRecipient->setState(recipient, contact);
-    }
-
-    void NewMessageWindow::restoreMessageAndRecipientFromMemo()
-    {
-        mementoMessage->restoreState(message);
-        mementoRecipient->restoreState(recipient, &phoneNumber);
-
-        if (phoneNumber.getNonEmpty() == "") {
-            return;
-        }
-
-        contact = DBServiceAPI::MatchContactByPhoneNumber(application, phoneNumber);
-        if (!contact || contact->isTemporary()) {
-            recipient->setText(phoneNumber.getFormatted());
-        }
-        else {
-            recipient->setText(contact->getFormattedName());
-        }
     }
 
 } // namespace gui
