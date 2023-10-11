@@ -31,9 +31,28 @@ namespace
         case Status::ChargingDone:
             return NewState::ChargingDone;
         case Status::ChargerNotCharging:
-            return NewState ::Discharging;
+            return NewState::Discharging;
         default:
             return NewState::PluggedNotCharging;
+        }
+    }
+
+    hal::battery::AbstractBatteryCharger::TemperatureState transformTemperatureState(
+        bsp::battery_charger::TemperatureRanges range)
+    {
+        using Range = bsp::battery_charger::TemperatureRanges;
+        using State = hal::battery::AbstractBatteryCharger::TemperatureState;
+        switch (range) {
+        case Range::Cdeg1to15:
+        case Range::Cdeg15to35:
+        case Range::Cdeg35to45:
+            return State::Normal;
+        case Range::Cold:
+            return State::TooLow;
+        case Range::Hot:
+            return State::TooHigh;
+        default:
+            return State::Unknown;
         }
     }
 
@@ -73,7 +92,7 @@ namespace hal::battery
             enum class Type
             {
                 ControllerINTB,
-                USBChargerAttached,
+                USBChargerAttached
             };
             Type type;
             std::uint8_t chargerType{};
@@ -87,6 +106,7 @@ namespace hal::battery
         std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
         ChargerPresence getChargerPresence() const final;
+        TemperatureState getTemperatureState() const final;
 
         static BatteryWorkerQueue &getWorkerQueueHandle();
 
@@ -183,6 +203,11 @@ namespace hal::battery
             return std::nullopt;
         }
         return scaledSoc;
+    }
+
+    AbstractBatteryCharger::TemperatureState PureBatteryCharger::getTemperatureState() const
+    {
+        return transformTemperatureState(bsp::battery_charger::getTemperatureRange());
     }
 
     AbstractBatteryCharger::ChargingStatus PureBatteryCharger::getChargingStatus() const

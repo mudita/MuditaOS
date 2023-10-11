@@ -28,8 +28,19 @@ namespace bsp::battery_charger
         OK,
         ChargerError,
         ChargerNotCharging,
+        ChargerPluggedNotCharging,
         ChargerCharging,
         ChargingDone
+    };
+
+    enum class TemperatureRanges
+    {
+        Cold,
+        Cdeg1to15,
+        Cdeg15to35,
+        Cdeg35to45,
+        Hot,
+        Unknown
     };
 
     enum class TopControllerIRQsource
@@ -59,6 +70,7 @@ namespace bsp::battery_charger
     void deinit();
 
     [[nodiscard]] std::optional<units::SOC> getBatteryLevel();
+    [[nodiscard]] TemperatureRanges getTemperatureRange();
 
     void storeBatteryLevelChange(units::SOC newSocValue);
 

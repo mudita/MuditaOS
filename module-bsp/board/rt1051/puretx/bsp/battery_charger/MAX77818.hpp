@@ -162,14 +162,16 @@ namespace bsp::battery_charger
     // CHG_DETAILS_01 register
     enum class CHG_DETAILS_01
     {
-        CHARGER_PREQUALIFICATION = 0x00,
-        CHARGER_CC               = 0x01,
-        CHARGER_CV               = 0x02,
-        CHARGER_TOPOFF           = 0x03,
-        CHARGER_DONE             = 0x04,
-        CHARGER_TIMER_FAULT      = 0x06,
-        CHARGER_BATTERY_DETECT   = 0x07,
-        CHARGER_OFF              = 0x08,
+        CHARGER_PREQUALIFICATION     = 0x00,
+        CHARGER_CC                   = 0x01,
+        CHARGER_CV                   = 0x02,
+        CHARGER_TOPOFF               = 0x03,
+        CHARGER_DONE                 = 0x04,
+        CHARGER_TIMER_FAULT          = 0x06,
+        CHARGER_BATTERY_DETECT       = 0x07,
+        CHARGER_OFF                  = 0x08,
+        CHARGER_OFF_OVERHEATED       = 0x0A,
+        CHARGER_OFF_WATCHDOG_EXPIRED = 0x0B
     };
 
     // CHG_CNFG_00 register

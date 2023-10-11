@@ -73,6 +73,22 @@ namespace
             return NewState::Normal;
         }
     }
+
+    Store::Battery::Temperature transformTemperatureState(AbstractBatteryCharger::TemperatureState state)
+    {
+        using State    = AbstractBatteryCharger::TemperatureState;
+        using NewState = Store::Battery::Temperature;
+        switch (state) {
+        case State::Normal:
+            return NewState::Normal;
+        case State::TooLow:
+            return NewState::TooLow;
+        case State::TooHigh:
+            return NewState::TooHigh;
+        default:
+            return NewState::Unknown;
+        }
+    }
 } // namespace
 
 BatteryController::BatteryController(sys::Service *service, xQueueHandle notificationChannel, EventManagerParams params)
@@ -106,12 +122,15 @@ BatteryController::BatteryController(sys::Service *service, xQueueHandle notific
 {
     updateSoc();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
-    batteryState.check(transformChargingState(Store::Battery::modify().state), Store::Battery::modify().level);
+    Store::Battery::modify().temperature = transformTemperatureState(charger->getTemperatureState());
+    batteryState.check(transformChargingState(Store::Battery::get().state),
+                       static_cast<float>(Store::Battery::get().level));
 
     LOG_INFO("Initial charger state: %s", magic_enum::enum_name(Store::Battery::get().state).data());
     LOG_INFO("Initial battery SOC: %d", Store::Battery::get().level);
     LOG_INFO("Initial battery voltage: %" PRIu32 "mV", getVoltage());
     LOG_INFO("Initial battery state: %s", magic_enum::enum_name(Store::Battery::get().levelState).data());
+    LOG_INFO("Initial battery temperature range: %s", magic_enum::enum_name(Store::Battery::get().temperature).data());
 }
 
 void sevm::battery::BatteryController::handleNotification(Events evt)
@@ -139,31 +158,36 @@ void sevm::battery::BatteryController::poll()
 
 void sevm::battery::BatteryController::printCurrentState()
 {
-    LOG_INFO("Charger state: %s | Battery SOC: %d%% | Voltage: %" PRIu32 "mV | Level state: %s",
+    LOG_INFO("Charger state: %s | Battery SOC: %d%% | Voltage: %" PRIu32 "mV | Level state: %s | Temperature: %s",
              magic_enum::enum_name(Store::Battery::get().state).data(),
              Store::Battery::get().level,
              getVoltage(),
-             magic_enum::enum_name(Store::Battery::get().levelState).data());
+             magic_enum::enum_name(Store::Battery::get().levelState).data(),
+             magic_enum::enum_name(Store::Battery::get().temperature).data());
 }
 
 void sevm::battery::BatteryController::update()
 {
     const auto lastSoc   = Store::Battery::get().level;
     const auto lastState = Store::Battery::get().state;
+    const auto lastTemperature = Store::Battery::get().temperature;
 
     updateSoc();
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
+    Store::Battery::modify().temperature = transformTemperatureState(charger->getTemperatureState());
 
     const auto currentSoc   = Store::Battery::get().level;
     const auto currentState = Store::Battery::get().state;
+    const auto currentTemperature = Store::Battery::get().temperature;
 
-    /// Send BatteryStatusChangeMessage only when battery SOC or charger state has changed
-    if (lastSoc != currentSoc || lastState != currentState) {
+    /// Send BatteryStatusChangeMessage only when battery SOC, charger state or temperature has changed
+    if ((lastSoc != currentSoc) || (lastState != currentState) || (lastTemperature != currentTemperature)) {
         auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
         service->bus.sendUnicast(std::move(message), service::name::evt_manager);
     }
 
-    batteryState.check(transformChargingState(Store::Battery::modify().state), Store::Battery::modify().level);
+    batteryState.check(transformChargingState(Store::Battery::get().state),
+                       static_cast<float>(Store::Battery::get().level));
 
     printCurrentState();
 }

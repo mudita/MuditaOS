@@ -16,7 +16,6 @@
 
 namespace cpp_freertos
 {
-    // fw decl
     class MutexStandard;
 } // namespace cpp_freertos
 
@@ -43,7 +42,16 @@ namespace Store
             ChargingDone,
             PluggedNotCharging,
         } state            = State::Discharging;
-        unsigned int level = 0;
+
+        enum class Temperature : std::uint8_t
+        {
+            Normal,
+            TooLow,
+            TooHigh,
+            Unknown
+        } temperature = Temperature::Normal;
+
+        unsigned level = 0;
 
         /// @brief Returns const reference to Battery instance, used to read battery state
         /// @return const Battery&

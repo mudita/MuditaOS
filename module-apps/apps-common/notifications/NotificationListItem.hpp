@@ -12,7 +12,6 @@
 
 namespace gui
 {
-
     class TextFixedSize;
 
     class NotificationListItem : public ListItem

@@ -40,6 +40,7 @@ namespace hal::battery
         std::optional<SOC> getSOC() const final;
         ChargingStatus getChargingStatus() const final;
         ChargerPresence getChargerPresence() const final;
+        TemperatureState getTemperatureState() const final;
 
       private:
         void worker();
@@ -84,6 +85,7 @@ namespace hal::battery
     {
         return batteryLevel;
     }
+
     AbstractBatteryCharger::ChargingStatus BatteryCharger::getChargingStatus() const
     {
         if (isPlugged && batteryLevel >= 100) {
@@ -96,10 +98,16 @@ namespace hal::battery
             return ChargingStatus::Discharging;
         }
     }
+
     AbstractBatteryCharger::ChargerPresence BatteryCharger::getChargerPresence() const
     {
         return isPlugged ? AbstractBatteryCharger::ChargerPresence::PluggedIn
                          : AbstractBatteryCharger::ChargerPresence::Unplugged;
+    }
+
+    AbstractBatteryCharger::TemperatureState BatteryCharger::getTemperatureState() const
+    {
+        return AbstractBatteryCharger::TemperatureState::Normal;
     }
 
     void BatteryCharger::worker()
@@ -107,11 +115,11 @@ namespace hal::battery
         mkfifo(batteryFIFO, fifoFileAccessRights);
 
         // Open FIFO for write only
-        int fd = open(batteryFIFO, O_RDONLY | O_NONBLOCK);
+        const auto fd = open(batteryFIFO, O_RDONLY | O_NONBLOCK);
 
         while (shouldRun) {
             std::uint8_t buff[fifoBuffSize];
-            std::int32_t readBytes = read(fd, buff, fifoBuffSize);
+            const auto readBytes = read(fd, buff, fifoBuffSize);
 
             if (readBytes > 0) {
                 Events evt{};
@@ -156,5 +164,4 @@ namespace hal::battery
     {
         return std::make_unique<BatteryCharger>(irqQueueHandle);
     }
-
 } // namespace hal::battery

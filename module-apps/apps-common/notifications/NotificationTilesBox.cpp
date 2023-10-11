@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationTilesBox.hpp"
@@ -13,10 +13,10 @@ namespace gui
                                                std::shared_ptr<NotificationTilesPresenter> notificationsPresenter)
         : HBox(
               parent, 0, 0, ::style::window::default_body_width, ::style::wallpaper::notificationTiles::tileIconHeight),
-          notificationsPresenter(notificationsPresenter)
+          notificationsPresenter(std::move(notificationsPresenter))
     {
         setEdges(RectangleEdge::None);
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        notificationsPresenter->attach(this);
+        this->notificationsPresenter->attach(this);
     }
 } // namespace gui

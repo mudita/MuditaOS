@@ -18,14 +18,14 @@ namespace
 {
     auto buildImageInactive(const UTF8 &img) -> gui::Image *
     {
-        auto thumbnail        = new gui::Image(img);
+        const auto thumbnail  = new gui::Image(img);
         thumbnail->activeItem = false;
         return thumbnail;
     }
 
     auto buildNotificationIcon(const UTF8 &icon) -> gui::Image *
     {
-        auto thumbnail = buildImageInactive(icon);
+        const auto thumbnail = buildImageInactive(icon);
         thumbnail->setMinimumWidth(style::notifications::iconWidth);
         thumbnail->setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
         thumbnail->setMargins(
@@ -33,9 +33,9 @@ namespace
         return thumbnail;
     }
 
-    auto buildNotificationNameLabel(uint32_t width) -> gui::TextFixedSize *
+    auto buildNotificationNameLabel([[maybe_unused]] std::uint32_t width) -> gui::TextFixedSize *
     {
-        auto text =
+        const auto text =
             new gui::TextFixedSize(nullptr, 0, 0, style::notifications::textMinWidth, style::notifications::itemHeight);
 
         text->setMaximumSize(style::notifications::textMaxWidth, Axis::X);
@@ -95,7 +95,8 @@ namespace
         {notifications::NotificationType::NotSeenCall, "calls_notification_icon_W_G"},
         {notifications::NotificationType::Tethering, "tethering_notification_icon_W_G"},
         {notifications::NotificationType::AlarmSnooze, "alarm_notification_icon_W_G"},
-        {notifications::NotificationType::PhoneLock, "lock_notification_icon_W_G"}};
+        {notifications::NotificationType::PhoneLock, "lock_notification_icon_W_G"},
+        {notifications::NotificationType::BatteryTooHot, "battery_notification_icon_W_G"}};
 } // namespace
 
 NotificationListItem::NotificationListItem(NotificationType type) : type{type}
@@ -151,7 +152,7 @@ NotificationWithOnOffButton::NotificationWithOnOffButton(notifications::Notifica
                                                          gui::ButtonTriState::State state)
     : NotificationListItem(type)
 {
-    auto button = new ButtonTriState(nullptr, state);
+    const auto button = new ButtonTriState(nullptr, state);
     button->setMargins(Margins(0, 0, 20, 0));
     box->addWidget(button);
 }

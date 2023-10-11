@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationTilesPresenter.hpp"
@@ -14,10 +14,11 @@ namespace
     constexpr auto tetheringIcon = "tethering_notification_icon_W_G";
     constexpr auto alarmIcon     = "alarm_notification_icon_W_G";
     constexpr auto lockIcon      = "lock_notification_icon_W_G";
+    constexpr auto batteryIcon   = "battery_notification_icon_W_G";
 
     auto buildNotificationIcon(const UTF8 &imageName) -> gui::Image *
     {
-        auto icon = new gui::Image(imageName);
+        const auto icon = new gui::Image(imageName);
         icon->setMinimumWidth(::style::wallpaper::notificationTiles::tileIconHeight);
         icon->setMargins(gui::Margins(::style::wallpaper::notificationTiles::tileIconMarigin,
                                       0,
@@ -30,9 +31,9 @@ namespace
 NotificationTilesPresenter::NotificationTilesPresenter()
 {}
 
-void NotificationTilesPresenter::attach(HBox *tilesBox)
+void NotificationTilesPresenter::attach(HBox *newTilesBox)
 {
-    this->tilesBox = tilesBox;
+    tilesBox = newTilesBox;
 }
 
 void NotificationTilesPresenter::updateData(app::manager::actions::NotificationsChangedParams *params,
@@ -57,6 +58,9 @@ void NotificationTilesPresenter::updateData(app::manager::actions::Notifications
         }
         else if (typeid(*notification) == typeid(notifications::PhoneLockNotification)) {
             tilesBox->addWidget(buildNotificationIcon(lockIcon));
+        }
+        else if (typeid(*notification) == typeid(notifications::BatteryTooHotNotification)) {
+            tilesBox->addWidget(buildNotificationIcon(batteryIcon));
         }
         else if (typeid(*notification) == typeid(notifications::AlarmSnoozeNotification)) {
             tilesBox->addWidget(buildNotificationIcon(alarmIcon));

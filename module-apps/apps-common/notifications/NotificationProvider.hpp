@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -26,20 +26,20 @@ namespace db
 
 namespace notifications
 {
-
     class NotificationProvider
     {
         template <NotificationType type, typename T>
         bool handleNotSeenWithCounter(NotificationsRecord &&record);
 
       public:
-        explicit NotificationProvider(sys::Service *ownerService, NotificationsConfiguration &notifcationConfig);
+        NotificationProvider(sys::Service *ownerService, NotificationsConfiguration &notificationConfig);
 
         void handle(locks::PhoneLockTimeUpdate *msg);
         void handle(db::query::notifications::GetAllResult *msg);
         void handle(db::NotificationMessage *msg);
         void handle(sys::phone_modes::Tethering tethering);
         void handleSnooze(unsigned snoozeCount);
+        void handleBatteryTooHot(bool tooHot, bool allowUpdate = true);
         void requestNotSeenNotifications();
         void send(NotificationOnReceiveUpdate updateOnReceive = NotificationOnReceiveUpdate::FullRebuild);
 
@@ -47,9 +47,8 @@ namespace notifications
 
       private:
         sys::Service *ownerService;
-        NotificationsConfiguration &notifcationConfig;
+        NotificationsConfiguration &notificationConfig;
         NotificationsListPolicy listPolicy;
         Notifications notifications;
     };
-
 } // namespace notifications

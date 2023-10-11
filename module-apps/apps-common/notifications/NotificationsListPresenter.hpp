@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,10 +18,10 @@ namespace gui
                                        public app::InternalModel<gui::NotificationListItem *>,
                                        public gui::ListItemProvider
     {
-        [[nodiscard]] unsigned int requestRecordsCount() final;
-        [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const final;
+        [[nodiscard]] unsigned requestRecordsCount() final;
+        [[nodiscard]] unsigned getMinimalItemSpaceRequired() const final;
         ListItem *getItem(Order order) final;
-        void requestRecords(uint32_t offset, uint32_t limit) final;
+        void requestRecords(std::uint32_t offset, std::uint32_t limit) final;
 
       protected:
         [[nodiscard]] virtual auto create(const notifications::NotSeenSMSNotification *notification)
@@ -34,6 +34,8 @@ namespace gui
             -> NotificationListItem *;
         [[nodiscard]] virtual auto create(const notifications::PhoneLockNotification *notification)
             -> NotificationListItem *;
+        [[nodiscard]] virtual auto create(const notifications::BatteryTooHotNotification *notification)
+            -> NotificationListItem *;
 
       public:
         NotificationsListPresenter();
@@ -43,5 +45,4 @@ namespace gui
         void updateData(app::manager::actions::NotificationsChangedParams *params, bool callAndSMSVisibility) final;
         void dismissAll() final;
     };
-
 } // namespace gui

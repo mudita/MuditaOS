@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationsHandler.hpp"
@@ -7,14 +7,14 @@
 
 using namespace notifications;
 
-NotificationsHandler::NotificationsHandler(sys::Service *parentService, NotificationsConfiguration &notifcationConfig)
-    : parentService{parentService}, notifcationConfig{notifcationConfig}
+NotificationsHandler::NotificationsHandler(sys::Service *parentService, NotificationsConfiguration &notificationConfig)
+    : parentService{parentService}, notificationConfig{notificationConfig}
 {}
 
 void NotificationsHandler::registerMessageHandlers()
 {
     parentService->connect(typeid(cellular::IncomingSMSNotificationMessage),
-                           [&](sys::Message *request) -> sys::MessagePointer {
+                           [&]([[maybe_unused]] sys::Message *request) -> sys::MessagePointer {
                                incomingSMSHandler();
                                return sys::msgHandled();
                            });
@@ -22,7 +22,7 @@ void NotificationsHandler::registerMessageHandlers()
 
 void NotificationsHandler::incomingSMSHandler()
 {
-    notifcationConfig.updateCurrentSMS(currentSMSPolicy);
+    notificationConfig.updateCurrentSMS(currentSMSPolicy);
     playbackSMSRingtone();
 }
 

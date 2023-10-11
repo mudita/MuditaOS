@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "NotificationProvider.hpp"
@@ -11,8 +11,8 @@
 
 using namespace notifications;
 
-NotificationProvider::NotificationProvider(sys::Service *ownerService, NotificationsConfiguration &notifcationConfig)
-    : ownerService{ownerService}, notifcationConfig{notifcationConfig}
+NotificationProvider::NotificationProvider(sys::Service *ownerService, NotificationsConfiguration &notificationConfig)
+    : ownerService{ownerService}, notificationConfig{notificationConfig}
 {}
 
 template <NotificationType type, typename T>
@@ -75,7 +75,7 @@ void NotificationProvider::handle(db::query::notifications::GetAllResult *msg)
         }
     }
 
-    notifcationConfig.updateCurrentList(listPolicy);
+    notificationConfig.updateCurrentList(listPolicy);
 
     if (notificationsChanged && listPolicy.updateListAllowed()) {
         send();
@@ -120,6 +120,25 @@ void NotificationProvider::handleSnooze(unsigned snoozeCount)
     send();
 }
 
+void NotificationProvider::handleBatteryTooHot(bool isBatteryTooHot, bool allowUpdate)
+{
+    auto notificationsChanged    = false;
+    const auto notificationShown = (notifications.count(NotificationType::BatteryTooHot) != 0);
+
+    if (isBatteryTooHot && !notificationShown) {
+        notifications[NotificationType::BatteryTooHot] = std::make_shared<notifications::BatteryTooHotNotification>();
+        notificationsChanged                           = true;
+    }
+    else if (!isBatteryTooHot && notificationShown) {
+        notifications.erase(NotificationType::BatteryTooHot);
+        notificationsChanged = true;
+    }
+
+    if (notificationsChanged && allowUpdate) {
+        send();
+    }
+}
+
 void NotificationProvider::requestNotSeenNotifications()
 {
     DBServiceAPI::GetQuery(
@@ -141,20 +160,20 @@ namespace
 
 void NotificationProvider::send(NotificationOnReceiveUpdate updateOnReceive)
 {
-    notifcationConfig.updateCurrentList(listPolicy);
+    using namespace app::manager;
 
-    std::list<std::shared_ptr<const Notification>> toSendNotifications;
-    transform(notifications.begin(), notifications.end(), back_inserter(toSendNotifications), get_second());
+    notificationConfig.updateCurrentList(listPolicy);
 
-    toSendNotifications.sort(
+    std::list<std::shared_ptr<const Notification>> notificationsToSend;
+    std::transform(notifications.begin(), notifications.end(), std::back_inserter(notificationsToSend), get_second());
+
+    notificationsToSend.sort(
         [](const std::shared_ptr<const Notification> &lhs, const std::shared_ptr<const Notification> &rhs) {
             return (lhs->getPriority() > rhs->getPriority());
         });
 
-    auto fastRefreshOnUpdate = updateOnReceive == NotificationOnReceiveUpdate::PartialRebuild;
-    app::manager::Controller::sendAction(
-        ownerService,
-        app::manager::actions::NotificationsChanged,
-        std::make_unique<app::manager::actions::NotificationsChangedParams>(
-            std::move(toSendNotifications), listPolicy.showListWhenLocked(), fastRefreshOnUpdate));
+    const auto fastRefreshOnUpdate = (updateOnReceive == NotificationOnReceiveUpdate::PartialRebuild);
+    auto data                      = std::make_unique<actions::NotificationsChangedParams>(
+        std::move(notificationsToSend), listPolicy.showListWhenLocked(), fastRefreshOnUpdate);
+    Controller::sendAction(ownerService, actions::NotificationsChanged, std::move(data));
 }
