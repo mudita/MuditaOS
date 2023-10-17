@@ -220,7 +220,7 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationNotes>(app::name_notes));
 #endif
 #ifdef ENABLE_APP_CALLLOG
-            applications.push_back(app::CreateLauncher<app::ApplicationCallLog>(app::CallLogAppStr));
+            applications.push_back(app::CreateLauncher<app::ApplicationCallLog>(app::name_calllog));
 #endif
 #ifdef ENABLE_APP_PHONEBOOK
             applications.push_back(app::CreateLauncher<app::ApplicationPhonebook>(app::name_phonebook));
@@ -230,7 +230,7 @@ int main()
 #endif
 #ifdef ENABLE_APP_SPECIAL_INPUT
             applications.push_back(
-                app::CreateLauncher<app::ApplicationSpecialInput>(app::special_input, app::Closeable::False));
+                app::CreateLauncher<app::ApplicationSpecialInput>(app::name_special_input, app::Closeable::False));
 #endif
 #ifdef ENABLE_APP_ANTENNA
             applications.push_back(app::CreateLauncher<app::ApplicationAntenna>(app::name_antenna));

@@ -16,6 +16,12 @@
 
 #include <memory>
 
+namespace
+{
+    constexpr auto pageFirstNotificationIdx = 0;
+    constexpr auto pageLastNotificationIdx  = style::notifications::model::maxNotificationsPerPage - 1;
+} // namespace
+
 namespace gui
 {
     void DesktopMainWindow::buildInterface()
@@ -88,7 +94,7 @@ namespace gui
 
     void DesktopMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        if (auto notificationData = dynamic_cast<app::manager::actions::NotificationsChangedParams *>(data)) {
+        if (const auto notificationData = dynamic_cast<app::manager::actions::NotificationsChangedParams *>(data)) {
             notificationsModel->updateData(notificationData);
         }
         else {
@@ -112,15 +118,9 @@ namespace gui
         return AppWindow::onInput(inputEvent);
     }
 
-    namespace
-    {
-        constexpr auto pageFirstNotificationIdx = 0;
-        constexpr auto pageLastNotificationIdx  = style::notifications::model::maxNotificationsPerPage - 1;
-    } // namespace
-
     bool DesktopMainWindow::processShortReleaseEvent(const InputEvent &inputEvent)
     {
-        auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
+        const auto code = translator.handle(inputEvent.getRawKey(), InputMode({InputMode::phone}).get());
         // if numeric key was pressed record that key and send it to call application
         if (code != 0) {
             const auto &number = std::string(1, static_cast<char>(code));
@@ -200,7 +200,7 @@ namespace gui
 
     app::ApplicationDesktop *DesktopMainWindow::getAppDesktop() const
     {
-        auto *app = dynamic_cast<app::ApplicationDesktop *>(application);
+        const auto app = dynamic_cast<app::ApplicationDesktop *>(application);
         assert(app);
         return app;
     }
@@ -220,5 +220,4 @@ namespace gui
         return app::manager::Controller::sendAction(
             application, app::manager::actions::Dial, std::make_unique<app::EnterNumberData>(number));
     }
-
 } /* namespace gui */
