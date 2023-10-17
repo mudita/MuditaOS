@@ -28,14 +28,18 @@
 #include <cassert>
 #include <memory>
 
+namespace
+{
+    constexpr auto applicationCallStackSize = 1024 * 8;
+}
+
 namespace app
 {
-
     ApplicationCall::ApplicationCall(std::string name,
                                      std::string parent,
                                      StatusIndicators statusIndicators,
                                      StartInBackground startInBackground)
-        : Application(name, parent, statusIndicators, startInBackground, app::call_stack_size)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, applicationCallStackSize)
     {
         using namespace gui::status_bar;
 
@@ -58,11 +62,11 @@ namespace app
             return actionNotHandled();
         });
         addActionReceiver(manager::actions::Dial, [this](auto &&data) {
-            switchWindow(window::name_enterNumber, std::forward<decltype(data)>(data));
+            switchWindow(gui::window::name::enter_number, std::forward<decltype(data)>(data));
             return actionHandled();
         });
         addActionReceiver(manager::actions::EmergencyDial, [this](auto &&data) {
-            switchWindow(app::window::name_emergencyCall, std::forward<decltype(data)>(data));
+            switchWindow(gui::window::name::emergency_call, std::forward<decltype(data)>(data));
             return actionHandled();
         });
         addActionReceiver(manager::actions::NotAnEmergencyNotification, [this](auto &&data) {
@@ -72,49 +76,49 @@ namespace app
             return actionHandled();
         });
 
-        addActionReceiver(manager::actions::NoSimNotification, [this](auto &&data) {
+        addActionReceiver(manager::actions::NoSimNotification, [this]([[maybe_unused]] auto &&data) {
             showNotificationAndRestartCallFlow(NotificationType::Info, utils::translate("app_call_no_sim"));
             return actionHandled();
         });
-        addActionReceiver(manager::actions::NoNetworkConnectionNotification, [this](auto &&data) {
+        addActionReceiver(manager::actions::NoNetworkConnectionNotification, [this]([[maybe_unused]] auto &&data) {
             showNotificationAndRestartCallFlow(NotificationType::Info,
                                                utils::translate("app_call_no_network_connection"));
             return actionHandled();
         });
-        addActionReceiver(manager::actions::CallRequestGeneralErrorNotification, [this](auto &&data) {
+        addActionReceiver(manager::actions::CallRequestGeneralErrorNotification, [this]([[maybe_unused]] auto &&data) {
             showNotificationAndRestartCallFlow(NotificationType::Failure,
                                                utils::translate("app_call_call_request_failed"));
             return actionHandled();
         });
-        addActionReceiver(manager::actions::CallRejectedByOfflineNotification, [this](auto &&data) {
+        addActionReceiver(manager::actions::CallRejectedByOfflineNotification, [this]([[maybe_unused]] auto &&data) {
             showNotificationAndRestartCallFlow(NotificationType::Info, utils::translate("app_call_offline"));
             return actionHandled();
         });
-        addActionReceiver(manager::actions::ActivateCall, [this](auto &&data) {
-            switchWindow(window::name_call);
+        addActionReceiver(manager::actions::ActivateCall, [this]([[maybe_unused]] auto &&data) {
+            switchWindow(gui::window::name::call);
             return actionHandled();
         });
-        addActionReceiver(manager::actions::HandleOutgoingCall, [this](auto &&data) {
-            switchWindow(window::name_call);
+        addActionReceiver(manager::actions::HandleOutgoingCall, [this]([[maybe_unused]] auto &&data) {
+            switchWindow(gui::window::name::call);
             return actionHandled();
         });
-        addActionReceiver(manager::actions::HandleIncomingCall, [this](auto &&data) {
+        addActionReceiver(manager::actions::HandleIncomingCall, [this]([[maybe_unused]] auto &&data) {
             callModel->setState(call::CallState::Incoming);
-            auto window = getCurrentWindow();
-            if (window->getName() != app::window::name_call) {
+            const auto window = getCurrentWindow();
+            if (window->getName() != gui::window::name::call) {
                 LOG_INFO("Switch to call window");
-                switchWindow(app::window::name_call);
+                switchWindow(gui::window::name::call);
             }
             return actionHandled();
         });
         addActionReceiver(manager::actions::HandleCallerId, [this](auto &&data) {
-            auto callParams = static_cast<app::manager::actions::CallParams *>(data.get());
+            const auto callParams = static_cast<app::manager::actions::CallParams *>(data.get());
             callModel->setPhoneNumber(callParams->getNumber());
             callModel->setState(call::CallState::Incoming);
-            auto window = getCurrentWindow();
-            if (window->getName() != app::window::name_call) {
-                LOG_INFO("Switch to call window");
-                switchWindow(app::window::name_call);
+            const auto window = getCurrentWindow();
+            if (window->getName() != gui::window::name::call) {
+                LOG_INFO("Switching to call window");
+                switchWindow(gui::window::name::call);
             }
             return actionHandled();
         });
@@ -145,7 +149,7 @@ namespace app
     // Invoked upon receiving data message
     sys::MessagePointer ApplicationCall::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
     {
-        auto retMsg = Application::DataReceivedHandler(msgl);
+        const auto retMsg = Application::DataReceivedHandler(msgl);
         // if message was handled by application's template there is no need to process further.
         auto response = dynamic_cast<sys::ResponseMessage *>(retMsg.get());
         assert(response);
@@ -158,49 +162,48 @@ namespace app
     // Invoked during initialization
     sys::ReturnCodes ApplicationCall::InitHandler()
     {
-
-        auto ret = Application::InitHandler();
+        const auto ret = Application::InitHandler();
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
 
         connect(typeid(cellular::CallDurationNotification), [&](sys::Message *request) {
-            auto message = static_cast<cellular::CallDurationNotification *>(request);
+            const auto message = static_cast<cellular::CallDurationNotification *>(request);
             callModel->setTime(message->callDuration);
             return sys::MessageNone{};
         });
 
-        connect(typeid(cellular::CallActiveNotification), [&](sys::Message *request) {
+        connect(typeid(cellular::CallActiveNotification), [&]([[maybe_unused]] sys::Message *request) {
             callModel->setState(app::call::CallState::Active);
             return sys::MessageNone{};
         });
 
-        connect(typeid(cellular::CallMissedNotification), [&](sys::Message *request) {
+        connect(typeid(cellular::CallMissedNotification), [&]([[maybe_unused]] sys::Message *request) {
             callModel->setState(app::call::CallState::Missed);
             app::manager::Controller::switchBack(this);
             return sys::MessageNone{};
         });
 
-        connect(typeid(cellular::CallEndedNotification), [&](sys::Message *request) {
+        connect(typeid(cellular::CallEndedNotification), [&]([[maybe_unused]] sys::Message *request) {
             callModel->setState(app::call::CallState::Ended);
-            switchWindow(app::window::name_call);
+            switchWindow(gui::window::name::call);
             return sys::MessageNone{};
         });
 
-        connect(typeid(cellular::IsCallActive), [&](sys::Message *request) {
+        connect(typeid(cellular::IsCallActive), [&]([[maybe_unused]] sys::Message *request) {
             return std::make_shared<cellular::IsCallActiveResponse>(callModel->getState() != call::CallState::None);
         });
 
         connect(typeid(cellular::CallStartedNotification), [&](sys::Message *request) {
-            auto message = static_cast<cellular::CallStartedNotification *>(request);
+            const auto message = static_cast<cellular::CallStartedNotification *>(request);
             callModel->setPhoneNumber(message->getNumber());
             callModel->setState(app::call::CallState::Outgoing);
-            switchWindow(app::window::name_call);
+            switchWindow(gui::window::name::call);
             return sys::MessageNone{};
         });
 
         connect(typeid(AudioRoutingNotification), [this](sys::Message *request) {
-            auto message = static_cast<AudioRoutingNotification *>(request);
+            const auto message = static_cast<AudioRoutingNotification *>(request);
             return handleRoutingNotification(message);
         });
 
@@ -217,18 +220,22 @@ namespace app
 
     void ApplicationCall::createUserInterface()
     {
-        windowsFactory.attach(app::window::name_enterNumber, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::EnterNumberWindow>(app, static_cast<ApplicationCall *>(app));
-        });
-        windowsFactory.attach(app::window::name_call, [this](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::CallWindow>(app, *callPresenter);
-        });
-        windowsFactory.attach(app::window::name_emergencyCall, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::EmergencyCallWindow>(app, static_cast<ApplicationCall *>(app));
-        });
-        windowsFactory.attach(app::window::name_dialogConfirm, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::DialogConfirm>(app, name);
-        });
+        windowsFactory.attach(
+            gui::window::name::enter_number, [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                return std::make_unique<gui::EnterNumberWindow>(app, static_cast<ApplicationCall *>(app));
+            });
+        windowsFactory.attach(gui::window::name::call,
+                              [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                                  return std::make_unique<gui::CallWindow>(app, *callPresenter);
+                              });
+        windowsFactory.attach(
+            gui::window::name::emergency_call, [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                return std::make_unique<gui::EmergencyCallWindow>(app, static_cast<ApplicationCall *>(app));
+            });
+        windowsFactory.attach(gui::window::name::call_dialog_confirm,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::DialogConfirm>(app, name);
+                              });
         attachPopups({gui::popup::ID::Volume,
                       gui::popup::ID::Tethering,
                       gui::popup::ID::PhoneModes,
@@ -242,14 +249,14 @@ namespace app
     {
         auto metaData =
             std::make_unique<gui::DialogMetadataMessage>(gui::DialogMetadata{"", icon, text, "", std::move(action)});
-        switchWindow(app::window::name_dialogConfirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
+        switchWindow(gui::window::name::call_dialog_confirm, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
         return true;
     }
 
     auto ApplicationCall::showNotificationAndRestartCallFlow(NotificationType type, const std::string &text) -> bool
     {
-        auto buttonAction = [=]() -> bool { return conditionalReturnToPreviousView(); };
-        auto icon         = type == NotificationType::Info ? "info_128px_W_G" : "fail_128px_W_G";
+        const auto buttonAction = [=]() -> bool { return conditionalReturnToPreviousView(); };
+        const auto icon         = type == NotificationType::Info ? "info_128px_W_G" : "fail_128px_W_G";
         callModel->clear();
         return showNotification(buttonAction, icon, text);
     }
@@ -259,7 +266,7 @@ namespace app
 
     void ApplicationCall::handleEmergencyCallEvent(const std::string &number)
     {
-        auto state = callModel->getState();
+        const auto state = callModel->getState();
         if (state != call::CallState::None) {
             LOG_WARN("Cannot call in %s state", c_str(state));
             return;
@@ -275,7 +282,7 @@ namespace app
 
     void ApplicationCall::handleCallEvent(const std::string &number, ExternalRequest isExternalRequest)
     {
-        auto state = callModel->getState();
+        const auto state = callModel->getState();
         if (state != call::CallState::None) {
             LOG_WARN("Cannot call in %s state", c_str(state));
             return;
@@ -286,7 +293,7 @@ namespace app
 
     void ApplicationCall::handleAddContactEvent(const std::string &number)
     {
-        LOG_INFO("add contact information");
+        LOG_INFO("Add contact information");
 
         auto numberView    = utils::PhoneNumber(number).getView();
         auto searchResults = DBServiceAPI::MatchContactByPhoneNumber(this, numberView);
@@ -310,11 +317,10 @@ namespace app
 
     sys::MessagePointer ApplicationCall::handleRoutingNotification(AudioRoutingNotification *message)
     {
-        if (auto window = getCurrentWindow(); window->getName() == app::window::name_call) {
+        if (const auto window = getCurrentWindow(); window->getName() == gui::window::name::call) {
             const auto currentRouting = message->profileType;
             callPresenter->processCurrentRouting(currentRouting);
         }
         return sys::MessageNone{};
     }
-
 } // namespace app
