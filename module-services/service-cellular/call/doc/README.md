@@ -37,7 +37,7 @@ CellularCall.hpp is written such as:
     - any API has to first define a virtual interface
     - then define platform implementation
 
-State machine is written using [boost::stm](https://boost-ext.github.io/sml/index.html)
+State machine is written using [boost::sml](https://boost-ext.github.io/sml/index.html)
 
 **NOTE** API catalog should and can be further split into API header and platform implementation.
 
