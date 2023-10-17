@@ -74,7 +74,7 @@ namespace gui
             break;
         }
 
-        setSaveButtonVisible(!newContactModel->emptyData());
+        setSaveButtonVisible(!newContactModel->readyToSave());
     }
 
     void PhonebookNewContact::onClose(Window::CloseReason reason)
@@ -138,8 +138,6 @@ namespace gui
 
     auto PhonebookNewContact::onInput(const InputEvent &inputEvent) -> bool
     {
-        setSaveButtonVisible(!newContactModel->emptyData());
-
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER) && !newContactModel->emptyData() &&
             newContactModel->verifyData()) {
             auto tmpId  = contact->ID;
@@ -160,7 +158,9 @@ namespace gui
                     return true;
                 }
             }
-            return AppWindow::onInput(inputEvent);
+            auto retunrVal = AppWindow::onInput(inputEvent);
+            setSaveButtonVisible(!newContactModel->readyToSave());
+            return retunrVal;
         }
 
         auto returnWhenCurrentAppShouldBeIgnoredOnSwitchBack = [this]() {

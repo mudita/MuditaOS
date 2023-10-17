@@ -117,6 +117,11 @@ namespace gui
         setEdges(RectangleEdge::None);
     }
 
+    auto InputLinesWithLabelWidget::getListItemName() -> phonebookInternals::ListItemName
+    {
+        return listItemName;
+    }
+
     void InputLinesWithLabelWidget::applyItemNameSpecificSettings()
     {
         switch (listItemName) {
