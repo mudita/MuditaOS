@@ -225,6 +225,21 @@ bool NewContactModel::emptyData()
     return true;
 }
 
+bool NewContactModel::readyToSave()
+{
+    // The contact model is ready to be saved when any of the phone number fields are not empty
+    for (const auto &item : internalData) {
+        if (auto itemWidget = dynamic_cast<gui::InputLinesWithLabelWidget *>(item); itemWidget != nullptr) {
+            if (auto typeOfItem = itemWidget->getListItemName();
+                (typeOfItem == phonebookInternals::ListItemName::Number ||
+                 typeOfItem == phonebookInternals::ListItemName::SecondNumber) &&
+                itemWidget->onEmptyCallback && !itemWidget->onEmptyCallback()) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
 [[nodiscard]] auto NewContactModel::getRequestType() -> PhonebookItemData::RequestType
 {
     return requestType;

@@ -1579,10 +1579,15 @@ auto ContactRecordInterface::matchedNumberRefersToTemporary(const ContactNumberH
 auto ContactRecordInterface::changeNumberRecordInPlaceIfCountryCodeIsOnlyDifferent(
     const std::vector<std::uint32_t> &oldNumberIDs, std::vector<ContactRecord::Number> &newNumbers) -> bool
 {
-    if (oldNumberIDs.empty() || newNumbers.empty()) {
-        LOG_ERROR("Failed to change number record in place if country code is only different. "
-                  "Empty input data.");
+    if (newNumbers.empty()) {
+        LOG_ERROR("Cannot to change number record in place if country code is only different. "
+                  "Empty new number data");
         return false;
+    }
+    if (oldNumberIDs.empty()) {
+        LOG_WARN("Cannot to change number record in place if country code is only different. "
+                 "Empty old number data.");
+        return true;
     }
     for (const auto id : oldNumberIDs) {
         if (id == 0)

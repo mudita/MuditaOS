@@ -40,6 +40,7 @@
 * Fixed crash on transferring audio file with big metadata.
 * Fixed possibility of OS crash during update package size check.
 * Fixed cut off VoLTE checking label in some languages.
+* Fixed inability to save a contact that did not previously have a phone number
 
 ## [1.8.0 2023-09-27]
 

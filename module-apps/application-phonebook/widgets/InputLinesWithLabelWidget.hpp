@@ -30,6 +30,8 @@ namespace gui
         Label *titleLabel        = nullptr;
         TextFixedSize *inputText = nullptr;
 
+        auto getListItemName() -> phonebookInternals::ListItemName;
+
       private:
         phonebookInternals::ListItemName listItemName;
         void applyItemNameSpecificSettings();
