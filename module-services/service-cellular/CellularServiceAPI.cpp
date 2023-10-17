@@ -261,7 +261,7 @@ bool CellularServiceAPI::IsCallStateForCallApplicationActive(sys::Service *serv,
 {
     // Ask ApplicationCall (if App even exist) about its internal Call State
     auto msg = std::make_shared<cellular::IsCallActive>();
-    auto ret = serv->bus.sendUnicastSync(msg, app::name_call, 1000);
+    const auto ret = serv->bus.sendUnicastSync(std::move(msg), app::name_call, 1000);
     if (ret.first == sys::ReturnCodes::Success) {
         auto celResponse = std::dynamic_pointer_cast<cellular::IsCallActiveResponse>(ret.second);
         if ((celResponse != nullptr) && (celResponse->retCode == sys::ReturnCodes::Success)) {

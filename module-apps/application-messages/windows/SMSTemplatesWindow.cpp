@@ -90,7 +90,7 @@ namespace gui
 
         auto requestingWindow  = switchData->requestingWindow;
         app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
-            LOG_DEBUG("SMS template id = %" PRIu32 "chosen", templ->ID);
+            LOG_DEBUG("SMS template id = %" PRIu32 " chosen", templ->ID);
             auto data = std::make_unique<SMSTextData>(templ->text, SMSTextData::Concatenate::True);
             application->switchWindow(requestingWindow, std::move(data));
             return true;
@@ -105,7 +105,7 @@ namespace gui
         assert(app != nullptr);
 
         app->templatesCallback = [=](std::shared_ptr<SMSTemplateRecord> templ) {
-            LOG_DEBUG("SMS template id = %" PRIu32 "sent", templ->ID);
+            LOG_DEBUG("SMS template id = %" PRIu32 " sent", templ->ID);
             app::manager::Controller::switchBack(
                 app,
                 std::make_unique<app::manager::SwitchBackRequest>(application->GetName(),

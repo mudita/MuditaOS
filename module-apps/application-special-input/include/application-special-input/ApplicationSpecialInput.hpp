@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,8 +9,7 @@
 
 namespace app
 {
-
-    inline constexpr auto special_input = "ApplicationSpecialInput";
+    inline constexpr auto name_special_input = "ApplicationSpecialInput";
     inline constexpr auto char_select   = gui::name::window::main_window;
 
     // app just to provide input selection on UI
@@ -19,7 +18,7 @@ namespace app
       public:
         std::string requester = "";
 
-        ApplicationSpecialInput(std::string name                    = special_input,
+        ApplicationSpecialInput(std::string name                    = name_special_input,
                                 std::string parent                  = {},
                                 StatusIndicators statusIndicators   = StatusIndicators{},
                                 StartInBackground startInBackground = {true});
