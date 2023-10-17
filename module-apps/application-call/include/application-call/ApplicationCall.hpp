@@ -5,6 +5,7 @@
 
 #include <application-call/model/CallModel.hpp>
 #include <application-call/presenter/CallPresenter.hpp>
+#include <application-call/windows/WindowNames.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <service-cellular/CellularMessage.hpp>
 #include <service-evtmgr/ServiceEventManagerName.hpp>
@@ -17,18 +18,7 @@
 
 namespace app
 {
-    inline constexpr auto name_call       = "ApplicationCall";
-    inline constexpr auto call_stack_size = 8192U;
-
-    namespace window
-    {
-        inline constexpr auto name_enterNumber       = gui::name::window::main_window;
-        inline constexpr auto name_call              = "CallWindow";
-        inline constexpr auto name_emergencyCall     = "EmergencyCallWindow";
-        inline constexpr auto name_duplicatedContact = "DuplicatedContactWindow";
-        inline constexpr auto name_dialogConfirm     = "DialogConfirm";
-        inline constexpr auto name_number            = "NumberWindow";
-    } // namespace window
+    inline constexpr auto name_call = "ApplicationCall";
 
     class EnterNumberWindowInterface
     {
@@ -56,7 +46,7 @@ namespace app
         sys::ReturnCodes InitHandler() override;
         sys::MessagePointer handleAppClose(sys::Message *msgl) override;
 
-        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+        sys::ReturnCodes SwitchPowerModeHandler([[maybe_unused]] const sys::ServicePowerMode mode) override final
         {
             return sys::ReturnCodes::Success;
         }

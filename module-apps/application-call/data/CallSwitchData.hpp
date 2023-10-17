@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,12 +6,10 @@
 #include "SwitchData.hpp"
 
 #include <PhoneNumber.hpp>
-
 #include <string>
 
 namespace app
 {
-
     class CallSwitchData : public gui::SwitchData
     {
       public:
@@ -28,7 +26,7 @@ namespace app
         utils::PhoneNumber::View phoneNumber;
 
       public:
-        CallSwitchData(const utils::PhoneNumber::View &phoneNumber, Type type = Type::UNDEFINED)
+        explicit CallSwitchData(const utils::PhoneNumber::View &phoneNumber, Type type = Type::UNDEFINED)
             : SwitchData(descriptionStr), type(type), phoneNumber(phoneNumber){};
 
         const Type &getType() const
@@ -48,7 +46,7 @@ namespace app
       public:
         static constexpr auto descriptionStr = "EnterNumberSwitchData";
 
-        EnterNumberData(const std::string &phoneNumber) : SwitchData(descriptionStr), phoneNumber(phoneNumber)
+        explicit EnterNumberData(const std::string &phoneNumber) : SwitchData(descriptionStr), phoneNumber(phoneNumber)
         {}
 
         const std::string &getPhoneNumber() const
@@ -60,7 +58,7 @@ namespace app
     class ExecuteCallData : public CallSwitchData
     {
       public:
-        ExecuteCallData(const utils::PhoneNumber::View &phoneNumber)
+        explicit ExecuteCallData(const utils::PhoneNumber::View &phoneNumber)
             : CallSwitchData(phoneNumber, app::CallSwitchData::Type::EXECUTE_CALL){};
     };
 } /* namespace app */

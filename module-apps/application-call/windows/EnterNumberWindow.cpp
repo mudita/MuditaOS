@@ -30,13 +30,13 @@ namespace gui
         navBar->setText(nav_bar::Side::Center, utils::translate("common_add"));
         navBar->setText(nav_bar::Side::Right, utils::translate("app_call_clear"));
 
-        auto iconsBox = new HBox(
+        const auto iconsBox = new HBox(
             this, style::window::default_left_margin, iconsBox::y, style::window::default_body_width, iconsBox::h);
         iconsBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         iconsBox->setEdges(RectangleEdge::None);
 
         newContactIcon                    = new gui::AddContactIcon(iconsBox);
-        newContactIcon->activatedCallback = [=](gui::Item &item) { return addNewContact(); };
+        newContactIcon->activatedCallback = [=]([[maybe_unused]] gui::Item &item) { return addNewContact(); };
         setFocusItem(newContactIcon);
 
         iconsBox->resizeItems();
@@ -62,7 +62,7 @@ namespace gui
         }
 
         if (data->getDescription() == app::EnterNumberData::descriptionStr) {
-            auto *callData = dynamic_cast<app::EnterNumberData *>(data);
+            const auto callData = dynamic_cast<app::EnterNumberData *>(data);
             assert(callData != nullptr);
 
             initFormatterInput(callData->getPhoneNumber());
@@ -70,10 +70,10 @@ namespace gui
             application->refreshWindow(RefreshModes::GUI_REFRESH_FAST);
         }
         else if (data->getDescription() == app::CallSwitchData::descriptionStr) {
-            auto *callData = dynamic_cast<app::CallSwitchData *>(data);
+            const auto callData = dynamic_cast<app::CallSwitchData *>(data);
             assert(callData != nullptr);
 
-            auto &phoneNumber = callData->getPhoneNumber();
+            const auto &phoneNumber = callData->getPhoneNumber();
 
             initFormatterInput(phoneNumber.getEntered());
             setNumberLabel(phoneNumber.getFormatted());
@@ -84,8 +84,7 @@ namespace gui
             }
         }
         else {
-            LOG_ERROR("Unhandled switch data");
-            abort();
+            LOG_ERROR("Unhandled switch data: %s", data->getDescription().c_str());
         }
 
         return true;

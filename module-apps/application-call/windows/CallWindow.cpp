@@ -27,7 +27,7 @@ namespace gui
     using namespace app::call;
 
     CallWindow::CallWindow(app::ApplicationCommon *app, app::call::CallWindowContract::Presenter &presenter)
-        : gui::AppWindow{app, app::window::name_call}, presenter{presenter}
+        : gui::AppWindow{app, gui::window::name::call}, presenter{presenter}
     {
         presenter.attach(this);
         presenter.attachCallbacks();
@@ -79,7 +79,7 @@ namespace gui
         iconsBox->setEdges(RectangleEdge::None);
 
         microphoneIcon                    = new MicrophoneIcon(iconsBox);
-        microphoneIcon->activatedCallback = [=](gui::Item &item) {
+        microphoneIcon->activatedCallback = [=]([[maybe_unused]] gui::Item &item) {
             microphoneIcon->setNext();
             LOG_INFO("Microphone %s", static_cast<bool>(microphoneIcon->get()) ? "activated" : "deactivated");
 
@@ -89,7 +89,7 @@ namespace gui
         };
 
         speakerIcon                    = new SpeakerIcon(iconsBox);
-        speakerIcon->activatedCallback = [=](gui::Item &item) {
+        speakerIcon->activatedCallback = [=]([[maybe_unused]] gui::Item &item) {
             speakerIcon->setNext();
             LOG_INFO("Speaker %s", static_cast<bool>(speakerIcon->get()) ? "activated" : "deactivated");
 
@@ -154,11 +154,11 @@ namespace gui
         }
     }
 
-    void CallWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void CallWindow::onBeforeShow([[maybe_unused]] ShowMode mode, SwitchData *data)
     {
         presenter.buildLayout();
 
-        if (auto switchData = dynamic_cast<SMSTemplateSent *>(data); switchData != nullptr) {
+        if (const auto switchData = dynamic_cast<SMSTemplateSent *>(data); switchData != nullptr) {
             presenter.hangUpCall();
             presenter.sendSms(switchData->getText());
             return;
@@ -208,7 +208,7 @@ namespace gui
 
     void CallWindow::connectTimerOnExit()
     {
-        timerCallback = [this](Item &, sys::Timer &timer) {
+        timerCallback = [this]([[maybe_unused]] Item &item, [[maybe_unused]] sys::Timer &timer) {
             LOG_DEBUG("Delayed exit timer callback");
             presenter.handleDelayedViewClose();
             application->popCurrentWindow();

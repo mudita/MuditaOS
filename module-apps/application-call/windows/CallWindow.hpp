@@ -69,5 +69,4 @@ namespace gui
         gui::SpeakerIconState getSpeakerIconState() override;
         void setSpeakerIconState(const gui::SpeakerIconState &icon) override;
     };
-
 } /* namespace gui */
