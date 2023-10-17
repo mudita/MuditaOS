@@ -1,0 +1,12 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+if (is on BT Main) then (no)
+  :navigate to BT main;
+else (yes)
+endif
+
+if (is BT off) then (no)
+  :turn BT off;
+else (yes)
+endif
+@enduml

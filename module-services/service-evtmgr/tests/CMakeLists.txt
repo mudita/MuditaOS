@@ -1,0 +1,9 @@
+﻿add_catch2_executable(
+    NAME
+        service-evtmgr
+    SRCS
+        test-ScreenLightControlFunctions.cpp
+    LIBS
+        service-evtmgr
+        module-bsp
+)

@@ -1,0 +1,44 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "AutoLock Timer" as timer
+participant "PhoneLock Handler" as lock
+participant "PhoneMode Observer" as obs
+participant "Application Manger" as apm
+participant "Application" as app
+
+activate apm
+apm -> timer : (re)start
+deactivate apm
+activate timer
+
+...
+
+timer-> apm : onPhoneLock
+deactivate timer
+activate apm
+
+apm->lock : isLocked
+activate lock
+lock-->apm : response
+deactivate lock
+
+apm->obs : isTetheringOn
+activate obs
+    obs-->apm : response
+deactivate obs
+
+apm->app : preventsAutolock
+activate app
+    app-->apm : response
+deactivate app
+
+alt [ is locked ]
+    apm->timer : stop
+else [ tetheringIsOn || preventsAutolock]
+    apm -> timer : restart
+else
+    apm -> lock : request lock
+end
+
+@enduml

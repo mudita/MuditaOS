@@ -1,0 +1,24 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+title BluetoothMessages - Class Diagram
+
+class BluetoothMessage
+
+class RequestBluetoothStatus implements BluetoothMessage
+class RequestBondedDevices implements BluetoothMessage
+class RequestDeviceName implements BluetoothMessage
+
+class ResponseBluetoothStatus implements BluetoothMessage
+class ResponseBondedDevices implements BluetoothMessage
+class ResponseDeviceName implements BluetoothMessage
+class ResponseVisibleDevices implements BluetoothMessage
+
+class SetBluetoothStatus implements BluetoothMessage
+class SetBondedDevices implements BluetoothMessage
+class SetDeviceName implements BluetoothMessage
+class SetScanState implements BluetoothMessage
+
+
+
+@enduml

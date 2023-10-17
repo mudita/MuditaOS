@@ -1,0 +1,381 @@
+/*
+ * Copyright 2017 NXP
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *
+ * o Redistributions of source code must retain the above copyright notice, this list
+ *   of conditions and the following disclaimer.
+ *
+ * o Redistributions in binary form must reproduce the above copyright notice, this
+ *   list of conditions and the following disclaimer in the documentation and/or
+ *   other materials provided with the distribution.
+ *
+ * o Neither the name of the copyright holder nor the names of its
+ *   contributors may be used to endorse or promote products derived from this
+ *   software without specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+ * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
+ * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+ * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+ * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
+ * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+ * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ */
+
+void Clock_Init(void)
+{
+    unsigned int CCM_CCGR0;
+    unsigned int CCM_CCGR1;
+    unsigned int CCM_CCGR2;
+    unsigned int CCM_CCGR3;
+    unsigned int CCM_CCGR4;
+    unsigned int CCM_CCGR5;
+    unsigned int CCM_CCGR6;
+    unsigned int CCM_ANALOG_PLL_SYS;
+    unsigned int CCM_ANALOG_PFD_528;
+    unsigned int CCM_CBCDR;
+
+    CCM_CCGR0 = 0x400FC068;
+    CCM_CCGR1 = 0x400FC06C;
+    CCM_CCGR2 = 0x400FC070;
+    CCM_CCGR3 = 0x400FC074;
+    CCM_CCGR4 = 0x400FC078;
+    CCM_CCGR5 = 0x400FC07C;
+    CCM_CCGR6 = 0x400FC080;
+    CCM_ANALOG_PLL_SYS = 0x400D8030;
+    CCM_ANALOG_PFD_528 = 0x400D8100;
+    CCM_CBCDR = 0x400FC014;
+
+    /* Enable clocking for all peripherals */
+    MEM_WriteU32(CCM_CCGR0, 0xFFFFFFFF);
+    MEM_WriteU32(CCM_CCGR1, 0xFFFFFFFF);
+    MEM_WriteU32(CCM_CCGR2, 0xFFFFFFFF);
+    MEM_WriteU32(CCM_CCGR3, 0xFFFFFFFF);
+    MEM_WriteU32(CCM_CCGR4, 0xFFFFFFFF);
+    MEM_WriteU32(CCM_CCGR5, 0xFFFFFFFF);
+    MEM_WriteU32(CCM_CCGR6, 0xFFFFFFFF);
+
+    /* Configure PLL_SYS:
+     * 24MHz OSC as source;
+     * output enabled;
+     * Fout = Fref * 22
+     * Fout = 24MHz * 22 = 528MHz */
+    MEM_WriteU32(CCM_ANALOG_PLL_SYS, 0x00002001);
+
+    /* Configure PFD_528:
+     * set PFD2_FRAC = 29;
+     * Fout = 528MHz * 18/29 = 327.724MHz */
+    MEM_WriteU32(CCM_ANALOG_PFD_528, 0x001D0000);
+
+    /* Configure CCM Bus Clock Dividers:
+     * set SEMC alternative clock as SEMC clock root;
+     * set PLL2 PFD2 as alternative clock for SEMC root clock;
+     * set IPG_PODF divider to 2;
+     * set AHB_PODF divider to 4;
+     * set SEMC_PODF divider to 2;
+     * set peripheral main clock to pre_periph_clk_sel;
+     * set PERIPH_CLK2_PODF divider to 1 */
+    MEM_WriteU32(CCM_CBCDR, 0x00010D40);
+
+    JLINK_SYS_Report("Clocks initialized");
+}
+
+void SDRAM_WaitIpCmdDone(void)
+{
+    unsigned int SEMC_INTR;
+    unsigned int reg_val;
+
+    SEMC_INTR = 0x402F003C;
+
+    do
+    {
+        reg_val = MEM_ReadU32(SEMC_INTR);
+    } while ((reg_val & 0x00000003) == 0);
+
+    MEM_WriteU32(SEMC_INTR, 0x00000003); // Clear IPCMDERR and IPCMDDONE bits
+}
+
+void SDRAM_IO_Init(void)
+{
+    /* Configure SDRAM IOMUX */
+    MEM_WriteU32(0x401F8014, 0x00000000); // EMC_00
+    MEM_WriteU32(0x401F8018, 0x00000000); // EMC_01
+    MEM_WriteU32(0x401F801C, 0x00000000); // EMC_02
+    MEM_WriteU32(0x401F8020, 0x00000000); // EMC_03
+    MEM_WriteU32(0x401F8024, 0x00000000); // EMC_04
+    MEM_WriteU32(0x401F8028, 0x00000000); // EMC_05
+    MEM_WriteU32(0x401F802C, 0x00000000); // EMC_06
+    MEM_WriteU32(0x401F8030, 0x00000000); // EMC_07
+    MEM_WriteU32(0x401F8034, 0x00000000); // EMC_08
+    MEM_WriteU32(0x401F8038, 0x00000000); // EMC_09
+    MEM_WriteU32(0x401F803C, 0x00000000); // EMC_10
+    MEM_WriteU32(0x401F8040, 0x00000000); // EMC_11
+    MEM_WriteU32(0x401F8044, 0x00000000); // EMC_12
+    MEM_WriteU32(0x401F8048, 0x00000000); // EMC_13
+    MEM_WriteU32(0x401F804C, 0x00000000); // EMC_14
+    MEM_WriteU32(0x401F8050, 0x00000000); // EMC_15
+    MEM_WriteU32(0x401F8054, 0x00000000); // EMC_16
+    MEM_WriteU32(0x401F8058, 0x00000000); // EMC_17
+    MEM_WriteU32(0x401F805C, 0x00000000); // EMC_18
+    MEM_WriteU32(0x401F8060, 0x00000000); // EMC_19
+    MEM_WriteU32(0x401F8064, 0x00000000); // EMC_20
+    MEM_WriteU32(0x401F8068, 0x00000000); // EMC_21
+    MEM_WriteU32(0x401F806C, 0x00000000); // EMC_22
+    MEM_WriteU32(0x401F8070, 0x00000000); // EMC_23
+    MEM_WriteU32(0x401F8074, 0x00000000); // EMC_24
+    MEM_WriteU32(0x401F8078, 0x00000000); // EMC_25
+    MEM_WriteU32(0x401F807C, 0x00000000); // EMC_26
+    MEM_WriteU32(0x401F8080, 0x00000000); // EMC_27
+    MEM_WriteU32(0x401F8084, 0x00000000); // EMC_28
+    MEM_WriteU32(0x401F8088, 0x00000000); // EMC_29
+    MEM_WriteU32(0x401F808C, 0x00000000); // EMC_30
+    MEM_WriteU32(0x401F8090, 0x00000000); // EMC_31
+    MEM_WriteU32(0x401F8094, 0x00000000); // EMC_32
+    MEM_WriteU32(0x401F8098, 0x00000000); // EMC_33
+    MEM_WriteU32(0x401F809C, 0x00000000); // EMC_34
+    MEM_WriteU32(0x401F80A0, 0x00000000); // EMC_35
+    MEM_WriteU32(0x401F80A4, 0x00000000); // EMC_36
+    MEM_WriteU32(0x401F80A8, 0x00000000); // EMC_37
+    MEM_WriteU32(0x401F80AC, 0x00000000); // EMC_38
+    MEM_WriteU32(0x401F80B0, 0x00000010); // EMC_39
+
+    /* Configure SDRAM PAD. Drive strength = 0x7
+     * to increase drive strength, otherwise data7
+     * bit may fail. */
+    MEM_WriteU32(0x401F8204, 0x000110F9); // EMC_00
+    MEM_WriteU32(0x401F8208, 0x000110F9); // EMC_01
+    MEM_WriteU32(0x401F820C, 0x000110F9); // EMC_02
+    MEM_WriteU32(0x401F8210, 0x000110F9); // EMC_03
+    MEM_WriteU32(0x401F8214, 0x000110F9); // EMC_04
+    MEM_WriteU32(0x401F8218, 0x000110F9); // EMC_05
+    MEM_WriteU32(0x401F821C, 0x000110F9); // EMC_06
+    MEM_WriteU32(0x401F8220, 0x000110F9); // EMC_07
+    MEM_WriteU32(0x401F8224, 0x000110F9); // EMC_08
+    MEM_WriteU32(0x401F8228, 0x000110F9); // EMC_09
+    MEM_WriteU32(0x401F822C, 0x000110F9); // EMC_10
+    MEM_WriteU32(0x401F8230, 0x000110F9); // EMC_11
+    MEM_WriteU32(0x401F8234, 0x000110F9); // EMC_12
+    MEM_WriteU32(0x401F8238, 0x000110F9); // EMC_13
+    MEM_WriteU32(0x401F823C, 0x000110F9); // EMC_14
+    MEM_WriteU32(0x401F8240, 0x000110F9); // EMC_15
+    MEM_WriteU32(0x401F8244, 0x000110F9); // EMC_16
+    MEM_WriteU32(0x401F8248, 0x000110F9); // EMC_17
+    MEM_WriteU32(0x401F824C, 0x000110F9); // EMC_18
+    MEM_WriteU32(0x401F8250, 0x000110F9); // EMC_19
+    MEM_WriteU32(0x401F8254, 0x000110F9); // EMC_20
+    MEM_WriteU32(0x401F8258, 0x000110F9); // EMC_21
+    MEM_WriteU32(0x401F825C, 0x000110F9); // EMC_22
+    MEM_WriteU32(0x401F8260, 0x000110F9); // EMC_23
+    MEM_WriteU32(0x401F8264, 0x000110F9); // EMC_24
+    MEM_WriteU32(0x401F8268, 0x000110F9); // EMC_25
+    MEM_WriteU32(0x401F826C, 0x000110F9); // EMC_26
+    MEM_WriteU32(0x401F8270, 0x000110F9); // EMC_27
+    MEM_WriteU32(0x401F8274, 0x000110F9); // EMC_28
+    MEM_WriteU32(0x401F8278, 0x000110F9); // EMC_29
+    MEM_WriteU32(0x401F827C, 0x000110F9); // EMC_30
+    MEM_WriteU32(0x401F8280, 0x000110F9); // EMC_31
+    MEM_WriteU32(0x401F8284, 0x000110F9); // EMC_32
+    MEM_WriteU32(0x401F8288, 0x000110F9); // EMC_33
+    MEM_WriteU32(0x401F828C, 0x000110F9); // EMC_34
+    MEM_WriteU32(0x401F8290, 0x000110F9); // EMC_35
+    MEM_WriteU32(0x401F8294, 0x000110F9); // EMC_36
+    MEM_WriteU32(0x401F8298, 0x000110F9); // EMC_37
+    MEM_WriteU32(0x401F829C, 0x000110F9); // EMC_38
+    MEM_WriteU32(0x401F82A0, 0x000110F9); // EMC_39
+}
+
+void SDRAM_SEMC_Init(void)
+{
+    unsigned int SEMC_MCR;
+    unsigned int SEMC_BMCR0;
+    unsigned int SEMC_BMCR1;
+    unsigned int SEMC_BR0;
+    unsigned int SEMC_SDRAMCR0;
+    unsigned int SEMC_SDRAMCR1;
+    unsigned int SEMC_SDRAMCR2;
+    unsigned int SEMC_SDRAMCR3;
+    unsigned int SEMC_IPCR0;
+    unsigned int SEMC_IPCR1;
+    unsigned int SEMC_IPCR2;
+    unsigned int SEMC_IPCMD;
+    unsigned int SEMC_IPTXDAT;
+    unsigned int SEMC_IPCMDMAGICKEY;
+    unsigned int SEMC_IPCMDMODESET;
+    unsigned int SEMC_IPCMDAUTOREFRESH;
+    unsigned int SEMC_IPCMDPRECHARGEALL;
+    unsigned int sdram_address;
+    unsigned int reg_val;
+
+    SEMC_MCR = 0x402F0000;
+    SEMC_BMCR0 = 0x402F0008;
+    SEMC_BMCR1 = 0x402F000C;
+    SEMC_BR0 = 0x402F0010;
+    SEMC_SDRAMCR0 = 0x402F0040;
+    SEMC_SDRAMCR1 = 0x402F0044;
+    SEMC_SDRAMCR2 = 0x402F0048;
+    SEMC_SDRAMCR3 = 0x402F004C;
+    SEMC_IPCR0 = 0x402F0090;
+    SEMC_IPCR1 = 0x402F0094;
+    SEMC_IPCR2 = 0x402F0098;
+    SEMC_IPCMD = 0x402F009C;
+    SEMC_IPTXDAT = 0x402F00A0;
+
+    /* SDRAM address in MCU memory map */
+    sdram_address = 0x80000000;
+
+    /* IP commands codes and magic key */
+    SEMC_IPCMDMAGICKEY = 0xA55A0000;
+    SEMC_IPCMDMODESET = 0x0000000A;
+    SEMC_IPCMDAUTOREFRESH = 0x0000000C;
+    SEMC_IPCMDPRECHARGEALL = 0x0000000F;
+
+    /* Disable SEMC module */
+    reg_val = MEM_ReadU32(SEMC_MCR);
+    reg_val |= 0x00000002;
+    MEM_WriteU32(SEMC_MCR, reg_val);
+
+    /* Configure queues for AXI bus as suggested in https://community.nxp.com/t5/i-MX-RT/i-MXRT1060-SEMC-SDRAM-Data-Corruption/m-p/11696908:
+     * Queue A:
+     * WQOS = 1;
+     * WAGE = 8;
+     * WSH = 0;
+     * WRWS = 0 */
+    MEM_WriteU32(SEMC_BMCR0, 0x00000081);
+
+    /* Queue B:
+     * WQOS = 1;
+     * WAGE = 8;
+     * WPH = 0;
+     * WRWS = 0;
+     * WBR = 0 */
+    MEM_WriteU32(SEMC_BMCR1, 0x00000081);
+
+    /* Configure MCR:
+     * set bus timeout cycles to 0x10;
+     * set DQS mode to loopback from DQS pad for more accurate timings;
+     * enable SEMC module. */
+    MEM_WriteU32(SEMC_MCR, 0x10000004);
+
+    /* Configure BR0:
+     * set SDRAM address;
+     * set memory size to 16MB;
+     * mark config as valid. */
+    MEM_WriteU32(SEMC_BR0, (sdram_address | 0x00000019));
+
+    /* Configure SDRAMCR0:
+     * set port size to 16 bits;
+     * set burst length to 1 (see IMXRT1050CE document, ERR050577, p.36);
+     * set column address bit number to 9;
+     * set CAS latency to 3 cycles. */
+    MEM_WriteU32(SEMC_SDRAMCR0, 0x00000F01);
+
+    /* Configure SDRAMCR1-3: SDRAM timings. The values
+     * were obtained by feeding SEMC_ConfigureSDRAM() with
+     * proper data from Winbond W987D6HBGX6I datasheet. */
+    MEM_WriteU32(SEMC_SDRAMCR1, 0x00665222);
+    MEM_WriteU32(SEMC_SDRAMCR2, 0x000A0C12);
+    MEM_WriteU32(SEMC_SDRAMCR3, 0x10100A00);    // Disable SDRAM self-refresh
+
+    /* Prepare to send IP commands */
+    MEM_WriteU32(SEMC_IPCR0, sdram_address);    // Set SDRAM address
+    MEM_WriteU32(SEMC_IPCR1, 0x00000002);       // Set 2-byte data size
+    MEM_WriteU32(SEMC_IPCR2, 0x00000000);       // Unmask all IPTXDAT command bytes
+
+    /* Standard SDRAM init procedure - PRECHARGE followed by AUTO REFRESH twice */
+    MEM_WriteU32(SEMC_IPCMD, (SEMC_IPCMDMAGICKEY | SEMC_IPCMDPRECHARGEALL));
+    SDRAM_WaitIpCmdDone();
+    MEM_WriteU32(SEMC_IPCMD, (SEMC_IPCMDMAGICKEY | SEMC_IPCMDAUTOREFRESH));
+    SDRAM_WaitIpCmdDone();
+    MEM_WriteU32(SEMC_IPCMD, (SEMC_IPCMDMAGICKEY | SEMC_IPCMDAUTOREFRESH));
+    SDRAM_WaitIpCmdDone();
+
+    /* Set SDRAM mode:
+     * set CAS latency to 3 cycles;
+     * set burst length to 1. */
+    MEM_WriteU32(SEMC_IPTXDAT, 0x00000030);
+    MEM_WriteU32(SEMC_IPCMD, (SEMC_IPCMDMAGICKEY | SEMC_IPCMDMODESET));
+    SDRAM_WaitIpCmdDone();
+
+    /* Re-enable SDRAM self-refresh */
+    reg_val = MEM_ReadU32(SEMC_SDRAMCR3);
+    reg_val |= 0x00000001;
+    MEM_WriteU32(SEMC_SDRAMCR3, reg_val);
+}
+
+void SDRAM_Init(void)
+{
+    SDRAM_IO_Init();
+    SDRAM_SEMC_Init();
+    JLINK_SYS_Report("SDRAM initialized");
+}
+
+void INTRAM_Init(void)
+{
+    unsigned int IOMUXC_GPR_GPR14;
+    unsigned int IOMUXC_GPR_GPR16;
+    unsigned int IOMUXC_GPR_GPR17;
+    unsigned int reg_val;
+    
+    IOMUXC_GPR_GPR14 = 0x400AC038;
+    IOMUXC_GPR_GPR16 = 0x400AC040;
+    IOMUXC_GPR_GPR17 = 0x400AC044;
+    
+    /* 448 KBytes of DTCM */
+    MEM_WriteU32(IOMUXC_GPR_GPR17, 0x5AAAAAAA);
+
+    /* Turn off ITCM */
+    reg_val = MEM_ReadU32(IOMUXC_GPR_GPR16);
+    reg_val &= ~0x00000001;
+    MEM_WriteU32(IOMUXC_GPR_GPR16, reg_val);
+    
+    /* Configure DTCM/ITCM size */
+    reg_val = MEM_ReadU32(IOMUXC_GPR_GPR14);
+    reg_val &= ~0x00FF0000; // Mask ITCM/DTCM size bits
+    reg_val |= 0x00A00000;  // Set DTCM size to 512KBytes
+    MEM_WriteU32(IOMUXC_GPR_GPR14, reg_val);
+
+    JLINK_SYS_Report("INTRAM initialized");
+}
+
+void WDOG_Disable(void)
+{
+    unsigned int MUX_CTL_PAD_GPIO_B1_13;
+    MUX_CTL_PAD_GPIO_B1_13 = 0x401F81B0;
+
+    /* Change pin mux from WDOG_B to GPIO to prevent resetting */
+    MEM_WriteU32(MUX_CTL_PAD_GPIO_B1_13, 0x00000005);
+
+    JLINK_SYS_Report("Watchdog disabled");
+}
+
+void SNVS_SSM_Init(void)
+{
+    unsigned int SNVS_HPCOMR;
+    unsigned int SNVS_HPCOMR_SW_SV_MASK;
+    unsigned int reg_val;
+
+    SNVS_HPCOMR = 0x400D4004;
+    SNVS_HPCOMR_SW_SV_MASK = (1 << 8);
+
+    /* Force enter non-secure state by setting software security violation bit */
+    reg_val = MEM_ReadU32(SNVS_HPCOMR);
+    reg_val |= SNVS_HPCOMR_SW_SV_MASK;
+    MEM_WriteU32(SNVS_HPCOMR, reg_val);
+
+    JLINK_SYS_Report("SSM initialized");
+}
+
+/* SetupTarget */
+int AfterResetTarget(void)
+{
+    WDOG_Disable();
+    Clock_Init();
+    SDRAM_Init();
+    INTRAM_Init();
+    SNVS_SSM_Init();
+}

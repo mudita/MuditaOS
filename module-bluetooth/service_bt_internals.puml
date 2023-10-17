@@ -1,0 +1,14 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+package ServiceBluetooth {
+  object BluetoothSettings {
+  bluetoothState
+  bondedDevices
+  deviceVisibilty
+  deviceName
+}
+  class BluetoothWorker{}
+}
+
+@enduml

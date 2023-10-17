@@ -1,0 +1,21 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+participant "Application" as app
+box "Application Manager Service" #LightBlue
+participant "Controller" as appmgr_control
+participant "Application Manager" as appmgr
+participant "Applications Registry" as app_reg
+end box
+participant "SMS Application" as sms_app
+
+app -> appmgr_control: Send "SendSms" action
+appmgr_control -> appmgr: Forward "SendSms" action
+appmgr -> app_reg: Find applications registered\nas "SendSms" action handlers
+alt Application 1 is closeable
+    appmgr -> app: Close
+else
+    appmgr -> app: Focus lost
+end
+app -> appmgr: Confirm
+appmgr -> sms_app: Start
+@enduml

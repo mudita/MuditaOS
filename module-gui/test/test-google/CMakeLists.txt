@@ -1,0 +1,17 @@
+add_gtest_executable(
+        NAME
+                gui
+        SRCS
+                test-gui-listview.cpp
+                test-gui-boxlayout.cpp
+                test-gui-gridlayout.cpp
+                test-gui-depthfirst-itemtree.cpp
+                test-gui-visitor-call.cpp
+                test-gui-dom-dump.cpp
+                ../mock/TestListViewProvider.cpp
+        LIBS
+                module-utils
+                module-gui
+                sys-service
+        USE_FS
+)

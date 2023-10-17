@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="280px" preserveAspectRatio="none" style="width:451px;height:280px;background:#F0F0F0;" version="1.1" viewBox="0 0 451 280" width="451px" zoomAndPan="magnify"><defs><filter height="300%" id="f1kxs7oz6ubkcg" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><ellipse cx="123" cy="253" fill="#000000" filter="url(#f1kxs7oz6ubkcg)" rx="10" ry="10" style="stroke: none; stroke-width: 1.0;"/><rect fill="#FEFECE" filter="url(#f1kxs7oz6ubkcg)" height="33.9688" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="95" x="220.5" y="236"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="75" x="230.5" y="257.1387">Limit 500mA</text><rect fill="#FEFECE" filter="url(#f1kxs7oz6ubkcg)" height="33.9688" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="100" x="6" y="8"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="80" x="16" y="29.1387">USB plugged</text><rect fill="#FEFECE" filter="url(#f1kxs7oz6ubkcg)" height="33.9688" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="151" x="126.5" y="8"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="131" x="136.5" y="29.1387">USB type recognition</text><polygon fill="#FEFECE" filter="url(#f1kxs7oz6ubkcg)" points="202,83,214,95,202,107,190,95,202,83" style="stroke: #A80036; stroke-width: 1.5;"/><rect fill="#FEFECE" filter="url(#f1kxs7oz6ubkcg)" height="33.9688" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="103" x="200.5" y="161"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="83" x="210.5" y="182.1387">Limit 1000mA</text><rect fill="#FEFECE" filter="url(#f1kxs7oz6ubkcg)" height="33.9688" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="116" x="324" y="161"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="96" x="334" y="182.1387">USB unplugged</text><!--MD5=[4efa0ceb8d869b0f02c9d84720c80e93]
+link start to Limit 500mA--><path d="M133.43,253 C150.43,253 185.24,253 215.2,253 " fill="none" id="start-&gt;Limit 500mA" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="220.34,253,211.34,249,215.34,253,211.34,257,220.34,253" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="66" x="143.75" y="247.2104">initialization</text><!--MD5=[04d55dba39d9a0eb7d067c791539fcd8]
+link USB plugged to USB type recognition--><path d="M106.19,25 C111.24,25 116.29,25 121.35,25 " fill="none" id="USB plugged-&gt;USB type recognition" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="126.4,25,117.4,21,121.4,25,117.4,29,126.4,25" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[36317cad5e94ba9bb427f52905fd2925]
+link USB type recognition to #8--><path d="M202,42.12 C202,52.92 202,67.08 202,77.88 " fill="none" id="USB type recognition-&gt;#8" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="202,82.89,206,73.89,202,77.89,198,73.89,202,82.89" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="104" x="78.175" y="74.3494">Detected USB type</text><!--MD5=[8b72c5e5407284ef9afe374b980984ef]
+link #8 to Limit 500mA--><path d="M196.54,101.67 C182.16,117.32 145.62,162.12 165,195 C176.15,213.91 196.07,226.98 215.44,235.79 " fill="none" id="#8-&gt;Limit 500mA" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="220.35,237.94,213.6995,230.6756,215.7669,235.9412,210.5014,238.0085,220.35,237.94" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="23" x="166" y="182.2104">SDP</text><!--MD5=[89706890e51c0f4911fc05b88ff306cf]
+link #8 to Limit 1000mA--><path d="M199.74,104.84 C197.8,114.34 196.16,129.6 202,141 C205.33,147.5 210.44,153.09 216.14,157.8 " fill="none" id="#8-&gt;Limit 1000mA" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="220.16,160.91,215.4833,152.2423,216.2033,157.8532,210.5924,158.5731,220.16,160.91" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="23" x="203" y="138.2104">CDP</text><!--MD5=[89706890e51c0f4911fc05b88ff306cf]
+link #8 to Limit 1000mA--><path d="M207.66,101.82 C213.28,107.81 221.91,117.55 228,127 C233.87,136.1 239.21,146.84 243.35,156.04 " fill="none" id="#8-&gt;Limit 1000mA-1" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="245.41,160.69,245.4415,150.8412,243.3939,156.1145,238.1206,154.0669,245.41,160.69" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="23" x="237" y="138.2104">DCP</text><!--MD5=[96c530ca5284f63feb7182093e557ed9]
+link USB unplugged to Limit 500mA--><path d="M356.98,195.02 C339.58,206.16 316.3,221.07 297.92,232.84 " fill="none" id="USB unplugged-&gt;Limit 500mA" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="293.35,235.76,303.0859,234.2729,297.5601,233.0627,298.7703,227.5368,293.35,235.76" style="stroke: #A80036; stroke-width: 1.0;"/><!--MD5=[5c5963d0db5bf50aa6995cb08d96bc1f]
+@startuml
+skinparam BackgroundColor F0F0F0
+(*) -> [initialization] "Limit 500mA"
+
+"USB plugged" -> "USB type recognition"
+If "Detected USB type" then
+    - - -> [SDP] "Limit 500mA"
+    else
+    -> [CDP] "Limit 1000mA"
+    else
+    - -> [DCP] "Limit 1000mA"
+Endif
+
+"USB unplugged" - -> "Limit 500mA"
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 05:22:07 EST 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.12+7-post-Debian-2
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

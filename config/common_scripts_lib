@@ -1,0 +1,27 @@
+#!/bin/bash
+
+RED='\e[38;2;255;13;0m'
+YELLOW="\e[38;2;255;232;0m"
+GREEN="\e[38;2;0;222;27m"
+ORANGE="\e[38;2;255;100;0m"
+
+OK="${GREEN}OK!\e[0m"
+ERROR="${RED}Error!\e[0m"
+FIXED="${YELLOW}Fixed!\e[0m"
+
+function printVar(){
+    echo "$1: '${!1}'"
+}
+
+function getArmCC() {
+    #download file to current directory
+    wget --no-verbose --show-progress -O ${ARM_GCC_PKG} ${ARM_GCC_SOURCE_LINK}
+}
+
+function getCMake() {
+    wget --no-verbose --show-progress -O ${CMAKE_PKG} ${CMAKE_SOURCE_LINK}
+}
+
+function getCodeQL() {
+    wget --no-verbose --show-progress -O ${CODEQL_PKG} ${CODEQL_SOURCE_LINK}
+}

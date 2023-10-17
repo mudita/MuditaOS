@@ -1,0 +1,13 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+abstract class BaseChannel
+
+BaseChannel <|-- Channel
+
+Channel ..> ATStream: Channel use ATStream
+
+Channel <|-- DLCChannel
+Channel <|-- ATParser
+
+@enduml

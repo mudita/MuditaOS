@@ -1,0 +1,26 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Service Cellular" as srvclr
+participant "Application Manager" as appmgr
+participant "ApplicaionDesktop" as appdsktp
+    == PIN flow overview ==
+
+[o->srvclr : event occurred
+activate srvclr
+srvclr -> appmgr : ActionMessage via sys::bus message
+    activate appmgr
+deactivate srvclr
+    appmgr -> appmgr : translate request to action
+    appmgr -> appdsktp : forward action
+        activate appdsktp
+    deactivate appmgr
+        appdsktp -> appdsktp : handle(Action)
+        alt
+srvclr <- appdsktp : Message via sys::bus message
+activate srvclr
+        deactivate appdsktp
+srvclr -> srvclr : handle(Message)
+deactivate srvclr
+        end
+@enduml

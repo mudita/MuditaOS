@@ -1,0 +1,19 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+participant "Application" as app
+participant "Application Manager" as appmgr
+participant "Previous Application" as prev
+
+app -> appmgr: SwitchBack
+
+alt Application is closeable
+    appmgr -> app: Close
+else
+    appmgr -> app: Focus lost
+end
+
+app -> appmgr: Confirm
+
+appmgr -> prev: Start
+
+@enduml

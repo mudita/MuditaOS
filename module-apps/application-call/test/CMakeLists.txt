@@ -1,0 +1,14 @@
+add_catch2_executable(
+        NAME
+        call-presenter
+        SRCS
+        unittest_call_presenter.cpp
+        LIBS
+        application-call
+        i18n
+        log
+        utils-time
+        module-utils
+        app
+        apps-common
+)

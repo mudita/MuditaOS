@@ -1,0 +1,15 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+(*) -> [initialization] "Limit 500mA"
+
+"USB plugged" -> "USB type recognition"
+If "Detected USB type" then
+    ---> [SDP] "Limit 500mA"
+    else
+    -> [CDP] "Limit 1000mA"
+    else
+    --> [DCP] "Limit 1000mA"
+Endif
+
+"USB unplugged" --> "Limit 500mA"
+@enduml

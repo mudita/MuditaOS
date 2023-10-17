@@ -1,0 +1,109 @@
+Checks: '-*,boost-*,bugprone-assert-side-effect,bugprone-bool-pointer-implicit-conversion,bugprone-copy-constructor-init,bugprone-dangling-handle,bugprone-exception-escape,bugprone-fold-init-type,bugprone-forward-declaration-namespace,bugprone-forwarding-reference-overload,bugprone-inaccurate-erase,bugprone-incorrect-roundings,bugprone-integer-division,bugprone-lambda-function-name,bugprone-macro-*,bugprone-misplaced-*,bugprone-move-forwarding-reference,bugprone-multiple-statement-macro,bugprone-parent-virtual-call,bugprone-sizeof-*,bugprone-string-*,bugprone-suspicious-*,bugprone-swapped-arguments,bugprone-terminating-continue,bugprone-throw-keyword-missing,bugprone-undefined-memory-manipulation,bugprone-undelegated-constructor,bugprone-unused-*,bugprone-use-after-move,bugprone-virtual-near-miss,cppcoreguidelines-avoid-goto,cppcoreguidelines-interfaces-global-init,cppcoreguidelines-narrowing-conversions,cppcoreguidelines-no-malloc,cppcoreguidelines-pro-bounds-constant-array-index,cppcoreguidelines-pro-bounds-pointer-arithmetic,cppcoreguidelines-pro-type-*,cppcoreguidelines-slicing,cppcoreguidelines-special-member-functions,google-build-*,google-default-arguments,google-explicit-constructor,google-global-names-in-headers,google-readability-casting,google-runtime-operator,hicpp-exception-baseclass,misc-*,performance-faster-string-find,performance-for-range-copy,performance-implicit-conversion-in-loop,performance-inefficient-*,performance-move-*,performance-noexcept-move-constructor,performance-type-promotion-in-math-fn,performance-unnecessary-*,readability-avoid-const-params-in-decls,readability-braces-around-statements,readability-container-size-empty,readability-delete-null-pointer,readability-deleted-default,readability-identifier-naming,readability-implicit-bool-conversion,readability-inconsistent-declaration-parameter-name,readability-misleading-indentation,readability-misplaced-array-index,readability-named-parameter,readability-non-const-parameter,readability-redundant-*,readability-simplify-*,readability-static-*,readability-string-compare,readability-uniqueptr-delete-release'
+WarningsAsErrors: ''
+HeaderFilterRegex: ''
+AnalyzeTemporaryDtors: false
+FormatStyle:     none
+CheckOptions:   
+  - key:             bugprone-assert-side-effect.AssertMacros
+    value:           'assert,Expects,Ensures'
+  - key:             bugprone-assert-side-effect.CheckFunctionCalls
+    value:           '0'
+  - key:             bugprone-dangling-handle.HandleClasses
+    value:           'std::basic_string_view;std::experimental::basic_string_view'
+  - key:             bugprone-exception-escape.FunctionsThatShouldNotThrow
+    value:           ''
+  - key:             bugprone-exception-escape.IgnoredExceptions
+    value:           ''
+  - key:             bugprone-misplaced-widening-cast.CheckImplicitCasts
+    value:           '0'
+  - key:             bugprone-sizeof-expression.WarnOnSizeOfCompareToConstant
+    value:           '1'
+  - key:             bugprone-sizeof-expression.WarnOnSizeOfConstant
+    value:           '1'
+  - key:             bugprone-sizeof-expression.WarnOnSizeOfIntegerExpression
+    value:           '0'
+  - key:             bugprone-sizeof-expression.WarnOnSizeOfThis
+    value:           '1'
+  - key:             bugprone-string-constructor.LargeLengthThreshold
+    value:           '8388608'
+  - key:             bugprone-string-constructor.WarnOnLargeLength
+    value:           '1'
+  - key:             bugprone-suspicious-enum-usage.StrictMode
+    value:           '0'
+  - key:             bugprone-suspicious-missing-comma.MaxConcatenatedTokens
+    value:           '5'
+  - key:             bugprone-suspicious-missing-comma.RatioThreshold
+    value:           '0.200000'
+  - key:             bugprone-suspicious-missing-comma.SizeThreshold
+    value:           '5'
+  - key:             bugprone-suspicious-string-compare.StringCompareLikeFunctions
+    value:           ''
+  - key:             bugprone-suspicious-string-compare.WarnOnImplicitComparison
+    value:           '1'
+  - key:             bugprone-suspicious-string-compare.WarnOnLogicalNotComparison
+    value:           '0'
+  - key:             bugprone-unused-return-value.CheckedFunctions
+    value:           '::std::async;::std::launder;::std::remove;::std::remove_if;::std::unique;::std::unique_ptr::release;::std::basic_string::empty;::std::vector::empty'
+  - key:             cppcoreguidelines-no-malloc.Allocations
+    value:           '::malloc;::calloc'
+  - key:             cppcoreguidelines-no-malloc.Deallocations
+    value:           '::free'
+  - key:             cppcoreguidelines-no-malloc.Reallocations
+    value:           '::realloc'
+  - key:             cppcoreguidelines-pro-bounds-constant-array-index.GslHeader
+    value:           ''
+  - key:             cppcoreguidelines-pro-type-member-init.IgnoreArrays
+    value:           '0'
+  - key:             cppcoreguidelines-special-member-functions.AllowMissingMoveFunctions
+    value:           '0'
+  - key:             cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor
+    value:           '1'
+  - key:             google-build-namespaces.HeaderFileExtensions
+    value:           ',h,hpp'
+  - key:             google-global-names-in-headers.HeaderFileExtensions
+    value:           ',h,hpp'
+  - key:             misc-definitions-in-headers.HeaderFileExtensions
+    value:           ',h,hpp'
+  - key:             misc-definitions-in-headers.UseHeaderFileExtension
+    value:           '1'
+  - key:             misc-throw-by-value-catch-by-reference.CheckThrowTemporaries
+    value:           '1'
+  - key:             misc-unused-parameters.StrictMode
+    value:           '0'
+  - key:             performance-faster-string-find.StringLikeClasses
+    value:           'std::basic_string'
+  - key:             performance-for-range-copy.WarnOnAllAutoCopies
+    value:           '0'
+  - key:             performance-inefficient-string-concatenation.StrictMode
+    value:           '0'
+  - key:             performance-inefficient-vector-operation.VectorLikeClasses
+    value:           '::std::vector'
+  - key:             performance-move-const-arg.CheckTriviallyCopyableMove
+    value:           '1'
+  - key:             performance-move-constructor-init.IncludeStyle
+    value:           llvm
+  - key:             performance-type-promotion-in-math-fn.IncludeStyle
+    value:           llvm
+  - key:             performance-unnecessary-value-param.IncludeStyle
+    value:           llvm
+  - key:             readability-braces-around-statements.ShortStatementLines
+    value:           '0'
+  - key:             readability-identifier-naming.IgnoreFailedSplit
+    value:           '0'
+  - key:             readability-implicit-bool-conversion.AllowIntegerConditions
+    value:           '0'
+  - key:             readability-implicit-bool-conversion.AllowPointerConditions
+    value:           '0'
+  - key:             readability-inconsistent-declaration-parameter-name.IgnoreMacros
+    value:           '1'
+  - key:             readability-inconsistent-declaration-parameter-name.Strict
+    value:           '0'
+  - key:             readability-simplify-boolean-expr.ChainedConditionalAssignment
+    value:           '0'
+  - key:             readability-simplify-boolean-expr.ChainedConditionalReturn
+    value:           '0'
+  - key:             readability-simplify-subscript-expr.Types
+    value:           '::std::basic_string;::std::basic_string_view;::std::vector;::std::array'
+  - key:             readability-static-accessed-through-instance.NameSpecifierNestingThreshold
+    value:           '3'
+...

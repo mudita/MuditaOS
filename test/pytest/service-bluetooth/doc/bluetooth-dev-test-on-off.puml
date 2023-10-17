@@ -1,0 +1,30 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+start
+partition Initialization {
+    :enforce pretest machine conditions:
+    ** bluetooth turned off;
+}
+
+partition test-run {
+
+    : set state:
+     -power on;
+    : get device state;
+
+    if (power is on )
+        : set state:
+        -power off;
+    else (no=failure)
+        stop
+    endif
+
+    : get device state;
+    if (power is off ) then (success)
+        stop
+    else (no=failure)
+        stop
+    endif
+}
+@enduml

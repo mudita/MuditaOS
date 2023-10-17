@@ -1,0 +1,9 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+participant "Service GUI" as gui
+participant "Context Pool" as pool
+
+gui -> gui: Cache frame
+gui -> pool: Return context
+
+@enduml

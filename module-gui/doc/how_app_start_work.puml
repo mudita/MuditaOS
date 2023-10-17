@@ -1,0 +1,30 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+== ApplicationManager aplication start ==
+
+APM -> Application: Message start
+APM <- Application: Application started confirmation
+APM -> Application: Init
+APM <- Application: Initialized
+APM -> Application: You have focus
+APM -> EVM: Application NAME has focus
+... ~~ Lots of action ~~ ...
+
+
+== ApplicationManager aplication start ==
+
+Application <- APM: EOL request
+
+hnote over APM
+    Get previous application or ignore
+endhnote
+
+== Service manager - power off ==
+
+loop each application
+SVM -> Application: EOL request
+SVM <-- Application: OK
+end
+
+@enduml

@@ -1,0 +1,46 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+actor User
+participant "Application Settings" as appstgs
+participant "Bluetooth Window" as btwndw
+participant "Service Bluetooth" as srvbt
+participant "Bluetooth Worker" as btwrkr
+participant "Service DB" as srvdb
+
+    == Change Bluetooth status flow ==
+
+User ->appstgs : Tries to open Bluetooth Window
+activate appstgs
+appstgs -> btwndw : Create Bluetooth Window
+    activate btwndw
+    deactivate appstgs
+btwndw -> srvbt : BluetoothMessage::RequestBluetoothStatus
+    activate srvbt
+    deactivate btwndw
+srvbt -> appstgs : BluetoothMessage::ResponseBluetoothStatus
+activate appstgs
+deactivate srvbt
+appstgs ->o btwndw : Recreate Bluetooth Window with new bluetoothStatus
+deactivate appstgs
+
+User -> btwndw : Changes bluetoothState
+activate btwndw
+btwndw -> srvbt : BluetoothMessage::SetBluetoothStatus
+deactivate btwndw
+activate srvbt
+srvbt -> srvbt : Cache received new value of bluetoothStatus
+srvbt ->o srvdb : Settings::setValue(bluetoothState)
+srvbt ->o srvdb : Settings::setValue(deviceVisibility)
+srvbt -> btwrkr : Pass cached Bluetooth settings
+activate btwrkr
+btwrkr ->o btwrkr : Reload Bluetooth settings
+deactivate btwrkr
+srvbt -> appstgs : BluetoothMessage::ResponseBluetoothStatus
+activate appstgs
+deactivate srvbt
+appstgs ->o btwndw : Recreate Bluetooth Window with new bluetoothStatus
+deactivate appstgs
+deactivate btwndw
+
+@enduml

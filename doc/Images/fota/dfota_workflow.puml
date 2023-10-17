@@ -1,0 +1,27 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+start
+:User checks firmware version;
+:Read current version;
+note right
+    Read from modem with AT+QGMR
+end note
+:Download versions file from server;
+note right
+    Simple file format:
+    <current versions>:<new version>:<delta file>
+end note
+:parse file;
+note right
+    based on current version, get <delta file>
+end note
+if (user allows update) then (yes)
+    :Download & install new firmware;
+    note right
+        use command
+        AT+QFOTADL=<httpURL>
+    end note
+endif
+:reboot device;
+stop
+@enduml

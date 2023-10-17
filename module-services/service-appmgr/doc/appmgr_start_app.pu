@@ -1,0 +1,14 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+participant "Application Manager" as appmgr
+participant "Application" as app
+
+alt Application running in background
+    appmgr -> app: Switch
+else
+    appmgr -> app: Run
+    app -> appmgr: Registers
+    appmgr -> app: Switch
+end
+
+@enduml

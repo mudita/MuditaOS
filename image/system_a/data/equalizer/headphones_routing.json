@@ -1,0 +1,46 @@
+{
+  "samplerate": 16000,
+  "bitWidth": 16,
+  "flags": 5,
+  "outputVolume": 10,
+  "inputGain": 5,
+  "inputPath": 0,
+  "outputPath": 0,
+  "filterParams": [
+    {
+      "filterType": "None",
+      "frequency": 997,
+      "samplerate": 44100,
+      "Q": 0.701,
+      "gain": 0
+    },
+    {
+      "filterType": "None",
+      "frequency": 4993.7,
+      "samplerate": 44100,
+      "Q": 0.701,
+      "gain": 0
+    },
+    {
+      "filterType": "None",
+      "frequency": 13984.7,
+      "samplerate": 44100,
+      "Q": 0.701,
+      "gain": -10
+    },
+    {
+      "filterType": "None",
+      "frequency": 200.4,
+      "samplerate": 44100,
+      "Q": 0.701,
+      "gain": -10
+    },
+    {
+      "filterType": "None",
+      "frequency": 1496.7,
+      "samplerate": 44100,
+      "Q": 0.701,
+      "gain": -4
+    }
+  ]
+}

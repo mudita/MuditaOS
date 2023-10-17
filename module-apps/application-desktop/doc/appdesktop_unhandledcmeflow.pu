@@ -1,0 +1,38 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Service Cellular" as srvclr
+participant "Application Manager" as appmgr
+participant "ApplicaionDesktop" as appdsktp
+participant "PinLockWindow" as pinwin
+actor User
+
+    == Unhandled CME Error flow ==
+
+[o->srvclr : CME error occured
+activate srvclr
+srvclr -> srvclr : handle(Error) -> unable to handle
+srvclr -> appmgr : ActionMessage{UnhandledCMEError, {cmeCode}} via sys::bus message
+    activate appmgr
+deactivate srvclr
+    appmgr -> appmgr : translate request to action
+    appmgr -> appdsktp : forward action
+        activate appdsktp
+    deactivate appmgr
+        appdsktp -> appdsktp : handle(UnhandledCMEAction)
+
+        appdsktp -> pinwin ** : switchWindow(UnhandledCMEError, cmeCode)
+            activate pinwin
+        deactivate appdsktp
+            pinwin -> pinwin : setVisibleCMEError
+            pinwin <- User : Confirm
+        appdsktp <- pinwin : return
+        activate appdsktp
+            deactivate pinwin
+
+note over srvclr, appdsktp #FFAAAA
+    from this point, further flow depends on specific context
+    in which CME occurred
+end note
+
+@enduml

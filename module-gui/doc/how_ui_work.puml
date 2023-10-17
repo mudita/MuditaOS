@@ -1,0 +1,18 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+Application -> Application : Prepare DOM for render
+Application -> ServiceGUI : Process DOM to render
+
+hnote over ServiceGUI
+    Draws DOM on canvas
+endhnote
+
+ServiceGUI -> ServiceEink: Process DOM render
+ServiceGUI <- ServiceEink: Request done (blocking)
+
+hnote over ServiceEink
+    Sends data to display
+endhnote
+
+@enduml

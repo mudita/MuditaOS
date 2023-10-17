@@ -1,0 +1,10 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+object CellularResultStruct {
+  CellularResultCode resultCode
+  vector<uint8_t> data
+
+  +std::shared_ptr<uint8_t> serialize()
+  +void deserialize(serialized, size)
+}
+@enduml

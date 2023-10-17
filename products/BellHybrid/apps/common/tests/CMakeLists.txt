@@ -1,0 +1,12 @@
+add_gtest_executable(
+    NAME
+        bell-apps-common-tests
+    SRCS
+        test-LanguageUtils.cpp
+    LIBS
+        bell::app-common
+        module-sys
+    INCLUDE
+        $<TARGET_PROPERTY:bell::app-common,INCLUDE_DIRECTORIES>
+    USE_FS
+)

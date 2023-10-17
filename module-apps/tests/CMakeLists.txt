@@ -1,0 +1,33 @@
+add_catch2_executable(
+    NAME
+        apps-common
+    SRCS
+        test-CallbackStorage.cpp
+        test-PhoneModesPolicies.cpp
+        tests-BluetoothSettingsModel.cpp
+        test-Model.cpp
+    LIBS
+        module-apps
+)
+
+add_catch2_executable(
+    NAME
+        windows-management
+    SRCS
+        windows/test-WindowsStack.cpp
+        windows/test-WindowsPopupQueue.cpp
+        windows/test-WindowsPopupFilter.cpp
+    LIBS
+        module-gui
+)
+
+add_gtest_executable(
+    NAME
+        apps-common-widgets
+    SRCS
+        widgets/test-DigitsContainer.cpp
+    LIBS
+       apps-common
+       gui-mock
+    USE_FS
+)

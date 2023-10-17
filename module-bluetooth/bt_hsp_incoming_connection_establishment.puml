@@ -1,0 +1,16 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Bluetooth Headset" as HS
+participant "Pure Phone" as AG
+
+    activate HS
+    activate AG
+    AG -> HS : Connection establishment
+    AG -> HS : Ring
+    ...
+     -> HS : User initiated action
+    HS -> AG : AT+CKPD=200
+    AG -> HS : OK
+    AG -> HS : SCO link establishment    
+@enduml

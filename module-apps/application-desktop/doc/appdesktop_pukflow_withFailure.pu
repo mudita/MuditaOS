@@ -1,0 +1,139 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Service Cellular" as srvclr
+participant "Application Manager" as appmgr
+participant "ApplicaionDesktop" as appdsktp
+participant "PinLockWindow" as pinwin
+actor User
+
+    == PUK required flow ==
+
+[o->srvclr : need PUK1
+activate srvclr
+srvclr -> appmgr : ActionMessage{RequestPuk1, {SIM1, attempts}} via sys::bus message
+    activate appmgr
+deactivate srvclr
+    appmgr -> appmgr : translate request to action
+    appmgr -> appdsktp : forward action
+        activate appdsktp
+    deactivate appmgr
+        appdsktp -> appdsktp : handle(RequestPukAction)
+note over of srvclr
+    Cellular side data:
+    State: PUK required
+    SIM: SIM1
+    phone: +48500500500
+    attempts: 8
+end note
+/ note left of pinwin
+    Desktop side data:
+    State: PUK required
+    SIM: SIM1
+    attempts: 8
+end note
+/ note left of appdsktp
+    Desktop side state:
+    Screen Unlocked
+end note
+
+        appdsktp -> pinwin : switchWindow(SIM1, reqPUK, attempts)
+            activate pinwin
+        deactivate appdsktp
+            pinwin -> pinwin : rebuild
+            pinwin -> pinwin : setVisiblePukRequired
+            pinwin <- User : Enters PUK (invalid)
+            pinwin <- User : Confirm
+            loop valid new PIN provided
+                pinwin -> pinwin : setVisibleNewPinRequired
+                pinwin <- User : Enters PIN
+                pinwin -> pinwin : setVisibleConfirmPIN
+                pinwin <- User : Enters PIN
+            end
+        appdsktp <- pinwin : handlePasscode(pukValue, newPin)
+        activate appdsktp
+            deactivate pinwin
+
+srvclr <- appdsktp : PukData(pukValue, newPin) via sys::bus message
+activate srvclr
+        deactivate appdsktp
+srvclr -> srvclr : verification failed
+srvclr -> srvclr : attempts --
+deactivate srvclr
+
+    == PUK invalid: Retry with 7 attempts left ==
+
+[o->srvclr : need PUK1
+activate srvclr
+srvclr -> appmgr : ActionMessage{RequestPuk1, {SIM1, attempts}} via sys::bus message
+    activate appmgr
+deactivate srvclr
+    appmgr -> appmgr : translate request to action
+    appmgr -> appdsktp : forward action
+        activate appdsktp
+    deactivate appmgr
+        appdsktp -> appdsktp : handle(RequestPukAction)
+note over of srvclr
+    Cellular side data:
+    State: PUK required
+    SIM: SIM1
+    phone: +48500500500
+    attempts: 7
+end note
+/ note left of pinwin
+    Desktop side data:
+    State: PUK invalid
+    SIM: SIM1
+    attempts: 7
+end note
+/ note left of appdsktp
+    Desktop side state:
+    Screen Unlocked
+end note
+
+        appdsktp -> pinwin : switchWindow(SIM1, invalidPUK, attempts)
+            activate pinwin
+        deactivate appdsktp
+            pinwin -> pinwin : rebuild
+            pinwin -> pinwin : setVisibleInvalidPuk
+            pinwin <- User : Confirm
+            pinwin -> pinwin : setVisiblePukRequired
+            pinwin <- User : Enters PUK (invalid)
+            pinwin <- User : Confirm
+            loop valid new PIN provided
+                pinwin -> pinwin : setVisibleNewPinRequired
+                pinwin <- User : Enters PIN
+                pinwin -> pinwin : setVisibleConfirmPIN
+                pinwin <- User : Enters PIN
+            end
+        appdsktp <- pinwin : handlePasscode(pukValue, newPin)
+        activate appdsktp
+            deactivate pinwin
+
+srvclr <- appdsktp : PukData(pukValue, newPin) via sys::bus message
+activate srvclr
+        deactivate appdsktp
+srvclr -> srvclr : verification failed
+srvclr -> srvclr : attempts --
+deactivate srvclr
+    == PUK invalid: Retry with 6 attempts left ==
+    ... multiple failures ...
+
+    == SIM blocked : Retry with 0 attempts left ==
+
+[o->srvclr : SIM1 unlocked
+activate srvclr
+srvclr -> appmgr : ActionMessage{SimBlocked, {SIM1}} via sys::bus message
+    activate appmgr
+deactivate srvclr
+    appmgr -> appmgr : translate request to action
+    appmgr -> appdsktp : forward action
+        activate appdsktp
+    deactivate appmgr
+        appdsktp -> appdsktp : handle(SimUnlockedAction)
+        appdsktp -> pinwin : switchWindow( Blocked, SIM1 )
+            activate pinwin
+        deactivate appdsktp
+            pinwin -> pinwin : setVisibleBlocked
+
+@enduml

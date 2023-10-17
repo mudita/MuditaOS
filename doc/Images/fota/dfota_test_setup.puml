@@ -1,0 +1,11 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+node PurePhone
+node "Development board" as Db
+node JLink
+node PC
+
+Device <-> Db 
+Db <-> JLink 
+JLink <-> PC
+@enduml

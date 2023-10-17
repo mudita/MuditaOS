@@ -1,0 +1,16 @@
+# Commit subject: [JIRA-TICKET] Changes summary, don't end with a period
+# No more than 72 chars. ########################### 72 chars is here: #
+
+# Commit message: Explain *what* and *why* (not *how*).
+# Wrap at 72 chars. ################################### which is here: #
+
+# How to Write a Git Commit Message:
+# https://chris.beams.io/posts/git-commit/
+#
+# 1. Separate subject from message with a blank line
+# 2. Limit the subject line to 72 characters
+# 3. Capitalize the subject line
+# 4. Do not end the subject line with a period
+# 5. Use the imperative mood in the subject line
+# 6. Wrap the commit message body at 72 characters
+# 7. Use the commit message to explain what and why vs. how

@@ -1,0 +1,9 @@
+﻿add_catch2_executable(
+    NAME
+        module-bsp
+    SRCS
+        test-battery-charger-utils.cpp
+    LIBS
+        module-sys
+        module-bsp
+)

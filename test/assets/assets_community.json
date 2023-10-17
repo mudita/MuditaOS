@@ -1,0 +1,99 @@
+{
+    "assets": [
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/fontmap.json",
+            "output": "assets/fonts/fontmap.json"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_regular_140.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_regular_140.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_regular_90.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_regular_90.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_light_90.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_light_90.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_light_46.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_light_46.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_regular_46.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_regular_46.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_light_38.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_light_38.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_regular_38.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_regular_38.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_bold_32.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_bold_32.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_bold_30.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_bold_30.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_regular_30.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_regular_30.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_light_30.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_light_30.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_bold_27.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_bold_27.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_regular_27.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_regular_27.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_light_27.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_light_27.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_bold_24.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_bold_24.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_regular_24.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_regular_24.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_bold_20.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_bold_20.mpf"
+        },
+        {
+            "name": "release.tgz",
+            "tarfile": "image/assets/fonts/dejavu_sans/dejavu_sans_regular_20.mpf",
+            "output": "assets/fonts/dejavu_sans/dejavu_sans_regular_20.mpf"
+        }
+    ]
+}

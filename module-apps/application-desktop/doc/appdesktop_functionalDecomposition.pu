@@ -1,0 +1,20 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+[Service Cellular] as srvclr
+[Application Manager] as apmmgr
+[Application Desktop] as appdsktp
+
+interface "APMActions" as intrfcAPM1
+interface "AppDesktopActionHandler" as intrfcDsktp1
+interface "SrvCellularMessageHandler" as intrfcClr1
+
+intrfcAPM1 -l- apmmgr
+intrfcDsktp1 -u- appdsktp
+intrfcClr1 -r- srvclr
+
+intrfcClr1 <. appdsktp : use
+apmmgr .> intrfcDsktp1 : use
+srvclr .> intrfcAPM1 : use
+
+@enduml

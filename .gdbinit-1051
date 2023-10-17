@@ -1,0 +1,21 @@
+source .gdb_macros
+
+set pagination off
+set python print-stack full
+target remote localhost:2331
+source tools/gdb_crash_extend.py
+source tools/misc/puregdb/puregdb.py
+monitor reset 0
+monitor halt
+monitor memU32 0x401BC000 = 128;
+load
+eval "monitor exec SetRTTAddr %p", &_SEGGER_RTT
+info threads
+thread 2
+tb main
+b HardFault_Handler
+b _exit
+b abort
+b WDOG1_IRQHandler
+b RTWDOG_IRQHandler
+b IntDefaultHandler

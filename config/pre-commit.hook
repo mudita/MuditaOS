@@ -1,0 +1,29 @@
+#!/bin/bash
+# Copyright (c) 2017-2020, Mudita Sp. z.o.o. All rights reserved. 
+# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#run pre-commit hooks
+
+if [[ $# -ne 0 ]]; then
+    cat <<-HELP_MSG &>1
+	This script doesn't support any parameters.
+	
+	If you are trying to check style call:
+	    ./config/style_check_hook.sh
+	
+	If you are trying to check license header call:
+	    ./config/license_header_check.sh
+	HELP_MSG
+fi
+
+
+set -e 
+L_GIT_DIR=$(git rev-parse --show-toplevel)
+pushd $L_GIT_DIR
+echo "=== check copyright ==="
+./config/license_header_check.sh --hook
+echo "=== check style ==="
+./config/style_check_hook.sh
+echo "=== binary blobs check ==="
+./config/bin_blob_check.sh
+popd

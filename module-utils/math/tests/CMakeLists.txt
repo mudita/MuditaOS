@@ -1,0 +1,9 @@
+add_catch2_executable(
+    NAME
+        math-test
+    SRCS
+        test_math.cpp
+    LIBS
+        utils-math
+        module-utils
+)

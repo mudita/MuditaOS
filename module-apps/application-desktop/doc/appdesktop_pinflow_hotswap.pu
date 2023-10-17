@@ -1,0 +1,137 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Service Cellular" as srvclr
+participant "Application Manager" as appmgr
+participant "ApplicaionDesktop" as appdsktp
+participant "PinLockWindow" as pinwin
+actor User
+
+    == PIN required - HotSwap ==
+
+note left of srvclr
+    Cellular side data:
+    State: PIN required
+    SIM: SIM1
+    phone: +48500500500
+    attempts: 4
+end note
+/ note left of appdsktp
+    Desktop side state:
+    Screen Locked
+end note
+/ note left of pinwin
+    Desktop side data:
+    None
+end note
+
+[o->srvclr : need PIN1
+activate srvclr
+srvclr -> appmgr : ActionMessage{RequestPin1, {SIM1, attempts}} via sys::bus message
+    activate appmgr
+deactivate srvclr
+    appmgr -> appmgr : translate request to action
+    appmgr -> appdsktp : forward action
+        activate appdsktp
+    deactivate appmgr
+        appdsktp -> appdsktp : handle(RequestPinAction) -> queued
+        deactivate appdsktp
+
+        ... ...
+        appdsktp <- User : Unlock screen
+        activate appdsktp
+
+note left of pinwin
+    Desktop side data:
+    State: PIN required
+    SIM: SIM1
+    attempts: 4
+end note
+/ note left of appdsktp
+    Desktop side state:
+    Screen Unlocked
+end note
+
+        appdsktp -> pinwin ** : switchWindow(SIM1, requiredPIN, attempts)
+            activate pinwin
+        deactivate appdsktp
+            pinwin -> pinwin : setVisiblePinRequired
+
+            pinwin <- User : Enters PIN
+            ... Entering PIN interrupted, user doing hot swap ...
+
+[o->srvclr : need PIN2
+activate srvclr
+
+note left of srvclr
+    Cellular side data:
+    State: PIN required
+    SIM: SIM2
+    phone: +48600600600
+    attempts: 4
+end note
+/ note left of pinwin
+    Desktop side data:
+    State: PIN required
+    SIM: SIM1
+    attempts: 4
+end note
+
+srvclr -> appmgr : ActionMessage{RequestPin1, {SIM2, attempts}} via sys::bus message
+    activate appmgr
+deactivate srvclr
+    appmgr -> appmgr : translate request to action
+    appmgr -> appdsktp : forward action
+        activate appdsktp
+    deactivate appmgr
+        appdsktp -> appdsktp : handle(RequestPinAction)
+
+note left of pinwin
+    Desktop side data:
+    State: PIN required
+    SIM: SIM2
+    attempts: 4
+end note
+        appdsktp -> pinwin : switchWindow(SIM2, requiredPIN, attempts)
+            activate pinwin
+        deactivate appdsktp
+            pinwin -> pinwin : rebuild
+            pinwin -> pinwin : setVisiblePinRequired
+            pinwin <- User : Enters PIN
+            pinwin <- User : Confirm
+        appdsktp <- pinwin : handlePasscode(pinValue)
+        activate appdsktp
+            deactivate pinwin
+            deactivate pinwin
+srvclr <- appdsktp : PinData(pinValue) via sys::bus message
+activate srvclr
+        deactivate appdsktp
+srvclr -> srvclr : verification passed
+deactivate srvclr
+
+note left of srvclr
+    Cellular side data:
+    State: PIN unlocked
+    SIM: SIM2
+    phone: +48600600600
+    attempts: 4
+end note
+
+[o->srvclr : SIM unlocked
+activate srvclr
+srvclr -> appmgr : ActionMessage{SimUnlocked, {SIM1}} via sys::bus message
+    activate appmgr
+deactivate srvclr
+    appmgr -> appmgr : translate request to action
+    appmgr -> appdsktp : forward action
+        activate appdsktp
+    deactivate appmgr
+        appdsktp -> appdsktp : handle(SimUnlockedAction)
+        appdsktp -> pinwin !! : delete
+        deactivate appdsktp
+note left of pinwin
+    Desktop side data:
+    None
+end note
+
+@enduml

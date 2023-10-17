@@ -1,0 +1,42 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+actor User
+
+== Simple fast key press ==
+
+User -> EVM : KeyPress
+EVM->Apps: KeyPress
+User-> EVM: KeyRelease
+EVM->Apps: KeyReleased
+
+== Long Press ==
+
+User -> EVM : KeyPress
+EVM->Apps: KeyPress
+... Some ~~long delay~~ ...
+EVM->Apps: KeyLongPress
+User-> EVM: KeyRelease
+EVM -x Apps: No KeyRelease now!
+
+== Long Press - with continous action ==
+
+User -> EVM : KeyPress
+EVM->Apps: KeyPress
+... Some ~~long delay~~ ...
+EVM->Apps: KeyLongPress
+        hnote over Apps
+            App TIMER process things:
+            each 100ms:
+                do_something
+        endhnote
+... Some ~~long delay~~ ...
+User->EVM: KeyReleased
+EVM-> Apps: KeyLongRelease
+        hnote over Apps
+            App end TIMER processing
+        endhnote
+EVM -x Apps: No KeyRelease now!
+
+@enduml
+

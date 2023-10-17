@@ -1,0 +1,29 @@
+add_catch2_executable(
+    NAME
+        actions-registry-tests
+    SRCS
+        test-ActionsRegistry.cpp
+    LIBS
+        service-appmgr
+        module-utils
+)
+
+add_catch2_executable(
+    NAME
+        application-manifest-tests
+    SRCS
+        test-ApplicationManifest.cpp
+    LIBS
+        service-appmgr
+        module-utils
+)
+
+add_catch2_executable(
+    NAME
+        application-stack-tests
+    SRCS
+        test-ApplicationStack.cpp
+    LIBS
+        service-appmgr
+        module-utils
+)

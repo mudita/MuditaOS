@@ -1,0 +1,47 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+Title AT Mode
+
+state CellularBSP {
+  UartIrq: Reads data with DMA to static buffer
+  UartIrq: and packs them into struct with result code.
+  UartIrq --> SendToWorker
+  SendToWorker: Puts structured data into workers MessageBuffer.
+  SendToWorker --> output
+
+  state output <<exitPoint>>
+}
+
+state CellularWorker{
+  state DMAMessageBuffer <<expansionInput>> 
+
+  DMAMessageBuffer --> ATParser
+  ATParser: Parses URC packages.
+  ATParser --> CmdAwaitingResponse
+  
+  state CmdAwaitingResponse <<choice>>
+  CmdAwaitingResponse ----> outputWorker : True
+  CmdAwaitingResponse --> CheckIfFOTA : False
+
+  CheckIfFOTA --> StoreURC : False
+  CheckIfFOTA --> FotaService : True
+
+  state outputWorker <<exitPoint>>
+}
+
+output --> DMAMessageBuffer
+
+state Channel {
+  state ATBuffer <<expansionInput>>
+  
+  ATBuffer --> ATStream 
+  ATStream: parses AT message
+  
+  ATStream --> channelOutput
+
+  state channelOutput <<exitPoint>>
+}
+
+outputWorker --> ATBuffer
+channelOutput --> ServiceCellular
+@enduml

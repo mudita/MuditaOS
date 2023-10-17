@@ -1,0 +1,53 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+start
+partition Initialization {
+    :enforce pretest conditions:
+    -read test input data:
+    **requires BT device name
+    -pretest machine state:
+    ** bluetooth turned on;
+}
+
+partition test-run {
+    :scanOn;
+
+    repeat
+        if( timeout exceeded )
+            : request available devices;
+        else (true = failure)
+            stop
+        endif
+    repeatwhile (the BT device name in available devices)
+
+    : pair with the device & turn scan off;
+
+    repeat
+        if( timeout exceeded )
+            : request bonded devices;
+        else (true = failure)
+            stop
+        endif
+    repeatwhile (the BT device name in bonded devices)
+
+
+    : connect with the device;
+    repeat
+        if( timeout exceeded )
+            : request bonded devices;
+        else (true = failure)
+            stop
+        endif
+    repeatwhile (the BT device address is connected)
+
+    : disconnect with the device;
+    : unpair the device;
+
+    if (the BT device address is not connected\nthe BT device name is not in bonded devices) then (success)
+        stop
+    else (false=failure)
+        stop
+    endif
+}
+@enduml

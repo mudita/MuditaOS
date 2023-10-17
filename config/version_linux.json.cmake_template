@@ -1,0 +1,11 @@
+{
+    "git":
+    {
+        "git_branch": "@GIT_BRANCH@",
+        "git_commit": "@GIT_REV@"
+    },
+    "version":
+    {
+        "version": "@PROJECT_VERSION@"
+    }
+}

@@ -1,0 +1,29 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+skinparam linetype ortho
+skinparam nodesep 100
+
+class "NotificationsModel" as model
+class ListView
+
+node "Owner Window" as owner {
+    class AppWindow
+    class "WindowWithNotifications" as notifWindow
+
+    AppWindow <|-- notifWindow
+}
+
+ListView -[hidden]- owner
+model -[hidden]r- owner
+
+notifWindow "create"*..>ListView
+ListView "use"-u-->model
+notifWindow *-->model
+model "use"--> AppWindow
+
+
+
+
+@enduml
+

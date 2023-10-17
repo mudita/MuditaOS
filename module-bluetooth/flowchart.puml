@@ -1,0 +1,42 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+== Vol Change - from BT ==
+BT ->  EVM: Vol Change request (same key symualtion)
+EVM -> App: Vol Change request process Audio
+== Vol Up/Down - to BT ==
+EVM ->  App: process Up/Down key (popup)
+        App -> Audio: request Vol Up/Down (finally)
+        hnote over Audio
+            Software codec applies gain
+        endhnote
+        EVM <- Audio: Notify sound change
+        EVM -> App: show sound change
+== BT device registration - audio ==
+BT ->   EVM: Event: BTA2DPOn (connection established)
+EVM -> Audio: Event: BTA2DPOn
+hnote over Audio
+            Audio notified about new BT A2DP device
+        endhnote
+BT <- Audio: BluetoothStreamRequestMessage (requesting metadata & queue handles)
+BT -> Audio: BluetoothStreamRequestMessageResult (metadata & queue handles)
+hnote over Audio
+            BT A2DP setup done,
+            ready to playback
+        endhnote
+== BT device registration - COM:WIP ==
+BT -> EVM: notify new device
+hnote over EVM
+    do whatever whoever wants with COM port
+    same as with audio device (open handles...)
+endhnote
+== BT device - close ==
+BT -> EVM: Event: BTA2DPOff
+EVM -> Audio: Event: BTA2DPOff
+      EVM <- Audio: Inform that bt audio ended (?)
+      EVM -> App: Show bt change (?)
+hnote over BT
+    BT closes handles to streams ( i.e. pipes)
+    and closes it's device handling
+    don't pass callback : pass handle
+endhnote
+@enduml

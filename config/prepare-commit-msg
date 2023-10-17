@@ -1,0 +1,32 @@
+#!/bin/bash
+#source: https://medium.com/better-programming/how-to-automatically-add-the-ticket-number-in-git-commit-message-bda5426ded05
+
+FILE=$1
+MESSAGE=$(cat $FILE)
+BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+TITLE_TAG="<Title>"
+
+BRANCH_REGEXP="^(\w+/)?(\w+[-_])?([0-9]+)[-_](.*)$"
+if [[ ${BRANCH_NAME} =~ ${BRANCH_REGEXP} ]]; then
+    TICKET="[${BASH_REMATCH[2]}${BASH_REMATCH[3]}]"
+    MESSAGE_TEXT="${BASH_REMATCH[4]//[-_]/ }"
+
+    if [[ ${MESSAGE} == "${TICKET}"* ]]; then
+        exit 0
+    fi
+
+    NEW_TITLE="${TICKET} ${MESSAGE_TEXT}"
+
+    echo "FILE:$FILE"
+    echo "TITLE_TAG:$TITLE_TAG"
+    FROM_TEMPLATE=$(cat ${FILE} | grep "${TITLE_TAG}")
+    echo "FROM_TEMPLATE: '${FROM_TEMPLATE}'"
+    if [[ -n $( cat $FILE | grep "${TITLE_TAG}" ) ]]; then
+        sed  -i "s:${TITLE_TAG}:${NEW_TITLE}:" $FILE
+    else 
+        echo -e "$TICKET $MESSAGE_TEXT \n$MESSAGE" > $FILE
+    fi
+else
+    echo "$MESSAGE" > $FILE
+fi
+

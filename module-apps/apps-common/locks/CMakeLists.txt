@@ -1,0 +1,41 @@
+target_include_directories(apps-common
+	PRIVATE
+		"${CMAKE_CURRENT_LIST_DIR}"		
+)
+
+target_sources(apps-common
+
+	PRIVATE
+		handlers/PhoneLockHandler.cpp
+		handlers/PhoneLockSubject.cpp
+		handlers/SimLockHandler.cpp
+		handlers/SimLockSubject.cpp
+		handlers/LockPolicyHandler.cpp
+		input/PhoneLockedKeysWhitelist.cpp
+		widgets/Lock.cpp
+		widgets/LockBoxConstantSize.cpp
+		widgets/LockBoxAlternatingSize.cpp
+		widgets/PhoneLockBox.cpp
+		widgets/SimLockBox.cpp
+		windows/LockInputWindow.cpp
+
+	PRIVATE
+		data/LockData.hpp
+		data/LockStyle.hpp
+		data/PhoneLockMessages.hpp
+		data/SimLockMessages.hpp
+		handlers/PhoneLockHandler.hpp
+		handlers/PhoneLockSubject.hpp
+		handlers/LockPolicyHandler.hpp
+		handlers/SimLockHandler.hpp
+		handlers/SimLockSubject.hpp
+		input/PhoneLockedKeysWhitelist.hpp
+		widgets/LockHash.hpp
+		widgets/Lock.hpp
+		widgets/LockBox.hpp
+		widgets/LockBoxConstantSize.hpp
+		widgets/LockBoxAlternatingSize.hpp
+		widgets/PhoneLockBox.hpp
+		widgets/SimLockBox.hpp
+		windows/LockInputWindow.hpp
+)

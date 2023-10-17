@@ -1,0 +1,15 @@
+list(APPEND CMAKE_MODULE_PATH "${SRC_DIR}/cmake/modules")
+include(Version)
+
+if (NOT ${BOOTLOADER_FILE} STREQUAL "")
+    file(MD5 ${BOOTLOADER_FILE} BOOTLOADER_MD5SUM)
+endif()
+if (NOT ${OS_FILE} STREQUAL "")
+    file(MD5 ${OS_FILE} OS_MD5SUM)
+endif()
+if (NOT ${RECOVERY_FILE} STREQUAL "")
+    file(MD5 ${RECOVERY_FILE} RECOVERY_MD5SUM)
+endif()
+
+message("Configuring version.json file")
+configure_file(${SRC_FILE} ${DST_FILE} @ONLY)

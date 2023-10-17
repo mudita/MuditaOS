@@ -1,0 +1,37 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+participant ServiceCellular as cellular
+participant ServiceTime as time
+participant TimeManager as manager
+participant SettingsApp as settings
+participant SettingsDB as db
+participant EventManagerCommon as event
+participant bspRTC as rtc
+participant OS as os
+
+== Network time sync enabled ==
+time -> cellular : Settings: Network time synchronisation Network time sync enabled
+cellular -> time : CTZE notification: time update
+time -> manager : Update time
+manager -> event : Store new time
+event -> rtc : Store new time
+event -> os : Time updated notification
+
+== Disabling / Enabling Network time synchonisation ==
+settings -> time : Time synchronisation disabled / enabled
+time -> db : Store new settings
+db -> time : Setting stored
+time -> cellular : Setting changed
+cellular -> cellular : handle settings changed ( Enable / Disable Network time reporting)
+
+== Network time synchronisation disabled, manually setting date / time==
+settings -> time : New date / time is set
+time -> manager : Update time
+manager -> event : Store new time
+event -> rtc : Store new time
+event -> os : Time updated notification
+
+
+
+
+@enduml

@@ -1,0 +1,43 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+participant "Service DB" as srvdb
+participant "Service Bluetooth" as srvbt
+participant "Bluetooth Worker" as btwrkr
+
+    == Load Bluetooth Settings on startup flow ==
+
+[o->srvbt : need Bluetooth Settings
+activate srvbt
+srvbt -> srvdb : Settings::registerValueChange(bluetoothState)
+    activate srvdb
+srvbt -> srvdb : Settings::registerValueChange(deviceVisibility)
+srvbt -> srvdb : Settings::registerValueChange(deviceName)
+srvbt -> srvdb : Settings::registerValueChange(bondedDevices)
+
+deactivate srvbt
+
+srvbt <- srvdb : activate callback with new value (bluetoothState)
+activate srvbt
+srvbt <- srvdb : activate callback with new value (deviceVisibility)
+srvbt <- srvdb : activate callback with new value (deviceName)
+srvbt <- srvdb : activate callback with new value (bondedDevices)
+deactivate srvdb
+
+srvbt -> srvdb : Settings::unregisterValueChange(bluetoothState)
+    activate srvdb
+srvbt -> srvdb : Settings::unregisterValueChange(deviceVisibility)
+srvbt -> srvdb : Settings::unregisterValueChange(deviceName)
+srvbt -> srvdb : Settings::unregisterValueChange(bondedDevices)
+
+deactivate srvdb
+
+srvbt -> btwrkr : Pass cached Bluetooth settings
+
+deactivate srvbt
+activate btwrkr
+btwrkr -> btwrkr : reload Bluetooth settings
+
+deactivate btwrkr
+
+@enduml

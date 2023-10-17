@@ -1,0 +1,48 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+interface AppDesktopActionHandler
+{
+    handle(Action)
+}
+
+abstract class Action
+{
+
+}
+class RequestPinAction
+{
+    GSM::SIM sim
+    unsigned int attempts
+}
+class RequestPukAction
+{
+    GSM::SIM sim
+    unsigned int attempts
+}
+class SimUnlockedAction
+{
+    GSM::SIM sim
+}
+class ChangePinAction
+{
+    GSM::SIM sim
+}
+class UnhandledCMEAction
+{
+    unsigned int cme_code
+}
+class SimBlockedAction
+{
+    GSM::SIM sim
+}
+Action <|-- RequestPinAction
+Action <|-- RequestPukAction
+Action <|-- SimUnlockedAction
+Action <|-- ChangePinAction
+Action <|-- UnhandledCMEAction
+Action <|-- SimBlockedAction
+
+AppDesktopActionHandler *-- Action : use
+
+@enduml

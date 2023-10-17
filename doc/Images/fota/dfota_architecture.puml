@@ -1,0 +1,25 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+skinparam rectangle{
+    roundCorner 25
+}
+
+'Actor User
+package PurePhone {
+    screen -up- [MCU]
+    keyboard - [MCU]
+    [MCU] - [Modem]
+    [Modem] - [Antena]
+}
+cloud Internet {
+}
+
+[Antena] <-> Internet
+
+
+package "Mudita Server" {
+ ["HTTP Server"] as HTTPd
+}
+Internet <-> HTTPd
+
+@enduml

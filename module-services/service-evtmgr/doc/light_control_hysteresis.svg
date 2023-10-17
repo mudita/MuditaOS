@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentScriptType="application/ecmascript" contentStyleType="text/css" height="335px" preserveAspectRatio="none" style="width:309px;height:335px;background:#F0F0F0;" version="1.1" viewBox="0 0 309 335" width="309px" zoomAndPan="magnify"><defs><filter height="300%" id="f1k1axwkvu47sh" width="300%" x="-1" y="-1"><feGaussianBlur result="blurOut" stdDeviation="2.0"/><feColorMatrix in="blurOut" result="blurOut2" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .4 0"/><feOffset dx="4.0" dy="4.0" in="blurOut2" result="blurOut3"/><feBlend in="SourceGraphic" in2="blurOut3" mode="normal"/></filter></defs><g><ellipse cx="194.58" cy="18" fill="#000000" filter="url(#f1k1axwkvu47sh)" rx="10" ry="10" style="stroke: none; stroke-width: 1.0;"/><polygon fill="#FEFECE" filter="url(#f1k1axwkvu47sh)" points="194.58,69,206.58,81,194.58,93,182.58,81,194.58,69" style="stroke: #A80036; stroke-width: 1.5;"/><polygon fill="#FEFECE" filter="url(#f1k1axwkvu47sh)" points="142.58,152,154.58,164,142.58,176,130.58,164,142.58,152" style="stroke: #A80036; stroke-width: 1.5;"/><rect fill="#FEFECE" filter="url(#f1k1axwkvu47sh)" height="33.9688" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="101" x="197.08" y="147"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="81" x="207.08" y="168.1387">update ramp</text><rect fill="#FEFECE" filter="url(#f1k1axwkvu47sh)" height="47.9375" rx="12.5" ry="12.5" style="stroke: #A80036; stroke-width: 1.5;" width="108" x="88.58" y="277"/><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="84" x="98.58" y="298.1387">RampValue =</text><text fill="#000000" font-family="sans-serif" font-size="12" lengthAdjust="spacingAndGlyphs" textLength="76" x="104.58" y="312.1074">RampTarget</text><!--MD5=[9e7bccaab94f33706b7c2613f3cc0026]
+link start to #3--><path d="M194.58,28 C194.58,37.34 194.58,52.16 194.58,63.59 " fill="none" id="start-&gt;#3" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="194.58,68.89,198.58,59.89,194.58,63.89,190.58,59.89,194.58,68.89" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="124" x="50.8175" y="61.4561">Ramp target reached?</text><!--MD5=[2773403863a502716c38047ac44135d7]
+link #3 to #6--><path d="M190.14,88.91 C181.16,102.89 160.75,134.69 149.82,151.72 " fill="none" id="#3-&gt;#6" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="147,156.11,155.2315,150.7024,149.7038,151.9041,148.5021,146.3764,147,156.11" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="117" x="-0.1643" y="117.3137">New target differs by</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="123" x="-3.1643" y="130.1184">hysteresis value from</text><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="68" x="25.8357" y="142.9231">the old one?</text><!--MD5=[7cfa565d5a7a904cbabcd798f1ced685]
+link #6 to ur--><path d="M154.62,164 C163.93,164 177.54,164 191.49,164 " fill="none" id="#6-&gt;ur" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="196.64,164,187.64,160,191.64,164,187.64,168,196.64,164" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="21" x="165.33" y="158.2104">Yes</text><!--MD5=[52e4b7cb87ab58fb7e68b8a1b8520dc5]
+link #6 to RampValue = \nRampTarget--><path d="M142.58,176.05 C142.58,196.74 142.58,241.91 142.58,271.63 " fill="none" id="#6-&gt;RampValue = \nRampTarget" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="142.58,276.99,146.58,267.99,142.58,271.99,138.58,267.99,142.58,276.99" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="15" x="143.58" y="233.2104">No</text><!--MD5=[1fc0cef09484a68efdf13ae0dd1e584d]
+link #3 to ur--><path d="M199.1,88.91 C206.8,100.69 222.78,125.09 234.28,142.68 " fill="none" id="#3-&gt;ur" style="stroke: #A80036; stroke-width: 1.0;"/><polygon fill="#A80036" points="237.1,146.99,235.5128,137.2699,234.3595,142.8079,228.8215,141.6546,237.1,146.99" style="stroke: #A80036; stroke-width: 1.0;"/><text fill="#000000" font-family="sans-serif" font-size="11" lengthAdjust="spacingAndGlyphs" textLength="15" x="224.58" y="124.2104">No</text><!--MD5=[d6f8db9ee3905d285f6e7e4eb45e55b5]
+@startuml
+skinparam BackgroundColor F0F0F0
+(*) - -> If "Ramp target reached?" then
+    If "New target differs by \nhysteresis value from \nthe old one?" then
+    -> [Yes] "update ramp" as ur
+    else
+    - - -> [No] "RampValue = \nRampTarget"
+    Endif
+else
+- -> [No] ur
+Endif
+@enduml
+
+PlantUML version 1.2020.02(Sun Mar 01 05:22:07 EST 2020)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Java Version: 11.0.12+7-post-Debian-2
+Operating System: Linux
+Default Encoding: UTF-8
+Language: en
+Country: US
+--></g></svg>

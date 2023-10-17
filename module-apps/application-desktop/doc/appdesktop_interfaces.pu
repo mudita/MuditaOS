@@ -1,0 +1,106 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+enum GSM::SIM
+{
+    SIM1
+    SIM2
+    NONE
+}
+
+enum ActionId
+{
+    RequestPin1
+    RequestPuk1
+    SimUnlocked
+    UnhandledCMEError
+    ChangePin1
+    SimBlocked
+}
+
+abstract class ActionParams
+{
+
+}
+
+abstract class Message
+{
+
+}
+class PinData
+{
+    std::vector<unsigned int> pinValue
+}
+class ReplacePinData
+{
+    std::vector<unsigned int> oldPinValue
+    std::vector<unsigned int> newPinValue
+}
+class PukData
+{
+    std::vector<unsigned int> pukValue
+    std::vector<unsigned int> newPinValue
+}
+class Abort
+{
+
+}
+
+class ActionMessage
+{
+    ActionId action
+    ActionParams
+}
+class RequestPinParams
+{
+    GSM::SIM sim
+    unsigned int attempts
+}
+class RequestPukParams
+{
+    GSM::SIM sim
+    unsigned int attempts
+}
+class UnlockedParams
+{
+    GSM::SIM sim
+}
+class CMEErrorParams
+{
+    unsigned int cme_code
+}
+class ChangePinParams
+{
+    GSM::SIM sim
+    unsigned int attempts
+}
+class SimBlockedParams
+{
+    GSM::SIM sim
+}
+
+Message <|-- PinData
+Message <|-- ReplacePinData
+Message <|-- PukData
+Message <|-- Abort
+Message <|-- ActionMessage
+ActionParams <|-- RequestPinParams
+ActionParams <|-- RequestPukParams
+ActionParams <|-- UnlockedParams
+ActionParams <|-- CMEErrorParams
+ActionParams <|-- ChangePinParams
+ActionParams <|-- SimBlockedParams
+interface SrvCellularMessageHandler
+{
+    handle(Message)
+}
+interface APMActions
+{
+    setAction(ActionMessage)
+}
+
+SrvCellularMessageHandler *-- Message : use
+APMActions *-- ActionMessage : use
+ActionMessage *-- ActionParams : use
+
+@enduml

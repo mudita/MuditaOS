@@ -1,0 +1,15 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+start
+note right
+    Call incoming
+end note
+:Service Cellular;
+:Application call;
+:Service Audio;
+:Service Bluetooth;
+if (Current profile allows ringing) then (yes)
+    :Ring;
+endif
+stop
+@enduml

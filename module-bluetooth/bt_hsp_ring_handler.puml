@@ -1,0 +1,16 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+start
+note right
+    Ringing
+end note
+while (Call terminated) is (no)
+    if (Answer a call) then (no)
+    else (yes)
+        :SCO link established;
+        break;
+    endif
+endwhile
+:Stop Ringing;
+stop
+@enduml

@@ -1,0 +1,36 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+  skinparam linetype ortho
+node "OwnerService" as owner{
+    class "ApplicationManager" as apm
+    class "APMController" as controller{
+        {method} sendAction(...)
+    }
+    abstract "sys::Service" as serv
+    serv <|-u-- apm
+    controller "use"-d--> apm
+}
+
+class "ActionsParams" as params
+
+node "Provider" as provider {
+    class "NotificationProvider" as notProvider {
+        {field} ownerService *
+        {method} handle(...)
+        {method} send()
+        {method} requestNotSeenNotifications()
+    }
+    class "NotificationsChangedParams" as notifParams
+    notProvider -l..>notifParams
+}
+
+provider -[hidden]d- owner
+
+notProvider "use"--> serv
+notProvider "use"--> controller
+params "use"<-- controller
+notifParams --|>params
+apm "creates"..>notProvider
+
+
+@enduml

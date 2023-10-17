@@ -1,0 +1,22 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+(*) --> [initialization] "measurement" as meas
+"teperature range\n violation interrupt" -> meas
+If "Detected range" then
+    ---> [T<=0 Cdeg] "charger off" as coff
+    --> "set interrupt\nbounds with hysteresis" as sh
+    else
+    --> [T>45 Cdeg] coff
+    else    
+    ---> [T = 1~15 Cdeg] "Charging: \nCC 300mA\nCV 4.35V"
+    -> "charger On" as con
+    else    
+    ---> [T = 15~35 Cdeg] "Charging: \nCC 1600mA\nCV 4.35V"
+    --> con
+    else    
+    ---> [T = 35~45 Cdeg] "Charging: \nCC 1600mA\nCV 4.1V"
+    -> con
+Endif
+con -> sh
+@enduml
+

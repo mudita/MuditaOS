@@ -1,0 +1,25 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+
+start
+fork
+  :unlocks keyboard;
+fork again
+  :connects USB;
+fork again
+  :connects the BT car kit;
+end fork {or}
+: switch to Permanent Report Mode;
+stop
+start
+fork
+  :locks keyboard;
+fork again
+  :disconnects USB;
+fork again
+  :disconnects the BT car kit;
+end fork {and}
+: switch to Hybrid Report Mode;
+stop
+
+@enduml

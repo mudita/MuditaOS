@@ -1,0 +1,19 @@
+@startuml
+skinparam BackgroundColor F0F0F0
+participant "Application 1" as app1
+participant "Application Manager" as appmgr
+participant "Application 2" as app2
+
+app1 -> appmgr: SwitchApplication("Application 2")
+
+alt Application 1 is closeable
+    appmgr -> app1: Close
+else
+    appmgr -> app1: Focus lost
+end
+
+app1 -> appmgr: Confirm
+
+appmgr -> app2: Start
+
+@enduml
