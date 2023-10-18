@@ -24,7 +24,9 @@ namespace gui
 
         auto icon =
             new Icon(this, 0, 0, style::window_width, style::window_height, "bell_battery_status_empty_W_M", {});
-        icon->text->setVisible(false);
+        icon->text->setRichText(utils::translate("app_bell_welcome_charge_message"));
+        icon->text->setFont(style::window::font::largelight);
+        icon->text->setVisible(true);
         icon->resizeItems();
     }
     bool BellBatteryShutdownWindow::onInput(const InputEvent &)
