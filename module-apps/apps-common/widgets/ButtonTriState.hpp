@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,8 +9,11 @@ namespace style
 {
     namespace buttonTriState
     {
-        constexpr uint32_t w = 56;
-        constexpr uint32_t h = 32;
+        inline constexpr std::uint32_t w                         = 56;
+        inline constexpr std::uint32_t h                         = 32;
+        inline constexpr std::uint32_t penWidth                  = 2;
+        inline constexpr std::uint32_t cornerRadiusRectangleView = 4;
+        inline constexpr std::uint32_t cornerRadiusTextView      = 0;
     } // namespace buttonTriState
 } // namespace style
 
@@ -30,7 +33,7 @@ namespace gui
         void switchState(State requestedState);
 
       private:
-        std::string const transitingText;
+        const std::string transitingText;
         State currentState;
     };
 } // namespace gui
