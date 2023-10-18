@@ -16,6 +16,8 @@ namespace app::call
         {
             duration = text;
         };
+        void updateEnteredNumber(const char &text, bool isVisible = true) override{};
+        void setEnteredNumberVisible(bool isVisible) override{};
         void refreshWindow() override
         {
             windowRefreshed = true;

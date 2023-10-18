@@ -33,6 +33,8 @@ namespace gui
         gui::Label *numberLabel = nullptr;
         // used to inform user about call state of call and display duration of call
         gui::Label *durationLabel = nullptr;
+        // used to inform user about provided numbers during the call
+        gui::Label *enteredDigitsLabel = nullptr;
 
         gui::HBox *iconsBox                 = nullptr;
         gui::SendSmsIcon *sendSmsIcon       = nullptr;
@@ -59,6 +61,8 @@ namespace gui
         void refreshWindow() override;
 
         void updateDuration(const UTF8 &text, bool isVisible = true) override;
+        void updateEnteredNumber(const char &newCharacter, bool isVisible = true) override;
+        void setEnteredNumberVisible(bool isVisible) override;
         void setNavBarForActiveCall() override;
         void setNavBarForIncomingCall() override;
         void clearNavBar() override;
