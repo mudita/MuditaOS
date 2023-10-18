@@ -149,7 +149,7 @@ namespace gui
         virtual void setText(const UTF8 &text);
         void setText(std::unique_ptr<TextDocument> &&document);
         void addText(const UTF8 &text, AdditionType additionType = AdditionType::perChar);
-        void addText(TextBlock text);
+        void addText(const TextBlock &text);
         /// @defgroup richtext can be virtualized by parametrized RichTextParser virtual api ( as second param )
         /// @{
         /// set rich text with default RichTextParser - please see RichTextParser documentation on how to use format

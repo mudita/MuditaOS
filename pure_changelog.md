@@ -28,6 +28,7 @@
 * Fixed crash on transferring audio file with big metadata
 * Fixed possibility of OS crash during update package size check
 * Fixed possible crash when entering phone number
+* Fixed cut off VoLTE checking label in some languages
 
 ## [1.8.0 2023-09-27]
 
