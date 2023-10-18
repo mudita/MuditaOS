@@ -16,6 +16,7 @@
 
 ### Changed / Improved
 * Hardware faults during device startup now result in shutdown and more user friendly message
+* Discharged device screen changed
 
 ## [2.2.0 2023-09-28]
 
