@@ -156,7 +156,7 @@ namespace gui
         drawLines();
     }
 
-    void Text::addText(TextBlock text)
+    void Text::addText(const TextBlock &text)
     {
         *cursor << text;
         onTextChanged();
@@ -171,10 +171,9 @@ namespace gui
 
     void Text::addRichText(const UTF8 &text, text::RichTextParser::TokenMap &&tokenMap)
     {
-        auto tmp_document = text::RichTextParser().parse(text, &format, std::move(tokenMap));
+        const auto tmp_document = text::RichTextParser().parse(text, &format, std::move(tokenMap));
 
         if (!tmp_document || tmp_document->isEmpty()) {
-
             debug_text("Nothing to parse/parser error in rich text: %s", text.c_str());
             return addText(text); // fallback
         }
@@ -238,13 +237,13 @@ namespace gui
 
     void Text::setMinimumWidthToFitText(const UTF8 &text)
     {
-        if (!text.empty()) {
-            auto textToFit = !text::RichTextParser().parse(text, &format)->getText().empty()
-                                 ? text::RichTextParser().parse(text, &format)->getText()
-                                 : text;
-
-            setMinimumWidth(format.getFont()->getPixelWidth(textToFit) + getCursorDrawSpace());
+        if (text.empty()) {
+            return;
         }
+
+        const auto &parsedText = text::RichTextParser().parse(text, &format)->getText();
+        const auto &textToFit  = !parsedText.empty() ? parsedText : text;
+        setMinimumWidth(format.getFont()->getPixelWidth(textToFit) + getCursorDrawSpace());
     }
 
     void Text::setMinimumHeightToFitText(unsigned int linesCount)
