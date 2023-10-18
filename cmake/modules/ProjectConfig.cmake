@@ -7,7 +7,7 @@ endif()
 
 set(ASSETS_TYPE "Proprietary" CACHE INTERNAL "")
 if (NOT ${ASSETS_TYPE} STREQUAL "Proprietary" AND NOT ${ASSETS_TYPE} STREQUAL "Community")
-    message(FATAL_ERROR " Unknown ASSETS_TYPE value: ${ASSETS_TYPE} - allowed values: Propertiary, Community")
+    message(FATAL_ERROR " Unknown ASSETS_TYPE value: ${ASSETS_TYPE} - allowed values: Proprietary, Community")
 endif()
 
 # add LOG_SENSITIVE_DATA enable option
@@ -70,12 +70,12 @@ if (${WITH_DEVELOPMENT_FEATURES} STREQUAL "ON")
 endif()
 
 # Enable/disable USB MTP
-option(ENABLE_USB_MTP "Enables usage of USB MTP" ON)
+option(ENABLE_USB_MTP "Enables usage of USB MTP" OFF)
 
 # add Mudita USB Vendor/Product IDs
 option(MUDITA_USB_ID "Enables using Mudita registered USB Vendor ID and Pure Phone USB Product ID" ON)
 
-#Config options described in README.md
+# Config options described in README.md
 set(PROJECT_CONFIG_DEFINITIONS
         LOG_USE_COLOR=${LOG_USE_COLOR}
         LOG_SENSITIVE_DATA_ENABLED=${LOG_SENSITIVE_DATA_ENABLED}
