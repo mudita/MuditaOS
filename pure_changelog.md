@@ -8,6 +8,8 @@
 
 ### Changed / Improved
 
+* Disabled USB MTP protocol
+
 ### Fixed
 
 * Fixed possible crash when entering phone number
