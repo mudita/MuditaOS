@@ -67,6 +67,17 @@ namespace gui
         durationLabel->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
 
+        enteredDigitsLabel = new gui::Label(
+            this, enteredDigitsLabel::x, enteredDigitsLabel::y, enteredDigitsLabel::w, enteredDigitsLabel::h);
+        enteredDigitsLabel->setFilled(false);
+        enteredDigitsLabel->setBorderColor(gui::ColorNoColor);
+        enteredDigitsLabel->setEdges(gui::RectangleEdge::None);
+        enteredDigitsLabel->setTextEllipsisType(gui::TextEllipsis::Left);
+        enteredDigitsLabel->setFont(style::window::font::mediumbold);
+        enteredDigitsLabel->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Bottom));
+        enteredDigitsLabel->setCursorStartPosition(CursorStartPosition::DocumentEnd);
+
         numberLabel = new gui::Label(this, numberLabel::x, numberLabel::y, numberLabel::w, numberLabel::h);
         numberLabel->setFilled(false);
         numberLabel->setBorderColor(gui::ColorNoColor);
@@ -151,6 +162,23 @@ namespace gui
         if (durationLabel != nullptr) {
             durationLabel->setText(text);
             durationLabel->setVisible(isVisible);
+        }
+    }
+
+    void CallWindow::updateEnteredNumber(const char &newCharacter, bool isVisible)
+    {
+        if (enteredDigitsLabel != nullptr && isVisible) {
+            auto newText = enteredDigitsLabel->getText();
+            newText.insert(&newCharacter);
+            enteredDigitsLabel->setText(newText);
+            enteredDigitsLabel->setVisible(isVisible);
+        }
+    }
+
+    void CallWindow::setEnteredNumberVisible(bool isVisible)
+    {
+        if (enteredDigitsLabel != nullptr) {
+            enteredDigitsLabel->setVisible(isVisible);
         }
     }
 

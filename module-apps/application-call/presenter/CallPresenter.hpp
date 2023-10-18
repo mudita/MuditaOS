@@ -15,17 +15,19 @@ namespace app::call
         class View
         {
           public:
-            virtual void updateDuration(const UTF8 &text, bool isVisible = true) = 0;
-            virtual void refreshWindow()                                         = 0;
-            virtual void setNavBarForActiveCall()                                = 0;
-            virtual void setNavBarForIncomingCall()                              = 0;
-            virtual void clearNavBar()                                           = 0;
-            virtual void setIncomingCallLayout(bool isValidCallerId)             = 0;
-            virtual void setActiveCallLayout()                                   = 0;
-            virtual void setCallEndedLayout(bool delayedClose = true)            = 0;
-            virtual void updateNumber(const UTF8 &text)                          = 0;
-            virtual gui::SpeakerIconState getSpeakerIconState()                  = 0;
-            virtual void setSpeakerIconState(const gui::SpeakerIconState &icon)  = 0;
+            virtual void updateDuration(const UTF8 &text, bool isVisible = true)      = 0;
+            virtual void updateEnteredNumber(const char &text, bool isVisible = true) = 0;
+            virtual void setEnteredNumberVisible(bool isVisible)                      = 0;
+            virtual void refreshWindow()                                              = 0;
+            virtual void setNavBarForActiveCall()                                     = 0;
+            virtual void setNavBarForIncomingCall()                                   = 0;
+            virtual void clearNavBar()                                                = 0;
+            virtual void setIncomingCallLayout(bool isValidCallerId)                  = 0;
+            virtual void setActiveCallLayout()                                        = 0;
+            virtual void setCallEndedLayout(bool delayedClose = true)                 = 0;
+            virtual void updateNumber(const UTF8 &text)                               = 0;
+            virtual gui::SpeakerIconState getSpeakerIconState()                       = 0;
+            virtual void setSpeakerIconState(const gui::SpeakerIconState &icon)       = 0;
 
             virtual ~View() noexcept = default;
         };
@@ -58,12 +60,13 @@ namespace app::call
             void processCurrentRouting(const audio::Profile::Type &routingType);
             void attachCallbacks();
             void clearModel();
+            bool isCallInProgress();
 
           private:
             std::shared_ptr<app::call::AbstractCallModel> model;
             UTF8 getCallerId();
             bool isIncomingCall();
-            bool isCallInProgress();
+            bool isProvidedCharValid(const char digitChar);
         };
     };
 } // namespace app::call

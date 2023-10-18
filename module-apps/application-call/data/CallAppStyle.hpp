@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -84,6 +84,13 @@ namespace callAppStyle
             inline constexpr auto w = 240U;
             inline constexpr auto h = 20U;
         } // namespace durationLabel
+        namespace enteredDigitsLabel
+        {
+            inline constexpr auto x = 120U;
+            inline constexpr auto y = 360U;
+            inline constexpr auto w = 240U;
+            inline constexpr auto h = 20U;
+        } // namespace enteredDigitsLabel
         namespace iconsBox
         {
             inline constexpr auto y = 411U;

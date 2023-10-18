@@ -43,6 +43,8 @@ namespace app::call
         auto view      = getView();
         auto callState = model->getState();
 
+        view->setEnteredNumberVisible(false);
+
         switch (callState) {
         case app::call::CallState::Incoming: {
             view->updateDuration(utils::translate(callAppStyle::strings::iscalling));
@@ -58,6 +60,7 @@ namespace app::call
         }
         case app::call::CallState::Active: {
             view->updateDuration(utils::time::Duration(model->getTime()).str());
+            view->setEnteredNumberVisible(true);
             view->setActiveCallLayout();
             break;
         }
@@ -144,6 +147,10 @@ namespace app::call
 
     bool CallWindowContract::Presenter::handleDigitButton(const uint32_t &digit)
     {
+        auto digitChar = static_cast<char>(digit);
+        if (isCallInProgress() && isProvidedCharValid(digitChar)) {
+            getView()->updateEnteredNumber(digitChar);
+        }
         model->transmitDtmfTone(digit);
         return true;
     }
@@ -203,6 +210,11 @@ namespace app::call
     void CallWindowContract::Presenter::clearModel()
     {
         model->clear();
+    }
+    bool CallWindowContract::Presenter::isProvidedCharValid(const char digitChar)
+    {
+        // Return true if the character comes from the phone's numeric keypad
+        return (std::isdigit(digitChar) || digitChar == '*' || digitChar == '#');
     }
 
 } // namespace app::call
