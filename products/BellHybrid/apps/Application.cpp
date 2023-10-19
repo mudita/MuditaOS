@@ -15,6 +15,7 @@
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <common/popups/BedtimeNotificationWindow.hpp>
+#include <common/popups/ChargingNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
 
 namespace app
@@ -99,6 +100,18 @@ namespace app
                 windowsFactory.attach(window::bedtime_notification_window,
                                       [](app::ApplicationCommon *app, const std::string &name) {
                                           return std::make_unique<gui::BedtimeNotificationWindow>(app);
+                                      });
+                break;
+            case ID::ChargingNotification:
+                windowsFactory.attach(window::charging_notification_window,
+                                      [](app::ApplicationCommon *app, const std::string &name) {
+                                          return std::make_unique<gui::ChargingNotificationWindow>(app);
+                                      });
+                break;
+            case ID::ChargingDoneNotification:
+                windowsFactory.attach(window::charging_done_notification_window,
+                                      [](app::ApplicationCommon *app, const std::string &name) {
+                                          return std::make_unique<gui::ChargingDoneNotificationWindow>(app);
                                       });
                 break;
             default:

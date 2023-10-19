@@ -139,6 +139,8 @@ namespace app
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::OnBoardingInstructionPromptWindow>(app, name);
                               });
+
+        attachPopups({gui::popup::ID::ChargingNotification, gui::popup::ID::ChargingDoneNotification});
     }
 
     void ApplicationBellOnBoarding::destroyUserInterface()

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -17,6 +17,7 @@
 
 #include "presenter/SettingsPresenter.hpp"
 #include "presenter/StatisticsPresenter.hpp"
+#include "apps-common/WindowsPopupFilter.hpp"
 
 #include <common/models/TimeModel.hpp>
 #include <common/models/AudioModel.hpp>
@@ -32,6 +33,17 @@ namespace app
                                      uint32_t stackDepth)
         : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth)
     {
+        getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &params) {
+            const auto popupId = params.getPopupId();
+            if (popupId == gui::popup::ID::ChargingNotification ||
+                popupId == gui::popup::ID::ChargingDoneNotification) {
+                return gui::window::bell_finished::defaultName != getCurrentWindow()->getName()
+                           ? gui::popup::FilterType::Show
+                           : gui::popup::FilterType::Remove;
+            }
+            return gui::popup::FilterType::Show;
+        });
+
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
     }
 
@@ -105,7 +117,9 @@ namespace app
                       gui::popup::ID::AlarmDeactivated,
                       gui::popup::ID::PowerOff,
                       gui::popup::ID::Reboot,
-                      gui::popup::ID::BedtimeNotification});
+                      gui::popup::ID::BedtimeNotification,
+                      gui::popup::ID::ChargingNotification,
+                      gui::popup::ID::ChargingDoneNotification});
     }
 
     sys::MessagePointer MeditationTimer::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

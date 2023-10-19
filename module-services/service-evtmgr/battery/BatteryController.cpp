@@ -10,6 +10,7 @@
 
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/ServiceEventManagerName.hpp>
+#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-desktop/ServiceDesktopName.hpp>
 #include <module-utils/EventStore/EventStore.hpp>
 #include <log/log.hpp>
@@ -88,6 +89,16 @@ namespace
         default:
             return NewState::Unknown;
         }
+    }
+
+    bool isProperLastState(Store::Battery::State state)
+    {
+        return (state == Store::Battery::State::Discharging) || (state == Store::Battery::State::PluggedNotCharging);
+    }
+
+    bool isProperCurrentState(Store::Battery::State state)
+    {
+        return (state == Store::Battery::State::Charging) || (state == Store::Battery::State::ChargingDone);
     }
 } // namespace
 
@@ -176,14 +187,24 @@ void sevm::battery::BatteryController::update()
     Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
     Store::Battery::modify().temperature = transformTemperatureState(charger->getTemperatureState());
 
-    const auto currentSoc   = Store::Battery::get().level;
-    const auto currentState = Store::Battery::get().state;
+    const auto currentSoc         = Store::Battery::get().level;
+    const auto currentState       = Store::Battery::get().state;
     const auto currentTemperature = Store::Battery::get().temperature;
 
     /// Send BatteryStatusChangeMessage only when battery SOC, charger state or temperature has changed
     if ((lastSoc != currentSoc) || (lastState != currentState) || (lastTemperature != currentTemperature)) {
         auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
         service->bus.sendUnicast(std::move(message), service::name::evt_manager);
+    }
+
+    if (isFirstUpdateDone) {
+        sendChargingNotification(lastState, currentState);
+    }
+    else {
+        if (lastState == Store::Battery::State::Discharging) {
+            sendChargingNotification(lastState, currentState);
+        }
+        isFirstUpdateDone = true;
     }
 
     batteryState.check(transformChargingState(Store::Battery::get().state),
@@ -223,4 +244,13 @@ void sevm::battery::BatteryController::checkChargerPresence()
         (newChargerPresence == ChargerPresence::PluggedIn) ? PlugEvent::CablePlugged : PlugEvent::CableUnplugged;
     service->bus.sendUnicast(std::make_shared<sevm::USBPlugEvent>(plugEvent), service::name::service_desktop);
     chargerPresence = newChargerPresence;
+}
+
+void sevm::battery::BatteryController::sendChargingNotification(const Store::Battery::State &lastState,
+                                                                const Store::Battery::State &currentState)
+{
+    if (isProperLastState(lastState) && isProperCurrentState(currentState)) {
+        service->bus.sendUnicast(std::make_shared<sevm::BatteryChargingMessage>(transformChargingState(currentState)),
+                                 service::name::appmgr);
+    }
 }

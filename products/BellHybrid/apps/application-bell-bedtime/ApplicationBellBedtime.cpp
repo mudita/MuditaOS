@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellBedtime.hpp"
@@ -48,7 +48,9 @@ namespace app
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,
                       gui::popup::ID::PowerOff,
-                      gui::popup::ID::Reboot});
+                      gui::popup::ID::Reboot,
+                      gui::popup::ID::ChargingNotification,
+                      gui::popup::ID::ChargingDoneNotification});
     }
 
     sys::MessagePointer ApplicationBellBedtime::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)

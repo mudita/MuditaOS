@@ -9,6 +9,10 @@
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
+#include <service-evtmgr/BatteryMessages.hpp>
+#include "service-appmgr/Controller.hpp"
+#include <popups/ChargingNotificationPopupRequestParams.hpp>
+#include <popups/ChargingDoneNotificationPopupRequestParams.hpp>
 
 namespace app::manager
 {
@@ -84,6 +88,31 @@ namespace app::manager
             handleStopIdleTimer(request);
             return sys::msgHandled();
         });
+
+        connect(typeid(sevm::BatteryChargingMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            auto *msg = dynamic_cast<sevm::BatteryChargingMessage *>(request);
+            if (msg == nullptr) {
+                return sys::msgNotHandled();
+            }
+            switch (msg->getChargingState()) {
+            case BatteryState::ChargingState::Charging:
+                app::manager::Controller::sendAction(this,
+                                                     app::manager::actions::ShowPopup,
+                                                     std::make_unique<gui::ChargingNotificationPopupRequestParams>());
+                break;
+            case BatteryState::ChargingState::ChargingDone:
+                app::manager::Controller::sendAction(
+                    this,
+                    app::manager::actions::ShowPopup,
+                    std::make_unique<gui::ChargingDoneNotificationPopupRequestParams>());
+                break;
+            default:
+                break;
+            }
+
+            return sys::msgHandled();
+        });
+
         connect(typeid(AlarmActivated), convertibleToActionHandler);
         connect(typeid(AlarmDeactivated), convertibleToActionHandler);
         connect(typeid(BedtimeNotification), convertibleToActionHandler);

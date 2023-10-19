@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Popups.hpp"
@@ -52,6 +52,10 @@ namespace gui::popup
             return gui::popup::window::reboot_window;
         case ID::BedtimeNotification:
             return gui::popup::window::bedtime_notification_window;
+        case ID::ChargingNotification:
+            return gui::popup::window::charging_notification_window;
+        case ID::ChargingDoneNotification:
+            return gui::popup::window::charging_done_notification_window;
         case ID::AppTestPopup:
             return gui::popup::window::test_popup;
         case ID::Invalid:
