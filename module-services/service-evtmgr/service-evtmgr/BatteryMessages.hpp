@@ -42,4 +42,18 @@ namespace sevm
 
         Event event = Event::CableUnplugged;
     };
+
+    class BatteryChargingMessage : public sys::DataMessage
+    {
+      public:
+        explicit BatteryChargingMessage(BatteryState::ChargingState chargingState) : chargingState{chargingState} {};
+
+        [[nodiscard]] BatteryState::ChargingState getChargingState() const
+        {
+            return chargingState;
+        }
+
+      private:
+        BatteryState::ChargingState chargingState{BatteryState::ChargingState::Discharging};
+    };
 } // namespace sevm

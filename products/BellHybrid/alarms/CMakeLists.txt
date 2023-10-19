@@ -19,6 +19,8 @@ target_sources(alarms
         include/popups/AlarmActivatedPopupRequestParams.hpp
         include/popups/AlarmDeactivatedPopupRequestParams.hpp
         include/popups/BedtimeReminderPopupRequestParams.hpp
+        include/popups/ChargingNotificationPopupRequestParams.hpp
+        include/popups/ChargingDoneNotificationPopupRequestParams.hpp
 )
 
 target_include_directories(alarms

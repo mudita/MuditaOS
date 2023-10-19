@@ -5,13 +5,11 @@
 ### Fixed
 * Fixed frequency lock during user activity
 
-
 ### Added
-
+* Added notification when charger is connected
 
 ### Changed / Improved
 * Disabled USB MTP protocol
-
 
 ## [2.2.1 2023-10-30]
 

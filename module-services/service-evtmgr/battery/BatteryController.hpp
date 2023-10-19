@@ -7,6 +7,7 @@
 #include "EventManagerParams.hpp"
 #include "BatteryBrownoutDetector.hpp"
 #include "BatteryState.hpp"
+#include "EventStore.hpp"
 
 #include <queue.hpp>
 #include <memory>
@@ -32,6 +33,8 @@ namespace sevm::battery
         void updateSoc();
         void printCurrentState();
         void checkChargerPresence();
+        void sendChargingNotification(const Store::Battery::State &lastState,
+                                      const Store::Battery::State &currentState);
         units::Voltage getVoltage();
 
         sys::Service *service{nullptr};
@@ -39,5 +42,6 @@ namespace sevm::battery
         BatteryBrownoutDetector brownoutDetector;
         BatteryState batteryState;
         ChargerPresence chargerPresence{ChargerPresence::Undefined};
+        bool isFirstUpdateDone{false};
     };
 }; // namespace sevm::battery

@@ -116,6 +116,8 @@
     "app_bellmain_relaxation": "Relajaci\u00f3n",
     "app_bellmain_settings": "Ajustes",
     "app_bellmain_usb_status_connected": "Conectado",
+    "app_bell_charging_notification": "Cargando",
+    "app_bell_charging_done_notification": "Completamente cargado",
     "app_calculator_decimal_separator": ",",
     "app_calculator_equals": "IGUAL A",
     "app_calculator_error": "Error",

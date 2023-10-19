@@ -62,7 +62,7 @@
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/shortcuts_step_restart_W_G.vpi", "output": "assets/images/shortcuts_step_restart_W_G.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/shortcuts_step_bedside_lamp_W_G.vpi", "output": "assets/images/shortcuts_step_bedside_lamp_W_G.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/big_information_W_G.vpi", "output": "assets/images/big_information_W_G.vpi"},
-
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/big_bell_battery_charging_W_G.vpi", "output": "assets/images/big_bell_battery_charging_W_G.vpi"},
 
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/chimes/Blissful_Dream.mp3", "output": "assets/audio/chimes/Blissful_Dream.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/chimes/Gentle_Chime.mp3", "output": "assets/audio/chimes/Gentle_Chime.mp3"},

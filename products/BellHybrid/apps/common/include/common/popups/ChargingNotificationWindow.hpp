@@ -12,23 +12,30 @@ namespace app
 }
 namespace gui
 {
+    namespace charging_notification
+    {} // namespace charging_notification
+
     class Icon;
 
-    class BedtimeNotificationWindow : public WindowWithTimer, public app::AsyncCallbackReceiver
+    class ChargingNotificationWindow : public WindowWithTimer, public app::AsyncCallbackReceiver
     {
-      private:
-        static constexpr auto bedtimeNotificationIcon   = "big_bedtime_W_G";
-        static constexpr auto bedtimeNotificationText    = "app_bell_bedtime_notification";
-        static constexpr auto bedtimeNotificationTimeout = std::chrono::seconds{6};
-
+      protected:
         app::ApplicationCommon *app;
         Icon *icon = nullptr;
+
         bool onInput(const InputEvent &inputEvent) override;
         void returnToPreviousWindow();
         void buildInterface() override;
 
       public:
-        explicit BedtimeNotificationWindow(app::ApplicationCommon *app);
+        explicit ChargingNotificationWindow(app::ApplicationCommon *app);
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+    };
+
+    class ChargingDoneNotificationWindow : public ChargingNotificationWindow
+    {
+      public:
+        explicit ChargingDoneNotificationWindow(app::ApplicationCommon *app);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 } /* namespace gui */

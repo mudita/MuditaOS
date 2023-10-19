@@ -125,7 +125,9 @@ namespace app
                       gui::popup::ID::AlarmDeactivated,
                       gui::popup::ID::PowerOff,
                       gui::popup::ID::Reboot,
-                      gui::popup::ID::BedtimeNotification});
+                      gui::popup::ID::BedtimeNotification,
+                      gui::popup::ID::ChargingNotification,
+                      gui::popup::ID::ChargingDoneNotification});
     }
 
     sys::MessagePointer ApplicationBellRelaxation::DataReceivedHandler(sys::DataMessage *msgl,
