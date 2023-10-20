@@ -4,31 +4,42 @@
 
 ### Added
 
-* Added VoLTE support in Poland, Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
-* Added "beta" label to VoLTE switch for selected countries
+* Added VoLTE support in Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
 
 ### Changed / Improved
 
-* Change roaming indicator to show domestic roaming as home network
-* Improved device stability related to frequency scaling
+### Fixed
+
+* Fixed possible crash when entering phone number
+
+## [1.9.0 2023-10-19]
+
+### Added
+
+* Added VoLTE support in Poland as a beta feature.
+* Added "beta" label to VoLTE switch for selected countries.
+* Added confirmation window when closing an app with unsaved changes.
+* Added preserving message text and recipient number when closing new message window.
+* Added confirmation window when switching to tethering from an app with unsaved changes.
+
+### Changed / Improved
+
+* Changed roaming indicator to show domestic roaming as home network.
+* Improved device stability related to frequency scaling.
+* Enabled screen autolock in meditation app when idle.
 
 ### Fixed
 
-* Fixed losing unsaved data on go back
-* Fixed disabled screen autolock in meditation app
-* Fixed multiple issues with input fields in "New alarm" window
-* Fixed losing drafted message and recipient number in new message windows
-* Fixed misleading "Save" button behavior in "Date and time" window
-* Fixed losing unsaved user data when tethering is switching on
-* Fixed invalid elapsed time in music player after playing and pausing track from songs list view
-* Fixed disappearing "Call" label in Phonebook app
-* Fixed disappearing selections when setting custom alarm after popup is shown
-* Fixed alarm preview playback behavior
-* Fixed frequency lock during user activity
-* Fixed crash on transferring audio file with big metadata
-* Fixed possibility of OS crash during update package size check
-* Fixed possible crash when entering phone number
-* Fixed cut off VoLTE checking label in some languages
+* Fixed multiple UI issues with input fields in "New alarm" window.
+* Fixed misleading "Save" button behavior in "Date and time" window.
+* Fixed invalid elapsed time in music player after playing and pausing track from songs list view.
+* Fixed disappearing "Call" label in Phonebook app.
+* Fixed disappearing selections when setting custom alarm after a popup is shown.
+* Fixed alarm preview playback behavior.
+* Fixed CPU minimum frequency lock during user activity.
+* Fixed crash on transferring audio file with big metadata.
+* Fixed possibility of OS crash during update package size check.
+* Fixed cut off VoLTE checking label in some languages.
 
 ## [1.8.0 2023-09-27]
 
