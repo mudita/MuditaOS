@@ -11,8 +11,27 @@ namespace cellular::service
     {
         ImsiParserDE()
             : ImsiParser(
-                  std::vector<std::string>{
-                      "26201", "26206", "26202", "26204", "26209", "26203", "26205", "26208", "26223"},
+                  std::vector<std::string>{/* TMobile */
+                                           "26201",
+                                           "26206",
+                                           "26278",
+                                           /* Vodafone */
+                                           "26202",
+                                           "26204",
+                                           "26209",
+                                           "26242",
+                                           /* Telefonica / E-Plus */
+                                           "26203",
+                                           "26205",
+                                           "26217",
+                                           "26220",
+                                           /* Telefonica / O2 */
+                                           "26207",
+                                           "26208",
+                                           "26211",
+                                           "26216",
+                                           /* 1 & 1 */
+                                           "26223"},
                   SupportStatus::Beta)
         {}
     };
