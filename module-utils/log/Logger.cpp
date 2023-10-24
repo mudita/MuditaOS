@@ -7,6 +7,7 @@
 #include <purefs/filesystem_paths.hpp>
 #include <fstream>
 #include <CrashdumpMetadataStore.hpp>
+#include <gsl/util>
 
 namespace
 {
@@ -187,6 +188,15 @@ namespace Log
     /// @return:   1 - log flush successflul
     int Logger::dumpToFile(const std::filesystem::path &logDirectoryPath, LoggerState loggerState)
     {
+        if (preDumpToFile != nullptr) {
+            preDumpToFile();
+        }
+        auto _ = gsl::finally([this] {
+            if (postDumpToFile != nullptr) {
+                postDumpToFile();
+            }
+        });
+
         if (logFileName.empty()) {
             const auto &osMetadata = Store::CrashdumpMetadata::getInstance().getMetadataString();
             logFileName = std::string(logFileNamePrefix) + logFileNameSeparator + osMetadata + logFileNameExtension;

@@ -14,6 +14,7 @@ target_sources(sys-manager
     PRIVATE
         CpuGovernor.cpp
         CpuSentinel.cpp
+        LogSentinel.cpp
         GovernorSentinelOperations.cpp
         CpuStatistics.cpp
         TaskStatistics.cpp

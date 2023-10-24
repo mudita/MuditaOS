@@ -20,6 +20,7 @@ target_link_libraries(log
         utility
         purefs-paths
         crashdump-metadata-store
+        Microsoft.GSL::GSL
     PUBLIC
         module-os
         log-api
