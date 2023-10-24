@@ -11,6 +11,7 @@
 * Fixed frequency lock during user activity
 * Fixed possibility of OS crash during update package size check
 * Fixed incorrect calculation of requested CPU frequency
+* Fixed CPU frequency setting when dumping logs to a file
 
 ### Added
 * Files not fully transferred via Center will be now removed when USB cable is unplugged

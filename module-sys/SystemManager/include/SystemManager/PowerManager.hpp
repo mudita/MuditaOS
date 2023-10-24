@@ -9,6 +9,7 @@
 #include "drivers/semc/DriverSEMC.hpp"
 #include "SysCpuUpdateResult.hpp"
 #include "CpuGovernor.hpp"
+#include "LogSentinel.hpp"
 #include "TaskStatistics.hpp"
 #include <bsp/lpm/PowerProfile.hpp>
 #include <vector>
@@ -75,6 +76,7 @@ namespace sys
         void SetCpuFrequency(bsp::CpuFrequencyMHz freq);
 
         void UpdateCpuFrequencyMonitor(bsp::CpuFrequencyMHz currentFreq);
+        [[nodiscard]] auto GetMinimumCpuFrequencyRequested() const noexcept -> sentinel::View;
 
         TickType_t lastCpuFrequencyChangeTimestamp{0};
         TickType_t lastLogStatisticsTimestamp{0};
@@ -84,6 +86,7 @@ namespace sys
         std::shared_ptr<drivers::DriverSEMC> driverSEMC;
         std::unique_ptr<bsp::LowPowerMode> lowPowerControl;
         std::unique_ptr<CpuGovernor> cpuGovernor;
+        std::unique_ptr<LogSentinel> logSentinel;
         const bsp::PowerProfile powerProfile;
 
         std::unique_ptr<sys::cpu::AlgorithmFactory> cpuAlgorithms;

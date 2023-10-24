@@ -14,6 +14,7 @@
 
 * Fixed possible crash when entering phone number
 * Fixed incorrect calculation of requested CPU frequency
+* Fixed CPU frequency setting when dumping logs to a file
 
 ## [1.9.0 2023-10-19]
 

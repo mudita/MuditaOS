@@ -10,6 +10,7 @@
 #include <SystemManager/PowerManager.hpp>
 #include <gsl/util>
 #include <log/log.hpp>
+#include <Logger.hpp>
 #include <Utils.hpp>
 
 namespace sys
@@ -19,6 +20,8 @@ namespace sys
         constexpr auto lowestLevelName{"lowestCpuFrequency"};
         constexpr auto middleLevelName{"middleCpuFrequency"};
         constexpr auto highestLevelName{"highestCpuFrequency"};
+
+        constexpr bsp::CpuFrequencyMHz logDumpFrequencyToHold{bsp::CpuFrequencyMHz::Level_4};
     } // namespace
 
     CpuFrequencyMonitor::CpuFrequencyMonitor(const std::string &name) : levelName(name)
@@ -60,6 +63,9 @@ namespace sys
         driverSEMC      = drivers::DriverSEMC::Create(drivers::name::ExternalRAM);
         lowPowerControl = bsp::LowPowerMode::Create().value_or(nullptr);
         cpuGovernor     = std::make_unique<CpuGovernor>();
+        logSentinel                       = std::make_unique<LogSentinel>(logDumpFrequencyToHold);
+        Log::Logger::get().preDumpToFile  = [this]() { logSentinel->HoldMinimumFrequency(); };
+        Log::Logger::get().postDumpToFile = [this]() { logSentinel->ReleaseMinimumFrequency(); };
 
         cpuAlgorithms = std::make_unique<cpu::AlgorithmFactory>();
         cpuAlgorithms->emplace(sys::cpu::AlgoID::ImmediateUpscale, std::make_unique<sys::cpu::ImmediateUpscale>());
@@ -107,7 +113,7 @@ namespace sys
         uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad();
         cpu::UpdateResult retval;
         const cpu::AlgorithmData data{
-            cpuLoad, lowPowerControl->GetCurrentFrequencyLevel(), cpuGovernor->GetMinimumFrequencyRequested()};
+            cpuLoad, lowPowerControl->GetCurrentFrequencyLevel(), GetMinimumCpuFrequencyRequested()};
 
         auto _ = gsl::finally([&retval, this, data] {
             retval.frequencySet = lowPowerControl->GetCurrentFrequencyLevel();
@@ -174,8 +180,17 @@ namespace sys
         UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
         while (lowPowerControl->GetCurrentFrequencyLevel() != freq) {
             lowPowerControl->SetCpuFrequency(freq);
+            logSentinel->UpdateCurrentFrequency(freq);
             cpuGovernor->InformSentinelsAboutCpuFrequencyChange(freq);
         }
+    }
+
+    [[nodiscard]] auto PowerManager::GetMinimumCpuFrequencyRequested() const noexcept -> sentinel::View
+    {
+        const auto governorSentinelsView = cpuGovernor->GetMinimumFrequencyRequested();
+        const auto logSentinelView       = logSentinel->GetRequestedFrequency();
+        return (logSentinelView.minFrequency > governorSentinelsView.minFrequency) ? logSentinelView
+                                                                                   : governorSentinelsView;
     }
 
     [[nodiscard]] auto PowerManager::getExternalRamDevice() const noexcept -> std::shared_ptr<devices::Device>

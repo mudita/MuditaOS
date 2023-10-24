@@ -56,6 +56,11 @@ namespace Log
         int flushLogs();
         [[nodiscard]] std::size_t getMaxLineLength();
 
+        /// functions called immediately before and after dumping logs to a file
+        /// created to synchronize necessary peripherals with the CPU frequency
+        std::function<void()> preDumpToFile;
+        std::function<void()> postDumpToFile;
+
         static constexpr auto CRIT_STR = "CRIT";
         static constexpr auto IRQ_STR  = "IRQ";
 
