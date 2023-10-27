@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -34,7 +34,7 @@ namespace mockup
         auto cpuAlgorithms = std::make_unique<sys::cpu::AlgorithmFactory>();
         cpuAlgorithms->emplace(sys::cpu::AlgoID::ImmediateUpscale, std::make_unique<sys::cpu::ImmediateUpscale>());
         cpuAlgorithms->emplace(sys::cpu::AlgoID::FrequencyStepping,
-                               std::make_unique<sys::cpu::FrequencyStepping>(powerProfile, cpuGovernor));
+                               std::make_unique<sys::cpu::FrequencyStepping>(powerProfile));
         cpuAlgorithms->emplace(sys::cpu::AlgoID::FrequencyHold,
                                std::make_unique<sys::cpu::FrequencyHold>(freq, powerProfile));
         return cpuAlgorithms;

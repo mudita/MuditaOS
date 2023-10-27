@@ -2,13 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FrequencyStepping.hpp"
-#include "SystemManager/CpuGovernor.hpp"
 
 namespace sys::cpu
 {
 
-    FrequencyStepping::FrequencyStepping(const bsp::PowerProfile &powerProfile, CpuGovernor &cpuGovernor)
-        : powerProfile(powerProfile), cpuGovernor(cpuGovernor)
+    FrequencyStepping::FrequencyStepping(const bsp::PowerProfile &powerProfile) : powerProfile(powerProfile)
     {}
 
     bsp::CpuFrequencyMHz stepDown(bsp::CpuFrequencyMHz freq, const bsp::PowerProfile &profile)
@@ -34,7 +32,7 @@ namespace sys::cpu
     {
         const auto load           = data.CPUload;
         const auto startFrequency = data.curentFrequency;
-        const auto min            = cpuGovernor.GetMinimumFrequencyRequested();
+        const auto minFrequency   = data.sentinel.minFrequency;
 
         if (load > powerProfile.frequencyShiftUpperThreshold && startFrequency < bsp::CpuFrequencyMHz::Level_6) {
             aboveThresholdCounter++;
@@ -52,7 +50,7 @@ namespace sys::cpu
             isFrequencyDownscalingInProgress = false;
         }
 
-        if (min.frequency > startFrequency) {}
+        if (minFrequency > startFrequency) {}
         else if (aboveThresholdCounter >= powerProfile.maxAboveThresholdCount) {
             if (startFrequency < bsp::CpuFrequencyMHz::Level_4) {
                 reset();
@@ -66,7 +64,7 @@ namespace sys::cpu
         else {
             if (belowThresholdCounter >= (isFrequencyDownscalingInProgress ? powerProfile.maxBelowThresholdInRowCount
                                                                            : powerProfile.maxBelowThresholdCount) &&
-                startFrequency > min.frequency) {
+                startFrequency > minFrequency) {
                 isFrequencyDownscalingInProgress = true;
                 reset();
                 return {algorithm::Change::Downscaled, stepDown(startFrequency, powerProfile)};

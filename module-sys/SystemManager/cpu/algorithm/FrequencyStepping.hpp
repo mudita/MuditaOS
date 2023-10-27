@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,13 +16,12 @@ namespace sys::cpu
     class FrequencyStepping : public Algorithm
     {
         const bsp::PowerProfile &powerProfile;
-        CpuGovernor &cpuGovernor;
         unsigned int aboveThresholdCounter    = 0;
         unsigned int belowThresholdCounter    = 0;
         bool isFrequencyDownscalingInProgress = true;
 
       public:
-        FrequencyStepping(const bsp::PowerProfile &powerProfile, CpuGovernor &cpuGovernor);
+        explicit FrequencyStepping(const bsp::PowerProfile &powerProfile);
         [[nodiscard]] AlgorithmResult calculateImplementation(const AlgorithmData &data) override;
         void resetImplementation() override;
     };

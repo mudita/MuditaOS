@@ -163,7 +163,7 @@ namespace sys
             return (*l).GetRequestedFrequency() < (*r).GetRequestedFrequency();
         });
 
-        d.frequency = (*minSentinel)->GetRequestedFrequency();
+        d.minFrequency = (*minSentinel)->GetRequestedFrequency();
         if (auto p = (*minSentinel)->GetSentinel().lock()) {
             d.name   = p->GetName();
             d.reason = p->getReason();

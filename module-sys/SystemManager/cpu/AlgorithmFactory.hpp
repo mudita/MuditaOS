@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,7 +27,7 @@ namespace sys::cpu
         /// use algorithms from factory depending on list to calculate frequency
         /// return used algorithm in used paramter
         AlgorithmResult calculate(const std::list<sys::cpu::AlgoID> &algorithms,
-                                  cpu::AlgorithmData &data,
+                                  const cpu::AlgorithmData &data,
                                   AlgoID *used = nullptr);
         /// reset internal algorithms data
         void reset(const std::list<sys::cpu::AlgoID> &algorithms);
