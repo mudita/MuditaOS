@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SystemManager/CpuPrinter.hpp"
@@ -44,7 +44,7 @@ namespace sys::cpu::stats
                    int(ret.frequencySet),
                    ret.data.name.c_str(),
                    ret.data.reason.c_str(),
-                   int(ret.data.frequency),
+                   int(ret.data.minFrequency),
                    CLOCK_GetFreq(0));
     }
 

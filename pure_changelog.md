@@ -13,6 +13,7 @@
 ### Fixed
 
 * Fixed possible crash when entering phone number
+* Fixed incorrect calculation of requested CPU frequency
 
 ## [1.9.0 2023-10-19]
 

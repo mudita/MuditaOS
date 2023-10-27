@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SystemManager/CpuPrinter.hpp"
@@ -67,7 +67,7 @@ namespace sys::cpu::stats
                                       {"freq", uint32_t(ret.frequencySet)},
                                       {"name", ret.data.name},
                                       {"reason", ret.data.reason},
-                                      {"requested", uint32_t(ret.data.frequency)},
+                                      {"requested", uint32_t(ret.data.minFrequency)},
                                       {"avgA", int32_t(bsp::battery_charger::getAvgCurrent())},
                                       {"nowA", int32_t(bsp::battery_charger::getCurrentMeasurement())},
                                       {"ts", getTimestamp()}};

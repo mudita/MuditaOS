@@ -64,7 +64,7 @@ namespace sys
         cpuAlgorithms = std::make_unique<cpu::AlgorithmFactory>();
         cpuAlgorithms->emplace(sys::cpu::AlgoID::ImmediateUpscale, std::make_unique<sys::cpu::ImmediateUpscale>());
         cpuAlgorithms->emplace(sys::cpu::AlgoID::FrequencyStepping,
-                               std::make_unique<sys::cpu::FrequencyStepping>(powerProfile, *cpuGovernor));
+                               std::make_unique<sys::cpu::FrequencyStepping>(powerProfile));
 
         cpuFrequencyMonitor.push_back(CpuFrequencyMonitor(lowestLevelName));
         cpuFrequencyMonitor.push_back(CpuFrequencyMonitor(middleLevelName));
@@ -106,7 +106,7 @@ namespace sys
     {
         uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad();
         cpu::UpdateResult retval;
-        cpu::AlgorithmData data{
+        const cpu::AlgorithmData data{
             cpuLoad, lowPowerControl->GetCurrentFrequencyLevel(), cpuGovernor->GetMinimumFrequencyRequested()};
 
         auto _ = gsl::finally([&retval, this, data] {

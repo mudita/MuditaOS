@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,7 +19,7 @@ namespace sys
             /// name of sentinel thread responsible for curent minimum load
             std::string name;
             /// curent minimum frequency set in sentinel
-            bsp::CpuFrequencyMHz frequency = bsp::CpuFrequencyMHz::Level_0;
+            bsp::CpuFrequencyMHz minFrequency = bsp::CpuFrequencyMHz::Level_0;
             /// textual information on what actually happens
             std::string reason;
         };
