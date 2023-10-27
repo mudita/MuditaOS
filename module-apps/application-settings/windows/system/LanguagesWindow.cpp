@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LanguagesWindow.hpp"
@@ -30,7 +30,9 @@ namespace gui
             options.emplace_back(std::make_unique<gui::option::OptionSettings>(
                 lang,
                 [=](const gui::Item &item) {
+                    // Changing the system language will change the input language
                     app::manager::Controller::changeDisplayLanguage(application, lang);
+                    app::manager::Controller::changeInputLanguage(application, lang);
                     return true;
                 },
                 nullptr,
