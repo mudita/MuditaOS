@@ -26,6 +26,7 @@
 * Added preserving message text and recipient number when closing new message window.
 * Added confirmation window when switching to tethering from an app with unsaved changes.
 * Added displaying number entered on the keypad during a call
+* Added automatic change of input language when changing system language
 
 ### Changed / Improved
 
