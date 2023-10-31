@@ -9,6 +9,7 @@
 ### Changed / Improved
 
 * Disabled USB MTP protocol
+* Changed UI flow on discharged device window.
 
 ### Fixed
 

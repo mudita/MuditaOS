@@ -258,7 +258,7 @@ namespace gui::status_bar
         void showTethering(bool enabled);
 
         /// Show/hide phone mode or tethering widget
-        void showPhoneModeOrTethering(bool phoneModeEnabled, bool tetheringEnabled);
+        void showPhoneModeOrTethering(bool signalEnabled, bool phoneModeEnabled, bool tetheringEnabled);
 
         /// Sets the status of the specified indicator on the Status bar
         /// @param indicator indicator id

@@ -275,6 +275,8 @@
     "app_desktop_unread_messages": "<text>Nowe wiadomo\u015bci</text>",
     "app_desktop_unread_single_message": "<text>Nowa wiadomo\u015b\u0107</text>",
     "app_desktop_battery_too_hot": "<text>Bateria zbyt gorąca, nie ładuje</text>",
+    "app_desktop_too_low_battery": "<text>Poziom naładowania baterii jest zbyt niski (<token>$VALUE</token>%). Aby dalej korzystać z Pure, podłącz go do ładowarki.</text>",
+    "app_desktop_too_low_battery_charging": "<text>Poziom naładowania baterii jest zbyt niski (<token>$VALUE</token>%). Pure uruchomi się po osiągnięciu minimalnego poziomu naładowania (5%).</text>",
     "app_emoji_input_window": "Emoji",
     "app_meditation_countdown_desc": "Startuje za",
     "app_meditation_interval_chime": "Cykliczny d\u017awi\u0119k",

@@ -283,6 +283,8 @@
     "app_desktop_unread_messages": "<text>Ungelesene Nachrichten</text>",
     "app_desktop_unread_single_message": "<text>Ungelesene Nachricht</text>",
     "app_desktop_battery_too_hot": "<text>Batterie zu heiß, lädt nicht</text>",
+    "app_desktop_too_low_battery": "<text>Ihr Batteriestand ist zu niedrig (<token>$VALUE</token>%). Um Pure weiterhin zu verwenden, schließen Sie das Ladegerät an.</text>",
+    "app_desktop_too_low_battery_charging": "<text>Ihr Batteriestand ist zu niedrig (<token>$VALUE</token>%). Pure wird gestartet, wenn der Mindestladezustand erreicht ist (5%).</text>",
     "app_emoji_input_window": "Emoji",
     "app_meditation_countdown_desc": "Beginnt in",
     "app_meditation_interval_chime": "Glocken-Intervall",

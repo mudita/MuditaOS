@@ -20,6 +20,7 @@ target_sources(application-desktop
 	PRIVATE
 		ApplicationDesktop.cpp
 		data/Mmi.hpp
+		data/DeadBatteryInfoWindowData.hpp
 		models/ActiveNotificationsListPresenter.cpp
 		models/ActiveNotificationsListPresenter.hpp
 		widgets/DBNotificationsHandler.cpp
@@ -29,6 +30,7 @@ target_sources(application-desktop
 		windows/ChargingBatteryWindow.hpp
 		windows/DeadBatteryWindow.cpp
 		windows/DeadBatteryWindow.hpp
+		windows/DeadBatteryInfoWindow.cpp
 		windows/DesktopMainWindow.cpp
 		windows/DesktopMainWindow.hpp
 		windows/ClosingWindow.cpp

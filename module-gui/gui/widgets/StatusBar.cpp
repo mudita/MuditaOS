@@ -389,10 +389,11 @@ namespace gui::status_bar
 
     void StatusBar::showPhoneMode(bool enabled)
     {
-        showPhoneModeOrTethering(enabled, configuration.isEnabled(Indicator::Tethering));
+        showPhoneModeOrTethering(
+            configuration.isEnabled(Indicator::Signal), enabled, configuration.isEnabled(Indicator::Tethering));
     }
 
-    void StatusBar::showPhoneModeOrTethering(bool phoneModeEnabled, bool tetheringEnabled)
+    void StatusBar::showPhoneModeOrTethering(bool signalEnabled, bool phoneModeEnabled, bool tetheringEnabled)
     {
         if (tetheringEnabled && configuration.getTetheringState() != sys::phone_modes::Tethering::Off) {
             phoneMode->hide();
@@ -402,7 +403,7 @@ namespace gui::status_bar
         }
         else {
             tethering->hide();
-            signal->show();
+            signalEnabled ? signal->show() : signal->hide();
             phoneModeEnabled ? phoneMode->show() : phoneMode->hide();
             showNetworkAccessTechnology(configuration.isEnabled(Indicator::NetworkAccessTechnology));
         }
@@ -425,7 +426,7 @@ namespace gui::status_bar
 
     bool StatusBar::showTime(bool enabled)
     {
-        const auto visibilityChanged = time->isVisible() == enabled ? false : true;
+        const auto visibilityChanged = (time->isVisible() != enabled);
         time->update();
         if (enabled) {
             centralBox->setMinimumSize(boxes::center::maxX, this->drawArea.h);
@@ -473,7 +474,8 @@ namespace gui::status_bar
 
     void StatusBar::showTethering(bool enabled)
     {
-        showPhoneModeOrTethering(configuration.isEnabled(Indicator::PhoneMode), enabled);
+        showPhoneModeOrTethering(
+            configuration.isEnabled(Indicator::Signal), configuration.isEnabled(Indicator::PhoneMode), enabled);
     }
 
     void StatusBar::accept(GuiVisitor &visitor)
