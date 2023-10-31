@@ -63,11 +63,13 @@ namespace app
     void ApplicationBellRelaxation::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
-            auto tagsFetcher      = std::make_unique<app::music::ServiceAudioTagsFetcher>(app);
-            const auto paths      = std::vector<std::string>{paths::audio::proprietary() / paths::audio::relaxation(),
-                                                        paths::audio::userApp() / paths::audio::relaxation()};
-            auto soundsRepository = std::make_unique<app::music::SongsRepository>(app, std::move(tagsFetcher), paths);
-            auto presenter = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(soundsRepository));
+            const auto paths = std::map<relaxation::MusicType, std::string>{
+                {relaxation::MusicType::Relaxation, paths::audio::proprietary() / paths::audio::relaxation()},
+                {relaxation::MusicType::User, paths::audio::userApp() / paths::audio::relaxation()}};
+
+            auto soundsRepository = std::make_unique<relaxation::RelaxationSongsRepository>(app, paths);
+            auto songsModel = std::make_unique<relaxation::RelaxationSongsModel>(app, std::move(soundsRepository));
+            auto presenter  = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(songsModel));
             return std::make_unique<gui::RelaxationMainWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(

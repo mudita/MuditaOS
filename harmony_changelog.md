@@ -24,6 +24,7 @@
 
 ### Changed / Improved
 * Disabled USB MTP protocol
+* Optimize the way Relaxation is loading music files
 
 ## [2.2.1 2023-10-30]
 

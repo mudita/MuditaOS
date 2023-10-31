@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -44,6 +44,7 @@ namespace db::multimedia_files::query
     class RemoveAll;
     class RemoveByPath;
     class RemoveResult;
+    class GetCountForPath;
 } // namespace db::multimedia_files::query
 
 namespace db::multimedia_files
@@ -99,6 +100,8 @@ namespace db::multimedia_files
             const std::shared_ptr<db::multimedia_files::query::GetByPath> &query);
         std::unique_ptr<db::multimedia_files::query::RemoveResult> runQueryImplRemoveByPath(
             const std::shared_ptr<db::multimedia_files::query::RemoveByPath> &query);
+        std::unique_ptr<db::multimedia_files::query::GetCountResult> runQueryImplGetCountForPath(
+            const std::shared_ptr<db::multimedia_files::query::GetCountForPath> &query);
 
         MultimediaFilesDB *database = nullptr;
     };

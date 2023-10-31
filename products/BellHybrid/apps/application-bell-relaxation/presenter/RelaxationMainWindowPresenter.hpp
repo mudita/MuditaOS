@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "model/RelaxationSongsModel.hpp"
 #include <apps-common/BasePresenter.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
 #include <vector>
@@ -13,6 +14,7 @@ namespace app::music
 }
 namespace app::relaxation
 {
+
     class RelaxationMainWindowContract
     {
       public:
@@ -21,24 +23,30 @@ namespace app::relaxation
           public:
             virtual ~View() = default;
 
-            virtual void setSoundsList(std::vector<db::multimedia_files::MultimediaFilesRecord> songs) = 0;
+            virtual void updateViewState()                                                             = 0;
             virtual void handleError()                                                                 = 0;
         };
 
         class Presenter : public BasePresenter<RelaxationMainWindowContract::View>
         {
+
           public:
-            virtual void loadAudioRecords() = 0;
+            virtual void createData(RelaxationSongsModel::OnActivateCallback activateCallback) = 0;
+            virtual void updateViewState()                                                     = 0;
+            virtual std::shared_ptr<RelaxationSongsModel> getSongsModel()                      = 0;
         };
     };
 
     class RelaxationMainWindowPresenter : public RelaxationMainWindowContract::Presenter
     {
-        std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository;
-        void loadAudioRecords() override;
+      private:
+        std::shared_ptr<RelaxationSongsModel> songsModel;
+        void createData(RelaxationSongsModel::OnActivateCallback activateCallback) override;
+        void updateViewState() override;
+        std::shared_ptr<RelaxationSongsModel> getSongsModel() override;
 
       public:
-        explicit RelaxationMainWindowPresenter(std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository);
+        explicit RelaxationMainWindowPresenter(std::unique_ptr<RelaxationSongsModel> songsModel);
     };
 
 } // namespace app::relaxation

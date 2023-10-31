@@ -7,7 +7,6 @@
 #include <data/RelaxationErrorData.hpp>
 
 #include <ApplicationBellRelaxation.hpp>
-#include <audio/AudioMessage.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 

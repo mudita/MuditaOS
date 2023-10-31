@@ -5,54 +5,53 @@
 #include <data/RelaxationAudioData.hpp>
 #include <data/RelaxationErrorData.hpp>
 #include <ApplicationBellRelaxation.hpp>
+#include "common/options/BellOptionsNavigation.hpp"
 
 #include <common/options/OptionBellMenu.hpp>
 #include <i18n/i18n.hpp>
 
-namespace
-{
-    constexpr auto maxDisplayedTitleLength    = 30U;
-    constexpr auto incompleteSequenceCharCode = '\342';
-} // namespace
 
 namespace gui
 {
     RelaxationMainWindow::RelaxationMainWindow(
         app::ApplicationCommon *app,
         std::unique_ptr<app::relaxation::RelaxationMainWindowContract::Presenter> &&presenter)
-        : BellOptionWindow(app, gui::name::window::main_window), presenter{std::move(presenter)}
+        : AppWindow(app, gui::name::window::main_window), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);
         buildInterface();
-        setListTitle(utils::translate("app_bellmain_relaxation"));
-    }
-
-    void RelaxationMainWindow::setSoundsList(std::vector<db::multimedia_files::MultimediaFilesRecord> sounds)
-    {
-        std::list<gui::Option> menuOptionList;
-        auto addRecord = [&](const db::multimedia_files::MultimediaFilesRecord &sound) {
-            menuOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
-                sound.tags.title,
-                [=](gui::Item &item) {
-                    onActivated(sound);
-                    return true;
-                },
-                [=](gui::Item &item) { return true; },
-                this));
-        };
-        for (const auto &sound : sounds) {
-            addRecord(sound);
-        }
-        addOptions(std::move(menuOptionList));
     }
 
     void RelaxationMainWindow::buildInterface()
     {
-        BellOptionWindow::buildInterface();
-        presenter->loadAudioRecords();
+        AppWindow::buildInterface();
+
+        statusBar->setVisible(false);
+        header->setTitleVisibility(false);
+        navBar->setVisible(false);
+
+        songList = new gui::ListViewWithArrows(
+            this, 0, 0, style::window_width, style::window_height, presenter->getSongsModel());
+        songList->applySizeRestrictions(style::bell_options_list::w,
+                                        style::bell_options_list::h,
+                                        style::bell_options_list::outer_layouts_h,
+                                        style::bell_options_list::outer_layouts_margin);
+
+        songList->setListTitle(utils::translate("app_bellmain_relaxation"));
+
+        auto storedCallback     = songList->inputCallback;
+        songList->inputCallback = [&, storedCallback](Item &item, const InputEvent &event) {
+            return storedCallback(item, invertNavigationDirection(event));
+        };
+        setFocusItem(songList);
+
+        presenter->createData([this](const db::multimedia_files::MultimediaFilesRecord &selectedSound) {
+            activate(selectedSound);
+            return true;
+        });
     }
 
-    void RelaxationMainWindow::onActivated(const db::multimedia_files::MultimediaFilesRecord &selectedSound)
+    void RelaxationMainWindow::activate(const db::multimedia_files::MultimediaFilesRecord &selectedSound)
     {
         auto audioContext = std::make_unique<RelaxationAudioContext>(selectedSound);
         auto switchData   = std::make_unique<RelaxationSwitchData>(std::move(audioContext));
@@ -65,9 +64,9 @@ namespace gui
         application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
     }
 
-    void RelaxationMainWindow::rebuild()
+    void RelaxationMainWindow::updateViewState()
     {
-        presenter->loadAudioRecords();
+        songList->rebuildList(gui::listview::RebuildType::InPlace);
     }
 
 } // namespace gui
