@@ -282,6 +282,8 @@
     "app_desktop_unread_messages": "<text>Mensajes no le\u00eddos</text>",
     "app_desktop_unread_single_message": "<text>Mensaje no le\u00eddo</text>",
     "app_desktop_battery_too_hot": "<text>Batería caliente, no carga</text>",
+    "app_desktop_too_low_battery": "<text>El nivel de tu batería es demasiado bajo (<token>$VALUE</token>%). Para seguir usando Pure, conecte el dispositivo al cargador.</text>",
+    "app_desktop_too_low_battery_charging": "<text>El nivel de tu batería es demasiado bajo (<token>$VALUE</token>%). Pure comenzará cuando se alcance el nivel mínimo de carga (5%).</text>",
     "app_emoji_input_window": "Emoji",
     "app_meditation_countdown_desc": "Empieza en",
     "app_meditation_interval_chime": "Campanilla de intervalo",

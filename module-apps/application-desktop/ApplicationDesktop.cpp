@@ -4,6 +4,7 @@
 #include "ApplicationDesktop.hpp"
 #include "ChargingBatteryWindow.hpp"
 #include "DeadBatteryWindow.hpp"
+#include "DeadBatteryInfoWindow.hpp"
 #include "DesktopMainWindow.hpp"
 #include "ClosingWindow.hpp"
 #include "MenuWindow.hpp"
@@ -148,14 +149,17 @@ namespace app
         windowsFactory.attach(desktop_menu, [this](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::MenuWindow>(app, dbNotificationHandler);
         });
-        windowsFactory.attach(dead_battery, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::DeadBatteryWindow>(app);
-        });
         windowsFactory.attach(closing_window, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::ClosingWindow>(app);
         });
+        windowsFactory.attach(dead_battery, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::DeadBatteryWindow>(app, name);
+        });
         windowsFactory.attach(charging_battery, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::ChargingBatteryWindow>(app);
+            return std::make_unique<gui::ChargingBatteryWindow>(app, name);
+        });
+        windowsFactory.attach(dead_battery_info, [](ApplicationCommon *app, const std::string &name) {
+            return std::make_unique<gui::DeadBatteryInfoWindow>(app, name);
         });
         windowsFactory.attach(desktop_mmi_pull, [](ApplicationCommon *app, const std::string &name) {
             return std::make_unique<gui::MmiPullWindow>(app, name);

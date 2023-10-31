@@ -1,13 +1,15 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ChargingBatteryWindow.hpp"
-#include "InputEvent.hpp"
 #include "Names.hpp"
+#include "DeadBatteryInfoWindowData.hpp"
 
 #include <gui/widgets/Image.hpp>
-#include <log/log.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <InputEvent.hpp>
+#include <EventStore.hpp>
+#include <FontManager.hpp>
 
 namespace gui
 {
@@ -15,10 +17,20 @@ namespace gui
     {
         constexpr inline auto imgPositionX = 176;
         constexpr inline auto imgPositionY = 250;
+
+        std::string getInfoText()
+        {
+            const auto &rawText     = utils::translate("app_desktop_too_low_battery_charging");
+            const auto batteryLevel = static_cast<int>(Store::Battery::get().level);
+            auto format             = TextFormat(FontManager::getInstance().getFont(style::window::font::medium));
+            auto tokenMap           = text::RichTextParser::TokenMap({{"$VALUE", batteryLevel}});
+
+            return text::RichTextParser().parse(rawText, &format, std::move(tokenMap))->getText();
+        }
     } // namespace
 
-    ChargingBatteryWindow::ChargingBatteryWindow(app::ApplicationCommon *app)
-        : AppWindow(app, app::window::name::charging_battery)
+    ChargingBatteryWindow::ChargingBatteryWindow(app::ApplicationCommon *app, const std::string &name)
+        : AppWindow(app, name)
     {
         buildInterface();
         preventsAutoLock = true;
@@ -43,10 +55,10 @@ namespace gui
         erase();
     }
 
-    bool ChargingBatteryWindow::onInput(const InputEvent &inputEvent)
+    bool ChargingBatteryWindow::onInput([[maybe_unused]] const InputEvent &inputEvent)
     {
-        // Ignore all inputs
+        auto data = std::make_unique<DeadBatteryInfoWindowData>(getInfoText());
+        application->switchWindow(app::window::name::dead_battery_info, std::move(data));
         return true;
     }
-
 } /* namespace gui */

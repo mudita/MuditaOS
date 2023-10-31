@@ -250,6 +250,8 @@
     "app_desktop_unread_messages": "<text>Messages non lus</text>",
     "app_desktop_unread_single_message": "<text>Message non lu</text>",
     "app_desktop_battery_too_hot": "<text>Batterie chaude, pas de charge</text>",
+    "app_desktop_too_low_battery": "<text>Le niveau de charge de votre batterie est trop faible (<token>$VALUE</token>%). Pour continuer à utiliser Pure, branchez-la au chargeur.</text>",
+    "app_desktop_too_low_battery_charging": "<text>Le niveau de charge de votre batterie est trop faible (<token>$VALUE</token>%). Pure se lancera lorsque le niveau de charge minimum sera atteint (5%).</text>",
     "app_emoji_input_window": "Emoji",
     "app_meditation_countdown_desc": "D\u00e9but dans",
     "app_meditation_interval_chime": "Carillon d'intervalle",

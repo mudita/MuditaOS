@@ -10,7 +10,8 @@ namespace app::window::name
     inline constexpr auto desktop_main_window        = gui::name::window::main_window;
     inline constexpr auto desktop_menu               = "MenuWindow";
     inline constexpr auto dead_battery               = "DeadBatteryWindow";
-    inline constexpr auto charging_battery           = "CharginBatteryWindow";
+    inline constexpr auto dead_battery_info          = "DeadBatteryInfoWindow";
+    inline constexpr auto charging_battery           = "ChargingBatteryWindow";
     inline constexpr auto closing_window             = "ClosingWindow";
     inline constexpr auto desktop_mmi_pull           = "MmiPullWindow";
     inline constexpr auto desktop_mmi_push           = "MmiPushWindow";
