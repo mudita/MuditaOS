@@ -4,31 +4,27 @@
 #include "RelaxationMainWindowPresenter.hpp"
 #include <apps-common/models/SongsRepository.hpp>
 
-namespace
-{
-    constexpr auto offset            = 0;
-    constexpr auto filesLimitPerPath = 100;
-} // namespace
-
 namespace app::relaxation
 {
-    RelaxationMainWindowPresenter::RelaxationMainWindowPresenter(
-        std::unique_ptr<app::music::AbstractSongsRepository> soundsRepository)
-        : soundsRepository{std::move(soundsRepository)}
+    RelaxationMainWindowPresenter::RelaxationMainWindowPresenter(std::unique_ptr<RelaxationSongsModel> songsModel)
+        : songsModel{std::move(songsModel)}
     {}
 
-    void RelaxationMainWindowPresenter::loadAudioRecords()
+    void RelaxationMainWindowPresenter::createData(RelaxationSongsModel::OnActivateCallback activateCallback)
     {
-        soundsRepository->getMusicFilesListByPaths(
-            offset,
-            filesLimitPerPath,
-            [this](const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
-                   unsigned int repoRecordsCount) {
-                getView()->setSoundsList(records);
-                if (repoRecordsCount > filesLimitPerPath) {
-                    getView()->handleError();
-                }
-                return true;
-            });
+        songsModel->createData(activateCallback);
+        updateViewState();
+    }
+    void RelaxationMainWindowPresenter::updateViewState()
+    {
+        auto view = getView();
+        if (view != nullptr) {
+            view->updateViewState();
+        }
+    }
+
+    std::shared_ptr<RelaxationSongsModel> RelaxationMainWindowPresenter::getSongsModel()
+    {
+        return songsModel;
     }
 } // namespace app::relaxation

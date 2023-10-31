@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -33,6 +33,15 @@ namespace db::multimedia_files::query
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
         const Album album;
+    };
+
+    class GetCountForPath : public Query
+    {
+      public:
+        explicit GetCountForPath(const std::string &path);
+        [[nodiscard]] auto debugInfo() const -> std::string override;
+
+        const std::string path;
     };
 
     class GetCountResult : public QueryResult

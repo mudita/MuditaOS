@@ -9,7 +9,7 @@
 
 namespace gui
 {
-    class RelaxationMainWindow : public BellOptionWindow, public app::relaxation::RelaxationMainWindowContract::View
+    class RelaxationMainWindow : public AppWindow, public app::relaxation::RelaxationMainWindowContract::View
     {
       public:
         RelaxationMainWindow(app::ApplicationCommon *app,
@@ -18,10 +18,11 @@ namespace gui
       private:
         std::unique_ptr<app::relaxation::RelaxationMainWindowContract::Presenter> presenter;
 
+        gui::ListViewWithArrows *songList = nullptr;
+
         void buildInterface() override;
         void handleError() override;
-        void rebuild() override;
-        void setSoundsList(std::vector<db::multimedia_files::MultimediaFilesRecord> soundsTags);
-        void onActivated(const db::multimedia_files::MultimediaFilesRecord &selectedSound);
+        void updateViewState() override;
+        void activate(const db::multimedia_files::MultimediaFilesRecord &selectedSound);
     };
 } // namespace gui

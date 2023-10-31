@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MultimediaFilesRecord.hpp"
@@ -80,6 +80,9 @@ namespace db::multimedia_files
         }
         if (typeid(*query) == typeid(query::GetByPath)) {
             return runQueryImplGetByPath(std::static_pointer_cast<query::GetByPath>(query));
+        }
+        if (typeid(*query) == typeid(query::GetCountForPath)) {
+            return runQueryImplGetCountForPath(std::static_pointer_cast<query::GetCountForPath>(query));
         }
         return nullptr;
     }
@@ -265,6 +268,15 @@ namespace db::multimedia_files
         const std::shared_ptr<db::multimedia_files::query::GetCountForAlbum> &query)
     {
         const auto ret = database->files.count(query->album);
+        auto response  = std::make_unique<query::GetCountResult>(ret);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    std::unique_ptr<db::multimedia_files::query::GetCountResult> MultimediaFilesRecordInterface::
+        runQueryImplGetCountForPath(const std::shared_ptr<db::multimedia_files::query::GetCountForPath> &query)
+    {
+        const auto ret = database->files.count(std::vector{query->path});
         auto response  = std::make_unique<query::GetCountResult>(ret);
         response->setRequestQuery(query);
         return response;
