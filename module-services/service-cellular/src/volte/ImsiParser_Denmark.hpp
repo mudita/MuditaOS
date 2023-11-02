@@ -10,8 +10,22 @@ namespace cellular::service
     struct ImsiParserDK : ImsiParser
     {
         ImsiParserDK()
-            : ImsiParser(std::vector<std::string>{"23801", "23802", "23806", "23820", "23866", "28801", "28802"},
-                         SupportStatus::Beta)
+            : ImsiParser(
+                  std::vector<std::string>{/* TDC */
+                                           "23801",
+                                           "23810",
+                                           /* Telenor */
+                                           "23877",
+                                           "23802",
+                                           "238299",
+                                           /* Telia */
+                                           "23820",
+                                           "23896",
+                                           /* Tre (3) */
+                                           "23806",
+                                           /* TT-Netværket */
+                                           "23866"},
+                  SupportStatus::Beta)
         {}
     };
 } // namespace cellular::service

@@ -9,9 +9,30 @@ namespace cellular::service
 {
     struct ImsiParserAT : ImsiParser
     {
-        ImsiParserAT()
-            : ImsiParser(std::vector<std::string>{"23201", "23203", "23213", "23205", "23210", "23207", "23208"},
-                         SupportStatus::Beta)
+        explicit ImsiParserAT()
+            : ImsiParser(
+                  std::vector<std::string>{/* A1 Telekom */
+                                           "23211",
+                                           "23202",
+                                           "23209",
+                                           "23201",
+                                           "23212",
+                                           /* T-Mobile/Magenta */
+                                           "23204",
+                                           "23203",
+                                           "23223",
+                                           "23213",
+                                           /* Drei (3) */
+                                           "23219",
+                                           "23205",
+                                           "23216",
+                                           "23210",
+                                           "23214",
+                                           /* Ventocom */
+                                           "23207",
+                                           /* Lycamobile AT */
+                                           "23208"},
+                  SupportStatus::Beta)
         {}
     };
 } // namespace cellular::service
