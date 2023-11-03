@@ -24,18 +24,29 @@ namespace gui
         Icon *icon = nullptr;
 
         bool onInput(const InputEvent &inputEvent) override;
-        void returnToPreviousWindow();
+        virtual void returnToPreviousWindow();
         void buildInterface() override;
 
       public:
-        explicit ChargingNotificationWindow(app::ApplicationCommon *app);
-        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+        explicit ChargingNotificationWindow(app::ApplicationCommon *app, const std::string &windowName);
     };
 
     class ChargingDoneNotificationWindow : public ChargingNotificationWindow
     {
+      protected:
+        void returnToPreviousWindow() override;
+
       public:
         explicit ChargingDoneNotificationWindow(app::ApplicationCommon *app);
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
+    };
+    class ChargingInProgressNotificationWindow : public ChargingNotificationWindow
+    {
+      protected:
+        void returnToPreviousWindow() override;
+
+      public:
+        explicit ChargingInProgressNotificationWindow(app::ApplicationCommon *app);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
 } /* namespace gui */

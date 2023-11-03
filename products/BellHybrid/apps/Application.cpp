@@ -105,7 +105,7 @@ namespace app
             case ID::ChargingNotification:
                 windowsFactory.attach(window::charging_notification_window,
                                       [](app::ApplicationCommon *app, const std::string &name) {
-                                          return std::make_unique<gui::ChargingNotificationWindow>(app);
+                                          return std::make_unique<gui::ChargingInProgressNotificationWindow>(app);
                                       });
                 break;
             case ID::ChargingDoneNotification:
