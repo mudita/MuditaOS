@@ -20,7 +20,8 @@ namespace gui
 
       private:
         auto buildOptionsList() -> std::list<Option> override;
-        auto getVolteLabel() -> std::string;
+        auto getVoltePrimaryLabel() -> std::string;
+        auto getVolteSecondaryLabel() -> std::string;
         auto getRightItemSetting() -> option::SettingRightItem;
 
         app::settingsInterface::OperatorsSettings *operatorsSettings = nullptr;

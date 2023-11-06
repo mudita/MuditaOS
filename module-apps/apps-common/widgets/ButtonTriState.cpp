@@ -16,10 +16,10 @@ namespace gui
 
     void ButtonTriState::switchState(State requestedState)
     {
-        setFont(style::window::font::small);
         setPenWidth(style::buttonTriState::penWidth);
 
         const auto setRectangleStyle = [this](State state) {
+            setFont(style::window::font::small);
             setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
             setEdges(RectangleEdge::All);
             setCorners(RectangleRoundedCorner::All);
@@ -30,6 +30,7 @@ namespace gui
         };
 
         const auto setTextOnlyStyle = [this](const std::string &text) {
+            setFont(style::window::font::verysmall);
             setAlignment(Alignment(gui::Alignment::Horizontal::Right, gui::Alignment::Vertical::Center));
             setEdges(RectangleEdge::None);
             setCorners(RectangleRoundedCorner::None);
