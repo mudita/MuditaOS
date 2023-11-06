@@ -131,7 +131,7 @@ int main()
     if (!sys::SystemWatchdog::getInstance().init()) {
         LOG_ERROR("System watchdog failed to initialize");
         // wait for the hardware watchdog (initialized in reset ISR) to reset the system
-        while (1)
+        while (true)
             ;
     }
 

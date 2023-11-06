@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <TextFixedSize.hpp>
@@ -8,15 +8,29 @@
 
 namespace gui::option
 {
+    OptionSettings::OptionSettings(const UTF8 &primaryText,
+                                   std::function<bool(Item &)> activatedCallback,
+                                   std::function<bool(Item &)> focusChangedCallback,
+                                   gui::AppWindow *app,
+                                   gui::option::SettingRightItem rightItem,
+                                   bool indent,
+                                   const UTF8 &textOnRight,
+                                   bool isTextOnRightSmall,
+                                   const UTF8 &secondaryText)
+        : primaryText(primaryText), secondaryText(secondaryText), activatedCallback(std::move(activatedCallback)),
+          focusChangedCallback(std::move(focusChangedCallback)), app(app), rightItem(rightItem), indent(indent),
+          textOnRight(textOnRight), isTextOnRightSmall(isTextOnRightSmall)
+    {}
+
     auto OptionSettings::build() const -> ListItem *
     {
-        auto optionItem = new gui::ListItem();
+        const auto optionItem = new gui::ListItem();
         optionItem->setMinimumSize(style::window::default_body_width, style::window::label::big_h);
         optionItem->setMargins(Margins(0, 0, 0, window::option_bottom_margin));
         optionItem->activatedCallback    = activatedCallback;
         optionItem->focusChangedCallback = focusChangedCallback;
 
-        auto optionBodyHBox = new HBox(optionItem, 0, 0, 0, 0);
+        const auto optionBodyHBox = new HBox(optionItem, 0, 0, 0, 0);
         optionBodyHBox->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         style::window::decorate(optionBodyHBox);
 
@@ -26,13 +40,32 @@ namespace gui::option
             return true;
         };
 
-        auto optionText = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
-        optionText->drawUnderline(false);
-        optionText->setAlignment(gui::Alignment::Vertical::Center);
-        optionText->setMaximumSize(style::window::default_body_width, style::window::label::big_h);
-        optionText->setMargins(Margins(window::option_left_margin, 0, 0, 0));
-        optionText->setFont(style::window::font::big);
-        optionText->setRichText(text);
+        const auto primaryOptionText = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
+        primaryOptionText->drawUnderline(false);
+        primaryOptionText->setAlignment(gui::Alignment::Vertical::Center);
+        primaryOptionText->setMargins(Margins(window::option_left_margin, 0, 0, 0));
+        primaryOptionText->setFont(style::window::font::big);
+        primaryOptionText->setRichText(primaryText);
+
+        if (!secondaryText.empty()) {
+            /* Set primary text box size to use only the space required for text to be shown */
+            primaryOptionText->setMinimumHeightToFitText();
+            primaryOptionText->setMinimumWidthToFitText();
+
+            /* Set secondary text box to take all the remaining space */
+            const auto secondaryOptionText = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
+            secondaryOptionText->drawUnderline(false);
+            secondaryOptionText->setAlignment(
+                Alignment(gui::Alignment::Horizontal::Left, gui::Alignment::Vertical::Center));
+            secondaryOptionText->setMaximumSize(style::window::default_body_width, style::window::label::small_h);
+            secondaryOptionText->setMargins(Margins(window::option_label_spacer, 0, 0, 0));
+            secondaryOptionText->setFont(style::window::font::small);
+            secondaryOptionText->setRichText(secondaryText);
+        }
+        else {
+            /* Set primary text box to take all the space */
+            primaryOptionText->setMaximumSize(style::window::default_body_width, style::window::label::big_h);
+        }
 
         std::string imageName;
         ButtonTriState *button = nullptr;
@@ -66,10 +99,9 @@ namespace gui::option
             imageName = "sim2_option_32px_W_G";
             break;
         case SettingRightItem::Text: {
-            auto optionTextRight = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
+            const auto optionTextRight = new TextFixedSize(optionBodyHBox, 0, 0, 0, 0);
             optionTextRight->drawUnderline(false);
-            optionTextRight->setFont((textOnRightIsSmall) ? style::window::font::verysmall
-                                                          : style::window::font::medium);
+            optionTextRight->setFont(isTextOnRightSmall ? style::window::font::verysmall : style::window::font::medium);
             optionTextRight->setMinimumWidthToFitText(textOnRight);
             optionTextRight->setMinimumHeight(style::window::label::big_h);
             optionTextRight->setAlignment(
@@ -86,14 +118,19 @@ namespace gui::option
             new gui::Image(optionBodyHBox, 0, 0, 0, 0, imageName);
         }
 
-        if (button) {
+        if (button != nullptr) {
             button->setMargins(Margins(0, 0, window::option_right_margin, 0));
         }
 
         if (indent) {
-            optionText->setMargins(Margins(window::option_left_margin * 2, 0, 0, 0));
+            primaryOptionText->setMargins(Margins(window::option_left_margin * 2, 0, 0, 0));
         }
 
         return optionItem;
+    }
+
+    auto OptionSettings::str() const -> std::string
+    {
+        return primaryText + secondaryText;
     }
 } // namespace gui::option

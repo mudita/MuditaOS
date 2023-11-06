@@ -46,7 +46,7 @@ namespace gui
             false));
 
         optionsList.emplace_back(std::make_unique<gui::option::OptionSettings>(
-            getVolteLabel(),
+            getVoltePrimaryLabel(),
             [this]([[maybe_unused]] gui::Item &item) {
                 const auto volteState = getVolteStateFromSettingsApp(application);
                 if (!volteState.permitted) {
@@ -80,7 +80,11 @@ namespace gui
                 return true;
             },
             nullptr,
-            getRightItemSetting()));
+            getRightItemSetting(),
+            false,
+            UTF8(),
+            true,
+            getVolteSecondaryLabel()));
 
 #if DISABLED_SETTINGS_OPTIONS == 1
         auto operatorsOn = operatorsSettings->getOperatorsOn();
@@ -124,7 +128,7 @@ namespace gui
         return optionsList;
     }
 
-    auto NetworkWindow::getVolteLabel() -> std::string
+    auto NetworkWindow::getVoltePrimaryLabel() -> std::string
     {
         const auto &volteState = getVolteStateFromSettingsApp(application);
 
@@ -136,12 +140,18 @@ namespace gui
             labelText += ": ";
             labelText += utils::translate("app_settings_network_volte_not_available");
         }
-        else if (volteState.beta) {
-            labelText += " <b>" + utils::translate("common_beta") + "</b>";
-        }
         labelText += "</text>";
 
         return labelText;
+    }
+
+    auto NetworkWindow::getVolteSecondaryLabel() -> std::string
+    {
+        const auto &volteState = getVolteStateFromSettingsApp(application);
+        if (volteState.permitted && volteState.beta) {
+            return "<text><b>" + utils::translate("common_experimental") + "</b><text>";
+        }
+        return {};
     }
 
     auto NetworkWindow::getRightItemSetting() -> option::SettingRightItem
