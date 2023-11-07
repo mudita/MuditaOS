@@ -47,6 +47,9 @@ namespace bsp
         case RebootType::NormalRestart:
             set_boot_reason(boot_reason_code_os);
             break;
+        case RebootType::GoToMSC:
+            set_boot_reason(boot_reason_code_usb_mc_mode);
+            break;
         default:
             set_boot_reason(boot_reason_code_unknown);
         }

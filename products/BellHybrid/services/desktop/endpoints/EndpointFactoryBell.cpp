@@ -10,6 +10,7 @@
 #include <endpoints/nullEndpoint/NullEndpoint.hpp>
 #include <endpoints/restore/RestoreEndpoint.hpp>
 #include <endpoints/update/UpdateEndpoint.hpp>
+#include <endpoints/reboot/RebootEndpoint.hpp>
 #include <log/log.hpp>
 
 namespace sdesktop::endpoints
@@ -33,6 +34,8 @@ namespace sdesktop::endpoints
             return std::make_unique<RestoreEndpoint>(ownerServicePtr);
         case EndpointType::factory:
             return std::make_unique<FactoryResetEndpoint>(ownerServicePtr);
+        case EndpointType::reboot:
+            return std::make_unique<RebootEndpoint>(ownerServicePtr);
         default:
             return std::make_unique<NullEndpoint>(ownerServicePtr);
         }

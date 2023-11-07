@@ -34,6 +34,7 @@ namespace sys
         CloseSystem,
         Restore,
         Reboot,
+        RebootMSC,
         RebootToRecovery,
         FactoryReset,
         None,
@@ -78,7 +79,8 @@ namespace sys
             Shutdown,
             ShutdownReady,
             Reboot,
-            RebootToRecovery
+            RebootToRecovery,
+            RebootMSC
         } state = State::Running;
 
         explicit SystemManagerCommon(std::vector<std::unique_ptr<BaseServiceCreator>> &&creators);
@@ -95,6 +97,10 @@ namespace sys
         static bool FactoryReset(Service *s);
 
         static bool Reboot(Service *s);
+
+        static bool RebootMSC(Service *s);
+
+        static bool RegularPowerDown(Service *s);
 
         static bool RebootToRecovery(Service *s, RecoveryReason recoveryReason);
 
@@ -179,6 +185,8 @@ namespace sys
 
         void RebootHandler();
 
+        void RebootHandlerMSC();
+
         void RebootToRecoveryHandler(CloseReason closeReason, RecoveryReason recoveryReason);
 
         void FreqUpdateTick();
@@ -225,6 +233,8 @@ inline const char *c_str(sys::SystemManagerCommon::State state)
         return "Shutdown";
     case sys::SystemManagerCommon::State::Reboot:
         return "Reboot";
+    case sys::SystemManagerCommon::State::RebootMSC:
+        return "RebootMSC";
     case sys::SystemManagerCommon::State::RebootToRecovery:
         return "RebootToRecovery";
     case sys::SystemManagerCommon::State::ShutdownReady:
