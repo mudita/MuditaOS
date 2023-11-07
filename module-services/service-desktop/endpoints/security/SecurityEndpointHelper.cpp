@@ -68,7 +68,7 @@ namespace sdesktop::endpoints
             case BlockReason::BatteryCriticalLevel:
                 responseContext.status = http::Code::Locked;
                 responseContext.body =
-                    json11::Json::object({{json::reason, std::to_string(static_cast<int>(security.reason))}});
+                    json11::Json::object({{json::common::reason, std::to_string(static_cast<int>(security.reason))}});
                 break;
             }
         }

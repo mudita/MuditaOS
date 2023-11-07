@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -71,10 +71,10 @@ class Sync
         OperationState state = OperationState::Stopped;
         json11::Json to_json() const
         {
-            auto response = json11::Json::object{{sdesktop::endpoints::json::state, opToString(state)}};
+            auto response = json11::Json::object{{sdesktop::endpoints::json::sync::state, opToString(state)}};
 
             if (state == OperationState::Error) {
-                response[sdesktop::endpoints::json::reason] = completionCodeToString(completionCode);
+                response[sdesktop::endpoints::json::common::reason] = completionCodeToString(completionCode);
             }
 
             return response;

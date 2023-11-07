@@ -5,68 +5,57 @@
 
 namespace sdesktop::endpoints::json
 {
-    inline constexpr auto batteryLevel        = "batteryLevel";
-    inline constexpr auto batteryState        = "batteryState";
-    inline constexpr auto selectedSim         = "selectedSim";
-    inline constexpr auto sim                 = "sim";
-    inline constexpr auto trayState           = "trayState";
-    inline constexpr auto signalStrength      = "signalStrength";
-    inline constexpr auto deviceSpaceTotal    = "deviceSpaceTotal";
-    inline constexpr auto systemReservedSpace = "systemReservedSpace";
-    inline constexpr auto usedUserSpace       = "usedUserSpace";
-    inline constexpr auto gitRevision         = "gitRevision";
-    inline constexpr auto gitBranch           = "gitBranch";
-    inline constexpr auto gitTag              = "gitTag";
-    inline constexpr auto currentRTCTime      = "currentRTCTime";
-    inline constexpr auto updateReady         = "updateReady";
-    inline constexpr auto updateFileList      = "updateFileList";
-    inline constexpr auto factoryRequest      = "factoryRequest";
-    inline constexpr auto networkStatus       = "networkStatus";
-    inline constexpr auto networkOperatorName = "networkOperatorName";
-    inline constexpr auto accessTechnology    = "accessTechnology";
-
-    inline constexpr auto update                 = "update";
-    inline constexpr auto updateInfo             = "updateInfo";
-    inline constexpr auto updateError            = "updateError";
-    inline constexpr auto errorCode              = "errorCode";
-    inline constexpr auto statusCode             = "statusCode";
-    inline constexpr auto updateHistory          = "updateHistory";
-    inline constexpr auto usbMscMode             = "usbMscMode";
-    inline constexpr auto versionString          = "string";
-    inline constexpr auto fileExists             = "fileExists";
-    inline constexpr auto boot                   = "boot";
-    inline constexpr auto version                = "version";
-    inline constexpr auto taskId                 = "id";
-    inline constexpr auto state                  = "state";
-    inline constexpr auto success                = "success";
-    inline constexpr auto reboot                 = "reboot";
-    inline constexpr auto request                = "request";
-    inline constexpr auto restore                = "restore";
-    inline constexpr auto finished               = "finished";
-    inline constexpr auto pending                = "pending";
-    inline constexpr auto location               = "location";
-    inline constexpr auto reason                 = "reason";
-    inline constexpr auto serialNumber           = "serialNumber";
-    inline constexpr auto caseColour             = "caseColour";
-    inline constexpr auto fileList               = "fileList";
-    inline constexpr auto files                  = "files";
-    inline constexpr auto recoveryStatusFilePath = "recoveryStatusFilePath";
-    inline constexpr auto updateFilePath         = "updateFilePath";
-    inline constexpr auto backupFilePath         = "backupFilePath";
-    inline constexpr auto syncFilePath           = "syncFilePath";
-    inline constexpr auto mtpPath                = "mtpPath";
-    inline constexpr auto deviceToken            = "deviceToken";
-    inline constexpr auto onboardingState        = "onboardingState";
-
-    namespace updateprocess
+    namespace common
     {
-        inline constexpr auto command       = "command";
-        inline constexpr auto updateAborted = "updateAborted";
-        namespace commands
-        {
-            inline constexpr auto abort = "abort";
-        } // namespace commands
-    }     // namespace updateprocess
+        inline constexpr auto reason = "reason";
+    } // namespace common
+
+    namespace deviceInfo
+    {
+        inline constexpr auto batteryLevel           = "batteryLevel";
+        inline constexpr auto batteryState           = "batteryState";
+        inline constexpr auto selectedSim            = "selectedSim";
+        inline constexpr auto sim                    = "sim";
+        inline constexpr auto trayState              = "trayState";
+        inline constexpr auto signalStrength         = "signalStrength";
+        inline constexpr auto deviceSpaceTotal       = "deviceSpaceTotal";
+        inline constexpr auto systemReservedSpace    = "systemReservedSpace";
+        inline constexpr auto usedUserSpace          = "usedUserSpace";
+        inline constexpr auto gitRevision            = "gitRevision";
+        inline constexpr auto gitBranch              = "gitBranch";
+        inline constexpr auto currentRTCTime         = "currentRTCTime";
+        inline constexpr auto networkStatus          = "networkStatus";
+        inline constexpr auto networkOperatorName    = "networkOperatorName";
+        inline constexpr auto accessTechnology       = "accessTechnology";
+        inline constexpr auto version                = "version";
+        inline constexpr auto serialNumber           = "serialNumber";
+        inline constexpr auto caseColour             = "caseColour";
+        inline constexpr auto fileList               = "fileList";
+        inline constexpr auto files                  = "files";
+        inline constexpr auto recoveryStatusFilePath = "recoveryStatusFilePath";
+        inline constexpr auto updateFilePath         = "updateFilePath";
+        inline constexpr auto backupFilePath         = "backupFilePath";
+        inline constexpr auto syncFilePath           = "syncFilePath";
+        inline constexpr auto mtpPath                = "mtpPath";
+        inline constexpr auto deviceToken            = "deviceToken";
+        inline constexpr auto onboardingState        = "onboardingState";
+    } // namespace deviceInfo
+
+    namespace factoryReset
+    {
+        inline constexpr auto factoryRequest = "factoryRequest";
+    } // namespace factoryReset
+
+    namespace update
+    {
+        inline constexpr auto update = "update";
+        inline constexpr auto reboot = "reboot";
+    } // namespace update
+
+    namespace sync
+    {
+        inline constexpr auto state = "state";
+    } // namespace sync
 
     namespace messages
     {
@@ -124,5 +113,13 @@ namespace sdesktop::endpoints::json
         inline constexpr auto phoneLockTime         = "phoneLockTime";
         inline constexpr auto timeLeftToNextAttempt = "timeLeftToNextAttempt";
     } // namespace usb
+
+    namespace reboot
+    {
+        inline constexpr auto rebootType = "rebootType";
+        inline constexpr auto msc        = "msc";
+        inline constexpr auto reboot     = "reboot";
+        inline constexpr auto shutdown   = "shutdown";
+    } // namespace reboot
 
 } // namespace sdesktop::endpoints::json
