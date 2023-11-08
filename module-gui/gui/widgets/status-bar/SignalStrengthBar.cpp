@@ -6,6 +6,7 @@
 #include <string>
 #include <Image.hpp>
 #include <map>
+#include <magic_enum.hpp>
 
 namespace gui::status_bar
 {
@@ -47,31 +48,47 @@ namespace gui::status_bar
         setMinimumSize(img->getWidth(), style::status_bar::height);
     }
 
-    void SignalStrengthBar::update(const Store::SignalStrength &signal,
+    bool SignalStrengthBar::update(const Store::SignalStrength &signal,
                                    const Store::Network::Status &status,
                                    const Store::Tethering &tethering)
     {
         try {
             if (img == nullptr) {
-                LOG_ERROR("SignalStrength image nullptr");
-                return;
+                LOG_ERROR("SignalStrength image is nullptr");
+                return false;
+            }
+
+            /* Skip update if nothing has changed */
+            if ((currentTethering == tethering) && (currentStatus == status) && (currentRssiBar == signal.rssiBar)) {
+                return false;
             }
 
             if (tethering == Store::Tethering::On) {
                 img->set(signal_none, style::status_bar::imageTypeSpecifier);
+                currentTethering = tethering;
             }
             else if (status == Store::Network::Status::RegisteredRoaming) {
                 img->set(signalMapRoaming.at(signal.rssiBar), style::status_bar::imageTypeSpecifier);
+                currentStatus  = status;
+                currentRssiBar = signal.rssiBar;
             }
             else if (status == Store::Network::Status::RegisteredHomeNetwork) {
                 img->set(signalMapHomeCon.at(signal.rssiBar), style::status_bar::imageTypeSpecifier);
+                currentStatus  = status;
+                currentRssiBar = signal.rssiBar;
             }
             else {
                 img->set(signal_none, style::status_bar::imageTypeSpecifier);
+                currentTethering = tethering;
+                currentStatus    = status;
+                currentRssiBar   = signal.rssiBar;
             }
+            return true;
         }
         catch (const std::exception &exception) {
             LOG_ERROR("Exception while updating signal image: %s", exception.what());
         }
+
+        return false;
     }
 } // namespace gui::status_bar

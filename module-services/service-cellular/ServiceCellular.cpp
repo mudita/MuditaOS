@@ -50,7 +50,7 @@
 #include <at/UrcCtze.hpp>
 #include <at/UrcCusd.hpp>
 #include <at/UrcQind.hpp>
-#include <at/UrcCpin.hpp> // for Cpin
+#include <at/UrcCpin.hpp>
 #include <at/response.hpp>
 #include <bsp/cellular/bsp_cellular.hpp>
 #include <EventStore.hpp>
@@ -156,10 +156,11 @@ ServiceCellular::ServiceCellular()
     simTimer = sys::TimerFactory::createSingleShotTimer(
         this, "simTimer", std::chrono::milliseconds{6000}, [this](sys::Timer &) { priv->simCard->handleSimTimer(); });
 
-    csqTimer = sys::TimerFactory::createPeriodicTimer(this, "csqTimer", std::chrono::minutes{15}, [this](sys::Timer &) {
-        priv->csqHandler->handleTimerTick();
-        csqCounter.clearCounter();
-    });
+    csqTimer =
+        sys::TimerFactory::createPeriodicTimer(this, "csqPollingTimer", std::chrono::minutes{15}, [this](sys::Timer &) {
+            priv->csqHandler->handleTimerTick();
+            csqCounter.clearCounter();
+        });
 
     priv->ussdHandler->setTimerStartCallback([this]() { ussdTimer.start(); });
     priv->ussdHandler->setTimerStopCallback([this]() { ussdTimer.stop(); });

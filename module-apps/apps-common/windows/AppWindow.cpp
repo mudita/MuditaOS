@@ -167,7 +167,7 @@ namespace gui
         return header->getTitle();
     }
 
-    bool AppWindow::onDatabaseMessage(sys::Message *msg)
+    bool AppWindow::onDatabaseMessage([[maybe_unused]] sys::Message *msg)
     {
         return false;
     }
@@ -309,7 +309,7 @@ namespace gui
         return application->GetName() + separator + getName();
     }
 
-    void AppWindow::startInputModeRestoreTimer(std::function<void()> inputModeRestoreFunction)
+    void AppWindow::startInputModeRestoreTimer(const std::function<void()> &inputModeRestoreFunction)
     {
         if (inputModeRestoreFunction == nullptr) {
             return;

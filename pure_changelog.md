@@ -11,6 +11,7 @@
 * Disabled USB MTP protocol
 * Changed UI flow on discharged device window.
 * Changed VoLTE label from 'beta' to 'experimental'.
+* Changed signal strength update mechanism to avoid unnecessary screen refreshes.
 
 ### Fixed
 
