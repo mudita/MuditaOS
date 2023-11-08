@@ -147,6 +147,7 @@ namespace locks
 
     void PhoneLockHandler::phoneInputRequiredAction(RequestReason reqReason)
     {
+        LOG_WARN("------  phoneInputRequiredAction"); // debug only
         auto data = std::make_unique<gui::PhoneUnlockInputRequestParams>(
             gui::popup::ID::PhoneLockInput, lock, phoneLockInputTypeAction);
         // If it's for MTP, don't show the input passcode popup if it's already on the screen
@@ -341,6 +342,7 @@ namespace locks
 
         lock.lockState    = Lock::LockState::NewInputRequired;
         lock.attemptsLeft = Lock::unlimitedNumOfAttempts;
+        LOG_WARN("------ from Onboarding"); // debug only
 
         phoneInputRequiredAction();
 

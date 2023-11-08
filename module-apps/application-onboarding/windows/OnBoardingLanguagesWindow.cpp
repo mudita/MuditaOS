@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OnBoardingLanguagesWindow.hpp"
@@ -23,6 +23,7 @@ namespace app::onBoarding
     {
         header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
         navBar->setActive(gui::nav_bar::Side::Right, false);
+        //        application->getSimLockSubject().setSim(cellular::api::SimSlot::SIM1); // Set SIM1 - Place 1
 
         LanguagesWindow::onBeforeShow(mode, data);
     }

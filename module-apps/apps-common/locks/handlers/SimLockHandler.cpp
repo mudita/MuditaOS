@@ -104,7 +104,8 @@ namespace locks
             setSim(static_cast<cellular::api::SimSlot>(selectedSim.value()));
         }
         else {
-            Store::GSM::get()->selected = Store::GSM::SelectedSIM::NONE;
+            setSim(static_cast<cellular::api::SimSlot>(Store::GSM::SelectedSIM::SIM1)); // Set SIM1 - Place 2
+            //            Store::GSM::get()->selected = Store::GSM::SelectedSIM::NONE;
         }
     }
 
@@ -115,6 +116,7 @@ namespace locks
             owner->bus.sendUnicast<cellular::msg::request::sim::SetActiveSim>(simSlot);
         }
         else {
+            // PoC: The SIM card is not ready immediately after power on
             simNotReadyAction();
         }
     }

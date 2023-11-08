@@ -99,6 +99,7 @@ namespace app
         connect(typeid(locks::SimSwitched), [&](sys::Message *msg) {
             auto simState = Store::GSM::get()->sim;
             if (simState == Store::GSM::SIM::SIM1 || simState == Store::GSM::SIM::SIM2) {
+                LOG_WARN("------ ::SimSwitched"); // debug only
                 phoneLockSubject.setPhoneLock();
                 return sys::msgHandled();
             }
@@ -109,7 +110,9 @@ namespace app
             auto selectedSIM = Store::GSM::get()->selected;
             if (getCurrentWindow()->getName() != gui::popup::window::sim_switching_window &&
                 selectedSIM != Store::GSM::SelectedSIM::NONE) {
-                phoneLockSubject.setPhoneLock();
+                LOG_WARN("------ ::SimReady"); // debug only
+                                               //                phoneLockSubject.setPhoneLock();
+                LOG_WARN("------ DO NOT: phoneLockSubject.setPhoneLock();"); // debug only
                 return sys::msgHandled();
             }
             return sys::msgNotHandled();

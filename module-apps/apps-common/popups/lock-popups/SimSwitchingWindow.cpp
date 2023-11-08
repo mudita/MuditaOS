@@ -27,6 +27,7 @@ namespace gui
                 auto simState = Store::GSM::get()->sim;
 
                 if (switchedSuccessful) {
+                    LOG_WARN("------"); // debug only
                     application->getSimLockSubject().simSwitched();
                     application->returnToPreviousWindow();
                 }
@@ -47,6 +48,7 @@ namespace gui
                     case Store::GSM::SIM::SIM_UNKNOWN:
                         if (std::chrono::steady_clock::now() - startTime >= constants::maxDurationTime) {
                             LOG_WARN("The SIM switch operation failed.");
+                            LOG_WARN("------"); // debug only
                             application->getSimLockSubject().simSwitched();
                             application->returnToPreviousWindow();
                         }
