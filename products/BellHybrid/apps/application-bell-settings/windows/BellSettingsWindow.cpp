@@ -88,6 +88,8 @@ namespace gui
         addWinSettings(
             utils::translate("app_bell_settings_language"), gui::window::name::bellSettingsLanguage, defaultCallback);
         addWinSettings(
+            utils::translate("app_bell_settings_shortcuts"), window::name::bellSettingsShortcuts, defaultCallback);
+        addWinSettings(
             utils::translate("app_bell_settings_frontlight"), gui::BellSettingsFrontlightWindow::name, defaultCallback);
         addWinSettings(utils::translate("app_bell_settings_about"), gui::AboutYourBellWindow::name, defaultCallback);
         addWinSettings(

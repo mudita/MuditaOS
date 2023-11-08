@@ -9,17 +9,16 @@
 #include <vector>
 #include <Item.hpp>
 
-namespace app::OnBoarding
+namespace app::bell_settings
 {
-    class OnBoardingShortcutsWindowPresenter : public gui::ShortcutsWindowContract::Presenter
+    class ShortcutsWindowPresenter : public gui::ShortcutsWindowContract::Presenter
     {
       private:
-        app::ApplicationCommon *app;
         std::vector<gui::Item *> layoutOptions;
         void initLayoutOptions();
 
       public:
-        explicit OnBoardingShortcutsWindowPresenter(app::ApplicationCommon *app);
+        explicit ShortcutsWindowPresenter(app::ApplicationCommon *app);
 
         std::vector<gui::Item *> getLayouts() const override;
         bool isLastLayout(const gui::Item *layout) const override;
@@ -27,4 +26,4 @@ namespace app::OnBoarding
         gui::Item *getFirstLayout() const override;
         bool onInput(const gui::InputEvent &inputEvent, const gui::Item *currentLayout) override;
     };
-} // namespace app::OnBoarding
+} // namespace app::bell_settings

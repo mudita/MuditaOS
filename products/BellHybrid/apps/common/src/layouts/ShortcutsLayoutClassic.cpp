@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "OnBoardingShortcutsLayoutClassic.hpp"
+#include "layouts/ShortcutsLayoutClassic.hpp"
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <i18n/i18n.hpp>
 #include <Style.hpp>
@@ -38,18 +38,18 @@ namespace
 
 namespace gui
 {
-    OnBoardingShortcutsLayoutClassic::OnBoardingShortcutsLayoutClassic(const UTF8 &image,
-                                                                       const UTF8 &description,
-                                                                       bool leftArrowVisible,
-                                                                       bool rightArrowVisible)
-        : OnBoardingShortcutsLayoutProvider(image, description),
+    ShortcutsLayoutClassic::ShortcutsLayoutClassic(const UTF8 &image,
+                                                   const UTF8 &description,
+                                                   bool leftArrowVisible,
+                                                   bool rightArrowVisible)
+        : ShortcutsLayoutProvider(image, description),
           VBox(nullptr, 0, 0, style::bell_base_layout::w, style::bell_base_layout::h), image{image},
           description{description}, leftArrowVisible{leftArrowVisible}, rightArrowVisible{rightArrowVisible}
     {
         buildInterface();
     }
 
-    void OnBoardingShortcutsLayoutClassic::buildInterface()
+    void ShortcutsLayoutClassic::buildInterface()
     {
         setAlignment(Alignment::Horizontal::Center);
 
@@ -117,7 +117,7 @@ namespace gui
         this->resizeItems();
     }
 
-    auto OnBoardingShortcutsLayoutClassic::getLayout() -> Item *
+    auto ShortcutsLayoutClassic::getLayout() -> Item *
     {
         return this;
     }
