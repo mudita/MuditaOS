@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,6 +20,7 @@ namespace gui::window::name
     inline constexpr auto bellSettingsLayout       = "BellSettingsLayout";
     inline constexpr auto bellSettingsBedtimeTone  = "BellSettingsBedtimeTone";
     inline constexpr auto bellSettingsFactoryReset = "BellSettingsFactoryReset";
+    inline constexpr auto bellSettingsShortcuts    = "BellSettingsShortcuts";
 } // namespace gui::window::name
 
 namespace app

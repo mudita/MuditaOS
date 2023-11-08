@@ -26,6 +26,7 @@ target_sources(application-bell-common
         src/windows/BellTurnOffWindow.cpp
         src/windows/BellWelcomeWindow.cpp
         src/windows/SessionPausedWindow.cpp
+        src/windows/ShortcutsWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
         src/TimeUtils.cpp
         src/TimeUtils.cpp
@@ -65,6 +66,8 @@ target_sources(application-bell-common
         src/layouts/HomeScreenLayoutVerticalSimple.cpp
         src/layouts/HomeScreenLayoutVerticalWithAmPm.cpp
         src/layouts/HomeScreenLayoutVerticalWithDate.cpp
+        src/layouts/ShortcutsLayouts.cpp
+        src/layouts/ShortcutsLayoutClassic.cpp
 
     PUBLIC
         include/common/BellListItemProvider.hpp
@@ -76,6 +79,8 @@ target_sources(application-bell-common
         include/common/windows/BellTurnOffWindow.hpp
         include/common/windows/BellWelcomeWindow.hpp
         include/common/windows/SessionPausedWindow.hpp
+        include/common/windows/ShortcutsWindowContract.hpp
+        include/common/windows/ShortcutsWindow.hpp
         include/common/TimeUtils.hpp
         include/common/data/BatteryUtils.hpp
         include/common/data/FrontlightUtils.hpp
@@ -126,6 +131,9 @@ target_sources(application-bell-common
         include/common/layouts/HomeScreenLayoutVerticalWithAmPm.hpp
         include/common/layouts/HomeScreenLayoutVerticalWithDate.hpp
         include/common/layouts/HomeScreenLayoutNames.hpp
+        include/common/layouts/ShortcutsLayouts.hpp
+        include/common/layouts/ShortcutsLayoutProvider.hpp
+        include/common/layouts/ShortcutsLayoutClassic.hpp
 )
 
 target_link_libraries(application-bell-common

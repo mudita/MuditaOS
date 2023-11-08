@@ -20,12 +20,9 @@ target_sources(application-bell-onboarding
         windows/OnBoardingInstructionPromptWindow.cpp
         windows/OnBoardingWelcomeWindow.cpp
         windows/OnBoardingShortcutsOptionWindow.cpp
-        windows/OnBoardingShortcutsWindow.cpp
         presenter/OnBoardingLanguageWindowPresenter.cpp
         presenter/OnBoardingFinalizeWindowPresenter.cpp
         presenter/OnBoardingShortcutsWindowPresenter.cpp
-        layouts/OnBoardingShortcutsLayouts.cpp
-        layouts/OnBoardingShortcutsLayoutClassic.cpp
 
         presenter/OnBoardingLanguageWindowPresenter.hpp
         presenter/OnBoardingFinalizeWindowPresenter.hpp
@@ -36,10 +33,6 @@ target_sources(application-bell-onboarding
         windows/OnBoardingInstructionPromptWindow.hpp
         windows/OnBoardingWelcomeWindow.hpp
         windows/OnBoardingShortcutsOptionWindow.hpp
-        windows/OnBoardingShortcutsWindow.hpp
-        layouts/OnBoardingShortcutsLayouts.hpp
-        layouts/OnBoardingShortcutsLayoutProvider.hpp
-        layouts/OnBoardingShortcutsLayoutClassic.hpp
 
     PUBLIC
         include/application-bell-onboarding/ApplicationBellOnBoarding.hpp

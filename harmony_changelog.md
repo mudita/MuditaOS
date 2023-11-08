@@ -10,6 +10,7 @@
 
 ### Added
 * Added notification when charger is connected
+* Added shortcuts instruction to settings
 
 ### Changed / Improved
 * Disabled USB MTP protocol
