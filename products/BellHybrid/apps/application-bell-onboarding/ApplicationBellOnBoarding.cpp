@@ -12,7 +12,6 @@
 #include <windows/OnBoardingWelcomeWindow.hpp>
 #include <windows/OnBoardingInstructionPromptWindow.hpp>
 #include <windows/OnBoardingShortcutsOptionWindow.hpp>
-#include <windows/OnBoardingShortcutsWindow.hpp>
 
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
@@ -21,6 +20,7 @@
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
+#include <common/windows/ShortcutsWindow.hpp>
 #include <common/models/LayoutModel.hpp>
 
 #include <application-bell-settings/models/TemperatureUnitModel.hpp>
@@ -115,7 +115,7 @@ namespace app
         windowsFactory.attach(
             gui::window::name::onBoardingShortcutsWindow, [this](ApplicationCommon *app, const std::string &name) {
                 auto presenter = std::make_unique<OnBoarding::OnBoardingShortcutsWindowPresenter>(this);
-                return std::make_unique<gui::OnBoardingShortcutsWindow>(app, std::move(presenter), name);
+                return std::make_unique<gui::ShortcutsWindow>(app, std::move(presenter), name);
             });
 
         windowsFactory.attach(
@@ -282,7 +282,7 @@ namespace app
             if (inputEvent.isKeyRelease(gui::KeyCode::KEY_UP) || inputEvent.isKeyRelease(gui::KeyCode::KEY_DOWN)) {
                 gui::AppWindow *window = getCurrentWindow();
                 const auto shortcutsWindow = window->getName() == gui::window::name::onBoardingShortcutsWindow
-                                                 ? dynamic_cast<gui::OnBoardingShortcutsWindow *>(window)
+                                                 ? dynamic_cast<gui::ShortcutsWindow *>(window)
                                                  : nullptr;
                 if (shortcutsWindow != nullptr) {
                     if (shortcutsWindow->isOneOfTwoLastShortcuts() && inputEvent.isKeyRelease(gui::KeyCode::KEY_UP))

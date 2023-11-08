@@ -1,27 +1,24 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "OnBoardingShortcutsWindow.hpp"
-#include "BellOnBoardingNames.hpp"
+#include "windows/ShortcutsWindow.hpp"
 
 #include <Style.hpp>
 #include <SideListView.hpp>
 #include <gui/input/InputEvent.hpp>
-#include <keymap/KeyMap.hpp>
 
 namespace gui
 {
-    OnBoardingShortcutsWindow::OnBoardingShortcutsWindow(
-        app::ApplicationCommon *app,
-        std::unique_ptr<app::OnBoarding::OnBoardingShortcutsWindowContract::Presenter> &&presenter,
-        const std::string &name)
+    ShortcutsWindow::ShortcutsWindow(app::ApplicationCommon *app,
+                                     std::unique_ptr<ShortcutsWindowContract::Presenter> &&presenter,
+                                     const std::string &name)
         : AppWindow(app, name), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);
         buildInterface();
     }
 
-    void OnBoardingShortcutsWindow::buildInterface()
+    void ShortcutsWindow::buildInterface()
     {
         AppWindow::buildInterface();
 
@@ -44,27 +41,20 @@ namespace gui
         setFocusItem(spinner);
     }
 
-    bool OnBoardingShortcutsWindow::isOneOfTwoLastShortcuts() const
+    bool ShortcutsWindow::isOneOfTwoLastShortcuts() const
     {
         auto currentLayout = spinner->getCurrentValue();
         return presenter->isOneOfTwoLastLayouts(currentLayout);
     }
 
-    bool OnBoardingShortcutsWindow::onInput(const gui::InputEvent &inputEvent)
+    bool ShortcutsWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (spinner->onInput(inputEvent)) {
             return true;
         }
 
-        if (inputEvent.isShortRelease()) {
-            const auto key = mapKey(inputEvent.getKeyCode());
-            if (key == KeyMap::LightPress) {
-                auto currentLayout = spinner->getCurrentValue();
-                if (presenter->isLastLayout(currentLayout)) {
-                    getApplication()->switchWindow(window::name::onBoardingSettingsWindow);
-                }
-                return true;
-            }
+        if (presenter->onInput(inputEvent, spinner->getCurrentValue())) {
+            return true;
         }
 
         return AppWindow::onInput(inputEvent);
