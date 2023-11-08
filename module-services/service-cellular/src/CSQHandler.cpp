@@ -8,56 +8,64 @@
 #include <ticks.hpp>
 #include <chrono>
 
+namespace
+{
+    constexpr auto urcThreshold     = 4;
+    constexpr auto pollModeDuration = std::chrono::minutes{60};
+
+    bool isRssiValid(std::uint32_t csq)
+    {
+        constexpr auto invalidRssiLow  = 99;
+        constexpr auto invalidRssiHigh = 199;
+        return ((csq != invalidRssiLow) && (csq != invalidRssiHigh));
+    }
+} // namespace
+
 namespace cellular::service
 {
-
     void CSQHandler::handleTimerTick()
     {
         if (currentMode == CSQMode::HybridPolling) {
             if (isPollModeTimeElapsed()) {
-                LOG_INFO("CSQ poll mode time elapsed.");
+                LOG_INFO("CSQ poll mode timer elapsed");
                 switchToHybridReportMode();
                 return;
             }
-
             getCSQ();
         }
     }
 
-    void CSQHandler::handleURCCounterMessage(const uint32_t counter)
+    void CSQHandler::handleURCCounterMessage(std::uint32_t counter)
     {
         urcCounter = counter;
-        if (isTooManyURC() && currentMode == CSQMode::HybridReporting) {
+        if (isTooManyURCs() && (currentMode == CSQMode::HybridReporting)) {
             switchToHybridPollMode();
         }
     }
 
-    auto CSQHandler::isTooManyURC() -> bool
+    auto CSQHandler::isTooManyURCs() -> bool
     {
-        return urcCounter > urcThreshold;
+        return (urcCounter > urcThreshold);
     }
 
     auto CSQHandler::isPollModeTimeElapsed() -> bool
     {
-        auto currentTime = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
-        auto timeSpentInPollMode =
-            currentTime >= switchToPollModeTimestamp
-                ? currentTime - switchToPollModeTimestamp
-                : std::numeric_limits<TickType_t>::max() - switchToPollModeTimestamp + currentTime;
-        return timeSpentInPollMode > std::chrono::duration_cast<std::chrono::milliseconds>(pollTime).count();
+        const auto currentTime         = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
+        const auto timeSpentInPollMode = utils::computeIncrease(currentTime, switchToPollModeTimestamp);
+        return (timeSpentInPollMode >= std::chrono::duration_cast<std::chrono::milliseconds>(pollModeDuration).count());
     }
 
     void CSQHandler::checkConditionToChangeMode()
     {
         if (currentMode != CSQMode::PermanentReporting) {
-            if (not isPhoneLocked || isBluetoothCarKitConnected ||
-                Store::Battery::get().state != Store::Battery::State::Discharging) {
+            if (!isPhoneLocked || isBluetoothCarKitConnected ||
+                (Store::Battery::get().state != Store::Battery::State::Discharging)) {
                 switchToPermanentReportMode();
             }
         }
         else {
-            if (isPhoneLocked && not isBluetoothCarKitConnected &&
-                Store::Battery::get().state == Store::Battery::State::Discharging) {
+            if (isPhoneLocked && !isBluetoothCarKitConnected &&
+                (Store::Battery::get().state == Store::Battery::State::Discharging)) {
                 switchToHybridReportMode();
             }
         }
@@ -65,13 +73,13 @@ namespace cellular::service
 
     bool CSQHandler::switchToPermanentReportMode()
     {
-        if (onEnableCsqReporting != nullptr && onEnableCsqReporting()) {
+        if ((onEnableCsqReporting != nullptr) && onEnableCsqReporting()) {
             currentMode = CSQMode::PermanentReporting;
-            LOG_INFO("Switch to permanent report mode.");
+            LOG_INFO("Switch to permanent report mode");
             return true;
         }
 
-        LOG_ERROR("Failed to switch to CSQ permanent report mode! Retry!");
+        LOG_ERROR("Failed to switch to CSQ permanent report mode, retrying");
         if (onRetrySwitchMode != nullptr) {
             onRetrySwitchMode(CSQMode::PermanentReporting);
         }
@@ -80,13 +88,13 @@ namespace cellular::service
 
     bool CSQHandler::switchToHybridReportMode()
     {
-        if (onEnableCsqReporting != nullptr && onEnableCsqReporting()) {
+        if ((onEnableCsqReporting != nullptr) && onEnableCsqReporting()) {
             currentMode = CSQMode::HybridReporting;
-            LOG_INFO("Switch to hybrid report mode.");
+            LOG_INFO("Switching to hybrid report mode");
             return true;
         }
 
-        LOG_ERROR("Failed to switch to CSQ hybrid report mode! Retry!");
+        LOG_ERROR("Failed to switch to CSQ hybrid report mode, retrying");
         if (onRetrySwitchMode != nullptr) {
             onRetrySwitchMode(CSQMode::HybridReporting);
         }
@@ -95,14 +103,14 @@ namespace cellular::service
 
     bool CSQHandler::switchToHybridPollMode()
     {
-        if (onDisableCsqReporting != nullptr && onDisableCsqReporting()) {
+        if ((onDisableCsqReporting != nullptr) && onDisableCsqReporting()) {
             currentMode               = CSQMode::HybridPolling;
             switchToPollModeTimestamp = cpp_freertos::Ticks::TicksToMs(cpp_freertos::Ticks::GetTicks());
-            LOG_INFO("Too many signal strength updates, switch to hybrid poll mode.");
+            LOG_INFO("Too many signal strength updates, switching to hybrid poll mode");
             return true;
         }
 
-        LOG_ERROR("Failed to switch to CSQ hybrid poll mode! Retry!");
+        LOG_ERROR("Failed to switch to CSQ hybrid poll mode, retrying");
         if (onRetrySwitchMode != nullptr) {
             onRetrySwitchMode(CSQMode::HybridPolling);
         }
@@ -112,17 +120,17 @@ namespace cellular::service
     bool CSQHandler::getCSQ()
     {
         if (onGetCsq != nullptr) {
-            if (auto result = onGetCsq(); result.has_value()) {
-                auto csq = result.value();
-                if (csq.csq != invalid_rssi_low && csq.csq != invalid_rssi_high) {
-                    LOG_INFO("Propagate valid CSQ");
+            if (const auto &result = onGetCsq(); result.has_value()) {
+                const auto &csq = result.value();
+                if (isRssiValid(csq.csq)) {
+                    LOG_INFO("Propagating valid CSQ");
                     if (onPropagateCSQ != nullptr) {
                         onPropagateCSQ(csq.csq);
                         return true;
                     }
                 }
                 else {
-                    LOG_INFO("Invalid CSQ, notify service antenna");
+                    LOG_INFO("Invalid CSQ, notifying service antenna");
                     if (onInvalidCSQ != nullptr) {
                         onInvalidCSQ();
                         return true;
@@ -131,7 +139,7 @@ namespace cellular::service
             }
         }
 
-        LOG_ERROR("Failed to get CSQ! Retry!");
+        LOG_ERROR("Failed to get CSQ, retrying");
         if (onRetryGetCSQ != nullptr) {
             onRetryGetCSQ();
         }
@@ -157,5 +165,4 @@ namespace cellular::service
     {
         isBluetoothCarKitConnected = false;
     }
-
 } // namespace cellular::service

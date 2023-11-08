@@ -271,9 +271,7 @@ namespace utils
         if (currentCount >= lastCount) {
             return currentCount - lastCount;
         }
-        else {
-            return std::numeric_limits<T>::max() - lastCount + currentCount;
-        }
+        return std::numeric_limits<T>::max() - lastCount + currentCount;
     }
 
     static inline void findAndReplaceAll(std::string &data,

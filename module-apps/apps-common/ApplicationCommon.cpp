@@ -352,52 +352,45 @@ namespace app
                 return handleNetworkAccessTechnologyUpdate(msgl);
             }
         }
-        else if (msgl->messageType == MessageType::AppInputEvent) {
+
+        switch (msgl->messageType) {
+        case MessageType::AppInputEvent:
             return handleInputEvent(msgl);
-        }
-        else if (msgl->messageType == MessageType::KBDKeyEvent) {
+        case MessageType::KBDKeyEvent:
             return handleKBDKeyEvent(msgl);
-        }
-        else if (msgl->messageType == MessageType::EVMMinuteUpdated) {
+        case MessageType::EVMMinuteUpdated:
             return handleMinuteUpdated(msgl);
-        }
-        else if (msgl->messageType == MessageType::AppAction) {
+        case MessageType::AppAction:
             return handleAction(msgl);
-        }
-        else if (msgl->messageType == MessageType::AppSwitch) {
+        case MessageType::AppSwitch:
             return handleApplicationSwitch(msgl);
-        }
-        else if (msgl->messageType == MessageType::AppSwitchBack) {
+        case MessageType::AppSwitchBack:
             returnToPreviousWindow();
             return sys::msgHandled();
-        }
-        else if (msgl->messageType == MessageType::AppSwitchWindow) {
+        case MessageType::AppSwitchWindow:
             return handleSwitchWindow(msgl);
-        }
-        else if (msgl->messageType == MessageType::AppClose) {
+        case MessageType::AppClose:
             return handleAppClose(msgl);
-        }
-        else if (msgl->messageType == MessageType::AppRebuild) {
+        case MessageType::AppRebuild:
             return handleAppRebuild(msg);
-        }
-        else if (msgl->messageType == MessageType::AppFocusLost) {
+        case MessageType::AppFocusLost:
             return handleAppFocusLost(msgl);
+        default:
+            return sys::msgNotHandled();
         }
-        return sys::msgNotHandled();
     }
 
     sys::MessagePointer ApplicationCommon::handleAsyncResponse(sys::ResponseMessage *resp)
     {
-        if (resp != nullptr) {
-            if (auto command = callbackStorage->getCallback(resp); command->execute()) {
-                refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
-                checkBlockingRequests();
-            }
-            return std::make_shared<sys::ResponseMessage>();
-        }
-        else {
+        if (resp == nullptr) {
             return std::make_shared<sys::ResponseMessage>(sys::ReturnCodes::Unresolved);
         }
+
+        if (const auto command = callbackStorage->getCallback(resp); command->execute()) {
+            refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
+            checkBlockingRequests();
+        }
+        return std::make_shared<sys::ResponseMessage>();
     }
 
     sys::MessagePointer ApplicationCommon::handleSignalStrengthUpdate([[maybe_unused]] sys::Message *msgl)

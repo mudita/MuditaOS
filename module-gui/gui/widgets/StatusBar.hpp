@@ -243,7 +243,8 @@ namespace gui::status_bar
 
         /// Show/hide signal strenght widget
         /// @param enabled true to show false to hide the widget
-        void showSignalStrength(bool enabled);
+        /// @return true if screen refresh is required, false if not required
+        bool showSignalStrength(bool enabled);
 
         /// Show/hide phone mode widget
         /// @param enabled true to show false to hide the widget

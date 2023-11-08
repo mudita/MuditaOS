@@ -119,7 +119,7 @@ namespace gui
         /// but it would mean not insignificant refactor
         BoundingBox bodySize();
 
-        void startInputModeRestoreTimer(std::function<void()> inputModeRestoreFunction = nullptr);
+        void startInputModeRestoreTimer(const std::function<void()> &inputModeRestoreFunction = nullptr);
     };
 
 } /* namespace gui */

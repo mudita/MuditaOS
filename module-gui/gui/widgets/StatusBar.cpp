@@ -2,8 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <iomanip>
-#include "Label.hpp"
-#include "Image.hpp"
 #include "BoxLayout.hpp"
 #include "StatusBar.hpp"
 #include "status-bar/Style.hpp"
@@ -268,7 +266,7 @@ namespace gui::status_bar
 
     void StatusBar::setIndicatorModifier(Indicator indicator, StatusBarVisitor &modifier)
     {
-        if (indicator == Indicator::SimCard && sim != nullptr) {
+        if ((indicator == Indicator::SimCard) && (sim != nullptr)) {
             sim->acceptStatusBarVisitor(modifier);
         }
     }
@@ -283,6 +281,7 @@ namespace gui::status_bar
 
     bool StatusBar::showBattery(bool enabled)
     {
+        const auto stateChanged      = battery->update(Store::Battery::get());
         const auto visibilityChanged = (battery->isVisible() != enabled);
         if (enabled) {
             battery->show();
@@ -290,14 +289,12 @@ namespace gui::status_bar
         else {
             battery->hide();
         }
-        const auto stateChanged    = battery->update(Store::Battery::get());
-        const auto refreshRequired = stateChanged || visibilityChanged;
-        return refreshRequired;
+        return (stateChanged || visibilityChanged);
     }
 
     void StatusBar::showBluetooth(bool enabled)
     {
-        if (enabled && configuration.getBluetoothMode() != sys::bluetooth::BluetoothMode::Disabled) {
+        if (enabled && (configuration.getBluetoothMode() != sys::bluetooth::BluetoothMode::Disabled)) {
             bluetooth->show();
         }
         else {
@@ -331,7 +328,7 @@ namespace gui::status_bar
 
     bool StatusBar::updateBluetooth(sys::bluetooth::BluetoothMode mode)
     {
-        if (bluetooth == nullptr || !configuration.isEnabled(Indicator::Bluetooth)) {
+        if ((bluetooth == nullptr) || !configuration.isEnabled(Indicator::Bluetooth)) {
             return false;
         }
         configuration.setBluetoothMode(mode);
@@ -342,7 +339,7 @@ namespace gui::status_bar
 
     bool StatusBar::updateAlarmClock(bool status)
     {
-        if (alarmClock == nullptr || !configuration.isEnabled(Indicator::AlarmClock)) {
+        if ((alarmClock == nullptr) || !configuration.isEnabled(Indicator::AlarmClock)) {
             return false;
         }
         configuration.setAlarmClockStatus(status);
@@ -360,13 +357,22 @@ namespace gui::status_bar
         return true;
     }
 
-    void StatusBar::showSignalStrength(bool enabled)
+    bool StatusBar::showSignalStrength(bool enabled)
     {
-        const auto signalStrength = Store::GSM::get()->getSignalStrength();
-        const auto networkStatus  = Store::GSM::get()->getNetwork().status;
-        const auto tethering      = Store::GSM::get()->getTethering();
-        signal->update(signalStrength, networkStatus, tethering);
-        enabled ? signal->show() : signal->hide();
+        const auto currentSignalStrength = Store::GSM::get()->getSignalStrength();
+        const auto currentNetworkStatus  = Store::GSM::get()->getNetwork().status;
+        const auto currentTethering      = Store::GSM::get()->getTethering();
+        const auto stateChanged      = signal->update(currentSignalStrength, currentNetworkStatus, currentTethering);
+        const auto visibilityChanged = (signal->isVisible() != enabled);
+        if (visibilityChanged) {
+            if (enabled) {
+                signal->show();
+            }
+            else {
+                signal->hide();
+            }
+        }
+        return (stateChanged || visibilityChanged);
     }
 
     bool StatusBar::updateSignalStrength()
@@ -374,8 +380,7 @@ namespace gui::status_bar
         if (signal == nullptr) {
             return false;
         }
-        showSignalStrength(configuration.isEnabled(Indicator::Signal));
-        return true;
+        return showSignalStrength(configuration.isEnabled(Indicator::Signal));
     }
 
     bool StatusBar::updatePhoneMode()
@@ -468,7 +473,6 @@ namespace gui::status_bar
         configuration.setTetheringState(state);
         showTethering(configuration.isEnabled(Indicator::Tethering));
         leftBox->resizeItems();
-
         return true;
     }
 

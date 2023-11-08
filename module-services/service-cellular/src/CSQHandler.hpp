@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,13 +12,6 @@
 
 namespace cellular::service
 {
-
-    constexpr auto urcThreshold = 4;
-    constexpr auto pollTime     = std::chrono::minutes{60};
-
-    static const auto invalid_rssi_low  = 99;
-    static const auto invalid_rssi_high = 199;
-
     enum class CSQMode
     {
         PermanentReporting,
@@ -30,12 +23,12 @@ namespace cellular::service
     {
       public:
         void handleTimerTick();
-        void handleURCCounterMessage(const uint32_t counter);
+        void handleURCCounterMessage(std::uint32_t counter);
 
         std::function<bool()> onEnableCsqReporting;
         std::function<bool()> onDisableCsqReporting;
         std::function<std::optional<at::result::CSQ>()> onGetCsq;
-        std::function<void(uint32_t)> onPropagateCSQ;
+        std::function<void(std::uint32_t)> onPropagateCSQ;
         std::function<void()> onInvalidCSQ;
 
         std::function<void(CSQMode)> onRetrySwitchMode;
@@ -52,7 +45,7 @@ namespace cellular::service
         bool getCSQ();
 
       private:
-        uint32_t urcCounter = 0;
+        std::uint32_t urcCounter = 0;
         CSQMode currentMode = CSQMode::HybridReporting;
         TickType_t switchToPollModeTimestamp{0};
 
@@ -61,6 +54,6 @@ namespace cellular::service
         bool isBluetoothCarKitConnected{false};
 
         auto isPollModeTimeElapsed() -> bool;
-        auto isTooManyURC() -> bool;
+        auto isTooManyURCs() -> bool;
     };
 } // namespace cellular::service
