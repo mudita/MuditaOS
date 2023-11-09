@@ -200,8 +200,6 @@ void LPSPI_MasterInit(LPSPI_Type *base, const lpspi_master_config_t *masterConfi
 
 #endif /* FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL */
 
-    /* Reset to known status */
-    LPSPI_Reset(base);
 
     /* Set LPSPI to master */
     LPSPI_SetMasterSlaveMode(base, kLPSPI_Master);
