@@ -491,7 +491,7 @@ void EinkChangeDisplayUpdateTimings(EinkDisplayTimingsMode_e timingsMode)
     } break;
     }
 
-    if (BSP_EinkWriteData(tmpbuf, 4, SPI_AUTOMATIC_CS) != 0) {
+    if (BSP_EinkWriteData(tmpbuf, sizeof(tmpbuf), SPI_AUTOMATIC_CS) != 0) {
         return;
     }
 }
@@ -530,7 +530,6 @@ EinkStatus_e EinkPowerOff()
 
     std::uint8_t cmd = EinkPowerOFF; // 0x02
     if (BSP_EinkWriteData(&cmd, sizeof(cmd), SPI_AUTOMATIC_CS) != 0) {
-        EinkPowerDown();
         return EinkDMAErr;
     }
 

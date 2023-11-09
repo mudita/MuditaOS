@@ -5,6 +5,7 @@
 ### Fixed
 * Fixed frequency lock during user activity
 * Fixed boot error screen text alignment
+* Fixed eink errors in logs
 
 ### Added
 * Added notification when charger is connected
