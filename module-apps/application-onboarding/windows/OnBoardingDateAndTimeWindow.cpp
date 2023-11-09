@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OnBoardingDateAndTimeWindow.hpp"
@@ -10,6 +10,7 @@
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <header/IceAction.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <EventStore.hpp>
 
 namespace app::onBoarding
 {
@@ -27,7 +28,9 @@ namespace app::onBoarding
     void OnBoardingDateAndTimeWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         DateAndTimeMainWindow::onBeforeShow(mode, data);
-        header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        if (Store::GSM::get()->simCardInserted()) {
+            header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        }
     }
 
     bool OnBoardingDateAndTimeWindow::onInput(const gui::InputEvent &inputEvent)
@@ -47,7 +50,7 @@ namespace app::onBoarding
                                       std::move(metaData));
             return true;
         }
-        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
+        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT) && Store::GSM::get()->simCardInserted()) {
             app::manager::Controller::sendAction(application,
                                                  app::manager::actions::EmergencyDial,
                                                  std::make_unique<gui::SwitchData>(),

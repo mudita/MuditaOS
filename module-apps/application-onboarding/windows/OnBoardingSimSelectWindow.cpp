@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OnBoardingSimSelectWindow.hpp"
@@ -10,6 +10,7 @@
 #include <header/IceAction.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
+#include <EventStore.hpp>
 
 namespace app::onBoarding
 {
@@ -22,7 +23,9 @@ namespace app::onBoarding
     void OnBoardingSimSelectWindow::buildInterface()
     {
         setTitle(utils::translate("app_onboarding_select_sim"));
-        header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        if (Store::GSM::get()->simCardInserted()) {
+            header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        }
         navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::select));
         navBar->setText(gui::nav_bar::Side::Right, utils::translate(::style::strings::common::back));
         navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::skip));
@@ -96,7 +99,7 @@ namespace app::onBoarding
                 gui::window::name::onBoarding_skip, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
             return true;
         }
-        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
+        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT) && Store::GSM::get()->simCardInserted()) {
             app::manager::Controller::sendAction(application,
                                                  app::manager::actions::EmergencyDial,
                                                  std::make_unique<gui::SwitchData>(),

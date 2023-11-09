@@ -8,6 +8,7 @@
 #include <locks/data/LockData.hpp>
 #include <locks/widgets/PhoneLockBox.hpp>
 #include <popups/data/PopupRequestParams.hpp>
+#include <EventStore.hpp>
 
 namespace gui
 {
@@ -127,7 +128,7 @@ namespace gui
             lock->clearAttempt();
             return true;
         }
-        else if (inputEvent.is(KeyCode::KEY_LEFT) && isIceVisible()) {
+        else if (inputEvent.is(KeyCode::KEY_LEFT) && isIceVisible() && Store::GSM::get()->simCardInserted()) {
             app::manager::Controller::sendAction(application,
                                                  app::manager::actions::EmergencyDial,
                                                  std::make_unique<gui::SwitchData>(),

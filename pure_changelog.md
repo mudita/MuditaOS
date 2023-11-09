@@ -12,6 +12,7 @@
 * Changed UI flow on discharged device window.
 * Changed VoLTE label from 'beta' to 'experimental'.
 * Changed signal strength update mechanism to avoid unnecessary screen refreshes.
+* Hide the SOS label during onboarding when the modem is not ready for an emergency call.
 
 ### Fixed
 

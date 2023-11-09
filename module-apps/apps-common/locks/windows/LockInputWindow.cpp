@@ -10,6 +10,7 @@
 #include <header/IceAction.hpp>
 #include <FontManager.hpp>
 #include <i18n/i18n.hpp>
+#include <EventStore.hpp>
 
 namespace lock_style = style::window::lock_input;
 
@@ -73,7 +74,9 @@ namespace gui
 
     void LockInputWindow::buildIceBox()
     {
-        header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        if (Store::GSM::get()->simCardInserted()) {
+            header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        }
     }
 
     void LockInputWindow::buildPinBody()
@@ -166,7 +169,7 @@ namespace gui
     {
         header->setTitleVisibility(titleVisible);
 
-        if (iceVisible) {
+        if (iceVisible && Store::GSM::get()->simCardInserted()) {
             header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
         }
         else {
