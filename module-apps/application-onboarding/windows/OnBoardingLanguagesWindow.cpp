@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "OnBoardingLanguagesWindow.hpp"
@@ -7,6 +7,7 @@
 #include <header/IceAction.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <EventStore.hpp>
 
 namespace app::onBoarding
 {
@@ -21,7 +22,9 @@ namespace app::onBoarding
 
     void OnBoardingLanguagesWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
-        header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        if (Store::GSM::get()->simCardInserted()) {
+            header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        }
         navBar->setActive(gui::nav_bar::Side::Right, false);
 
         LanguagesWindow::onBeforeShow(mode, data);
@@ -32,7 +35,7 @@ namespace app::onBoarding
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
             return true;
         }
-        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT)) {
+        else if (inputEvent.isShortRelease(gui::KeyCode::KEY_LEFT) && Store::GSM::get()->simCardInserted()) {
             app::manager::Controller::sendAction(application,
                                                  app::manager::actions::EmergencyDial,
                                                  std::make_unique<gui::SwitchData>(),

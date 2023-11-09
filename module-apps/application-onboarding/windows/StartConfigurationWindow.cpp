@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StartConfigurationWindow.hpp"
@@ -15,6 +15,7 @@
 #include <i18n/i18n.hpp>
 #include <Style.hpp>
 #include <InputEvent.hpp>
+#include <EventStore.hpp>
 
 namespace app::onBoarding
 {
@@ -28,7 +29,9 @@ namespace app::onBoarding
     {
         AppWindow::buildInterface();
 
-        header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        if (Store::GSM::get()->simCardInserted()) {
+            header->navigationIndicatorAdd(new gui::header::IceAction(), gui::header::BoxSelection::Left);
+        }
         navBar->setText(gui::nav_bar::Side::Center, utils::translate(::style::strings::common::start));
         navBar->setText(gui::nav_bar::Side::Right, utils::translate(::style::strings::common::back));
         navBar->setText(gui::nav_bar::Side::Left, utils::translate(::style::strings::common::skip));
@@ -64,7 +67,7 @@ namespace app::onBoarding
                                           gui::ShowMode::GUI_SHOW_INIT,
                                           std::make_unique<OnBoardingSwitchData>());
             }
-            if (inputEvent.is(gui::KeyCode::KEY_LEFT)) {
+            if (inputEvent.is(gui::KeyCode::KEY_LEFT) && Store::GSM::get()->simCardInserted()) {
                 app::manager::Controller::sendAction(application,
                                                      app::manager::actions::EmergencyDial,
                                                      std::make_unique<gui::SwitchData>(),
