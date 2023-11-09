@@ -29,6 +29,8 @@
 #define BSP_EINK_TRANSFER_WRITE_CLOCK 18000000
 #define BSP_EINK_TRANSFER_READ_CLOCK  3000000
 
+using namespace drivers;
+
 typedef enum
 {
     EventWaitRegistered,
@@ -66,25 +68,24 @@ typedef struct _bsp_eink_driver
     edma_handle_t *edmaRxRegToRxDataHandle;
     edma_handle_t *edmaTxDataToTxRegHandle;
     std::uint32_t baudRate_Bps;
-    std::uint8_t flags; /*!< Control and state flags. */
+    std::uint8_t flags; // Control and state flags.
 
     bsp_eink_BusyEvent event;
-    /* Current transfer chip select configuration( automatic of manual ) */
-    eink_spi_cs_config_e chipselectConf;
-    /* Tells if something is waiting for not busy event */
-    busy_wait_registered_e eventRegister;
+    eink_spi_cs_config_e chipselectConf;  // Current transfer chip select configuration(automatic of manual)
+    busy_wait_registered_e eventRegister; // Tells if something is waiting for not busy event
 
 } bsp_eink_driver_t;
 
 namespace
 {
-    using namespace drivers;
-    static lpspi_master_config_t s_eink_lpspi_master_config;
-    static std::shared_ptr<drivers::DriverGPIO> gpio;
-    static std::shared_ptr<drivers::DriverDMA> dma;
-    static std::shared_ptr<drivers::DriverDMAMux> dmamux;
-    static std::unique_ptr<drivers::DriverDMAHandle> rxDMAHandle;
-    static std::unique_ptr<drivers::DriverDMAHandle> txDMAHandle;
+    lpspi_master_config_t spi_config;
+    std::shared_ptr<DriverGPIO> gpio;
+    std::shared_ptr<DriverDMA> dma;
+    std::shared_ptr<DriverDMAMux> dmamux;
+    std::unique_ptr<DriverDMAHandle> rxDMAHandle;
+    std::unique_ptr<DriverDMAHandle> txDMAHandle;
+
+    constexpr auto delayInNanoSec = 1'000'000'000 / BSP_EINK_TRANSFER_WRITE_CLOCK;
 } // namespace
 
 static std::uint32_t BSP_EINK_LPSPI_GetFreq(void)
@@ -121,11 +122,9 @@ static bsp_eink_driver_t BSP_EINK_LPSPI_EdmaDriverState = {
     EventWaitRegistered,
 };
 
-static bool bsp_eink_IsInitialised = false;
-
+static bool isEInkInitialised = false;
 static SemaphoreHandle_t bsp_eink_TransferComplete;
-
-static SemaphoreHandle_t bsp_eink_busySemaphore; //  This semaphore suspends the task until the EPD display is busy
+static SemaphoreHandle_t bsp_eink_busySemaphore; // This semaphore suspends the task until the EPD display is busy
 
 static void s_LPSPI_MasterEdmaCallback(LPSPI_Type *base,
                                        lpspi_master_edma_handle_t *handle,
@@ -149,7 +148,7 @@ static void s_LPSPI_MasterEdmaCallback(LPSPI_Type *base,
 
 status_t BSP_EinkInit()
 {
-    if (bsp_eink_IsInitialised) {
+    if (isEInkInitialised) {
         return kStatus_Success;
     }
     bsp_eink_driver_t *lpspi = &BSP_EINK_LPSPI_EdmaDriverState;
@@ -188,25 +187,24 @@ status_t BSP_EinkInit()
 
     bsp::eink::eink_gpio_configure();
 
-    s_eink_lpspi_master_config.baudRate     = BSP_EINK_TRANSFER_WRITE_CLOCK;
-    s_eink_lpspi_master_config.bitsPerFrame = 8;
-    s_eink_lpspi_master_config.cpol         = kLPSPI_ClockPolarityActiveHigh;
-    s_eink_lpspi_master_config.cpha         = kLPSPI_ClockPhaseFirstEdge;
-    s_eink_lpspi_master_config.direction    = kLPSPI_MsbFirst;
+    LPSPI_MasterGetDefaultConfig(&spi_config);
 
-    s_eink_lpspi_master_config.pcsToSckDelayInNanoSec        = 1000000000 / s_eink_lpspi_master_config.baudRate;
-    s_eink_lpspi_master_config.lastSckToPcsDelayInNanoSec    = 1000000000 / s_eink_lpspi_master_config.baudRate;
-    s_eink_lpspi_master_config.betweenTransferDelayInNanoSec = 1000000000 / s_eink_lpspi_master_config.baudRate;
+    spi_config.baudRate                      = BSP_EINK_TRANSFER_WRITE_CLOCK;
+    spi_config.bitsPerFrame                  = 8;
+    spi_config.cpol                          = kLPSPI_ClockPolarityActiveHigh;
+    spi_config.cpha                          = kLPSPI_ClockPhaseFirstEdge;
+    spi_config.direction                     = kLPSPI_MsbFirst;
+    spi_config.pcsToSckDelayInNanoSec        = delayInNanoSec;
+    spi_config.lastSckToPcsDelayInNanoSec    = delayInNanoSec;
+    spi_config.betweenTransferDelayInNanoSec = delayInNanoSec;
+    spi_config.whichPcs                      = kLPSPI_Pcs0;
+    spi_config.pcsActiveHighOrLow            = kLPSPI_PcsActiveLow;
+    spi_config.pinCfg                        = kLPSPI_SdiInSdoOut;
+    spi_config.dataOutConfig                 = kLpspiDataOutRetained;
 
-    s_eink_lpspi_master_config.whichPcs           = kLPSPI_Pcs0;
-    s_eink_lpspi_master_config.pcsActiveHighOrLow = kLPSPI_PcsActiveLow;
+    LPSPI_MasterInit(BSP_EINK_LPSPI_BASE, &spi_config, BSP_EINK_LPSPI_GetFreq());
 
-    s_eink_lpspi_master_config.pinCfg        = kLPSPI_SdiInSdoOut;
-    s_eink_lpspi_master_config.dataOutConfig = kLpspiDataOutRetained;
-
-    LPSPI_MasterInit(BSP_EINK_LPSPI_BASE, &s_eink_lpspi_master_config, GetPerphSourceClock(PerphClock_LPSPI));
-
-    // fsl_lpspi doesn't support configuring autopcs feature
+    // fsl lpspi doesn't support configuring autopcs feature
     BSP_EINK_LPSPI_BASE->CFGR1 |= LPSPI_CFGR1_AUTOPCS(0);
 
     dmamux = DriverDMAMux::Create(static_cast<DMAMuxInstances>(BoardDefinitions::EINK_DMAMUX), DriverDMAMuxParams{});
@@ -232,14 +230,13 @@ status_t BSP_EinkInit()
                                          lpspi->edmaRxRegToRxDataHandle,
                                          lpspi->edmaTxDataToTxRegHandle);
 
-    bsp_eink_IsInitialised = true;
-
+    isEInkInitialised = true;
     return kStatus_Success;
 }
 
 void BSP_EinkDeinit(void)
 {
-    if (!bsp_eink_IsInitialised) {
+    if (!isEInkInitialised) {
         return;
     }
     LPSPI_Enable(BSP_EINK_LPSPI_BASE, false);
@@ -263,7 +260,7 @@ void BSP_EinkDeinit(void)
     gpio->ClearPortInterrupts(1 << static_cast<std::uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
     gpio.reset();
 
-    bsp_eink_IsInitialised = false;
+    isEInkInitialised = false;
 }
 
 void BSP_EinkLogicPowerOn()
@@ -281,15 +278,12 @@ status_t BSP_EinkChangeSpiFrequency(std::uint32_t frequencyHz)
     std::uint32_t tcrPrescalerValue = 0;
 
     LPSPI_Enable(BSP_EINK_LPSPI_BASE, false);
-    LPSPI_MasterSetBaudRate(
-        BSP_EINK_LPSPI_BASE, frequencyHz, GetPerphSourceClock(PerphClock_LPSPI), &tcrPrescalerValue);
+    LPSPI_MasterSetBaudRate(BSP_EINK_LPSPI_BASE, frequencyHz, BSP_EINK_LPSPI_GetFreq(), &tcrPrescalerValue);
 
-    s_eink_lpspi_master_config.baudRate = frequencyHz;
-    BSP_EINK_LPSPI_BASE->TCR =
-        LPSPI_TCR_CPOL(s_eink_lpspi_master_config.cpol) | LPSPI_TCR_CPHA(s_eink_lpspi_master_config.cpha) |
-        LPSPI_TCR_LSBF(s_eink_lpspi_master_config.direction) |
-        LPSPI_TCR_FRAMESZ(s_eink_lpspi_master_config.bitsPerFrame - 1U) | LPSPI_TCR_PRESCALE(tcrPrescalerValue) |
-        LPSPI_TCR_PCS(s_eink_lpspi_master_config.whichPcs);
+    spi_config.baudRate      = frequencyHz;
+    BSP_EINK_LPSPI_BASE->TCR = LPSPI_TCR_CPOL(spi_config.cpol) | LPSPI_TCR_CPHA(spi_config.cpha) |
+                               LPSPI_TCR_LSBF(spi_config.direction) | LPSPI_TCR_FRAMESZ(spi_config.bitsPerFrame - 1U) |
+                               LPSPI_TCR_PRESCALE(tcrPrescalerValue) | LPSPI_TCR_PCS(spi_config.whichPcs);
 
     return 0;
 }
@@ -381,7 +375,7 @@ status_t BSP_EinkReadData(void *rxBuffer, std::uint32_t len, eink_spi_cs_config_
     xfer.txData      = NULL;
     xfer.rxData      = (std::uint8_t *)rxBuffer;
     xfer.dataSize    = len;
-    xfer.configFlags = /*RTE_SPI1_MASTER_PCS_PIN_SEL |*/ kLPSPI_MasterByteSwap | kLPSPI_MasterPcsContinuous;
+    xfer.configFlags = kLPSPI_MasterByteSwap | kLPSPI_MasterPcsContinuous;
 
     if (cs == SPI_AUTOMATIC_CS) {
         BSP_EinkWriteCS(BSP_Eink_CS_Clr);
@@ -473,7 +467,7 @@ BaseType_t BSP_EinkBusyPinStateChangeHandler(void)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
 
-    /* Give semaphore only if something is waiting on it */
+    // Give semaphore only if something is waiting on it
     if (BSP_EINK_LPSPI_EdmaDriverState.eventRegister == EventWaitRegistered) {
         gpio->DisableInterrupt(1 << static_cast<std::uint32_t>(BoardDefinitions::EINK_BUSY_PIN));
 
