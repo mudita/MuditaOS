@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <AlarmOperations.hpp>
@@ -62,6 +62,23 @@ namespace
         Settings settings{true, std::chrono::minutes{1}};
     };
 
+    class MockedOnboardingSettingsProvider : public alarms::OnboardingSettingsProvider
+    {
+      public:
+        void setSettings(bool doneOnboarding)
+        {
+            done = doneOnboarding;
+        }
+
+        auto isDone() -> bool override
+        {
+            return done;
+        }
+
+      private:
+        bool done{true};
+    };
+
     class MockedBedtimeModel : public alarms::AbstractBedtimeSettingsProvider
     {
       public:
@@ -87,12 +104,14 @@ namespace
         std::unique_ptr<MockAlarmEventsRepository> &alarmRepo,
         std::unique_ptr<alarms::PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
         std::unique_ptr<alarms::SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider,
+        std::unique_ptr<alarms::OnboardingSettingsProvider> &&onboardingSettingsProvider,
         std::unique_ptr<alarms::AbstractBedtimeSettingsProvider> &&bedtimeSettingsProvider)
     {
         return std::make_unique<alarms::AlarmOperations>(std::move(alarmRepo),
                                                          timeInjector,
                                                          std::move(preWakeUpSettingsProvider),
                                                          std::move(snoozeChimeSettingsProvider),
+                                                         std::move(onboardingSettingsProvider),
                                                          std::move(bedtimeSettingsProvider));
     }
 } // namespace
@@ -104,6 +123,7 @@ std::unique_ptr<alarms::IAlarmOperations> AlarmOperationsFixture::getMockedAlarm
     return ::getMockedAlarmOperations(alarmRepo,
                                       std::make_unique<MockedPreWakeUpSettingsProvider>(),
                                       std::make_unique<MockedSnoozeChimeSettingsProvider>(),
+                                      std::make_unique<MockedOnboardingSettingsProvider>(),
                                       std::make_unique<MockedBedtimeModel>());
 }
 
@@ -219,6 +239,7 @@ class BellAlarmOperationsFixture : public ::testing::Test
         alarmOperations = ::getMockedAlarmOperations(alarmRepoMock,
                                                      std::make_unique<MockedPreWakeUpSettingsProvider>(),
                                                      std::make_unique<MockedSnoozeChimeSettingsProvider>(),
+                                                     std::make_unique<MockedOnboardingSettingsProvider>(),
                                                      std::make_unique<MockedBedtimeModel>());
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpChime, chimeHandler);
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpFrontlight, frontlightHandler);

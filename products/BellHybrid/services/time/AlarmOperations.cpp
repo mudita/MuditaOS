@@ -1,13 +1,11 @@
 // Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <time/AlarmOperations.hpp>
-
 #include <BellAlarmHandler.hpp>
 
-#include <service-db/Settings.hpp>
-#include <db/SystemSettings.hpp>
+#include <time/AlarmOperations.hpp>
 #include <time/dateCommon.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 
 #include <string>
 
@@ -82,10 +80,7 @@ namespace alarms
             std::unique_ptr<app::bell_bedtime::BedtimeTimeModel> bedtimeTimeModel;
             settings::Settings settings;
         };
-    } // namespace
 
-    namespace
-    {
         class SnoozeChimeSettingsProviderImpl : public SnoozeChimeSettingsProvider
         {
           public:
@@ -113,6 +108,28 @@ namespace alarms
                 return {true, std::chrono::minutes{interval}};
             }
         }
+
+        class OnboardingSettingsProviderImpl : public OnboardingSettingsProvider
+        {
+          public:
+            explicit OnboardingSettingsProviderImpl(sys::Service *service);
+            auto isDone() -> bool override;
+
+          private:
+            settings::Settings settings;
+        };
+
+        OnboardingSettingsProviderImpl::OnboardingSettingsProviderImpl(sys::Service *service)
+        {
+            settings.init(service::ServiceProxy{service->weak_from_this()});
+        }
+
+        auto OnboardingSettingsProviderImpl::isDone() -> bool
+        {
+            return utils::getNumericValue<bool>(
+                settings.getValue(settings::SystemProperties::onboardingDone, settings::SettingsScope::Global));
+        }
+
     } // namespace
 
     std::unique_ptr<IAlarmOperations> AlarmOperationsFactory::create(
@@ -122,11 +139,13 @@ namespace alarms
     {
         auto preWakeUpSettingsProvider   = std::make_unique<PreWakeUpSettingsProviderImpl>(service);
         auto snoozeChimeSettingsProvider = std::make_unique<SnoozeChimeSettingsProviderImpl>(service);
+        auto onboardingSettingsProvider  = std::make_unique<OnboardingSettingsProviderImpl>(service);
         auto bedtimeSettingsProvider     = std::make_unique<BedtimeSettingsProviderImpl>(service);
         auto alarmOperations             = std::make_unique<AlarmOperations>(std::move(alarmEventsRepo),
                                                                  getCurrentTimeCallback,
                                                                  std::move(preWakeUpSettingsProvider),
                                                                  std::move(snoozeChimeSettingsProvider),
+                                                                 std::move(onboardingSettingsProvider),
                                                                  std::move(bedtimeSettingsProvider));
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock,
                                                   std::make_shared<alarms::BellAlarmClockHandler>(service));
@@ -146,14 +165,19 @@ namespace alarms
                                      GetCurrentTime getCurrentTimeCallback,
                                      std::unique_ptr<PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
                                      std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettings,
+                                     std::unique_ptr<OnboardingSettingsProvider> &&onboardingSettings,
                                      std::unique_ptr<AbstractBedtimeSettingsProvider> &&bedtimeSettingsProvider)
         : AlarmOperationsCommon{std::move(alarmEventsRepo), std::move(getCurrentTimeCallback)},
           preWakeUp(std::move(preWakeUpSettingsProvider)), snoozeChimeSettings(std::move(snoozeChimeSettings)),
-          bedtime(std::move(bedtimeSettingsProvider))
+          onboardingSettings(std::move(onboardingSettings)), bedtime(std::move(bedtimeSettingsProvider))
     {}
 
     void AlarmOperations::minuteUpdated(TimePoint now)
     {
+        // Prevent activating alarms when the onboard is not done yet
+        if (!isOnboardingDone()) {
+            return;
+        }
         /**
          * A very simple alarm priority:
          * 1. Main alarm
@@ -305,6 +329,10 @@ namespace alarms
     bool AlarmOperations::isBedtimeAllowed() const
     {
         return ongoingSingleEvents.empty() && snoozedSingleEvents.empty() && not preWakeUp.isActive();
+    }
+    bool AlarmOperations::isOnboardingDone()
+    {
+        return onboardingSettings->isDone();
     }
 
     void AlarmOperations::handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,

@@ -6,6 +6,7 @@
 * Fixed frequency lock during user activity
 * Fixed boot error screen text alignment
 * Fixed eink errors in logs
+* Fixed alarm when the onboarding is in progress
 
 ### Added
 * Added notification when charger is connected
