@@ -44,7 +44,7 @@ namespace app
                                            std::string parent                  = "",
                                            StatusIndicators statusIndicators   = StatusIndicators{},
                                            StartInBackground startInBackground = {false},
-                                           std::uint32_t stackDepth            = 1024 * 8);
+                                           std::uint32_t stackDepth            = 1024 * 11);
         ~ApplicationBellOnBoarding();
 
         sys::ReturnCodes InitHandler() override;

@@ -6,7 +6,7 @@
 #include <AlarmOperations.hpp>
 #include <db/SystemSettings.hpp>
 #include <common/models/BedtimeModel.hpp>
-
+#include <service-db/Settings.hpp>
 namespace alarms
 {
     class AlarmOperationsFactory : public IAlarmOperationsFactory
@@ -43,6 +43,13 @@ namespace alarms
 
         virtual ~SnoozeChimeSettingsProvider() noexcept = default;
         virtual auto getSettings() -> Settings          = 0;
+    };
+
+    class OnboardingSettingsProvider
+    {
+      public:
+        virtual ~OnboardingSettingsProvider() noexcept = default;
+        virtual auto isDone() -> bool                  = 0;
     };
 
     class AbstractBedtimeSettingsProvider
@@ -95,6 +102,7 @@ namespace alarms
                         GetCurrentTime getCurrentTimeCallback,
                         std::unique_ptr<PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
                         std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider,
+                        std::unique_ptr<OnboardingSettingsProvider> &&onboardingSettingsProvider,
                         std::unique_ptr<AbstractBedtimeSettingsProvider> &&BedtimeModel);
 
       private:
@@ -117,9 +125,11 @@ namespace alarms
                               bool newStateOn) override;
 
         bool isBedtimeAllowed() const;
+        bool isOnboardingDone();
 
         PreWakeUp preWakeUp;
         std::unique_ptr<SnoozeChimeSettingsProvider> snoozeChimeSettings;
+        std::unique_ptr<OnboardingSettingsProvider> onboardingSettings;
         Bedtime bedtime;
     };
 } // namespace alarms
