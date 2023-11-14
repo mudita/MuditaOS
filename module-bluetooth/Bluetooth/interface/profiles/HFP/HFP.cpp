@@ -16,6 +16,7 @@
 
 #include <BluetoothWorker.hpp>
 #include "SCO/ScoUtils.hpp"
+#include <Anonymize.hpp>
 
 #define ARRAY_LENGTH(x) (sizeof(x) / sizeof((x)[0]))
 
@@ -145,7 +146,7 @@ namespace bluetooth
     std::uint8_t HFP::HFPImpl::serviceBuffer[serviceBufferSize];
 
     std::unique_ptr<SCO> HFP::HFPImpl::sco;
-    SCOCodec HFP::HFPImpl::codec                       = SCOCodec::CVSD;
+    SCOCodec HFP::HFPImpl::codec = SCOCodec::CVSD;
     std::shared_ptr<CVSDAudioDevice> HFP::HFPImpl::audioDevice;
 
     std::unique_ptr<CellularInterface> HFP::HFPImpl::cellularInterface;
@@ -202,8 +203,8 @@ namespace bluetooth
 
     void HFP::HFPImpl::sendAudioEvent(audio::EventType event, audio::Event::DeviceState state)
     {
-        auto evt       = std::make_shared<audio::Event>(event, state);
-        auto msg       = std::make_shared<AudioEventRequest>(std::move(evt));
+        auto evt = std::make_shared<audio::Event>(event, state);
+        auto msg = std::make_shared<AudioEventRequest>(std::move(evt));
         ownerService->bus.sendUnicast(std::move(msg), service::name::evt_manager);
     }
 
@@ -526,7 +527,10 @@ namespace bluetooth
 
     auto HFP::HFPImpl::setIncomingCallNumber(const std::string &num) const noexcept -> Result::Code
     {
-        LOG_SENSITIVE(LOGDEBUG, "Setting number: %s", num.c_str());
+        LOG_SENSITIVE(
+            LOGDEBUG,
+            "Setting number: %s",
+            utils::anonymize::anonymizeNumbers(num, utils::anonymize::SIGNS_TO_LEAVE_FOR_PHONE_NUMBERS).c_str());
         hfp_ag_set_clip(129, num.c_str());
         return Result::Code::Success;
     }

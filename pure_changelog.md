@@ -9,6 +9,7 @@
 ### Changed / Improved
 
 * Hide the SOS label during onboarding when the modem is not ready for an emergency call.
+* Anonymization sensitive data in logs added.
 
 ### Fixed
 
