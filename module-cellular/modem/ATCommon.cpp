@@ -11,6 +11,7 @@
 #include "ATStream.hpp"
 #include <at/ATFactory.hpp>
 #include <gsl/util>
+#include <Anonymize.hpp>
 
 using namespace at;
 using namespace std::chrono_literals;
@@ -41,16 +42,20 @@ void Channel::cmdLog(std::string cmd, const Result &result, std::chrono::millise
     } break;
     case Result::Code::ERROR: {
         LOG_ERROR("AT response: error");
-        LOG_SENSITIVE(
-            LOGERROR, "[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
+        LOG_SENSITIVE(LOGERROR,
+                      "[AT]: >%s<, >%s<",
+                      utils::anonymize::anonymizeCellularIfNecessary(cmd).c_str(),
+                      result.response.size() ? result.response.back().c_str() : "");
     } break;
     default:
-        LOG_SENSITIVE(
-            LOGDEBUG, "[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
+        LOG_SENSITIVE(LOGDEBUG,
+                      "[AT]: >%s<, >%s<",
+                      utils::anonymize::anonymizeCellularIfNecessary(cmd).c_str(),
+                      result.response.size() ? result.response.back().c_str() : "");
         break;
     }
     for ([[maybe_unused]] const auto &s : result.response) {
-        LOG_SENSITIVE(LOGINFO, "[AT] > %s", s.c_str());
+        LOG_SENSITIVE(LOGINFO, "[AT] > %s", utils::anonymize::anonymizeCellularIfNecessary(s).c_str());
     }
 }
 
@@ -86,7 +91,7 @@ Result Channel::cmd(const std::string &cmd, std::chrono::milliseconds timeout, s
 
     cmdInit();
     std::string cmdFixed = formatCommand(cmd);
-    LOG_DEBUG("Start of %s", cmdFixed.c_str());
+    LOG_DEBUG("Start of %s", utils::anonymize::anonymizeCellularIfNecessary(cmdFixed).c_str());
     cmdSend(cmdFixed);
 
     auto startTime = std::chrono::steady_clock::now();

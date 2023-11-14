@@ -98,6 +98,7 @@
 #include <ticks.hpp>
 
 #include "ServiceCellularPriv.hpp"
+#include "Anonymize.hpp"
 #include <service-cellular/api/request/sim.hpp>
 #include <service-cellular/api/notification/notification.hpp>
 
@@ -973,7 +974,7 @@ std::optional<std::shared_ptr<sys::Message>> ServiceCellular::identifyNotificati
     const std::string str(data.begin(), data.end());
 
     const std::string logStr = utils::removeNewLines(str);
-    LOG_SENSITIVE(LOGDEBUG, "Notification:: %s", logStr.c_str());
+    LOG_SENSITIVE(LOGDEBUG, "Notification:: %s", utils::anonymize::anonymizeCellularIfNecessary(logStr).c_str());
 
     auto urc = at::urc::UrcFactory::Create(str);
     urc->Handle(urcHandler);

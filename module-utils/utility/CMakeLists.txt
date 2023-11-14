@@ -3,6 +3,7 @@ add_library(utility STATIC)
 target_sources(utility
     PRIVATE
         Utils.cpp
+        Anonymize.cpp
 
     PUBLIC
         integer.hpp
@@ -12,6 +13,7 @@ target_sources(utility
         Utility.hpp
         Utils.hpp
         Units.hpp
+        Anonymize.hpp
 )
 
 target_include_directories(utility
