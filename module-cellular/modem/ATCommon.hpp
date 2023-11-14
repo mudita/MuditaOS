@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -88,6 +88,7 @@ namespace at
         virtual void cmdLog(std::string cmd, const Result &result, std::chrono::milliseconds timeout) final;
 
         Result checkResult(bsp::cellular::CellularResultCode cellularResult);
+        std::string anonymizeIfNecessary(std::string text);
 
         std::function<void()> onWakeUpModem;
         std::function<void()> onSleepModem;

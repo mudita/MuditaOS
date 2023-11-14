@@ -28,6 +28,7 @@ const std::string Channel::CMS_ERROR  = "+CMS ERROR:";
 
 void Channel::cmdLog(std::string cmd, const Result &result, std::chrono::milliseconds timeout)
 {
+    LOG_WARN("--------- cmd:%s", cmd.c_str()); // for debug only
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\r'), cmd.end());
     cmd.erase(std::remove(cmd.begin(), cmd.end(), '\n'), cmd.end());
     switch (result.code) {
@@ -41,16 +42,20 @@ void Channel::cmdLog(std::string cmd, const Result &result, std::chrono::millise
     } break;
     case Result::Code::ERROR: {
         LOG_ERROR("AT response: error");
-        LOG_SENSITIVE(
-            LOGERROR, "[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
+        LOG_SENSITIVE(LOGERROR,
+                      "[AT]: >%s<, >%s<",
+                      anonymizeIfNecessary(cmd).c_str(),
+                      result.response.size() ? result.response.back().c_str() : "");
     } break;
     default:
-        LOG_SENSITIVE(
-            LOGDEBUG, "[AT]: >%s<, >%s<", cmd.c_str(), result.response.size() ? result.response.back().c_str() : "");
+        LOG_SENSITIVE(LOGDEBUG,
+                      "[AT]: >%s<, >%s<",
+                      anonymizeIfNecessary(cmd).c_str(),
+                      result.response.size() ? result.response.back().c_str() : "");
         break;
     }
     for ([[maybe_unused]] const auto &s : result.response) {
-        LOG_SENSITIVE(LOGINFO, "[AT] > %s", s.c_str());
+        LOG_SENSITIVE(LOGINFO, "[AT] > %s", anonymizeIfNecessary(s).c_str());
     }
 }
 
@@ -86,7 +91,7 @@ Result Channel::cmd(const std::string &cmd, std::chrono::milliseconds timeout, s
 
     cmdInit();
     std::string cmdFixed = formatCommand(cmd);
-    LOG_DEBUG("Start of %s", cmdFixed.c_str());
+    LOG_DEBUG("Start of %s", anonymizeIfNecessary(cmdFixed).c_str());
     cmdSend(cmdFixed);
 
     auto startTime = std::chrono::steady_clock::now();
@@ -155,4 +160,43 @@ Result Channel::checkResult(bsp::cellular::CellularResultCode cellularResult)
     }
 
     return result;
+}
+
+std::string Channel::anonymizeIfNecessary(std::string text) // TODO: const, inline??
+{
+    LOG_WARN("---- INPUT  STR:%s", text.c_str()); //-----------------------------------
+    std::string outputStr                 = text;
+    std::array<std::string, 3> substrings = {"ATD", "CPIN", "CLCC"}; // TODO: std::array<std::string, 3>
+
+    size_t foundPosition    = std::string::npos;
+    size_t substringsLength = 0;
+
+    // Iterate through the substrings to find the position of any one of them
+    for (const std::string &sub : substrings) {
+        size_t pos = outputStr.find(sub);
+        if (pos != std::string::npos) {
+            foundPosition    = pos;
+            substringsLength = sub.length();
+            break; // Break loop if any substring is found
+        }
+    }
+
+    if (foundPosition != std::string::npos) {
+        // Get the position where the second part begins
+        size_t secondPartPosition = foundPosition + substringsLength;
+        if (secondPartPosition < outputStr.length()) {
+            // Replace the second part of the string
+            std::string substringAfterPosition = outputStr.substr(secondPartPosition);
+            std::string anonymizedPart         = "##";
+            for (char c : substringAfterPosition) {
+                anonymizedPart += std::to_string(static_cast<int>(c));
+            }
+            outputStr.replace(secondPartPosition, std::string::npos, anonymizedPart);
+        }
+    }
+    else {
+        LOG_WARN("---- Substring not found");
+    }
+    LOG_WARN("---- OUTPUT STR:%s", outputStr.c_str()); //-----------------------------------
+    return outputStr;
 }
