@@ -3,14 +3,24 @@
 ## Unreleased
 
 ### Fixed
-* Fixed frequency lock during user activity
-* Fixed boot error screen text alignment
 * Fixed eink errors in logs
 * Fixed alarm when the onboarding is in progress
 
 ### Added
-* Added notification when charger is connected
 * Added shortcuts instruction to settings
+
+### Changed / Improved
+
+## [2.2.2 2023-11-14]
+
+### Fixed
+
+* Fixed CPU frequency setting when dumping logs to a file
+* Fixed incorrect calculation of requested CPU frequency
+* Fixed boot error screen text alignment
+
+### Added
+* Added notification when charger is connected
 
 ### Changed / Improved
 * Disabled USB MTP protocol
@@ -24,13 +34,14 @@
 * Fixed incorrect message after new alarm setting in some scenarios
 * Fixed the possibility of OS crash during update package size check
 * Fixed errors that occur when uploading a music file with graphics in the metadata via the Center
+* Fixed frequency lock during user activity
 
 ### Added
 * Files not fully transferred via Center will be now removed when USB cable is unplugged
 
 ### Changed / Improved
 * Improved the display time of the "turn off" window.
-* Hardware faults during device startup now result in shutdown and a more user friendly message
+* Hardware faults during device startup now result in shutdown and a more user-friendly message
 * Discharged device screen changed
 
 ## [2.2.0 2023-09-28]
