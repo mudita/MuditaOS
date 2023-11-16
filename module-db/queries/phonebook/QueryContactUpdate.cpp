@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QueryContactUpdate.hpp"
@@ -11,7 +11,10 @@ using namespace db::query;
 ContactUpdate::ContactUpdate(const ContactRecord &rec) : Query(Query::Type::Update), rec(std::move(rec))
 {}
 
-ContactUpdateResult::ContactUpdateResult(bool result) : result(result)
+ContactUpdateResult::ContactUpdateResult(bool result,
+                                         std::uint32_t id,
+                                         const std::vector<utils::PhoneNumber::View> &duplicates)
+    : result(result), duplicates(duplicates), id(id)
 {}
 
 [[nodiscard]] auto ContactUpdate::debugInfo() const -> std::string

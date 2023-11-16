@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -250,7 +250,8 @@ class ContactRecordInterface : public RecordInterface<ContactRecord, ContactReco
      * @param record single contact record to be verified
      * @return true if contact can be considered as a duplicate in DB
      */
-    auto verifyDuplicate(ContactRecord &record) -> std::vector<utils::PhoneNumber::View>;
+    auto verifyDuplicate(ContactRecord &record, const std::uint32_t contactIDToIgnore = 0u)
+        -> std::vector<utils::PhoneNumber::View>;
 
     /**
      * @brief Verify if single contact record can be considered as an existing temporary contact in DB

@@ -276,12 +276,20 @@ Parameters:
 }
 ```
 
-Warning:
-In the current implementation, there is no duplicate detection while updating contact.
-Example:
-We have contact A with number 123 and contact B with number 456.
-Contact A is updated with a new number - 456. Number 456 is silently unattached from contact B and assigned to contact
-A. Finally, we have contact A with number 456 and contact B with no number.
+**Response Payload Structure when contact is matched as a duplicate**
+
+```json
+{
+  "body": {
+    "duplicatedNumbers": [
+      "123456789"
+    ]
+  },
+  "endpoint": 7,
+  "status": 409,
+  "uuid": 123
+}
+```
 
 ### Delete a contact
 

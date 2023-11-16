@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/contacts/ContactHelper.hpp>
@@ -244,9 +244,19 @@ namespace sdesktop::endpoints
         auto listener = std::make_unique<db::EndpointListener>(
             [](db::QueryResult *result, Context context) {
                 if (auto contactResult = dynamic_cast<db::query::ContactUpdateResult *>(result)) {
-
-                    context.setResponseStatus(contactResult->getResult() ? http::Code::NoContent
-                                                                         : http::Code::InternalServerError);
+                    if (contactResult->hasDuplicates()) {
+                        auto numberDuplicates = json11::Json::array();
+                        for (const auto &number : contactResult->getDuplicates()) {
+                            numberDuplicates.emplace_back(number.getEntered().c_str());
+                        }
+                        context.setResponseBody(
+                            json11::Json::object({{json::contacts::duplicateNumbers, numberDuplicates}}));
+                        context.setResponseStatus(http::Code::Conflict);
+                    }
+                    else {
+                        context.setResponseStatus(contactResult->getResult() ? http::Code::NoContent
+                                                                             : http::Code::InternalServerError);
+                    }
                     putToSendQueue(context.createSimpleResponse());
 
                     return true;
