@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactRecord.hpp"
@@ -657,9 +657,20 @@ auto ContactRecordInterface::addQuery(const std::shared_ptr<db::Query> &query) -
 auto ContactRecordInterface::updateQuery(const std::shared_ptr<db::Query> &query)
     -> const std::unique_ptr<db::QueryResult>
 {
-    auto updateQuery = static_cast<const db::query::ContactUpdate *>(query.get());
-    auto result      = ContactRecordInterface::Update(updateQuery->rec);
-    auto response    = std::make_unique<db::query::ContactUpdateResult>(result);
+    auto updateQuery = dynamic_cast<db::query::ContactUpdate *>(query.get());
+    if (updateQuery == nullptr) {
+        LOG_ERROR("Dynamic casting db::query::ContactUpdate has failed!");
+        return std::unique_ptr<db::QueryResult>();
+    }
+    auto result = false;
+
+    // Checking for duplicates along with omitting this contact in the DB in the search
+    auto duplicates = verifyDuplicate(updateQuery->rec, updateQuery->rec.ID);
+    if (duplicates.empty()) {
+        result = ContactRecordInterface::Update(updateQuery->rec);
+    }
+
+    auto response = std::make_unique<db::query::ContactUpdateResult>(result, updateQuery->rec.ID, duplicates);
     response->setRequestQuery(query);
     response->setRecordID(updateQuery->rec.ID);
     return response;
@@ -1540,11 +1551,13 @@ auto ContactRecordInterface::CheckContactsListDuplicates(std::vector<ContactReco
     return {unique, duplicates};
 }
 
-auto ContactRecordInterface::verifyDuplicate(ContactRecord &record) -> std::vector<utils::PhoneNumber::View>
+auto ContactRecordInterface::verifyDuplicate(ContactRecord &record, const std::uint32_t contactIDToIgnore)
+    -> std::vector<utils::PhoneNumber::View>
 {
     std::vector<utils::PhoneNumber::View> duplicates = {};
     for (const auto &number : record.numbers) {
-        auto matchResult = MatchByNumber(number.number);
+        auto matchResult = MatchByNumber(
+            number.number, CreateTempContact::False, utils::PhoneNumber::Match::POSSIBLE, contactIDToIgnore);
         if (!matchResult.has_value() || matchResult.value().contact.isTemporary()) {
             continue;
         }
