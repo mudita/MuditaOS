@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,14 +6,8 @@
 #include "Decoder.hpp"
 #include <src/dr_mp3.h>
 
-extern "C"
-{
-#include "xing_header.h"
-};
-
 namespace audio
 {
-
     class decoderMP3 : public Decoder
     {
 
@@ -27,7 +21,7 @@ namespace audio
         void setPosition(float pos) override;
 
       private:
-        std::unique_ptr<drmp3> mp3 = nullptr;
+        std::unique_ptr<drmp3> mp3;
 
         // Callback for when data needs to be read from the client.
         //
@@ -39,7 +33,7 @@ namespace audio
         //
         // A return value of less than bytesToRead indicates the end of the stream. Do _not_ return from this callback
         // until either the entire bytesToRead is filled or you have reached the end of the stream.
-        static size_t drmp3_read(void *pUserData, void *pBufferOut, size_t bytesToRead);
+        static std::size_t drmp3_read(void *pUserData, void *pBufferOut, std::size_t bytesToRead);
 
         // Callback for when data needs to be seeked.
         //
@@ -54,5 +48,4 @@ namespace audio
         // drflac_seek_origin_current.
         static drmp3_bool32 drmp3_seek(void *pUserData, int offset, drmp3_seek_origin origin);
     };
-
 } // namespace audio

@@ -7,6 +7,7 @@
 * Fixed boot error screen text alignment
 * Fixed eink errors in logs
 * Fixed alarm when the onboarding is in progress
+* Fixed relaxation start delay when trying to play MP3 files with large metadata
 
 ### Added
 * Added notification when charger is connected
