@@ -22,6 +22,7 @@ namespace gui
 
         void buildInterface() override;
         void handleError() override;
+        void rebuild() override;
         void updateViewState() override;
         void activate(const db::multimedia_files::MultimediaFilesRecord &selectedSound);
     };

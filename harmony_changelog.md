@@ -10,6 +10,7 @@
 * Added shortcuts instruction to settings
 
 ### Changed / Improved
+* Optimize the way Relaxation is loading music files
 
 ## [2.2.2 2023-11-14]
 
@@ -24,7 +25,6 @@
 
 ### Changed / Improved
 * Disabled USB MTP protocol
-* Optimize the way Relaxation is loading music files
 
 ## [2.2.1 2023-10-30]
 
