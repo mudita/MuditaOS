@@ -19,6 +19,7 @@
 * Fixed possible crash when entering phone number
 * Fixed incorrect calculation of requested CPU frequency
 * Fixed CPU frequency setting when dumping logs to a file
+* Fixed playback start delay when trying to play MP3 files with large metadata
 
 ## [1.9.0 2023-10-19]
 

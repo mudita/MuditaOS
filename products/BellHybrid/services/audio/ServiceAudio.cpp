@@ -23,7 +23,7 @@ namespace
     {
         using namespace audio;
         // clang-format off
-        static constexpr std::initializer_list<std::pair<audio::DbPathElement, const char *>> values{
+        constexpr std::initializer_list<std::pair<audio::DbPathElement, const char *>> values{
             {DbPathElement{Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackLoudspeaker},defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker},defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker}, defaultVolume},
@@ -71,7 +71,7 @@ namespace service
 
         connect(typeid(AudioStartPlaybackRequest), [this](sys::Message *msg) -> sys::MessagePointer {
             auto *msgl = static_cast<AudioStartPlaybackRequest *>(msg);
-            return handleStart(audio::Operation::Type::Playback, msgl->fileName.c_str(), msgl->playbackType);
+            return handleStart(audio::Operation::Type::Playback, msgl->fileName, msgl->playbackType);
         });
 
         connect(typeid(AudioInternalEOFNotificationMessage), [this](sys::Message *msg) -> sys::MessagePointer {
@@ -95,18 +95,23 @@ namespace service
             return handleGetVolume(msgl->playbackType);
         });
 
-        connect(typeid(AudioPauseRequest), [this](sys::Message *msg) -> sys::MessagePointer { return handlePause(); });
+        connect(typeid(AudioPauseRequest),
+                [this]([[maybe_unused]] sys::Message *msg) -> sys::MessagePointer { return handlePause(); });
 
         connect(typeid(AudioResumeRequest),
-                [this](sys::Message *msg) -> sys::MessagePointer { return handleResume(); });
+                [this]([[maybe_unused]] sys::Message *msg) -> sys::MessagePointer { return handleResume(); });
     }
+
     Audio::~Audio()
     {
     }
-    sys::MessagePointer Audio::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+
+    sys::MessagePointer Audio::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msgl,
+                                                   [[maybe_unused]] sys::ResponseMessage *resp)
     {
         return sys::msgNotHandled();
     }
+
     sys::ReturnCodes Audio::InitHandler()
     {
         settingsProvider->init(service::ServiceProxy(weak_from_this()));
@@ -114,11 +119,13 @@ namespace service
         LOG_INFO("Initialized");
         return sys::ReturnCodes::Success;
     }
+
     sys::ReturnCodes Audio::DeinitHandler()
     {
         LOG_INFO("Deinitialized");
         return sys::ReturnCodes::Success;
     }
+
     void Audio::ProcessCloseReason([[maybe_unused]] sys::CloseReason closeReason)
     {
         if (const auto &activeInputOpt = audioMux.GetActiveInput(); activeInputOpt.has_value()) {
@@ -126,6 +133,7 @@ namespace service
             activeInput->audio->Stop();
         }
     }
+
     auto Audio::handleStart(const audio::Operation::Type opType,
                             const std::string &fileName,
                             const audio::PlaybackType &playbackType) -> std::unique_ptr<AudioResponseMessage>
@@ -141,7 +149,7 @@ namespace service
                 retToken = audioMux.ResetInput(input);
 
                 try {
-                    retCode = (*input)->audio->Start(opType, retToken, fileName.c_str(), playbackType);
+                    retCode = (*input)->audio->Start(opType, retToken, fileName, playbackType);
                 }
                 catch (const audio::AudioInitException &audioException) {
                     retCode = audio::RetCode::FailedToAllocateMemory;
@@ -154,8 +162,9 @@ namespace service
 
         return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
     }
-    auto Audio::handleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
-        -> std::unique_ptr<AudioResponseMessage>
+
+    auto Audio::handleStop([[maybe_unused]] const std::vector<audio::PlaybackType> &stopTypes,
+                           const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>
     {
         std::vector<std::pair<audio::Token, audio::RetCode>> retCodes;
 
@@ -178,6 +187,7 @@ namespace service
 
         return std::make_unique<AudioStopResponse>(audio::RetCode::Success, token);
     }
+
     auto Audio::stopInput(audio::AudioMux::Input *input, Audio::StopReason stopReason) -> audio::RetCode
     {
         if (input->audio->GetCurrentState() == audio::Audio::State::Idle) {
@@ -197,10 +207,12 @@ namespace service
         manageCpuSentinel();
         return retCode;
     }
+
     constexpr auto Audio::shouldLoop(const std::optional<audio::PlaybackType> &type) const -> bool
     {
         return type == audio::PlaybackType::Alarm;
     }
+
     auto Audio::isBusy() const -> bool
     {
         const auto &inputs = audioMux.GetAllInputs();
@@ -208,6 +220,7 @@ namespace service
             return input.audio->GetCurrentState() != audio::Audio::State::Idle;
         });
     }
+
     void Audio::handleEOF(const audio::Token &token)
     {
         if (const auto input = audioMux.GetInput(token); input) {
@@ -222,6 +235,7 @@ namespace service
             }
         }
     }
+
     auto Audio::AudioServicesCallback(const sys::Message *msg) -> std::optional<std::string>
     {
         std::optional<std::string> ret;
@@ -243,6 +257,7 @@ namespace service
 
         return ret;
     }
+
     auto Audio::handleSetVolume(const audio::PlaybackType &playbackType, const std::string &value)
         -> std::unique_ptr<AudioResponseMessage>
     {
@@ -261,6 +276,7 @@ namespace service
         }
         return std::make_unique<AudioResponseMessage>(retCode);
     }
+
     auto Audio::handleGetVolume(const audio::PlaybackType &playbackType) -> std::unique_ptr<AudioResponseMessage>
     {
         constexpr auto setting = audio::Setting::Volume;
@@ -272,10 +288,12 @@ namespace service
 
         return std::make_unique<AudioResponseMessage>(audio::RetCode::Failed);
     }
+
     sys::ReturnCodes Audio::SwitchPowerModeHandler([[maybe_unused]] const sys::ServicePowerMode mode)
     {
         return sys::ReturnCodes::Success;
     }
+
     auto Audio::handlePause() -> std::unique_ptr<AudioResponseMessage>
     {
         auto retCode = audio::RetCode::InvokedInIncorrectState;
@@ -291,6 +309,7 @@ namespace service
         manageCpuSentinel();
         return std::make_unique<AudioResponseMessage>(retCode);
     }
+
     auto Audio::handleResume() -> std::unique_ptr<AudioResponseMessage>
     {
         auto retCode = audio::RetCode::InvokedInIncorrectState;
@@ -301,15 +320,18 @@ namespace service
         manageCpuSentinel();
         return std::make_unique<AudioResponseMessage>(retCode);
     }
+
     constexpr auto Audio::isResumable(audio::PlaybackType type) const -> bool
     {
         return type == audio::PlaybackType::Multimedia;
     }
+
     void Audio::manageCpuSentinel()
     {
         isBusy() ? cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6)
                  : cpuSentinel->ReleaseMinimumFrequency();
     }
+
     void Audio::initializeDatabase()
     {
         for (const auto &entry : initializer::values) {
