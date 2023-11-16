@@ -195,7 +195,7 @@ This can be done manually, by editing the `.cmake` files (not recommended though
 | `MUDITA_USB_ID`               | Enable using Mudita registered USB Vendor ID and Pure Phone USB Product ID| OFF           |
 | `ENABLE_APP_X`                | Build and enable application X                                            | ON            |
 | `OPTIMIZE_APP_X`              | Optimize application X in debug build                                     | ON            |
-| `LINUX_ENABLE_SANITIZER`      | Enable address sanitizer for Linux                                        | ON            |
+| `LINUX_ENABLE_SANITIZER`      | Enable address sanitizer for Linux                                        | OFF           |
 | `ENABLE_SECURE_BOOT`          | Build signed binary for Secure Boot                                       | OFF           |
 | `THIRD_PARTY_DEBUG_OPTIMIZE`  | Optimize third party in debug                                             | ON            |
 | `ENABLE_TEST_LOGS`            | Enable logs in unit tests                                                 | OFF           |

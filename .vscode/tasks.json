@@ -40,9 +40,33 @@
         },
         {
             "type": "shell",
+            "label": "Run PurePhone (Linux + Valgrind)",
+            "command": "valgrind",
+            "args": [
+                "./PurePhone.elf"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build-PurePhone-linux-Debug"
+            },
+            "group": {
+                "kind": "build",
+                //"isDefault": true
+            },
+            "detail": "Build dir has to be configured with Cmake using Ninja",
+        },
+        {
+            "type": "shell",
             "label": "Configure and Build PurePhone (Linux)",
             "group": "build",
             "dependsOn": ["Configure PurePhone (Linux)", "Build PurePhone (Linux)"],
+            "dependsOrder": "sequence",
+            "detail": "Configure cmake project and build with Ninja",
+        },
+        {
+            "type": "shell",
+            "label": "Build and Run PurePhone (Linux + Valgrind)",
+            "group": "build",
+            "dependsOn": ["Build PurePhone (Linux)", "Run PurePhone (Linux + Valgrind)"],
             "dependsOrder": "sequence",
             "detail": "Configure cmake project and build with Ninja",
         },
@@ -81,6 +105,19 @@
         },
         {
             "type": "shell",
+            "label": "Run BellHybrid (Linux + Valgrind)",
+            "command": "valgrind",
+            "args": [
+                "./BellHybrid.elf"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}/build-BellHybrid-linux-Debug"
+            },
+            "group": "build",
+            "detail": "Build dir has to be configured with Cmake using Ninja",
+        },
+        {
+            "type": "shell",
             "label": "Build BellHybrid Disk Image (Linux)",
             "command": "ninja",
             "args": [
@@ -97,6 +134,14 @@
             "label": "Configure and Build BellHybrid (Linux)",
             "group": "build",
             "dependsOn": ["Configure BellHybrid (Linux)", "Build BellHybrid (Linux)", "Build BellHybrid Disk Image (Linux)"],
+            "dependsOrder": "sequence",
+            "detail": "Configure cmake project and build with Ninja",
+        },
+        {
+            "type": "shell",
+            "label": "Build and Run BellHybrid (Linux + Valgrind)",
+            "group": "build",
+            "dependsOn": ["Build BellHybrid (Linux)", "Run BellHybrid (Linux + Valgrind)"],
             "dependsOrder": "sequence",
             "detail": "Configure cmake project and build with Ninja",
         },
