@@ -68,5 +68,9 @@ namespace gui
     {
         songList->rebuildList(gui::listview::RebuildType::InPlace);
     }
+    void RelaxationMainWindow::rebuild()
+    {
+        songList->rebuildList(gui::listview::RebuildType::Full);
+    }
 
 } // namespace gui
