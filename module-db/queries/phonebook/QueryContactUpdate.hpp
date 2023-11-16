@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,15 +24,29 @@ namespace db::query
     class ContactUpdateResult : public QueryResult
     {
       public:
-        ContactUpdateResult(bool result);
+        ContactUpdateResult(bool result, std::uint32_t id, const std::vector<utils::PhoneNumber::View> &duplicates);
         auto getResult() -> bool
         {
             return result;
+        }
+        [[nodiscard]] auto hasDuplicates() const noexcept -> bool
+        {
+            return !duplicates.empty();
+        }
+        [[nodiscard]] auto getDuplicates() const noexcept -> std::vector<utils::PhoneNumber::View>
+        {
+            return duplicates;
+        }
+        [[nodiscard]] auto getID() const noexcept -> std::uint32_t
+        {
+            return id;
         }
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
       private:
         bool result;
+        std::vector<utils::PhoneNumber::View> duplicates;
+        std::uint32_t id;
     };
 
 }; // namespace db::query

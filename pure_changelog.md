@@ -1,5 +1,15 @@
 # MuditaOS changelog - PurePhone
 
+## Unreleased
+
+### Fixed
+Fixed no response when editing a contact via Center to have the same number as another
+
+### Added
+
+### Changed / Improved
+
+
 ## [1.11.0 2023-12-15]
 
 ### Added
