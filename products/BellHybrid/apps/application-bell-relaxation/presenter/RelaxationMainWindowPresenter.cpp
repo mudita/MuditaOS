@@ -23,6 +23,11 @@ namespace app::relaxation
         }
     }
 
+    void RelaxationMainWindowPresenter::updateRecordsCount()
+    {
+        songsModel->updateRecordsCount();
+    }
+
     std::shared_ptr<RelaxationSongsModel> RelaxationMainWindowPresenter::getSongsModel()
     {
         return songsModel;

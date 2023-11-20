@@ -28,8 +28,15 @@
 #include <common/models/BatteryModel.hpp>
 #include <common/models/AudioModel.hpp>
 #include <audio/AudioMessage.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 
 #include <log/log.hpp>
+
+namespace
+{
+    constexpr auto relaxationRebuildTimer         = "RelaxationRebuildTimer";
+    constexpr auto relaxationRebuildTimerInterval = std::chrono::milliseconds{5000};
+} // namespace
 
 namespace app
 {
@@ -42,6 +49,7 @@ namespace app
           audioModel{std::make_unique<AudioModel>(this)}
     {
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
+        bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
     ApplicationBellRelaxation::~ApplicationBellRelaxation() = default;
 
@@ -52,8 +60,15 @@ namespace app
             return ret;
         }
 
-        batteryModel = std::make_unique<app::BatteryModel>(this);
-        player       = std::make_unique<relaxation::RelaxationPlayer>(*audioModel);
+        batteryModel                 = std::make_unique<app::BatteryModel>(this);
+        player                       = std::make_unique<relaxation::RelaxationPlayer>(*audioModel);
+        relaxationRebuildTimerHandle = sys::TimerFactory::createSingleShotTimer(
+            this, relaxationRebuildTimer, relaxationRebuildTimerInterval, [this](sys::Timer &) {
+                const auto mainWindow = getWindow(gui::name::window::main_window);
+                if (mainWindow != nullptr) {
+                    mainWindow->rebuild();
+                }
+            });
 
         createUserInterface();
 
@@ -141,6 +156,20 @@ namespace app
             return retMsg;
         }
 
+        if (auto msg = dynamic_cast<db::NotificationMessage *>(msgl); msg != nullptr) {
+            if (msg->interface == db::Interface::Name::MultimediaFiles && msg->type != db::Query::Type::Read) {
+                if (!relaxationRebuildTimerHandle.isActive()) {
+                    relaxationRebuildTimerHandle.start();
+                }
+                else {
+                    relaxationRebuildTimerHandle.restart(relaxationRebuildTimerInterval);
+                }
+                return sys::msgHandled();
+            }
+            userInterfaceDBNotification(
+                msgl, [&]([[maybe_unused]] sys::Message *, [[maybe_unused]] const std::string &) { return true; });
+            return sys::msgHandled();
+        }
         return handleAsyncResponse(resp);
     }
 

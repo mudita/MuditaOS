@@ -44,5 +44,6 @@ namespace app::relaxation
         void requestRecords(std::uint32_t offset, std::uint32_t limit) override;
 
         void createData(OnActivateCallback activateCallback) override;
+        void updateRecordsCount();
     };
 } // namespace app::relaxation

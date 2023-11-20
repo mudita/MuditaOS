@@ -70,6 +70,7 @@ namespace gui
     }
     void RelaxationMainWindow::rebuild()
     {
+        presenter->updateRecordsCount();
         songList->rebuildList(gui::listview::RebuildType::Full);
     }
 

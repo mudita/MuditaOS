@@ -34,6 +34,11 @@ namespace app::relaxation
 
     void RelaxationSongsRepository::init()
     {
+        updateFilesCount();
+    }
+
+    void RelaxationSongsRepository::updateFilesCount()
+    {
         for (const auto &[musicType, musicPath] : pathPrefixes) {
             updateFilesCount(musicType, musicPath);
         }
@@ -79,7 +84,6 @@ namespace app::relaxation
             if (viewUpdateCallback) {
                 viewUpdateCallback(musicFilesViewCache.records, musicFilesViewCache.recordsCount);
             }
-            updateCountCallback(musicType, result->getCount());
             return true;
         };
 

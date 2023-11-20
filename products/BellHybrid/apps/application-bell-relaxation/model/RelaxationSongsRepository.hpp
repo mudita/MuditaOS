@@ -27,6 +27,7 @@ namespace app::relaxation
                            const OnGetMusicFilesListCallback &viewUpdateCallback);
 
         std::uint32_t getRecordsCount();
+        void updateFilesCount();
 
       private:
         ApplicationCommon *application;
