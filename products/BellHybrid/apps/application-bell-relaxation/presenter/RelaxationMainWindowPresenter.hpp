@@ -33,6 +33,7 @@ namespace app::relaxation
           public:
             virtual void createData(RelaxationSongsModel::OnActivateCallback activateCallback) = 0;
             virtual void updateViewState()                                                     = 0;
+            virtual void updateRecordsCount()                                                  = 0;
             virtual std::shared_ptr<RelaxationSongsModel> getSongsModel()                      = 0;
         };
     };
@@ -43,6 +44,7 @@ namespace app::relaxation
         std::shared_ptr<RelaxationSongsModel> songsModel;
         void createData(RelaxationSongsModel::OnActivateCallback activateCallback) override;
         void updateViewState() override;
+        void updateRecordsCount() override;
         std::shared_ptr<RelaxationSongsModel> getSongsModel() override;
 
       public:

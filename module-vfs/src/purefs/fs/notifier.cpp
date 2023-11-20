@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #include <purefs/fs/notifier.hpp>
 #include <purefs/fs/inotify_message.hpp>
@@ -109,7 +109,7 @@ namespace purefs::fs::internal
             svc->bus.sendUnicast(std::move(msg), svc->GetName());
         }
         else {
-            LOG_WARN("Sent notification to the same thread is forbidded");
+            LOG_WARN("Sending a notification to the same thread is forbidden");
         }
     }
 } // namespace purefs::fs::internal

@@ -22,6 +22,11 @@ namespace app::relaxation
         songsRepository->init();
     }
 
+    void RelaxationSongsModel::updateRecordsCount()
+    {
+        songsRepository->updateFilesCount();
+    }
+
     unsigned int RelaxationSongsModel::requestRecordsCount()
     {
         return songsRepository->getRecordsCount();
@@ -39,11 +44,11 @@ namespace app::relaxation
 
         auto item = new gui::option::OptionBellMenu(
             sound->tags.title,
-            [=](gui::Item &item) {
+            [=]([[maybe_unused]] gui::Item &item) {
                 activateCallback(*sound);
                 return true;
             },
-            [=](gui::Item &item) { return true; },
+            [=]([[maybe_unused]] gui::Item &item) { return true; },
             nullptr);
 
         return item->build();
