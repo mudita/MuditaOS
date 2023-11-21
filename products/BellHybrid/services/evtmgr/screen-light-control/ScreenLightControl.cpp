@@ -5,7 +5,6 @@
 
 #include <Service/Service.hpp>
 #include <Timers/TimerFactory.hpp>
-#include <Utils.hpp>
 
 #include <system/Constants.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
@@ -201,5 +200,4 @@ namespace bell::screen_light_control
     {
         return false;
     }
-
 } // namespace bell::screen_light_control

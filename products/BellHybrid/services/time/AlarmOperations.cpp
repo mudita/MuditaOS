@@ -59,6 +59,7 @@ namespace alarms
             {
                 settings.init(service::ServiceProxy{service->weak_from_this()});
             }
+
             auto isBedtimeEnabled() -> bool override
             {
                 bool enabled = false;
@@ -71,7 +72,8 @@ namespace alarms
                 }
                 return enabled;
             }
-            auto getBedtimeTime() -> time_t override
+
+            auto getBedtimeTime() -> std::time_t override
             {
                 return bedtimeTimeModel->getValue();
             }
@@ -223,7 +225,7 @@ namespace alarms
     {
         if (bedtime.decide(now)) {
             auto bedtimeEvent           = std::make_shared<AlarmEventRecord>();
-            bedtimeEvent.get()->enabled = true;
+            bedtimeEvent->enabled       = true;
             handleAlarmEvent(bedtimeEvent, alarms::AlarmType::BedtimeReminder, true);
         }
     }
@@ -249,7 +251,7 @@ namespace alarms
         return event;
     }
 
-    void AlarmOperations::turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback)
+    void AlarmOperations::turnOffRingingAlarm(std::uint32_t id, OnTurnOffRingingAlarm callback)
     {
         auto nextEvent = getNextPreWakeUpEvent();
         if (nextEvent.isValid()) {
@@ -365,6 +367,7 @@ namespace alarms
         const auto expectedAlarmStart = std::chrono::floor<std::chrono::minutes>(now) + settings.timeBeforeAlarm;
         return settings.enabled && std::chrono::floor<std::chrono::minutes>(event.startDate) == expectedAlarmStart;
     }
+
     auto PreWakeUp::isActive() const -> bool
     {
         return active;
@@ -386,11 +389,11 @@ namespace alarms
         return activated && isTimeForBed(now, time);
     }
 
-    auto Bedtime::isTimeForBed(const TimePoint &now, const time_t &bedtime) -> bool
+    auto Bedtime::isTimeForBed(const TimePoint &now, const std::time_t &bedtime) -> bool
     {
-        auto time_tNow    = TimePointToTimeT(now);
-        std::tm bedtimeTm = *std::localtime(&bedtime);
-        std::tm checkTm   = *std::localtime(&time_tNow);
+        const auto timeNow   = TimePointToTimeT(now);
+        const auto bedtimeTm = *std::localtime(&bedtime);
+        const auto checkTm   = *std::localtime(&timeNow);
         return (bedtimeTm.tm_hour == checkTm.tm_hour && bedtimeTm.tm_min == checkTm.tm_min);
     }
 } // namespace alarms

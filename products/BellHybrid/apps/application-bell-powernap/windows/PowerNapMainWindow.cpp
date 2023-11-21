@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapMainWindow.hpp"
 #include <Style.hpp>
 #include <SideListView.hpp>
 #include <gui/input/InputEvent.hpp>
+
 namespace gui
 {
     PowerNapMainWindow::PowerNapMainWindow(
@@ -40,5 +41,4 @@ namespace gui
 
         return AppWindow::onInput(inputEvent);
     }
-
 } // namespace gui

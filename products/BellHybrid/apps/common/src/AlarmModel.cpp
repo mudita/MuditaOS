@@ -50,7 +50,7 @@ namespace app
                                                        service::name::service_time);
         request->execute(app, this, responseCallback);
     }
-    void AlarmModel::setAlarmTime(time_t time)
+    void AlarmModel::setAlarmTime(std::time_t time)
     {
         auto alarmEventPtr = getAlarmPtr();
         if (!alarmEventPtr) {
@@ -69,7 +69,7 @@ namespace app
         updateAlarm(*alarmEventPtr);
     }
 
-    time_t AlarmModel::getAlarmTime() const
+    std::time_t AlarmModel::getAlarmTime() const
     {
         return Clock::to_time_t(cachedRecord.startDate);
     }
@@ -146,6 +146,7 @@ namespace app
         const auto snoozeActive    = utils::getNumericValue<bool>(snoozeActiveStr);
         return snoozeActive;
     }
+
     void AlarmModel::turnOff()
     {
         snoozeCount    = 0;
@@ -195,10 +196,12 @@ namespace app
         }
         return alarmEventPtr;
     }
+
     bool AlarmModel::isSnoozeActive()
     {
         return snoozeCount > 0;
     }
+
     void AlarmModel::updateCache(const SingleEventRecord &record, alarms::AlarmStatus status)
     {
         if (record.startDate != cachedRecord.startDate) {
@@ -208,6 +211,7 @@ namespace app
         alarmStatus  = status;
         state        = State::Valid;
     }
+
     void AlarmModel::setDefaultAlarmTime()
     {
         auto alarmEventPtr = getAlarmPtr();
@@ -229,6 +233,7 @@ namespace app
     {
         return alarmStatus;
     }
+
     TimePoint AlarmModel::getTimeOfNextSnooze()
     {
         return nextSnoozeTime;

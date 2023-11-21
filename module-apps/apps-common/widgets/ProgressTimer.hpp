@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
@@ -8,10 +8,7 @@
 #include <atomic>
 #include <chrono>
 #include <string>
-namespace
-{
-    constexpr auto baseTickDefault = std::chrono::milliseconds{1000};
-} // namespace
+
 namespace gui
 {
     class Item;
@@ -81,5 +78,4 @@ namespace app
         void registerOnIntervalCallback(std::function<void()> cb) override;
         [[nodiscard]] auto isStopped() const noexcept -> bool override;
     };
-
 } // namespace app

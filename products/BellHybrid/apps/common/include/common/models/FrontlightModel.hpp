@@ -82,5 +82,4 @@ namespace app::bell_settings
         const std::string autoStr;
         const std::string onDemandStr;
     };
-
 } // namespace app::bell_settings

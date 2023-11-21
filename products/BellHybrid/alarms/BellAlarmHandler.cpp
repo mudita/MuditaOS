@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellAlarmHandler.hpp"
@@ -41,7 +41,7 @@ namespace alarms
         actions.emplace_back(factory::createAlarmToneAction(*service));
         actions.emplace_back(std::make_unique<NotifyGUIAction>(*service));
         actions.emplace_back(std::make_unique<FrontlightAction>(
-            *service, FrontlightAction::Mode::Manual, FrontlightAction::SettingsDependency::AlarmClock));
+            *service, FrontlightAction::Mode::LinearProgress, FrontlightAction::SettingsDependency::AlarmClock));
         return actions;
     }
 

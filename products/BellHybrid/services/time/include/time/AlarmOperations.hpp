@@ -7,6 +7,7 @@
 #include <db/SystemSettings.hpp>
 #include <common/models/BedtimeModel.hpp>
 #include <service-db/Settings.hpp>
+
 namespace alarms
 {
     class AlarmOperationsFactory : public IAlarmOperationsFactory
@@ -57,7 +58,7 @@ namespace alarms
       public:
         virtual ~AbstractBedtimeSettingsProvider() noexcept = default;
         virtual auto isBedtimeEnabled() -> bool             = 0;
-        virtual auto getBedtimeTime() -> time_t             = 0;
+        virtual auto getBedtimeTime() -> std::time_t        = 0;
     };
 
     class PreWakeUp
@@ -90,7 +91,7 @@ namespace alarms
         auto decide(TimePoint now) -> bool;
 
       private:
-        auto isTimeForBed(const TimePoint &now, const time_t &bedtime) -> bool;
+        auto isTimeForBed(const TimePoint &now, const std::time_t &bedtime) -> bool;
 
         const std::unique_ptr<AbstractBedtimeSettingsProvider> settingsProvider;
     };
@@ -116,9 +117,8 @@ namespace alarms
         void handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
         void disablePreWakeUp(const std::shared_ptr<AlarmEventRecord> &event);
         void handleSnoozeChime(const SingleEventRecord &event, bool newStateOn);
-        void handleBedtime(const SingleEventRecord &event, bool decision);
         void processBedtime(TimePoint now);
-        void turnOffRingingAlarm(const std::uint32_t id, OnTurnOffRingingAlarm callback) override;
+        void turnOffRingingAlarm(std::uint32_t id, OnTurnOffRingingAlarm callback) override;
         void onAlarmTurnedOff(const std::shared_ptr<AlarmEventRecord> &event, alarms::AlarmType alarmType) override;
         void handleAlarmEvent(const std::shared_ptr<AlarmEventRecord> &event,
                               alarms::AlarmType alarmType,

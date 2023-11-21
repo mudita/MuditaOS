@@ -19,8 +19,6 @@ namespace app
 
 namespace app
 {
-    constexpr std::uint32_t maxSnoozeCount = 3;
-
     class AlarmModel : public AbstractAlarmModel, public AsyncCallbackReceiver
     {
       public:
@@ -28,8 +26,8 @@ namespace app
 
         bool isActive() const override;
         void setDefaultAlarmTime() override;
-        void setAlarmTime(time_t time) override;
-        time_t getAlarmTime() const override;
+        void setAlarmTime(std::time_t time) override;
+        std::time_t getAlarmTime() const override;
         void activate(bool value) override;
         void update(AlarmModelReadyHandler callback) override;
         std::chrono::seconds getSnoozeDuration() const override;

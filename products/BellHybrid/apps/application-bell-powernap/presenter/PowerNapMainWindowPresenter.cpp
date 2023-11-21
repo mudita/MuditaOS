@@ -1,13 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapMainWindowPresenter.hpp"
 #include "models/PowerNapModel.hpp"
 #include "data/PowerNapCommon.hpp"
 #include <ApplicationBellPowerNap.hpp>
-#include <apps-common/ApplicationCommon.hpp>
-#include <service-db/agents/settings/SystemSettings.hpp>
-#include <service-db/Settings.hpp>
 
 namespace app::powernap
 {
@@ -32,7 +29,7 @@ namespace app::powernap
         const auto currentValue = model->getCurrentValue();
         settings->setValue(
             powernapDBRecordName, utils::to_string(currentValue.count()), settings::SettingsScope::AppLocal);
-        reinterpret_cast<app::Application *>(app)->suspendIdleTimer();
-        app->switchWindow(gui::window::name::powernapProgress);
+        static_cast<app::Application *>(app)->suspendIdleTimer();
+        app->switchWindow(gui::window::name::powerNapProgress);
     }
 } // namespace app::powernap

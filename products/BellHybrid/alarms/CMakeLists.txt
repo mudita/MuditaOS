@@ -11,6 +11,7 @@ target_sources(alarms
 
         include/AbstractAlarmAction.hpp
         include/BellAlarmHandler.hpp
+        include/BellAlarmConstants.hpp
         src/actions/PlayAudioActions.hpp
         src/actions/FrontlightAction.hpp
         src/actions/NotifyGUIAction.hpp

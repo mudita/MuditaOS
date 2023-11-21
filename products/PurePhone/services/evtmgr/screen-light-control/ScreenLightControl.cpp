@@ -10,7 +10,7 @@ namespace pure::screen_light_control
 {
     namespace
     {
-        constexpr bsp::eink_frontlight::BrightnessPercentage fadeOutBrigthnessMax = 35.0f;
+        constexpr bsp::eink_frontlight::BrightnessPercentage fadeOutBrightnessMax = 35.0f;
     }
 
     ScreenLightController::ScreenLightController(sys::Service *parent)
@@ -187,10 +187,10 @@ namespace pure::screen_light_control
     {
         if (automaticMode == ScreenLightMode::Automatic) {
             fadeOut = true;
-            // Set fadeout brightess as maximum or current ramp state if lower
+            // Set fadeout brightness as maximum or current ramp state if lower
             auto rampState         = ::screen_light_control::functions::getRampState();
-            auto fadeOutBrigthness = std::clamp(rampState, 0.0f, fadeOutBrigthnessMax);
-            ::screen_light_control::functions::setRampTarget(fadeOutBrigthness);
+            auto fadeOutBrightness = std::clamp(rampState, 0.0f, fadeOutBrightnessMax);
+            ::screen_light_control::functions::setRampTarget(fadeOutBrightness);
         }
     }
 
@@ -198,5 +198,4 @@ namespace pure::screen_light_control
     {
         return fadeOut;
     }
-
 } // namespace pure::screen_light_control

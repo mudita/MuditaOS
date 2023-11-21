@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapProgressWindow.hpp"
@@ -10,8 +10,8 @@
 
 namespace
 {
-    inline constexpr auto powernapTimerName = "PowerNapTimer";
-    inline constexpr std::chrono::seconds timerTick{1};
+    constexpr auto powerNapTimerName   = "PowerNapTimer";
+    constexpr auto powerNapTimerPeriod = std::chrono::seconds{1};
 } // namespace
 
 namespace gui
@@ -19,7 +19,7 @@ namespace gui
     PowerNapProgressWindow::PowerNapProgressWindow(
         app::ApplicationCommon *app,
         std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> &&windowPresenter)
-        : AppWindow(app, gui::window::name::powernapProgress), presenter{std::move(windowPresenter)}
+        : AppWindow(app, gui::window::name::powerNapProgress), presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();
@@ -90,7 +90,7 @@ namespace gui
     void PowerNapProgressWindow::configureTimer()
     {
         auto progressTimer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
-            application, *this, powernapTimerName, timerTick, app::ProgressCountdownMode::Increasing);
+            application, *this, powerNapTimerName, powerNapTimerPeriod, app::ProgressCountdownMode::Increasing);
         progressTimer->attach(progress);
         progressTimer->attach(timer);
         presenter->setTimer(std::move(progressTimer));
@@ -98,13 +98,19 @@ namespace gui
 
     bool PowerNapProgressWindow::onInput(const InputEvent &inputEvent)
     {
+        const auto key = mapKey(inputEvent.getKeyCode());
+
+        /* Prevent leaving by back long press */
+        if (inputEvent.isLongRelease() && (key == KeyMap::Back)) {
+            return true;
+        }
+
         if (inputEvent.isShortRelease()) {
-            const auto key = mapKey(inputEvent.getKeyCode());
-            if (presenter->isNapFinished() && key == KeyMap::LightPress) {
+            if (presenter->isNapFinished() && (key == KeyMap::LightPress)) {
                 presenter->endNap();
                 return true;
             }
-            else if (not presenter->isNapFinished() && key == KeyMap::LightPress) {
+            else if (!presenter->isNapFinished() && (key == KeyMap::LightPress)) {
                 if (presenter->isTimerStopped()) {
                     presenter->resume();
                 }
@@ -113,9 +119,9 @@ namespace gui
                 }
                 return true;
             }
-            else if (not presenter->isNapFinished() && key == KeyMap::Back) {
-                reinterpret_cast<app::Application *>(application)->resumeIdleTimer();
-                presenter->endNap();
+            else if (!presenter->isNapFinished() && (key == KeyMap::Back)) {
+                static_cast<app::Application *>(application)->resumeIdleTimer();
+                presenter->abortNap();
                 application->returnToPreviousWindow();
                 return true;
             }
@@ -123,9 +129,10 @@ namespace gui
         }
         return AppWindow::onInput(inputEvent);
     }
+
     void PowerNapProgressWindow::napEnded()
     {
-        application->switchWindow(gui::window::name::powernapSessionEnded, std::make_unique<gui::PowerNapSwitchData>());
+        application->switchWindow(gui::window::name::powerNapSessionEnded, std::make_unique<gui::PowerNapSwitchData>());
     }
 
     void PowerNapProgressWindow::setTime(std::time_t newTime)
