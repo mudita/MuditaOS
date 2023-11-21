@@ -52,7 +52,6 @@ namespace app::bell_settings
     auto PrewakeUpWindowPresenter::saveData() -> void
     {
         for (const auto &item : provider->getListItems()) {
-
             item->getValue();
         }
     }
@@ -73,10 +72,12 @@ namespace app::bell_settings
     {
         provider->clearData();
     }
+
     void PrewakeUpWindowPresenter::stopSound()
     {
         this->audioModel.stopPlayedByThis({});
     }
+
     void PrewakeUpWindowPresenter::exitWithoutSave()
     {
         model->getChimeVolume().restoreDefault();

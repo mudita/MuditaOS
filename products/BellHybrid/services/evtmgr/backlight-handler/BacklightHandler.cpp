@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <evtmgr/backlight-handler/BacklightHandler.hpp>
@@ -15,19 +15,19 @@ namespace backlight
 {
     namespace timers
     {
-        constexpr auto screenLightTimerTimeout       = std::chrono::seconds(5);
-        constexpr auto screenLightTimerHoldTimeout   = std::chrono::seconds(10);
-        constexpr auto screenLightBedsideLampTimeout = std::chrono::minutes(10);
+        constexpr auto screenLightTimerTimeout       = std::chrono::seconds{5};
+        constexpr auto screenLightTimerHoldTimeout   = std::chrono::seconds{10};
+        constexpr auto screenLightBedsideLampTimeout = std::chrono::minutes{10};
     } // namespace timers
 
     Handler::Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
         : HandlerCommon(std::move(settings),
                         std::make_shared<bell::screen_light_control::ScreenLightController>(parent),
                         parent,
-                        [this](sys::Timer &t) {
-                            if (this->screenLightController->isLightOn()) {
+                        [this]([[maybe_unused]] sys::Timer &t) {
+                            if (screenLightController->isLightOn()) {
                                 backlightType = Type::Frontlight;
-                                this->screenLightController->processRequest(screen_light_control::Action::turnOff);
+                                screenLightController->processRequest(screen_light_control::Action::turnOff);
                             }
                         })
     {}
@@ -36,7 +36,7 @@ namespace backlight
     {
         using namespace screen_light_control;
         settings->registerValueChange(settings::Brightness::brightnessLevel, [&](const std::string &value) {
-            ConstLinearProgressModeParameters params{utils::getNumericValue<float>(value)};
+            const ConstLinearProgressModeParameters params{utils::getNumericValue<float>(value)};
             screenLightController->processRequest(Action::setAutomaticModeParameters, Parameters(params));
         });
 
@@ -47,7 +47,9 @@ namespace backlight
 
     void Handler::handleKeyPressed([[maybe_unused]] int key)
     {
-        handleScreenLightRefresh(key);
+        if (!ignoreKeypress) {
+            handleScreenLightRefresh(key);
+        }
     }
 
     void Handler::handleScreenLightRefresh([[maybe_unused]] int key)
@@ -59,7 +61,7 @@ namespace backlight
             if (controller->isLightOn()) {
                 timer->restart(timers::screenLightTimerHoldTimeout);
             }
-            else if (!onDemandModeOn && !ignoreKeypress) {
+            else if (!onDemandModeOn) {
                 setKeyPressedModeFrontlightOn();
                 controller->processRequest(screen_light_control::Action::turnOn);
                 timer->restart(timers::screenLightTimerHoldTimeout);
@@ -108,9 +110,10 @@ namespace backlight
         switch (sender) {
         case screen_light_control::Sender::AlarmPrewakeup:
         case screen_light_control::Sender::Alarm:
+        case screen_light_control::Sender::PowerNap:
             switch (action) {
             case screen_light_control::Action::turnOff:
-                backlightType = Type::Frontlight;
+                backlightType = Type::Frontlight; // Override bedside lamp for events with higher priority
                 break;
             default:
                 break;
@@ -181,7 +184,7 @@ namespace backlight
     {
         using namespace screen_light_control;
         auto brightnessLevel = utils::getNumericValue<float>(getValue(settings::Brightness::brightnessLevel));
-        screen_light_control::ConstLinearProgressModeParameters params{brightnessLevel};
+        const ConstLinearProgressModeParameters params{brightnessLevel};
         screenLightController->processRequest(Action::setAutomaticModeParameters, Parameters(params));
     }
 

@@ -1,40 +1,35 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <Application.hpp>
 #include <common/models/AbstractAudioModel.hpp>
-#include <common/models/FrontlightModel.hpp>
-#include <common/models/AlarmSettingsModel.hpp>
+#include <Application.hpp>
 
 namespace gui::window::name
 {
-    inline constexpr auto powernapProgress     = "PowerNapProgressWindow";
-    inline constexpr auto powernapSessionEnded = "PowerNapSessionEndedWindow";
+    inline constexpr auto powerNapProgress     = "PowerNapProgressWindow";
+    inline constexpr auto powerNapSessionEnded = "PowerNapSessionEndedWindow";
 } // namespace gui::window::name
+
 namespace app
 {
-    namespace powernap
-    {
-        class PowerNapAlarmImpl;
-    }
-
     inline constexpr auto applicationBellPowerNapName = "ApplicationBellPowerNap";
+    inline constexpr auto applicationBellPowerNapStackSize = 1024 * 8;
+    inline constexpr std::chrono::minutes powerNapAlarmDuration{5};
 
     class ApplicationBellPowerNap : public Application
     {
       private:
         std::unique_ptr<AbstractAudioModel> audioModel;
-        std::unique_ptr<app::bell_settings::AbstractFrontlightModel> frontLightModel;
         void onStop() override;
 
       public:
-        ApplicationBellPowerNap(std::string name                    = applicationBellPowerNapName,
-                                std::string parent                  = "",
-                                StatusIndicators statusIndicators   = StatusIndicators{},
-                                StartInBackground startInBackground = {false},
-                                uint32_t stackDepth                 = 4096 * 2);
+        explicit ApplicationBellPowerNap(std::string name                    = applicationBellPowerNapName,
+                                         std::string parent                  = "",
+                                         StatusIndicators statusIndicators   = StatusIndicators{},
+                                         StartInBackground startInBackground = {false},
+                                         std::uint32_t stackDepth            = applicationBellPowerNapStackSize);
         ~ApplicationBellPowerNap();
         sys::ReturnCodes InitHandler() override;
 
@@ -44,7 +39,7 @@ namespace app
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
-        sys::ReturnCodes SwitchPowerModeHandler(const sys::ServicePowerMode mode) override final
+        sys::ReturnCodes SwitchPowerModeHandler([[maybe_unused]] const sys::ServicePowerMode mode) override final
         {
             return sys::ReturnCodes::Success;
         }

@@ -1,16 +1,21 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/models/AlarmSettingsModel.hpp>
-
-#include <apps-common/ApplicationCommon.hpp>
 #include <db/SystemSettings.hpp>
 
 namespace app::bell_settings
 {
     namespace
     {
-        static constexpr std::string_view DefaultBrightness{"50.0"};
+        inline void validateBrightness(std::string &brightness)
+        {
+            constexpr auto defaultBrightness = std::string_view{"50.0"};
+
+            if (brightness.empty()) {
+                brightness = defaultBrightness;
+            }
+        }
     }
 
     void AlarmToneModel::setValue(UTF8 value)
@@ -32,10 +37,12 @@ namespace app::bell_settings
     {
         return defaultValue;
     }
+
     void AlarmVolumeModel::restoreDefault()
     {
         setValue(defaultValue);
     }
+
     AlarmVolumeModel::AlarmVolumeModel(AbstractAudioModel &audioModel) : audioModel{audioModel}
     {
         defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::Alarm).value_or(0);
@@ -43,14 +50,14 @@ namespace app::bell_settings
 
     void AlarmLightOnOffModel::setValue(bool value)
     {
-        const auto valStr = std::to_string(value);
+        const auto valStr = std::to_string(static_cast<int>(value));
         settings.setValue(bell::settings::Alarm::lightActive, valStr, settings::SettingsScope::Global);
     }
 
     bool AlarmLightOnOffModel::getValue() const
     {
         const auto str = settings.getValue(bell::settings::Alarm::lightActive, settings::SettingsScope::Global);
-        return std::stoi(str);
+        return (utils::toNumeric(str) != 0);
     }
 
     void AlarmFrontlightModel::setValue(frontlight_utils::Brightness value)
@@ -62,9 +69,7 @@ namespace app::bell_settings
     frontlight_utils::Brightness AlarmFrontlightModel::getValue() const
     {
         auto str = settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
-        if (str.empty()) {
-            str = DefaultBrightness;
-        }
-        return frontlight_utils::percentageToFixedVal(std::stoi(str));
+        validateBrightness(str);
+        return frontlight_utils::percentageToFixedVal(static_cast<float>(utils::toNumeric(str)));
     }
 } // namespace app::bell_settings

@@ -24,6 +24,7 @@ target_sources(application-bell-powernap
         windows/PowerNapSessionEndedWindow.cpp
         data/PowerNapListItem.cpp
         models/PowerNapModel.cpp
+        models/PowerNapFrontlightModel.cpp
 
         presenter/PowerNapMainWindowPresenter.hpp
         presenter/PowerNapProgressPresenter.hpp
@@ -35,6 +36,7 @@ target_sources(application-bell-powernap
         data/PowerNapStyle.hpp
         data/PowerNapCommon.hpp
         models/PowerNapModel.hpp
+        models/PowerNapFrontlightModel.hpp
 
     PUBLIC
         include/application-bell-powernap/ApplicationBellPowerNap.hpp

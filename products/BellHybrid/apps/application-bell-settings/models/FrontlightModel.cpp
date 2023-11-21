@@ -35,6 +35,7 @@ namespace app::bell_settings
                                                        service::name::evt_manager);
         request->execute(app, this, responseCallback);
     }
+
     void FrontlightModel::setBacklight(BacklightState state)
     {
         app->bus.sendUnicast(std::make_shared<sevm::ScreenLightControlMessage>(
@@ -42,6 +43,7 @@ namespace app::bell_settings
                                                              : screen_light_control::Action::turnOff),
                              service::name::evt_manager);
     }
+
     void FrontlightModel::setMode(screen_light_control::ScreenLightMode mode)
     {
         app->bus.sendUnicast(
@@ -50,17 +52,20 @@ namespace app::bell_settings
                                                                   : screen_light_control::Action::disableAutomaticMode),
             service::name::evt_manager);
     }
+
     void FrontlightModel::setBrightness(frontlight_utils::Brightness value)
     {
-        screen_light_control::ConstLinearProgressModeParameters parameters{
+        const screen_light_control::ConstLinearProgressModeParameters parameters{
             frontlight_utils::fixedValToPercentage(value)};
         app->bus.sendUnicast(std::make_shared<sevm::ScreenLightSetConstLinearModeParams>(parameters),
                              service::name::evt_manager);
     }
+
     gui::AbstractSettingsModel<std::uint8_t> &FrontlightModel::getBrightnessModel()
     {
         return *brightnessAdapter;
     }
+
     gui::AbstractSettingsModel<UTF8> &FrontlightModel::getModeModel()
     {
         return *modeAdapter;

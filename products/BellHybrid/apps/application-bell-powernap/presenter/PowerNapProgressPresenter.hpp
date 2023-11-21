@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,8 +10,6 @@
 #include <time/time_locale.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <memory>
-#include <common/models/FrontlightModel.hpp>
-#include <common/models/AlarmSettingsModel.hpp>
 
 namespace app
 {
@@ -19,15 +17,11 @@ namespace app
     class ApplicationCommon;
 } // namespace app
 
-namespace app::bell_settings
-{
-    class AbstractFrontlightModel;
-    class AlarmLightOnOffModel;
-} // namespace app::bell_settings
 namespace gui
 {
     class Item;
 } // namespace gui
+
 namespace settings
 {
     class Settings;
@@ -35,6 +29,8 @@ namespace settings
 
 namespace app::powernap
 {
+    class PowerNapFrontlightModel;
+
     class PowerNapProgressContract
     {
       public:
@@ -55,6 +51,7 @@ namespace app::powernap
           public:
             virtual void activate()                                                 = 0;
             virtual void endNap()                                                   = 0;
+            virtual void abortNap()                                                 = 0;
             virtual bool isTimerStopped()                                           = 0;
             virtual void pause()                                                    = 0;
             virtual void resume()                                                   = 0;
@@ -71,10 +68,9 @@ namespace app::powernap
         settings::Settings *settings{};
         std::unique_ptr<AbstractSoundsRepository> soundsRepository;
         AbstractAudioModel &audioModel;
-        app::bell_settings::AbstractFrontlightModel &frontLightModel;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
-        std::unique_ptr<app::bell_settings::AlarmLightOnOffModel> alarmLightOnOffModel;
+        std::unique_ptr<PowerNapFrontlightModel> frontlightModel;
         sys::TimerHandle napAlarmTimer;
         bool napFinished{false};
 
@@ -85,12 +81,13 @@ namespace app::powernap
                                   settings::Settings *settings,
                                   std::unique_ptr<AbstractSoundsRepository> soundsRepository,
                                   AbstractAudioModel &audioModel,
-                                  app::bell_settings::AbstractFrontlightModel &frontLightModel,
                                   std::unique_ptr<AbstractTimeModel> timeModel,
-                                  std::unique_ptr<app::bell_settings::AlarmLightOnOffModel> alarmLightOnOffModel);
+                                  std::unique_ptr<PowerNapFrontlightModel> frontlightModel,
+                                  const std::chrono::seconds &powerNapAlarmDuration);
 
         void activate() override;
         void endNap() override;
+        void abortNap() override;
         void pause() override;
         void resume() override;
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;

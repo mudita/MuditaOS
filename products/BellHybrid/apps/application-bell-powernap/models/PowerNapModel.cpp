@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapModel.hpp"
@@ -18,14 +18,17 @@ namespace app::powernap
     {
         return getRecord(order);
     }
+
     auto PowerNapModel::requestRecordsCount() -> unsigned int
     {
         return internalData.size();
     }
+
     auto PowerNapModel::getMinimalItemSpaceRequired() const -> unsigned int
     {
         return style::sidelistview::list_item::w;
     }
+
     void PowerNapModel::requestRecords(uint32_t offset, uint32_t limit)
     {
         setupModel(offset, limit);
@@ -39,6 +42,7 @@ namespace app::powernap
         }
         return std::chrono::minutes{powerNapItem->getSpinnerValue()};
     }
+
     void PowerNapModel::setValue(std::chrono::minutes napTimeValue)
     {
         if (powerNapItem == nullptr) {

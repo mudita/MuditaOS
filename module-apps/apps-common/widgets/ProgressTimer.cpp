@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ProgressTimer.hpp"
@@ -10,7 +10,6 @@
 
 namespace app
 {
-
     ProgressTimer::ProgressTimer(app::ApplicationCommon *app,
                                  gui::Item &parent,
                                  std::string timerName,
@@ -47,7 +46,9 @@ namespace app
     void ProgressTimer::startTimer()
     {
         Expects(app != nullptr);
-        parent.timerCallback = [this](gui::Item &it, sys::Timer &task) { return onTimerTimeout(task); };
+        parent.timerCallback = [this]([[maybe_unused]] gui::Item &it, sys::Timer &task) {
+            return onTimerTimeout(task);
+        };
         timerTask            = app::GuiTimerFactory::createPeriodicTimer(app, &parent, name, baseTickInterval);
         timerTask.start();
     }
@@ -94,6 +95,7 @@ namespace app
     {
         isRunning = false;
     }
+
     std::chrono::milliseconds ProgressTimer::getElapsed()
     {
         return elapsed;

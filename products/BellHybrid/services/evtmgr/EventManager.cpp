@@ -127,7 +127,7 @@ void EventManager::initProductEvents()
         return sys::msgHandled();
     });
 
-    connect(sevm::ScreenLightControlRequestParameters(), [&](sys::Message *msgl) {
+    connect(sevm::ScreenLightControlRequestParameters(), [&]([[maybe_unused]] sys::Message *msgl) {
         const screen_light_control::ManualModeParameters params = {backlightHandler.getScreenBrightnessValue()};
         auto msg = std::make_shared<sevm::ScreenLightControlParametersResponse>(
             backlightHandler.getScreenLightState(), backlightHandler.getScreenAutoModeState(), params);

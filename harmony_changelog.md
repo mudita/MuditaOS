@@ -10,6 +10,7 @@
 
 ### Added
 * Added shortcuts instruction to settings
+* Added brightness fade in functionality
 
 ### Changed / Improved
 * Optimize the way Relaxation is loading music files

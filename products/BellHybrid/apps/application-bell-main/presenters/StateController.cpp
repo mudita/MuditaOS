@@ -1,9 +1,10 @@
 // Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-bell-main/presenters/HomeScreenPresenter.hpp"
-#include "models/TemperatureModel.hpp"
 #include "StateController.hpp"
+#include "BellAlarmConstants.hpp"
+#include "models/TemperatureModel.hpp"
+#include "application-bell-main/presenters/HomeScreenPresenter.hpp"
 
 #include <common/TimeUtils.hpp>
 #include <common/models/TimeModel.hpp>
@@ -16,7 +17,6 @@
 #include <time/time_conversion.hpp>
 
 #include <chrono>
-#include <random>
 
 /// Uncomment to print state machine debug logs
 /// #define DEBUG_STATE_MACHINE 1U
@@ -225,7 +225,7 @@ namespace app::home_screen
         {
             auto entry =
                 [](AbstractView &view, AbstractTemperatureModel &temperatureModel, AbstractPresenter &presenter) {
-                    presenter.spawnTimer(defaultAlarmRingingTime);
+                    presenter.spawnTimer(alarms::defaultAlarmRingingTime);
                     view.setViewState(ViewState::AlarmRinging);
                     view.setTemperature(temperatureModel.getTemperature());
                 };

@@ -2,9 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellPowerNap.hpp"
-#include "presenter/PowerNapMainWindowPresenter.hpp"
-#include "presenter/PowerNapProgressPresenter.hpp"
-#include "presenter/PowerNapSessionEndedPresenter.hpp"
+#include "models/PowerNapFrontlightModel.hpp"
 #include "windows/PowerNapMainWindow.hpp"
 #include "windows/PowerNapProgressWindow.hpp"
 #include "windows/PowerNapSessionEndedWindow.hpp"
@@ -18,10 +16,9 @@ namespace app
                                                      std::string parent,
                                                      StatusIndicators statusIndicators,
                                                      StartInBackground startInBackground,
-                                                     uint32_t stackDepth)
+                                                     std::uint32_t stackDepth)
         : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth),
-          audioModel{std::make_unique<AudioModel>(this)},
-          frontLightModel{std::make_unique<app::bell_settings::FrontlightModel>(this)}
+          audioModel{std::make_unique<AudioModel>(this)}
     {
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
     }
@@ -40,31 +37,33 @@ namespace app
 
     void ApplicationBellPowerNap::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<powernap::PowerNapMainWindowPresenter>(app, settings.get());
-            return std::make_unique<gui::PowerNapMainWindow>(app, std::move(presenter));
-        });
         windowsFactory.attach(
-            gui::window::name::powernapProgress, [this](ApplicationCommon *app, const std::string &name) {
+            gui::name::window::main_window, [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                auto presenter = std::make_unique<powernap::PowerNapMainWindowPresenter>(app, settings.get());
+                return std::make_unique<gui::PowerNapMainWindow>(app, std::move(presenter));
+            });
+        windowsFactory.attach(
+            gui::window::name::powerNapProgress,
+            [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
                 auto timeModel       = std::make_unique<app::TimeModel>();
-                auto alarmLightOnOff = std::make_unique<bell_settings::AlarmLightOnOffModel>(this);
+                auto frontlightModel = std::make_unique<powernap::PowerNapFrontlightModel>(this, powerNapAlarmDuration);
                 auto soundsRepository =
                     std::make_unique<SoundsRepository>(paths::audio::proprietary() / paths::audio::alarm());
                 auto presenter = std::make_unique<powernap::PowerNapProgressPresenter>(app,
                                                                                        settings.get(),
                                                                                        std::move(soundsRepository),
                                                                                        *audioModel,
-                                                                                       *frontLightModel,
                                                                                        std::move(timeModel),
-                                                                                       std::move(alarmLightOnOff));
+                                                                                       std::move(frontlightModel),
+                                                                                       powerNapAlarmDuration);
                 return std::make_unique<gui::PowerNapProgressWindow>(app, std::move(presenter));
             });
         windowsFactory.attach(gui::window::session_paused::sessionPaused,
-                              [](ApplicationCommon *app, const std::string &name) {
+                              [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
                                   return std::make_unique<gui::SessionPausedWindow>(app);
                               });
-        windowsFactory.attach(gui::window::name::powernapSessionEnded,
-                              [](ApplicationCommon *app, const std::string &name) {
+        windowsFactory.attach(gui::window::name::powerNapSessionEnded,
+                              [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
                                   auto presenter = std::make_unique<powernap::PowerNapSessionEndPresenter>(app);
                                   return std::make_unique<gui::PowerNapSessionEndedWindow>(app, std::move(presenter));
                               });

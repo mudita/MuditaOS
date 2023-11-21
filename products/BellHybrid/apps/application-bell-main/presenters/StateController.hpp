@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,8 +17,6 @@ namespace app
 
 namespace app::home_screen
 {
-
-    inline constexpr auto defaultAlarmRingingTime = std::chrono::minutes(5);
     inline constexpr auto defaultAlarmSetTime     = std::chrono::seconds{10};
 
     class AbstractView;

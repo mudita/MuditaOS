@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,9 +34,6 @@ namespace alarms
         bool turnOff() override;
 
       private:
-        static constexpr std::string_view alarmFrontlightOFF     = "0";
-        static constexpr std::string_view prewakeupFrontlightOFF = "0";
-
         sys::Service &service;
         SettingsDependency settingsDependency;
         std::unique_ptr<AbstractAlarmAction> pimpl;

@@ -1,16 +1,14 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <models/alarm_settings/PrewakeUpSettingsModel.hpp>
-
-#include <apps-common/ApplicationCommon.hpp>
 #include <db/SystemSettings.hpp>
 
 namespace app::bell_settings
 {
     namespace
     {
-        static constexpr std::string_view DefaultBrightness{"50.0"};
+        constexpr std::string_view DefaultBrightness{"50.0"};
     }
 
     void PrewakeUpChimeDurationModel::setValue(std::uint8_t value)
@@ -22,7 +20,7 @@ namespace app::bell_settings
     std::uint8_t PrewakeUpChimeDurationModel::getValue() const
     {
         const auto str = settings.getValue(bell::settings::PrewakeUp::duration, settings::SettingsScope::Global);
-        return std::stoi(str);
+        return utils::toNumeric(str);
     }
 
     void PrewakeUpChimeToneModel::setValue(UTF8 value)
@@ -44,10 +42,12 @@ namespace app::bell_settings
     {
         return defaultValue;
     }
+
     PrewakeUpChimeVolumeModel::PrewakeUpChimeVolumeModel(AbstractAudioModel &audioModel) : audioModel{audioModel}
     {
         defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::PreWakeup).value_or(0);
     }
+
     void PrewakeUpChimeVolumeModel::restoreDefault()
     {
         setValue(defaultValue);
@@ -62,7 +62,7 @@ namespace app::bell_settings
     std::uint8_t PrewakeUpLightDurationModel::getValue() const
     {
         const auto str = settings.getValue(bell::settings::PrewakeUp::lightDuration, settings::SettingsScope::Global);
-        return std::stoi(str);
+        return utils::toNumeric(str);
     }
 
     void PrewakeUpFrontlightModel::setValue(frontlight_utils::Brightness value)
@@ -77,6 +77,6 @@ namespace app::bell_settings
         if (str.empty()) {
             str = DefaultBrightness;
         }
-        return frontlight_utils::percentageToFixedVal(std::stoi(str));
+        return frontlight_utils::percentageToFixedVal(static_cast<float>(utils::toNumeric(str)));
     }
 } // namespace app::bell_settings

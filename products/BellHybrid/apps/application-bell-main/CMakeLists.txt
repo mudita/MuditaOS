@@ -38,6 +38,7 @@ target_include_directories(application-bell-main
 
 target_link_libraries(application-bell-main
     PRIVATE
+        alarms
         app
         apps-common
         i18n
