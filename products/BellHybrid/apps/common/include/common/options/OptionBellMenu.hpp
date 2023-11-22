@@ -16,11 +16,14 @@ namespace gui::option
 {
     class OptionBellMenu : public option::Base
     {
-      private:
+
+      protected:
         UTF8 text;
         std::function<bool(Item &)> activatedCallback    = nullptr;
         std::function<bool(Item &)> focusChangedCallback = nullptr;
         AppWindow *app                                   = nullptr;
+
+        void prepareListItem(ListItem *item) const;
 
       public:
         OptionBellMenu(const UTF8 &text,

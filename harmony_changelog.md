@@ -11,6 +11,7 @@
 ### Added
 * Added shortcuts instruction to settings
 * Added brightness fade in functionality
+* Added labels to Relaxation
 
 ### Changed / Improved
 * Optimize the way Relaxation is loading music files

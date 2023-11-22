@@ -70,7 +70,7 @@ namespace app::relaxation
         std::uint32_t limit,
         const RelaxationSongsRepository::OnGetMusicFilesListCallback &viewUpdateCallback)
     {
-        auto taskCallback = [this, viewUpdateCallback, offset, musicType](auto response) {
+        auto taskCallback = [this, viewUpdateCallback, offset](auto response) {
             auto result = dynamic_cast<db::multimedia_files::query::GetLimitedResult *>(response);
             if (result == nullptr) {
                 return false;
@@ -113,7 +113,6 @@ namespace app::relaxation
         musicFilesViewCache.records.clear();
         std::uint32_t totalFilesCount{0};
         const auto lastFileIndex = offset + limit;
-
         if (filesPerType.empty()) {
             getMusicFiles(MusicType::Relaxation, offset, limit, callback);
         }
@@ -134,6 +133,10 @@ namespace app::relaxation
                 offset                  = calculateOffset(offset, filesCount);
             }
         }
+    }
+    std::map<MusicType, std::string> &RelaxationSongsRepository::getPathPrefixes()
+    {
+        return pathPrefixes;
     }
 
 } // namespace app::relaxation

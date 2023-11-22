@@ -23,6 +23,9 @@ target_sources(application-bell-relaxation
         presenter/RelaxationLowBatteryPresenter.cpp
         presenter/RelaxationErrorPresenter.cpp
         widgets/RelaxationPlayer.cpp
+        widgets/RelaxationListView.cpp
+        widgets/RelaxationOption.cpp
+        widgets/RelaxationItem.cpp
         windows/RelaxationMainWindow.cpp
         windows/RelaxationPausedWindow.cpp
         windows/RelaxationRunningProgressWindow.cpp
@@ -39,7 +42,10 @@ target_sources(application-bell-relaxation
         data/RelaxationSwitchData.hpp
         data/RelaxationErrorData.hpp
         widgets/RelaxationPlayer.hpp
+        widgets/RelaxationListView.hpp
+        widgets/RelaxationOption.hpp
         windows/RelaxationMainWindow.hpp
+        widgets/RelaxationItem.cpp
         presenter/RelaxationMainWindowPresenter.hpp
         presenter/RelaxationRunningProgressPresenter.hpp
         presenter/RelaxationRunningLoopPresenter.hpp

@@ -545,7 +545,7 @@ namespace gui
 
     void ListViewEngine::updateCountOfElementsAboveCurrentPage()
     {
-        unsigned countOfElementsAboveCurrentPage = startIndex;
+        const auto countOfElementsAboveCurrentPage = startIndex;
         if (onElementsAboveOfCurrentPageChangeCallback) {
             onElementsAboveOfCurrentPageChangeCallback(countOfElementsAboveCurrentPage);
         }

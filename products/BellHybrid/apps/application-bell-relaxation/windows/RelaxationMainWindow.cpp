@@ -30,7 +30,7 @@ namespace gui
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        songList = new gui::ListViewWithArrows(
+        songList = new gui::RelaxationListView(
             this, 0, 0, style::window_width, style::window_height, presenter->getSongsModel());
         songList->applySizeRestrictions(style::bell_options_list::w,
                                         style::bell_options_list::h,
@@ -71,6 +71,7 @@ namespace gui
     void RelaxationMainWindow::rebuild()
     {
         presenter->updateRecordsCount();
+        songList->reset();
         songList->rebuildList(gui::listview::RebuildType::Full);
     }
 

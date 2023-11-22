@@ -3,7 +3,21 @@
 
 #include "RelaxationSongsModel.hpp"
 #include "common/options/OptionBellMenu.hpp"
+#include "widgets/RelaxationOption.hpp"
 
+namespace
+{
+    app::relaxation::MusicType getTypeFromPath(const std::string &path,
+                                               const std::map<app::relaxation::MusicType, std::string> &pathPrefixes)
+    {
+        for (const auto &[type, pathPrefix] : pathPrefixes) {
+            if (path.find(pathPrefix) != std::string::npos) {
+                return type;
+            }
+        }
+        return app::relaxation::MusicType::Relaxation;
+    }
+} // namespace
 namespace app::relaxation
 {
 
@@ -42,7 +56,8 @@ namespace app::relaxation
             return nullptr;
         }
 
-        auto item = new gui::option::OptionBellMenu(
+        auto item = new gui::option::RelaxationOption(
+            getTypeFromPath(sound->fileInfo.path, songsRepository->getPathPrefixes()),
             sound->tags.title,
             [=]([[maybe_unused]] gui::Item &item) {
                 activateCallback(*sound);
