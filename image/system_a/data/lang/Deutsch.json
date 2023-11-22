@@ -104,6 +104,7 @@
     "app_bell_settings_temp_scale": "Temperaturskala",
     "app_bell_settings_time_units": "Zeit",
     "app_bell_settings_time_units_time_fmt_top_message": "Zeitformat",
+    "app_bell_settings_time_units_date_fmt_top_message": "Datumsformat",
     "app_bell_settings_time_units_time_message": "Zeit",
     "app_bell_settings_turn_off": "Ausschalten",
     "app_bell_turn_off_question": "Schalten Sie das Ger\u00e4t aus?",

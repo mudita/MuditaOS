@@ -10,6 +10,8 @@
 #include <gui/widgets/text/TextFixedSize.hpp>
 #include <widgets/TimeSetFmtSpinner.hpp>
 
+#include <service-time/api/TimeSettingsApi.hpp>
+
 namespace gui
 {
     HomeScreenLayoutClassicWithDate::HomeScreenLayoutClassicWithDate(std::string name)
@@ -55,14 +57,10 @@ namespace gui
     void HomeScreenLayoutClassicWithDate::setTime(std::time_t newTime)
     {
         HomeScreenLayoutClassic::setTime(newTime);
-
         const auto t = std::localtime(&newTime);
-        std::stringstream ss;
-        ss << std::setfill('0') << std::setw(2) << t->tm_mday;
-        ss << '/';
-        ss << std::setfill('0') << std::setw(2) << (t->tm_mon + 1);
 
-        date->setText(ss.str());
+        date->setText((stm::api::dateFormat() == utils::time::Locale::DateFormat::DD_MM_YYYY) ? GetDateInDDMMFormat(t)
+                                                                                              : GetDateInMMDDFormat(t));
 
         if (ampm->visible) {
             const auto hours = std::chrono::hours{t->tm_hour};

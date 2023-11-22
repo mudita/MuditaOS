@@ -105,6 +105,7 @@
     "app_bell_settings_temp_scale": "\u00c9chelle de temp\u00e9rature",
     "app_bell_settings_time_units": "Temps",
     "app_bell_settings_time_units_time_fmt_top_message": "Format de l'heure",
+    "app_bell_settings_time_units_date_fmt_top_message": "Format de la date",
     "app_bell_settings_time_units_time_message": "Heure",
     "app_bell_settings_turn_off": "\u00c9teindre",
     "app_bell_turn_off_question": "\u00c9teindre l'appareil ?",

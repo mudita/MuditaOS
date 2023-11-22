@@ -103,6 +103,7 @@
     "app_bell_settings_temp_scale": "Escala de temperatura",
     "app_bell_settings_time_units": "Hora",
     "app_bell_settings_time_units_time_fmt_top_message": "Formato de hora",
+    "app_bell_settings_time_units_date_fmt_top_message": "Formato de fecha",
     "app_bell_settings_time_units_time_message": "Hora",
     "app_bell_settings_turn_off": "Apagar",
     "app_bell_turn_off_question": "\u00bfApagar Mudita Harmony?",

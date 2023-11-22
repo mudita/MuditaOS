@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,6 +21,11 @@ namespace gui
         {
             inline constexpr auto font = style::window::font::supersizeme;
         } // namespace time_fmt_set_list_item
+
+        namespace date_fmt_set_list_item
+        {
+            inline constexpr auto font = style::window::font::supersizeme;
+        } // namespace date_fmt_set_list_item
 
         namespace top_text
         {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,6 +13,7 @@ namespace gui
     class DateSetListItem;
     class TimeSetListItem;
     class TimeFormatSetListItem;
+    class DateFormatSetListItem;
     class TemperatureUnitListItem;
 } // namespace gui
 
@@ -38,13 +39,17 @@ namespace app::bell_settings
 
       protected:
         app::ApplicationCommon *application{};
-        gui::DateSetListItem *dateSetListItem{};
+        gui::DateSetListItem *yearSetListItem{};
+        gui::DateSetListItem *monthSetListItem{};
+        gui::DateSetListItem *daySetListItem{};
         gui::TimeSetListItem *timeSetListItem{};
+        gui::DateFormatSetListItem *dateFmtSetListItem{};
         gui::TimeFormatSetListItem *timeFmtSetListItem{};
         gui::TemperatureUnitListItem *temperatureUnitListItem{};
 
         void sendRtcUpdateTimeMessage(time_t newTime);
         void sendTimeFmtUpdateMessage(utils::time::Locale::TimeFormat newFmt);
+        void sendDateFmtUpdateMessage(utils::time::Locale::DateFormat newFmt);
     };
 
     class DateTimeUnitsModelFactoryResetValues : public DateTimeUnitsModel

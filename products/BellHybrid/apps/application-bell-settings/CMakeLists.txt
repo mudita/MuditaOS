@@ -50,6 +50,7 @@ target_sources(application-bell-settings
 
         widgets/TemperatureUnitListItem.cpp
         widgets/TimeFormatSetListItem.cpp
+        widgets/DateFormatSetListItem.cpp
         widgets/DateSetListItem.cpp
         widgets/TimeSetListItem.cpp
         widgets/AboutYourBellListItem.cpp
@@ -92,6 +93,7 @@ target_sources(application-bell-settings
 
         widgets/TemperatureUnitListItem.hpp
         widgets/TimeFormatSetListItem.hpp
+        widgets/DateFormatSetListItem.hpp
         widgets/TimeSetListItem.hpp
         widgets/AboutYourBellListItem.hpp
         widgets/DialogYesNo.hpp

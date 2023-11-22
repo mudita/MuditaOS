@@ -83,13 +83,13 @@ namespace gui
         auto handleRightFunctionKey() -> bool;
         void handleContentChanged() override;
 
-        TimeSetSpinner *timeSetSpinner = nullptr;
-        StringSpinner *fmt             = nullptr;
-        EditMode editMode              = EditMode::Edit;
-        std::string focusFontName      = style::window::font::supersizeme;
-        std::string noFocusFontName    = style::window::font::supersizemelight;
+        TimeSetSpinner *timeSetSpinner{nullptr};
+        StringSpinner *fmt{nullptr};
+        EditMode editMode{EditMode::Edit};
+        std::string focusFontName{style::window::font::supersizeme};
+        std::string noFocusFontName{style::window::font::supersizemelight};
 
-        utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H;
+        utils::time::Locale::TimeFormat timeFormat{utils::time::Locale::TimeFormat::FormatTime12H};
     };
 
 } // namespace gui

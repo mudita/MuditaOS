@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeSetListItem.hpp"
@@ -7,6 +7,12 @@
 #include <gui/input/InputEvent.hpp>
 #include <widgets/TimeSetFmtSpinner.hpp>
 
+namespace
+{
+    constexpr auto focusFontName   = style::window::font::supersizeme;
+    constexpr auto noFocusFontName = style::window::font::supersizemelight;
+} /* namespace */
+
 namespace gui
 {
     TimeSetListItem::TimeSetListItem(
@@ -14,9 +20,11 @@ namespace gui
     {
         setupTopTextBox(description);
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
-        timeSetFmtSpinner = new TimeSetFmtSpinner(body->getCenterBox());
-        timeSetFmtSpinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
-        timeSetFmtSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        timeSetSpinner = new TimeSetSpinner(body->getCenterBox());
+        timeSetSpinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
+        timeSetSpinner->setFont(focusFontName, noFocusFontName);
+        timeSetSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+
         setFocusItem(body);
 
         dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool {
