@@ -343,7 +343,7 @@ namespace service::eink
                 previousContext->insert(0, 0, ctx);
             }
         }
-        if (previousRefreshStatus == RefreshStatus::Failed) {
+        if ((previousRefreshStatus == RefreshStatus::Failed) && !updateFrames.empty()) {
             updateFrames.front() = {0, 0, BOARD_EINK_DISPLAY_RES_X, BOARD_EINK_DISPLAY_RES_Y};
         }
 
