@@ -6,6 +6,7 @@
 * Fixed eink errors in logs
 * Fixed alarm when the onboarding is in progress
 * Fixed relaxation start delay when trying to play MP3 files with large metadata
+* Fixed eink crash while refreshing
 
 ### Added
 * Added shortcuts instruction to settings
