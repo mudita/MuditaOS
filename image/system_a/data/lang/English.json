@@ -138,6 +138,7 @@
     "app_bell_settings_temp_scale": "Temperature scale",
     "app_bell_settings_time_units": "Time",
     "app_bell_settings_time_units_time_fmt_top_message": "Time format",
+    "app_bell_settings_time_units_date_fmt_top_message": "Date format",
     "app_bell_settings_time_units_time_message": "Time",
     "app_bell_settings_turn_off": "Turn off",
     "app_bell_turn_off_question": "Turn off Mudita Harmony?",

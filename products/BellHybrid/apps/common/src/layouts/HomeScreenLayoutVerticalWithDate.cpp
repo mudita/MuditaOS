@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "layouts/HomeScreenLayoutVerticalWithDate.hpp"
@@ -11,10 +11,14 @@
 #include <gui/widgets/Icon.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
-#include <time/time_constants.hpp>
+
 #include <widgets/AlarmIcon.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
 #include <widgets/ClockVertical.hpp>
+
+#include <time/time_constants.hpp>
+#include <time/dateCommon.hpp>
+#include <service-time/api/TimeSettingsApi.hpp>
 
 namespace gui
 {
@@ -76,15 +80,10 @@ namespace gui
     auto HomeScreenLayoutVerticalWithDate::setTime(std::time_t newTime) -> void
     {
         HomeScreenLayoutVertical::setTime(newTime);
-
         const auto t = std::localtime(&newTime);
 
-        std::stringstream ss;
-        ss << std::setfill('0') << std::setw(2) << t->tm_mday;
-        ss << '/';
-        ss << std::setfill('0') << std::setw(2) << (t->tm_mon + 1);
-
-        date->setText(ss.str());
+        date->setText((stm::api::dateFormat() == utils::time::Locale::DateFormat::DD_MM_YYYY) ? GetDateInDDMMFormat(t)
+                                                                                              : GetDateInMMDDFormat(t));
 
         if (ampm->visible) {
             const auto hours = std::chrono::hours{t->tm_hour};

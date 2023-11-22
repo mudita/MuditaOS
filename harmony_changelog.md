@@ -12,11 +12,13 @@
 * Added shortcuts instruction to settings
 * Added brightness fade in functionality
 * Added labels to Relaxation
+* Added date format setting
 
 ### Changed / Improved
 * Optimize the way Relaxation is loading music files
 * Disabled Address Sanitizer for the Linux simulator
 * Changed misleading factory reset translations in Polish
+* Time setting updated
 
 ## [2.2.2 2023-11-14]
 

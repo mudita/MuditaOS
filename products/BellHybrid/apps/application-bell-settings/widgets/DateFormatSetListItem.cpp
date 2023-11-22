@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "TimeFormatSetListItem.hpp"
+#include "DateFormatSetListItem.hpp"
 #include "BellSettingsStyle.hpp"
 
 #include <gui/core/FontManager.hpp>
@@ -12,13 +12,13 @@
 
 namespace
 {
-    constexpr auto fmtSpinner12H = "12 h";
-    constexpr auto fmtSpinner24H = "24 h";
+    constexpr auto fmtSpinner_DD_MM = "DD / MM";
+    constexpr auto fmtSpinner_MM_DD = "MM / DD";
 } // namespace
 
 namespace gui
 {
-    TimeFormatSetListItem::TimeFormatSetListItem(
+    DateFormatSetListItem::DateFormatSetListItem(
         Length x, Length y, Length w, Length h, const UTF8 &topDesc, const UTF8 &botDesc)
     {
         setupTopTextBox(topDesc);
@@ -26,16 +26,16 @@ namespace gui
         setEdges(RectangleEdge::None);
         setFocusItem(body);
 
-        timeFormat = new StringSpinner({fmtSpinner24H, fmtSpinner12H}, Boundaries::Fixed);
-        timeFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
-        timeFormat->setFont(bell_settings_style::time_fmt_set_list_item::font);
-        timeFormat->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        timeFormat->setFocusEdges(RectangleEdge::None);
-        timeFormat->onValueChanged = [this](const auto &) {
-            body->setMinMaxArrowsVisibility(timeFormat->is_min(), timeFormat->is_max());
+        dateFormat = new StringSpinner({fmtSpinner_DD_MM, fmtSpinner_MM_DD}, Boundaries::Fixed);
+        dateFormat->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
+        dateFormat->setFont(bell_settings_style::date_fmt_set_list_item::font);
+        dateFormat->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        dateFormat->setFocusEdges(RectangleEdge::None);
+        dateFormat->onValueChanged = [this](const auto &) {
+            body->setMinMaxArrowsVisibility(dateFormat->is_min(), dateFormat->is_max());
         };
 
-        body->getCenterBox()->addWidget(timeFormat);
+        body->getCenterBox()->addWidget(dateFormat);
         setupBottomTextBox(botDesc);
         dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
             body->setArea({0, 0, newDim.w, newDim.h});
@@ -62,21 +62,21 @@ namespace gui
         };
     }
 
-    auto TimeFormatSetListItem::getTimeFmt() const noexcept -> utils::time::Locale::TimeFormat
+    auto DateFormatSetListItem::getDateFmt() const noexcept -> utils::time::Locale::DateFormat
     {
-        return timeFormat->value() == fmtSpinner12H ? utils::time::Locale::TimeFormat::FormatTime12H
-                                                    : utils::time::Locale::TimeFormat::FormatTime24H;
+        return (dateFormat->value() == fmtSpinner_DD_MM) ? utils::time::Locale::DateFormat::DD_MM_YYYY
+                                                         : utils::time::Locale::DateFormat::MM_DD_YYYY;
     }
 
-    auto TimeFormatSetListItem::setTimeFmt(utils::time::Locale::TimeFormat fmt) noexcept -> void
+    auto DateFormatSetListItem::setDateFmt(utils::time::Locale::DateFormat fmt) noexcept -> void
     {
         using namespace utils::time;
-        if (fmt == Locale::TimeFormat::FormatTime12H) {
-            timeFormat->set_value(fmtSpinner12H);
+        if (fmt == Locale::DateFormat::MM_DD_YYYY) {
+            dateFormat->set_value(fmtSpinner_MM_DD);
         }
-        else if (fmt == Locale::TimeFormat::FormatTime24H) {
-            timeFormat->set_value(fmtSpinner24H);
+        else {
+            dateFormat->set_value(fmtSpinner_DD_MM);
         }
-        body->setMinMaxArrowsVisibility(timeFormat->is_min(), timeFormat->is_max());
+        body->setMinMaxArrowsVisibility(dateFormat->is_min(), dateFormat->is_max());
     }
 } // namespace gui

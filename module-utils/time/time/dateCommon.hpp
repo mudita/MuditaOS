@@ -375,6 +375,30 @@ inline TimePoint nextTimePointFromHHMM(std::chrono::hours hours, std::chrono::mi
     return GetFollowingDayTime(nextTime, from);
 }
 
+/// @brief Time conversion to date in DDMM format
+/// @param time - a pointer to a time structure
+/// @return date string in DD/MM format
+inline std::string GetDateInDDMMFormat(const struct tm *time)
+{
+    std::stringstream ss;
+    ss << std::setfill('0') << std::setw(2) << time->tm_mday;
+    ss << '/';
+    ss << std::setfill('0') << std::setw(2) << (time->tm_mon + 1);
+    return ss.str();
+}
+
+/// @brief Time conversion to date in MMDD format
+/// @param time - a pointer to a time structure
+/// @return date string in MM/DD format
+inline std::string GetDateInMMDDFormat(const struct tm *time)
+{
+    std::stringstream ss;
+    ss << std::setfill('0') << std::setw(2) << (time->tm_mon + 1);
+    ss << '/';
+    ss << std::setfill('0') << std::setw(2) << time->tm_mday;
+    return ss.str();
+}
+
 inline std::string createUID()
 {
     constexpr auto bufferSize = 16;

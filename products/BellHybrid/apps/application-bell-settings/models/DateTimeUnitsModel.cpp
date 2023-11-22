@@ -4,6 +4,7 @@
 #include "models/DateTimeUnitsModel.hpp"
 #include "widgets/DateSetListItem.hpp"
 #include "widgets/TimeFormatSetListItem.hpp"
+#include "widgets/DateFormatSetListItem.hpp"
 #include "widgets/TimeSetListItem.hpp"
 #include "widgets/TemperatureUnitListItem.hpp"
 #include "ProductConfig.hpp"
@@ -45,25 +46,49 @@ namespace app::bell_settings
 
     void DateTimeUnitsModel::createData()
     {
-        dateSetListItem = new gui::DateSetListItem();
-        internalData.push_back(dateSetListItem);
+        yearSetListItem = new gui::YearSetListItem(utils::translate("app_settings_title_year"));
+        internalData.push_back(yearSetListItem);
 
-        timeFmtSetListItem = new gui::TimeFormatSetListItem(
-            0, 0, 0, 0, utils::translate("app_bell_settings_time_units_time_fmt_top_message"));
-        internalData.push_back(timeFmtSetListItem);
+        monthSetListItem = new gui::MonthSetListItem(utils::translate("app_settings_title_month"));
+        internalData.push_back(monthSetListItem);
+
+        daySetListItem = new gui::DaySetListItem(utils::translate("app_settings_title_day"));
+        internalData.push_back(daySetListItem);
+
+        dateFmtSetListItem = new gui::DateFormatSetListItem(
+            0, 0, 0, 0, utils::translate("app_bell_settings_time_units_date_fmt_top_message"));
+        internalData.push_back(dateFmtSetListItem);
 
         timeSetListItem =
             new gui::TimeSetListItem(0U, 0U, 0, 0, utils::translate("app_bell_settings_time_units_time_message"));
         internalData.push_back(timeSetListItem);
 
-        timeFmtSetListItem->onNextCallback = [this](gui::Item &) {
-            timeSetListItem->timeSetFmtSpinner->setTimeFormat(timeFmtSetListItem->getTimeFmt());
-        };
+        timeFmtSetListItem = new gui::TimeFormatSetListItem(
+            0, 0, 0, 0, utils::translate("app_bell_settings_time_units_time_fmt_top_message"));
+        internalData.push_back(timeFmtSetListItem);
 
 #if CONFIG_ENABLE_TEMP == 1
         temperatureUnitListItem = new gui::TemperatureUnitListItem(utils::translate("app_bell_settings_temp_scale"));
         internalData.push_back(temperatureUnitListItem);
 #endif
+
+        yearSetListItem->onNextCallback = [this](gui::Item &) {
+            const auto date = yearSetListItem->dateSetSpinner->getDate();
+            monthSetListItem->dateSetSpinner->setDate(date);
+            daySetListItem->dateSetSpinner->setDate(date);
+        };
+
+        monthSetListItem->onNextCallback = [this](gui::Item &) {
+            const auto date = monthSetListItem->dateSetSpinner->getDate();
+            daySetListItem->dateSetSpinner->setDate(date);
+            yearSetListItem->dateSetSpinner->setDate(date);
+        };
+
+        daySetListItem->onNextCallback = [this](gui::Item &) {
+            const auto date = daySetListItem->dateSetSpinner->getDate();
+            yearSetListItem->dateSetSpinner->setDate(date);
+            monthSetListItem->dateSetSpinner->setDate(date);
+        };
 
         for (auto item : internalData) {
             item->deleteByList = false;
@@ -77,38 +102,42 @@ namespace app::bell_settings
 
     void DateTimeUnitsModel::saveData()
     {
-        const auto date   = dateSetListItem->dateSetSpinner->getDate();
+        const auto date       = daySetListItem->dateSetSpinner->getDate();
         const auto year   = date.year().operator int();
         const auto month  = static_cast<int>(date.month().operator unsigned int());
         const auto day    = static_cast<int>(date.day().operator unsigned int());
-        const auto hour   = timeSetListItem->timeSetFmtSpinner->getHour24Format();
-        const auto minute = timeSetListItem->timeSetFmtSpinner->getMinute();
-        const auto fmt    = timeFmtSetListItem->getTimeFmt();
+        const auto hour       = timeSetListItem->timeSetSpinner->getHour();
+        const auto minute     = timeSetListItem->timeSetSpinner->getMinute();
+        const auto timeFormat = timeFmtSetListItem->getTimeFmt();
+        const auto dateFormat = dateFmtSetListItem->getDateFmt();
 
-        const auto newTime = GetAsUTCTime(year, month, day, hour.count(), minute);
+        const auto newTime = GetAsUTCTime(year, month, day, hour, minute);
 
-        LOG_DEBUG("Setting a new date/time: %d/%d/%d %d:%d %s",
+        LOG_DEBUG("Setting a new date/time: %02d/%02d/%d (%s) %d:%02d (%s)",
+                  (dateFormat == utils::time::Locale::DateFormat::DD_MM_YYYY) ? day : month,
+                  (dateFormat == utils::time::Locale::DateFormat::DD_MM_YYYY) ? month : day,
                   year,
-                  month,
-                  day,
-                  static_cast<int>(hour.count()),
+                  utils::time::Locale::get_date_format(dateFormat).data(),
+                  hour,
                   minute,
-                  utils::time::Locale::get_time_format(fmt).data());
+                  utils::time::Locale::get_time_format(timeFormat).data());
 
         sendRtcUpdateTimeMessage(newTime);
-        sendTimeFmtUpdateMessage(fmt);
+        sendTimeFmtUpdateMessage(timeFormat);
+        sendDateFmtUpdateMessage(dateFormat);
     }
 
     void DateTimeUnitsModel::loadData()
     {
         const auto now        = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         const auto timeFormat = stm::api::timeFormat();
-        timeSetListItem->timeSetFmtSpinner->setTimeFormat(timeFormat);
-        timeSetListItem->timeSetFmtSpinner->setTime(now);
-        dateSetListItem->dateSetSpinner->setDate(
+        const auto dateFormat = stm::api::dateFormat();
+        timeSetListItem->timeSetSpinner->setTime(now);
+        yearSetListItem->dateSetSpinner->setDate(
             date::year_month_day{date::floor<date::days>(std::chrono::system_clock::now())});
 
         timeFmtSetListItem->setTimeFmt(timeFormat);
+        dateFmtSetListItem->setDateFmt(dateFormat);
     }
 
     auto DateTimeUnitsModel::requestRecords(uint32_t offset, uint32_t limit) -> void
@@ -126,6 +155,12 @@ namespace app::bell_settings
     void DateTimeUnitsModel::sendTimeFmtUpdateMessage(utils::time::Locale::TimeFormat newFmt)
     {
         auto msg = std::make_shared<stm::message::SetTimeFormatRequest>(newFmt);
+        application->bus.sendUnicast(std::move(msg), service::name::service_time);
+    }
+
+    void DateTimeUnitsModel::sendDateFmtUpdateMessage(utils::time::Locale::DateFormat newFmt)
+    {
+        auto msg = std::make_shared<stm::message::SetDateFormatRequest>(newFmt);
         application->bus.sendUnicast(std::move(msg), service::name::service_time);
     }
 
@@ -156,13 +191,13 @@ namespace app::bell_settings
 
         /// Default date/time after factory reset: 2023/01/01 12:00PM
         const auto factoryResetDate   = 2023_y / jan / 1_d;
-        const auto factoryRestTimeFmt = utils::time::Locale::TimeFormat::FormatTime12H;
+        const auto factoryResetTimeFmt = utils::time::Locale::TimeFormat::FormatTime24H;
+        const auto factoryResetDateFmt = utils::time::Locale::DateFormat::DD_MM_YYYY;
 
-        dateSetListItem->dateSetSpinner->setDate(factoryResetDate);
-        timeSetListItem->timeSetFmtSpinner->setTimeFormat(factoryRestTimeFmt);
-        timeSetListItem->timeSetFmtSpinner->setHour(12);
-        timeSetListItem->timeSetFmtSpinner->setMinute(0);
-        timeSetListItem->timeSetFmtSpinner->set12HPeriod(gui::TimeSetFmtSpinner::Period::PM);
-        timeFmtSetListItem->setTimeFmt(factoryRestTimeFmt);
+        yearSetListItem->dateSetSpinner->setDate(factoryResetDate);
+        timeSetListItem->timeSetSpinner->setHour(12);
+        timeSetListItem->timeSetSpinner->setMinute(0);
+        timeFmtSetListItem->setTimeFmt(factoryResetTimeFmt);
+        dateFmtSetListItem->setDateFmt(factoryResetDateFmt);
     }
 } // namespace app::bell_settings
