@@ -10,13 +10,14 @@ namespace
     constexpr auto ellipsisSpace  = 2u;
     constexpr auto linesMaxNumber = 1u;
 
-    UTF8 adjustTextLength(const UTF8 &text, const std::uint32_t maxCharsInLine)
+    UTF8 adjustTextLength(const UTF8 &textToDisplay, std::uint32_t maxCharsInLine)
     {
-        if (maxCharsInLine < text.length()) {
-            return text.substr(0, maxCharsInLine - ellipsisSpace) + ellipsis;
+        if (maxCharsInLine < textToDisplay.length()) {
+            return textToDisplay.substr(0, maxCharsInLine - ellipsisSpace) + ellipsis;
         }
-        return text;
+        return textToDisplay;
     }
+
 } // namespace
 
 namespace gui::option
@@ -24,6 +25,12 @@ namespace gui::option
     auto OptionBellMenu::build() const -> ListItem *
     {
         auto optionItem = new gui::ListItem();
+        prepareListItem(optionItem);
+        return optionItem;
+    }
+
+    void OptionBellMenu::prepareListItem(ListItem *optionItem) const
+    {
         optionItem->setMinimumSize(style::bell_options::default_text_width, style::bell_options::h);
         optionItem->setMargins(Margins(0, style::bell_options::option_margin, 0, style::bell_options::option_margin));
         optionItem->setAlignment(gui::Alignment::Horizontal::Center);
@@ -48,7 +55,5 @@ namespace gui::option
             optionBodyHBox->setArea({0, 0, newDim.w, newDim.h});
             return true;
         };
-
-        return optionItem;
     }
 } // namespace gui::option

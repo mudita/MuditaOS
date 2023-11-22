@@ -187,7 +187,7 @@ namespace gui
         /// Callback to be called on rebuild preparation - in example to on demand clear provider data.
         std::function<void()> prepareRebuildCallback;
 
-        void reset();
+        virtual void reset();
         virtual void clear();
         void onClose();
 

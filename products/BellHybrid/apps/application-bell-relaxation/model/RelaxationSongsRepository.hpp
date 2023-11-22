@@ -3,15 +3,11 @@
 
 #pragma once
 
+#include "data/RelaxationCommon.hpp"
 #include <apps-common/models/SongsRepository.hpp>
 #include <memory>
 namespace app::relaxation
 {
-    enum class MusicType
-    {
-        Relaxation,
-        User
-    };
 
     class RelaxationSongsRepository : public app::AsyncCallbackReceiver
     {
@@ -28,6 +24,7 @@ namespace app::relaxation
 
         std::uint32_t getRecordsCount();
         void updateFilesCount();
+        std::map<MusicType, std::string> &getPathPrefixes();
 
       private:
         ApplicationCommon *application;
