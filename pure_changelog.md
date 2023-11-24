@@ -4,34 +4,46 @@
 
 ### Added
 
-* Added VoLTE support in Germany, Denmark, United Kingdom, Netherlands, Canada and Austria
+* Added VoLTE support in Denmark, United Kingdom, Netherlands, Canada and Austria
 
 ### Changed / Improved
 
-* Disabled USB MTP protocol
-* Changed UI flow on discharged device window.
-* Changed VoLTE label from 'beta' to 'experimental'.
-* Changed signal strength update mechanism to avoid unnecessary screen refreshes.
 * Hide the SOS label during onboarding when the modem is not ready for an emergency call.
 
 ### Fixed
 
-* Fixed possible crash when entering phone number
-* Fixed incorrect calculation of requested CPU frequency
-* Fixed CPU frequency setting when dumping logs to a file
 * Fixed playback start delay when trying to play MP3 files with large metadata
+
+## [1.10.0 2023-11-24]
+
+### Added
+
+* Added VoLTE support in Germany as an experimental feature.
+
+### Changed / Improved
+
+* Disabled USB MTP protocol.
+* Changed UI flow on discharged device window.
+* Changed VoLTE label from 'beta' to 'experimental'.
+* Changed signal strength update mechanism to avoid unnecessary screen refreshes.
+
+### Fixed
+
+* Fixed possible crash when entering phone number.
+* Fixed incorrect calculation of requested CPU frequency.
+* Fixed CPU frequency setting when dumping logs to a file.
 
 ## [1.9.0 2023-10-19]
 
 ### Added
 
-* Added VoLTE support in Poland as a beta feature.
+* Added VoLTE support in Poland as an experimental feature.
 * Added "beta" label to VoLTE switch for selected countries.
 * Added confirmation window when closing an app with unsaved changes.
 * Added preserving message text and recipient number when closing new message window.
 * Added confirmation window when switching to tethering from an app with unsaved changes.
-* Added displaying number entered on the keypad during a call
-* Added automatic change of input language when changing system language
+* Added displaying number entered on the keypad during a call.
+* Added automatic change of input language when changing system language.
 
 ### Changed / Improved
 
