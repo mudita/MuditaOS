@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -68,6 +68,7 @@ namespace style
             inline constexpr auto veryverybiglight = "veryverybiglight";
             inline constexpr auto verybiglight     = "verybiglight";
             inline constexpr auto verybig          = "verybig";
+            inline constexpr auto verybigbold      = "verybigbold";
             inline constexpr auto mediumbigbold    = "mediumbigbold";
             inline constexpr auto bigbold          = "bigbold";
             inline constexpr auto big              = "big";
