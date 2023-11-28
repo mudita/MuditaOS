@@ -6,6 +6,7 @@
 #include <purefs/filesystem_paths.hpp>
 #include <board/BoardDefinitions.hpp>
 #include <log/log.hpp>
+#include <lzma.hpp>
 
 #include <gsl/util>
 
@@ -17,7 +18,7 @@ namespace hal::eink
 {
     namespace
     {
-        constexpr auto DefaultSurroundingTemperature = -1000;
+        constexpr auto defaultSurroundingTemperature = -1000;
         constexpr auto LUTDSize                      = 16385;
         constexpr auto LUTCSize                      = 64;
         constexpr auto LUTRSize                      = 256; ///< Needed due to \ref LutsFileName structure
@@ -30,15 +31,18 @@ namespace hal::eink
         constexpr auto LUTTemperatureOffsetInterval    = 3;
         constexpr auto LUTTemperatureOffsetSubcritical = 12;
         constexpr auto LUTTemperatureOffsetCritical    = 13;
-        constexpr auto EinkDisplayMaxInitRetries       = 10U;
+        constexpr auto einkDisplayMaxInitRetries       = 10U;
 
-        const auto LutsFilePath = purefs::dir::getAssetsDirPath() / "luts.bin";
+        constexpr auto compressedLutsFilename = "luts.bin.xz";
+
+        const auto compressedLutsPath = purefs::dir::getMfgConfPath() / compressedLutsFilename;
+        const auto lutsFilePath       = purefs::dir::getAssetsDirPath() / "luts.bin";
 
         EinkWaveformSettings_t createDefaultWaveFormSettings(EinkWaveforms_e waveformMode)
         {
             EinkWaveformSettings_t settings{};
             settings.mode        = waveformMode;
-            settings.temperature = DefaultSurroundingTemperature;
+            settings.temperature = defaultSurroundingTemperature;
             settings.useCounter  = 0;
             settings.LUTCData    = nullptr;
             settings.LUTCSize    = 0;
@@ -84,6 +88,50 @@ namespace hal::eink
                 throw std::invalid_argument{"Invalid waveform mode."};
             }
         }
+
+        void removeFile(const std::filesystem::path &path)
+        {
+            LOG_INFO("Removing file '%s'...", path.c_str());
+            try {
+                std::filesystem::remove(path);
+                LOG_INFO("File '%s' removed successfully!", path.c_str());
+            }
+            catch (const std::exception &ex) {
+                LOG_ERROR("Failed to remove file '%s': %s", path.c_str(), ex.what());
+            }
+        }
+
+        bool isLutsFilePresentInEeprom()
+        {
+            return std::filesystem::exists(compressedLutsPath);
+        }
+
+        /* The name is bad as this function has side effect of removing the source file, but it's just a PoC anyway */
+        bool copyLutsFileToEeprom(const std::filesystem::path &src)
+        {
+            std::error_code copyErrorCode;
+            std::filesystem::copy(src, compressedLutsPath, copyErrorCode);
+            if (copyErrorCode) {
+                LOG_ERROR("Failed to copy compressed LUTS to EEPROM, error message: '%s'",
+                          copyErrorCode.message().c_str());
+                return false;
+            }
+            removeFile(src); // Remove source file from filesystem
+            return true;
+        }
+
+        void decompressLutsFile()
+        {
+            try {
+                LOG_INFO("Size of compressed LUTS file: %.3gKiB",
+                         std::filesystem::file_size(compressedLutsPath) / 1024.0f);
+                utils::lzma::decompress(compressedLutsPath, lutsFilePath);
+                LOG_INFO("Decompression done successfully!");
+            }
+            catch (const std::exception &ex) {
+                LOG_FATAL("Failed to decompress LUT file: %s", ex.what());
+            }
+        }
     } // namespace
 
     EinkDisplayColorMode_e translateDisplayColorMode(const EinkDisplayColorMode mode)
@@ -126,11 +174,29 @@ namespace hal::eink
 #if defined(TARGET_RT1051)
         driverLPSPI = drivers::DriverLPSPI::Create(
             "EInk", static_cast<drivers::LPSPIInstances>(BoardDefinitions::EINK_LPSPI_INSTANCE));
+
+        //        std::filesystem::remove(compressedLutsPath);
+
+        removeFile(lutsFilePath); // Remove previous file if it wasn't removed in destructor
+
+        /* Prepare LUTS file */
+        if (!isLutsFilePresentInEeprom()) {
+            const auto compressedLutsSourcePath =
+                purefs::dir::getSystemDiskPath() / compressedLutsFilename; // Just some hardcoded path for now
+            LOG_INFO("No LUTS file found in EEPROM, trying to copy from '%s'...", compressedLutsSourcePath.c_str());
+            copyLutsFileToEeprom(compressedLutsSourcePath);
+        }
+
+        LOG_INFO("Decompressing LUTS file from EEPROM...");
+        decompressLutsFile();
+
 #endif
     }
 
     EinkDisplay::~EinkDisplay() noexcept
     {
+        removeFile(lutsFilePath);
+
         delete[] currentWaveform.LUTCData;
         delete[] currentWaveform.LUTDData;
     }
@@ -337,9 +403,9 @@ namespace hal::eink
             return EinkStatus::EinkOK;
         }
 
-        auto file = std::fopen(LutsFilePath.c_str(), "rb");
+        auto file = std::fopen(lutsFilePath.c_str(), "rb");
         if (file == nullptr) {
-            LOG_FATAL("Could not find LUTS file in '%s'! Returning...", LutsFilePath.c_str());
+            LOG_FATAL("Could not find LUTS file in '%s'! Returning...", lutsFilePath.c_str());
             return EinkStatus::EinkWaveformsFileOpenFail;
         }
         auto fileHandlerCleanup = gsl::finally([&file]() { std::fclose(file); });
@@ -406,10 +472,10 @@ namespace hal::eink
         if (EinkIsPoweredOn()) {
             return EinkStatus::EinkOK;
         }
-        while (status != EinkStatus::EinkOK && errorCounter++ < EinkDisplayMaxInitRetries) {
+        while (status != EinkStatus::EinkOK && errorCounter++ < einkDisplayMaxInitRetries) {
             status = tryReinitAndPowerOn();
             if (status != EinkStatus::EinkOK) {
-                if (errorCounter < EinkDisplayMaxInitRetries) {
+                if (errorCounter < einkDisplayMaxInitRetries) {
                     LOG_WARN("Failed to initialize and power on Eink, trying once more...");
                 }
                 else {

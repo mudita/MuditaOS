@@ -21,7 +21,7 @@ namespace hal::eink
     class EinkDisplay : public AbstractEinkDisplay
     {
       public:
-        EinkDisplay(FrameSize size);
+        explicit EinkDisplay(FrameSize size);
 
         ~EinkDisplay() noexcept;
 
@@ -30,12 +30,12 @@ namespace hal::eink
 
         EinkStatus showImageUpdate(const std::vector<EinkFrame> &updateFrames,
                                    const std::uint8_t *frameBuffer) override;
-        EinkStatus showImageRefresh(const EinkFrame &refreshFrame, const EinkRefreshMode refreshMode) override;
+        EinkStatus showImageRefresh(const EinkFrame &refreshFrame, EinkRefreshMode refreshMode) override;
         EinkStatus showImage(const std::vector<EinkFrame> &updateFrames,
                              const EinkFrame &refreshFrame,
                              const std::uint8_t *frameBuffer,
-                             const EinkRefreshMode refreshMode) override;
-        void prepareEarlyRequest(EinkRefreshMode refreshMode, const WaveformTemperature behaviour) override;
+                             EinkRefreshMode refreshMode) override;
+        void prepareEarlyRequest(EinkRefreshMode refreshMode, WaveformTemperature behaviour) override;
 
         EinkStatus resetAndInit() override;
         EinkStatus dither() override;

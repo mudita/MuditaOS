@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,7 +14,6 @@
 
 enum class BoardDefinitions
 {
-
     POWER_SWITCH_HOLD_GPIO   = static_cast<int>(drivers::GPIOInstances::GPIO_2),
     POWER_SWITCH_HOLD_BUTTON = 7,
 

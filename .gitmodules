@@ -116,3 +116,6 @@
 [submodule "third-party/fakeit/FakeIt"]
 	path = third-party/fakeit/FakeIt
 	url = https://github.com/eranpeer/FakeIt.git
+[submodule "third-party/minlzma/src"]
+	path = third-party/minlzma/src
+	url = git@github.com:ionescu007/minlzma.git

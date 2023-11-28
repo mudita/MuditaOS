@@ -88,6 +88,7 @@ target_link_libraries(module-bsp
 		Microsoft.GSL::GSL
 	PRIVATE
 		hash-library::hash-library
+		lzma
 )
 
 add_library(system-stats-sink-board)

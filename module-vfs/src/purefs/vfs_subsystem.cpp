@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/filesystem.hpp>
@@ -29,7 +29,7 @@ namespace purefs::subsystem
         constexpr auto boot_size_limit          = 16384L;
         constexpr auto block_size_max_shift     = 21;
         constexpr auto block_size_min_shift     = 8;
-        constexpr uint32_t nvrom_lfs_block_size = 128U;
+        constexpr std::uint32_t nvrom_lfs_block_size = 128U;
         namespace json
         {
             constexpr auto os_type = "ostype";
@@ -145,12 +145,9 @@ namespace purefs::subsystem
 
         fs::internal::set_default_thread_cwd(purefs::dir::getSystemDiskPath().string());
 
-        // Mount NVRAM memory
-        err = vfs->mount(default_nvrom_name,
-                         purefs::dir::getMfgConfPath().c_str(),
-                         "littlefs",
-                         fs::mount_flags::read_only,
-                         &nvrom_lfs_block_size);
+        // Mount NVROM memory
+        err =
+            vfs->mount(default_nvrom_name, purefs::dir::getMfgConfPath().c_str(), "littlefs", 0, &nvrom_lfs_block_size);
         if (err != 0) {
             LOG_WARN("Unable to mount NVROM partition err %i. Possible: NVROM unavailable", err);
             err = 0;
@@ -172,8 +169,9 @@ namespace purefs::subsystem
         }
         for (const auto &mpoint : mount_points) {
             err = vfs->umount(mpoint);
-            if (err)
+            if (err) {
                 break;
+            }
         }
         boot_control_deinit();
         return err;
