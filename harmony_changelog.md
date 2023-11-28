@@ -15,6 +15,7 @@
 ### Changed / Improved
 * Optimize the way Relaxation is loading music files
 * Disabled Address Sanitizer for the Linux simulator
+* Changed misleading factory reset translations in Polish
 
 ## [2.2.2 2023-11-14]
 
