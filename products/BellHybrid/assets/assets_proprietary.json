@@ -73,6 +73,11 @@
             "name": "./fonts/common/gt_pressura_light_90.mpf",
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
             "output": "assets/fonts/gt_pressura/gt_pressura_light_90.mpf"
+        },
+        {
+            "name": "./fonts/bell/gt_pressura_bold_38.mpf",
+            "output": "assets/fonts/gt_pressura/gt_pressura_bold_38.mpf",
+            "ref": "a5a432e1330f2728d7f943ccc9dbb678c3f9ebca"
         }
     ]
 }
