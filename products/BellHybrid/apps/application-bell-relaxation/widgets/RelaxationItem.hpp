@@ -15,6 +15,7 @@ namespace gui
 
       public:
         explicit RelaxationItem(app::relaxation::MusicType musicType);
+        virtual ~RelaxationItem() = default;
         app::relaxation::MusicType getMusicType();
     };
 
@@ -22,5 +23,6 @@ namespace gui
     {
       public:
         explicit RelaxationMarkerItem(const UTF8 &labelText);
+        virtual ~RelaxationMarkerItem() = default;
     };
 } // namespace gui

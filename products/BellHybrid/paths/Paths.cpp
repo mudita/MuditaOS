@@ -36,3 +36,7 @@ std::filesystem::path paths::audio::meditation() noexcept
 {
     return "meditation";
 }
+std::filesystem::path paths::audio::colorOfNoises() noexcept
+{
+    return "noises";
+}

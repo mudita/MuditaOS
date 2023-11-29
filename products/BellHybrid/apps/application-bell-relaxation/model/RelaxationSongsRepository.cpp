@@ -118,6 +118,9 @@ namespace app::relaxation
         }
 
         for (const auto &[type, filesCount] : filesPerType) {
+            if (filesCount == 0) {
+                continue;
+            }
             totalFilesCount += filesCount;
             if (const auto newOffset = calculateOffset(offset, filesCount); newOffset != offset) {
                 offset = newOffset;

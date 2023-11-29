@@ -14,6 +14,7 @@ namespace app::relaxation
                                     public gui::ListItemProvider
     {
       public:
+        virtual ~RelaxationSongsProvider() = default;
         using OnActivateCallback =
             std::function<bool(const db::multimedia_files::MultimediaFilesRecord &selectedSound)>;
         explicit RelaxationSongsProvider(ApplicationCommon *application);
@@ -32,6 +33,8 @@ namespace app::relaxation
         [[nodiscard]] bool updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records) override;
 
       public:
+        virtual ~RelaxationSongsModel() = default;
+
         explicit RelaxationSongsModel(ApplicationCommon *application,
                                       std::unique_ptr<RelaxationSongsRepository> soundsRepository);
 
@@ -45,5 +48,6 @@ namespace app::relaxation
 
         void createData(OnActivateCallback activateCallback) override;
         void updateRecordsCount();
+        bool nextRecordExist(gui::Order order);
     };
 } // namespace app::relaxation

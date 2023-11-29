@@ -13,6 +13,7 @@
 * Added brightness fade in functionality
 * Added labels to Relaxation
 * Added date format setting
+* Added colors of noise to Relaxation
 
 ### Changed / Improved
 * Optimize the way Relaxation is loading music files

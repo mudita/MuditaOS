@@ -17,6 +17,7 @@ namespace paths
         std::filesystem::path bedtimeReminder() noexcept;
         std::filesystem::path relaxation() noexcept;
         std::filesystem::path meditation() noexcept;
+        std::filesystem::path colorOfNoises() noexcept;
     } // namespace audio
 
 } // namespace paths
