@@ -10,6 +10,7 @@ namespace app::relaxation
     enum class MusicType
     {
         Relaxation,
+        ColorsOfNoise,
         User,
         Undefined
     };

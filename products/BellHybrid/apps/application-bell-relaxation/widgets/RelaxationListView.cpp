@@ -3,6 +3,7 @@
 
 #include "RelaxationListView.hpp"
 #include "widgets/RelaxationOption.hpp"
+#include "model/RelaxationSongsModel.hpp"
 #include "RelaxationItem.hpp"
 #include <TextFixedSize.hpp>
 
@@ -13,6 +14,7 @@ namespace
 
     const std::map<app::relaxation::MusicType, std::string> typeToLabel{
         {app::relaxation::MusicType::Relaxation, "app_bell_relaxation_sounds"},
+        {app::relaxation::MusicType::ColorsOfNoise, "app_bell_relaxation_noises"},
         {app::relaxation::MusicType::User, "app_bell_relaxation_uploaded_sounds"}};
 
     gui::RelaxationMarkerItem *createMarkerItem(app::relaxation::MusicType musicType)
@@ -41,7 +43,6 @@ namespace gui
         currentPageSize = 0;
         itemsOnPage     = 0;
         labelAdded      = false;
-        getSlotsLeft();
 
         ListItem *item = nullptr;
         while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
@@ -56,6 +57,9 @@ namespace gui
                 itemsOnPage++;
             }
             else {
+                // Add invisible item to list to avoid memory leak
+                item->setVisible(false);
+                body->addWidget(item);
                 break;
             }
             /* If direction is bottom-to-top, add label mark after adding relaxation item. */
@@ -108,13 +112,15 @@ namespace gui
                 }
             }
             else {
-                const auto nextItemExist = provider->getItem(getOrderFromDirection()) != nullptr;
+                const auto relaxationProvider = dynamic_cast<app::relaxation::RelaxationSongsModel *>(provider.get());
+                if (relaxationProvider == nullptr) {
+                    break;
+                }
+                const auto nextItemExist = relaxationProvider->nextRecordExist(getOrderFromDirection());
                 if (!nextItemExist && getSlotsLeft() == 1) {
                     body->addWidget(createMarkerItem(currentType));
                     updateState(currentType);
                 }
-                // Setting back iterator to proper position
-                provider->getItem(getOppositeOrderFromDirection());
             }
             break;
         }

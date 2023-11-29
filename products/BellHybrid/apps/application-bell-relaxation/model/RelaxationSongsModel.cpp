@@ -20,7 +20,6 @@ namespace
 } // namespace
 namespace app::relaxation
 {
-
     RelaxationSongsProvider::RelaxationSongsProvider(ApplicationCommon *app) : DatabaseModel(app)
     {}
 
@@ -49,24 +48,33 @@ namespace app::relaxation
     {
         return style::bell_options::h + 2 * style::bell_options::option_margin;
     }
+    bool RelaxationSongsModel::nextRecordExist(gui::Order order)
+    {
+        const auto getOppositeOrder = [order]() {
+            return order == gui::Order::Next ? gui::Order::Previous : gui::Order::Next;
+        };
+
+        auto exist = getRecord(order) != nullptr;
+        getRecord(getOppositeOrder());
+        return exist;
+    }
     gui::ListItem *RelaxationSongsModel::getItem(gui::Order order)
     {
         const auto sound = getRecord(order);
         if (!sound) {
             return nullptr;
         }
+        auto item =
+            gui::option::RelaxationOption{getTypeFromPath(sound->fileInfo.path, songsRepository->getPathPrefixes()),
+                                          sound->tags.title,
+                                          [=]([[maybe_unused]] gui::Item &item) {
+                                              activateCallback(*sound);
+                                              return true;
+                                          },
+                                          [=]([[maybe_unused]] gui::Item &item) { return true; },
+                                          nullptr};
 
-        auto item = new gui::option::RelaxationOption(
-            getTypeFromPath(sound->fileInfo.path, songsRepository->getPathPrefixes()),
-            sound->tags.title,
-            [=]([[maybe_unused]] gui::Item &item) {
-                activateCallback(*sound);
-                return true;
-            },
-            [=]([[maybe_unused]] gui::Item &item) { return true; },
-            nullptr);
-
-        return item->build();
+        return item.build();
     }
     void RelaxationSongsModel::requestRecords(std::uint32_t offset, std::uint32_t limit)
     {

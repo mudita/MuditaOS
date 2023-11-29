@@ -80,6 +80,7 @@ namespace app
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             const auto paths = std::map<relaxation::MusicType, std::string>{
                 {relaxation::MusicType::Relaxation, paths::audio::proprietary() / paths::audio::relaxation()},
+                {relaxation::MusicType::ColorsOfNoise, paths::audio::proprietary() / paths::audio::colorOfNoises()},
                 {relaxation::MusicType::User, paths::audio::userApp() / paths::audio::relaxation()}};
 
             auto soundsRepository = std::make_unique<relaxation::RelaxationSongsRepository>(app, paths);
