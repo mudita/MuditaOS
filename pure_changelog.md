@@ -13,7 +13,8 @@
 
 ### Fixed
 
-* Fixed playback start delay when trying to play MP3 files with large metadata
+* Fixed playback start delay when trying to play MP3 files with large metadata.
+* Fixed memory leak in contacts list view.
 
 ## [1.10.0 2023-11-24]
 

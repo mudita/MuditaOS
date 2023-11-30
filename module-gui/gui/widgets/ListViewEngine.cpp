@@ -64,7 +64,7 @@ namespace gui
             setup(rebuildType, dataOffset);
 
             // If deletion operation caused last page to be removed request previous one.
-            if ((startIndex != 0 && startIndex == elementsCount)) {
+            if (startIndex != 0 && startIndex == elementsCount) {
                 requestPreviousPage();
             }
             else {
@@ -178,9 +178,7 @@ namespace gui
         body->setFocusItem(nullptr);
 
         while (const auto el = body->children.back()) {
-
             if (el->type == ItemType::LIST_ITEM) {
-
                 if (!dynamic_cast<ListItem *>(el)->deleteByList) {
                     body->removeWidget(el);
                 }
@@ -319,7 +317,8 @@ namespace gui
             if (!item->visible) {
                 // In case model is tracking internal indexes -> undo last get.
                 if (requestFullListRender) {
-                    provider->getItem(getOppositeOrderFromDirection());
+                    const auto prevItem = provider->getItem(getOppositeOrderFromDirection());
+                    delete prevItem; // Remove created item to prevent memory leak
                 }
                 break;
             }

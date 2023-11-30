@@ -61,7 +61,6 @@ namespace gui
         ListItem *previousListItem = nullptr;
 
         while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
-
             /* If direction is top-to-bottom, add label mark before adding phonebook item. */
             if (direction == listview::Direction::Bottom) {
                 addLabelMarker(dynamic_cast<gui::PhonebookItem *>(item));
@@ -73,6 +72,7 @@ namespace gui
                 body->addWidget(item);
             }
             else {
+                delete item; // Item has not been added to any GUI element - delete it manually
                 if (direction == listview::Direction::Top) {
                     if (previousItemIsLabel) {
                         break;
@@ -97,7 +97,7 @@ namespace gui
         recalculateStartIndex();
 
         // Add element on top for first page purpose
-        if (startIndex == 0 && direction == listview::Direction::Top) {
+        if ((startIndex == 0) && (direction == listview::Direction::Top)) {
             body->addWidget(new PhonebookMarkItem(labelMark));
         }
     }
