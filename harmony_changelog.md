@@ -3,13 +3,9 @@
 ## Unreleased
 
 ### Fixed
-* Fixed eink errors in logs
-* Fixed alarm when the onboarding is in progress
-* Fixed relaxation start delay when trying to play MP3 files with large metadata
 * Fixed eink crash while refreshing
 
 ### Added
-* Added shortcuts instruction to settings
 * Added brightness fade in functionality
 * Added labels to Relaxation
 * Added date format setting
@@ -20,6 +16,18 @@
 * Disabled Address Sanitizer for the Linux simulator
 * Changed misleading factory reset translations in Polish
 * Time setting updated
+
+## [2.2.3 2023-11-30]
+
+### Fixed
+
+* Fixed eink errors in logs
+* Fixed alarm when the onboarding is in progress
+* Fixed relaxation start delay when trying to play MP3 files with large metadata
+
+### Added
+
+* Added shortcuts instruction to settings
 
 ## [2.2.2 2023-11-14]
 
