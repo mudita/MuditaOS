@@ -1,35 +1,53 @@
 # MuditaOS changelog - Harmony
 
-## Unreleased
+## [2.2.3 2023-11-30]
 
 ### Fixed
-* Fixed frequency lock during user activity
-* Fixed boot error screen text alignment
+
 * Fixed eink errors in logs
 * Fixed alarm when the onboarding is in progress
 * Fixed relaxation start delay when trying to play MP3 files with large metadata
 
 ### Added
-* Added notification when charger is connected
+
 * Added shortcuts instruction to settings
 
 ### Changed / Improved
+
+## [2.2.2 2023-11-14]
+
+### Fixed
+
+* Fixed CPU frequency setting when dumping logs to a file
+* Fixed incorrect calculation of requested CPU frequency
+* Fixed boot error screen text alignment
+
+### Added
+
+* Added notification when charger is connected
+
+### Changed / Improved
+
 * Disabled USB MTP protocol
 
 ## [2.2.1 2023-10-30]
 
 ### Fixed
+
 * Fixed meditation countdown timer when a deep press is performed
 * Fixed uneven screen refresh when turning on the device
 * Fixed not disappearing snooze icon when an alarm is deactivated
 * Fixed incorrect message after new alarm setting in some scenarios
 * Fixed the possibility of OS crash during update package size check
 * Fixed errors that occur when uploading a music file with graphics in the metadata via the Center
+* Fixed frequency lock during user activity
 
 ### Added
+
 * Files not fully transferred via Center will be now removed when USB cable is unplugged
 
 ### Changed / Improved
+
 * Improved the display time of the "turn off" window.
 * Hardware faults during device startup now result in shutdown and a more user friendly message
 * Discharged device screen changed
