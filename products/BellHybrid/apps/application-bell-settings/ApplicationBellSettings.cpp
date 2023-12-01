@@ -21,6 +21,7 @@
 #include "windows/BellSettingsLanguageWindow.hpp"
 #include "windows/BellSettingsLayoutWindow.hpp"
 #include "windows/BellSettingsFrontlightWindow.hpp"
+#include "windows/BellSettingsFactoryResetWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp"
 #include "windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp"
@@ -29,7 +30,6 @@
 #include "windows/BellSettingsHomeViewWindow.hpp"
 #include "windows/BellSettingsTimeUnitsWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
-#include "widgets/DialogYesNo.hpp"
 
 #include <Paths.hpp>
 #include <apps-common/windows/Dialog.hpp>
@@ -39,6 +39,7 @@
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/windows/ShortcutsWindow.hpp>
+#include <common/windows/BellFactoryReset.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/models/AudioModel.hpp>
 #include <common/models/TimeModel.hpp>
@@ -153,6 +154,11 @@ namespace app
             return std::make_unique<gui::BellTurnOffWindow>(app, std::make_unique<gui::BellPowerOffPresenter>(app));
         });
 
+        windowsFactory.attach(gui::BellSettingsFactoryResetWindow::defaultName,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellSettingsFactoryResetWindow>(app);
+                              });
+
         windowsFactory.attach(
             gui::BellSettingsPrewakeUpWindow::name, [this](ApplicationCommon *app, const std::string &name) {
                 auto prewakeUpChimeDurationModel = std::make_unique<bell_settings::PrewakeUpChimeDurationModel>(this);
@@ -236,11 +242,6 @@ namespace app
                     std::make_unique<bell_settings::AboutYourBellWindowPresenter>(std::move(aboutYourBellModel));
                 return std::make_unique<gui::AboutYourBellWindow>(app, std::move(aboutYourBellPresenter));
             });
-
-        windowsFactory.attach(gui::window::name::bellSettingsFactoryReset,
-                              [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::BellDialogYesNo>(app, name);
-                              });
 
         windowsFactory.attach(gui::window::name::bellSettingsShortcuts,
                               [&](ApplicationCommon *app, const std::string &name) {

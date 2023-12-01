@@ -64,6 +64,7 @@ target_sources(application-bell-settings
         windows/BellSettingsLanguageWindow.cpp
         windows/BellSettingsLayoutWindow.cpp
         windows/BellSettingsFrontlightWindow.cpp
+        windows/BellSettingsFactoryResetWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.cpp

@@ -17,6 +17,7 @@
 #include <common/models/LayoutModel.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <common/windows/BellFactoryReset.hpp>
+#include <common/BellFactoryResetPresenter.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
@@ -144,7 +145,7 @@ namespace app
                               });
 
         windowsFactory.attach(gui::BellFactoryReset::name, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::BellFactoryReset>(app, std::make_unique<gui::BellPowerOffPresenter>(app));
+            return std::make_unique<gui::BellFactoryReset>(app, std::make_unique<gui::BellFactoryResetPresenter>(app));
         });
 
         windowsFactory.attach(gui::BellBatteryStatusWindow::name, [](ApplicationCommon *app, const std::string &name) {
