@@ -14,6 +14,7 @@ paths.db_factory_dir = paths.db_dir .. "/factory"
 paths.temp_dir = user_dir .. "/temp"
 paths.update_dir = user_dir .. "/temp/update"
 paths.migration_scripts_dir = paths.db_dir .. "/migration"
+paths.user_relaxation_file = user_dir .. "/media/app/relaxation"
 
 local target = {}
 target.var_dir = target_dir .. "/var"

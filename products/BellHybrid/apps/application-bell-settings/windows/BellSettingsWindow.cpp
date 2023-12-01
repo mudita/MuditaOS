@@ -3,6 +3,7 @@
 
 #include "AboutYourBellWindow.hpp"
 #include "BellSettingsFrontlightWindow.hpp"
+#include "BellSettingsFactoryResetWindow.hpp"
 #include "BellSettingsWindow.hpp"
 #include "alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
 
@@ -43,26 +44,6 @@ namespace gui
             };
         };
 
-        auto factoryResetCallback = [this](const std::string &window) {
-            auto actionCallback = [this]() {
-                auto switchRequest = std::make_unique<app::manager::SwitchRequest>(
-                    service::name::appmgr, app::applicationBellName, gui::BellFactoryReset::name, nullptr);
-                application->bus.sendUnicast(std::move(switchRequest), service::name::appmgr);
-                return true;
-            };
-
-            return [this, actionCallback, window](gui::Item &) {
-                auto metaData = std::make_unique<gui::DialogMetadataMessage>(
-                    gui::DialogMetadata{utils::translate("app_bell_settings_factory_reset"),
-                                        "",
-                                        utils::translate("app_bell_settings_display_factory_reset_confirmation"),
-                                        "",
-                                        actionCallback});
-                application->switchWindow(window, gui::ShowMode::GUI_SHOW_INIT, std::move(metaData));
-                return true;
-            };
-        };
-
         std::list<gui::Option> settingsOptionList;
         auto addWinSettings = [&](const UTF8 &name, const std::string &window, Callback &&callback) {
             settingsOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
@@ -95,8 +76,8 @@ namespace gui
         addWinSettings(
             utils::translate("app_bell_settings_turn_off"), BellTurnOffOptionWindow::defaultName, defaultCallback);
         addWinSettings(utils::translate("app_bell_settings_factory_reset"),
-                       gui::window::name::bellSettingsFactoryReset,
-                       factoryResetCallback);
+                       gui::BellSettingsFactoryResetWindow::defaultName,
+                       defaultCallback);
 
         return settingsOptionList;
     }

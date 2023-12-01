@@ -13,6 +13,7 @@ target_include_directories(application-bell-common
 target_sources(application-bell-common
     PRIVATE
         src/BellPowerOffPresenter.cpp
+        src/BellFactoryResetPresenter.cpp
         src/AlarmModel.cpp
         src/AudioModel.cpp
         src/LanguageUtils.cpp
@@ -53,6 +54,7 @@ target_sources(application-bell-common
 
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
+        src/options/BellOptionWithDescriptionWindow.cpp
         src/options/OptionBellMenu.cpp
         src/options/BellOptionsNavigation.cpp
 
@@ -74,6 +76,7 @@ target_sources(application-bell-common
         include/common/LanguageUtils.hpp
         include/common/SoundsRepository.hpp
         include/common/BellPowerOffPresenter.hpp
+        include/common/BellFactoryResetPresenter.hpp
         include/common/windows/BellFactoryReset.hpp
         include/common/windows/BellFinishedWindow.hpp
         include/common/windows/BellTurnOffWindow.hpp

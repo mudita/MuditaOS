@@ -19,7 +19,6 @@ namespace gui::window::name
     inline constexpr auto bellSettingsLanguage     = "BellSettingsLanguage";
     inline constexpr auto bellSettingsLayout       = "BellSettingsLayout";
     inline constexpr auto bellSettingsBedtimeTone  = "BellSettingsBedtimeTone";
-    inline constexpr auto bellSettingsFactoryReset = "BellSettingsFactoryReset";
     inline constexpr auto bellSettingsShortcuts    = "BellSettingsShortcuts";
 } // namespace gui::window::name
 
