@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsStyle.hpp"
@@ -72,6 +72,11 @@ namespace app::bell_settings
         };
 
         internalData.emplace_back(alarmVolume);
+
+        auto onOffFade = new OnOffListItem(settingsModel.getAlarmFadeOnOff(),
+                                           utils::translate("app_bell_settings_alarm_settings_fade"));
+
+        internalData.emplace_back(onOffFade);
 
         auto onOffLight = new OnOffListItem(settingsModel.getAlarmLightOnOff(),
                                             utils::translate("app_bell_settings_alarm_settings_light"));

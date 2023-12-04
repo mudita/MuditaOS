@@ -107,6 +107,7 @@
     "app_bell_settings_alarm_settings": "Alarm",
     "app_bell_settings_alarm_settings_alarm_tone_and_light": "Main alarm",
     "app_bell_settings_alarm_settings_light": "Main alarm light",
+    "app_bell_settings_alarm_settings_fade": "Gradually raise the alarm volume",
     "app_bell_settings_alarm_settings_prewake_up": "Pre-wake up",
     "app_bell_settings_alarm_settings_prewake_up_chime_bottom_description": "before the alarm",
     "app_bell_settings_alarm_settings_prewake_up_chime_tone": "Pre-wake up chime tone",

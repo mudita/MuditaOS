@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,10 +17,12 @@ namespace app::bell_settings
         AbstractAlarmSettingsModel(
             std::unique_ptr<gui::AbstractSettingsModel<UTF8>> alarmTone,
             std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> alarmVolume,
+            std::unique_ptr<gui::AbstractSettingsModel<bool>> alarmFadeOnOff,
             std::unique_ptr<gui::AbstractSettingsModel<bool>> alarmLightOnOff,
             std::unique_ptr<gui::AbstractSettingsModel<frontlight_utils::Brightness>> alarmFrontlight)
             : alarmTone(std::move(alarmTone)), alarmVolume(std::move(alarmVolume)),
-              alarmLightOnOff(std::move(alarmLightOnOff)), alarmFrontlight(std::move(alarmFrontlight))
+              alarmFadeOnOff(std::move(alarmFadeOnOff)), alarmLightOnOff(std::move(alarmLightOnOff)),
+              alarmFrontlight(std::move(alarmFrontlight))
         {}
 
         virtual ~AbstractAlarmSettingsModel() = default;
@@ -33,6 +35,11 @@ namespace app::bell_settings
         gui::AbstractSettingsModel<std::uint8_t> &getAlarmVolume()
         {
             return *alarmVolume;
+        }
+
+        gui::AbstractSettingsModel<bool> &getAlarmFadeOnOff()
+        {
+            return *alarmFadeOnOff;
         }
 
         gui::AbstractSettingsModel<bool> &getAlarmLightOnOff()
@@ -48,6 +55,7 @@ namespace app::bell_settings
       private:
         std::unique_ptr<gui::AbstractSettingsModel<UTF8>> alarmTone;
         std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> alarmVolume;
+        std::unique_ptr<gui::AbstractSettingsModel<bool>> alarmFadeOnOff;
         std::unique_ptr<gui::AbstractSettingsModel<bool>> alarmLightOnOff;
         std::unique_ptr<gui::AbstractSettingsModel<frontlight_utils::Brightness>> alarmFrontlight;
     };

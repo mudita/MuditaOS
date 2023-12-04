@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlayAudioActions.hpp"
@@ -24,8 +24,14 @@ namespace alarms
         if (duration) {
             spawnTimer(*duration);
         }
-        return service.bus.sendUnicast(std::make_shared<service::AudioStartPlaybackRequest>(path, playbackType),
-                                       service::audioServiceName);
+        const auto fadeInSettings = utils::getNumericValue<bool>(
+            settings.getValue(bell::settings::Alarm::fadeActive, settings::SettingsScope::Global));
+        const auto fadeInEnabled = (fadeInSettings && (playbackType == audio::PlaybackType::Alarm))
+                                       ? audio::FadeIn::Enable
+                                       : audio::FadeIn::Disable;
+        return service.bus.sendUnicast(
+            std::make_shared<service::AudioStartPlaybackRequest>(path, playbackType, fadeInEnabled),
+            service::audioServiceName);
     }
 
     bool PlayAudioAction::turnOff()

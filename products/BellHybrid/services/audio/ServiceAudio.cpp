@@ -16,9 +16,11 @@ namespace
     constexpr auto defaultVolume        = "5";
     constexpr auto defaultSnoozeVolume  = "4";
     constexpr auto defaultBedtimeVolume = "6";
-    constexpr audio::Volume maxInVolume = 10;
-    constexpr audio::Volume minVolume   = 0;
+    constexpr auto maxVolumeToSet       = 10.0f;
+    constexpr auto minVolumeToSet       = 0.0f;
     constexpr auto profileType          = audio::Profile::Type::PlaybackLoudspeaker;
+    constexpr auto volumeSetting        = audio::Setting::Volume;
+
     namespace initializer
     {
         using namespace audio;
@@ -69,9 +71,19 @@ namespace service
         auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
         bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
 
+        auto callback = [this](float volumeToSet) {
+            const auto clampedValue = std::clamp(volumeToSet, minVolumeToSet, maxVolumeToSet);
+            if (const auto activeInput = audioMux.GetActiveInput(); activeInput) {
+                if (activeInput.value()) {
+                    activeInput.value()->audio->SetOutputVolume(clampedValue);
+                }
+            }
+        };
+        volumeFadeIn = std::make_unique<audio::VolumeFadeIn>(this, std::move(callback));
+
         connect(typeid(AudioStartPlaybackRequest), [this](sys::Message *msg) -> sys::MessagePointer {
             auto *msgl = static_cast<AudioStartPlaybackRequest *>(msg);
-            return handleStart(audio::Operation::Type::Playback, msgl->fileName, msgl->playbackType);
+            return handleStart(audio::Operation::Type::Playback, msgl->fadeIn, msgl->fileName, msgl->playbackType);
         });
 
         connect(typeid(AudioInternalEOFNotificationMessage), [this](sys::Message *msg) -> sys::MessagePointer {
@@ -81,6 +93,7 @@ namespace service
         });
 
         connect(typeid(AudioStopRequest), [this](sys::Message *msg) -> sys::MessagePointer {
+            volumeFadeIn->Stop();
             auto *msgl = static_cast<AudioStopRequest *>(msg);
             return handleStop(msgl->stopVec, msgl->token);
         });
@@ -134,7 +147,8 @@ namespace service
         }
     }
 
-    auto Audio::handleStart(const audio::Operation::Type opType,
+    auto Audio::handleStart(audio::Operation::Type opType,
+                            audio::FadeIn fadeIn,
                             const std::string &fileName,
                             const audio::PlaybackType &playbackType) -> std::unique_ptr<AudioResponseMessage>
     {
@@ -159,6 +173,9 @@ namespace service
         auto input = audioMux.GetPlaybackInput(playbackType);
         AudioStart(input);
         manageCpuSentinel();
+        if (fadeIn == audio::FadeIn::Enable) {
+            volumeFadeIn->Start(getVolume(playbackType), minVolumeToSet, maxVolumeToSet);
+        }
 
         return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
     }
@@ -226,6 +243,10 @@ namespace service
         if (const auto input = audioMux.GetInput(token); input) {
             if (shouldLoop((*input)->audio->GetCurrentOperationPlaybackType())) {
                 (*input)->audio->Start();
+                if (volumeFadeIn->IsActive()) {
+                    volumeFadeIn->Restart();
+                }
+
                 if ((*input)->audio->IsMuted()) {
                     (*input)->audio->Mute();
                 }
@@ -263,7 +284,7 @@ namespace service
     {
         constexpr auto setting  = audio::Setting::Volume;
         auto retCode            = audio::RetCode::Success;
-        const auto clampedValue = std::clamp(utils::getNumericValue<audio::Volume>(value), minVolume, maxInVolume);
+        const auto clampedValue = std::clamp(utils::getNumericValue<float>(value), minVolumeToSet, maxVolumeToSet);
 
         if (const auto activeInput = audioMux.GetActiveInput(); activeInput) {
             if (activeInput.value()) {
@@ -279,14 +300,20 @@ namespace service
 
     auto Audio::handleGetVolume(const audio::PlaybackType &playbackType) -> std::unique_ptr<AudioResponseMessage>
     {
-        constexpr auto setting = audio::Setting::Volume;
-
-        const auto path = dbPath(setting, playbackType, profileType);
+        const auto path = dbPath(volumeSetting, playbackType, profileType);
         if (const auto value = settingsProvider->getValue(path); not value.empty()) {
             return std::make_unique<AudioResponseMessage>(audio::RetCode::Success, value);
         }
 
         return std::make_unique<AudioResponseMessage>(audio::RetCode::Failed);
+    }
+
+    auto Audio::getVolume(const audio::PlaybackType &playbackType) -> audio::Volume
+    {
+        const auto path  = dbPath(volumeSetting, playbackType, profileType);
+        const auto value = settingsProvider->getValue(path);
+        return value.empty() ? utils::getNumericValue<audio::Volume>(defaultVolume)
+                             : utils::getNumericValue<audio::Volume>(value);
     }
 
     sys::ReturnCodes Audio::SwitchPowerModeHandler([[maybe_unused]] const sys::ServicePowerMode mode)

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,7 +17,10 @@ namespace app
         void setVolume(Volume volume, PlaybackType playbackType, OnStateChangeCallback &&callback) override;
         std::optional<Volume> getVolume(PlaybackType playbackType) override;
         void getVolume(PlaybackType playbackType, OnGetValueCallback &&callback) override;
-        void play(const std::string &filePath, PlaybackType type, OnStateChangeCallback &&callback) override;
+        void play(const std::string &filePath,
+                  PlaybackType type,
+                  OnStateChangeCallback &&callback,
+                  audio::FadeIn fadeIn = audio::FadeIn::Disable) override;
         void stopAny(OnStateChangeCallback &&callback) override;
         void stopPlayedByThis(OnStateChangeCallback &&callback) override;
         void pause(OnStateChangeCallback &&callback) override;

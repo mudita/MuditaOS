@@ -81,6 +81,12 @@ namespace audio
         Other
     };
 
+    enum class FadeIn
+    {
+        Disable,
+        Enable
+    };
+
     /// Used to describe audio operations
     using Context = std::pair<Profile::Type, PlaybackType>;
 
