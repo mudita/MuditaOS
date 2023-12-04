@@ -89,8 +89,11 @@ namespace app::powernap
 
         const auto &filePath = soundsRepository->titleToPath(
             settings->getValue(bell::settings::Alarm::tone, settings::SettingsScope::Global));
-
-        audioModel.play(filePath.value_or(""), AbstractAudioModel::PlaybackType::Alarm, {});
+        const auto fadeInActive = utils::getNumericValue<bool>(settings->getValue(bell::settings::Alarm::fadeActive,
+                                                                                  settings::SettingsScope::Global))
+                                      ? audio::FadeIn::Enable
+                                      : audio::FadeIn::Disable;
+        audioModel.play(filePath.value_or(""), AbstractAudioModel::PlaybackType::Alarm, {}, fadeInActive);
         napAlarmTimer.start();
         napFinished = true;
     }

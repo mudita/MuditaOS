@@ -72,6 +72,7 @@
     "app_bell_settings_alarm_settings": "Ajustes de alarma",
     "app_bell_settings_alarm_settings_alarm_tone_and_light": "Alarma principal",
     "app_bell_settings_alarm_settings_light": "Luz de alarma",
+    "app_bell_settings_alarm_settings_fade": "Aumentar vol. alarma gradualmente",
     "app_bell_settings_alarm_settings_prewake_up": "Despertar gradual",
     "app_bell_settings_alarm_settings_prewake_up_chime_bottom_description": "antes de la alarma",
     "app_bell_settings_alarm_settings_prewake_up_chime_tone": "Tono",

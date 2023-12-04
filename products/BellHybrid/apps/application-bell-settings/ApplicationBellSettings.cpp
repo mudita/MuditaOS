@@ -216,11 +216,13 @@ namespace app
             gui::BellSettingsAlarmSettingsWindow::name, [this](ApplicationCommon *app, const std::string &) {
                 auto alarmToneModel       = std::make_unique<bell_settings::AlarmToneModel>(this);
                 auto alarmVolumeModel     = std::make_unique<bell_settings::AlarmVolumeModel>(*audioModel);
+                auto alarmFadeOnOffModel  = std::make_unique<bell_settings::AlarmFadeOnOffModel>(this);
                 auto alarmLightOnOffModel = std::make_unique<bell_settings::AlarmLightOnOffModel>(this);
                 auto alarmFrontlightModel = std::make_unique<bell_settings::AlarmFrontlightModel>(this);
                 auto alarmSettingsModel =
                     std::make_unique<bell_settings::AlarmSettingsModel>(std::move(alarmToneModel),
                                                                         std::move(alarmVolumeModel),
+                                                                        std::move(alarmFadeOnOffModel),
                                                                         std::move(alarmLightOnOffModel),
                                                                         std::move(alarmFrontlightModel));
                 auto soundsRepository = std::make_unique<SoundsRepository>(paths::audio::proprietary() / paths::audio::alarm());

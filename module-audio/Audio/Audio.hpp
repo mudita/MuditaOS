@@ -47,8 +47,8 @@ namespace audio
             return currentState;
         }
 
-        // Range 0-1
-        audio::RetCode SetOutputVolume(Volume vol);
+        // Range 0.0-10.0
+        audio::RetCode SetOutputVolume(float vol);
 
         // Range 0-10
         audio::RetCode SetInputGain(Gain gain);

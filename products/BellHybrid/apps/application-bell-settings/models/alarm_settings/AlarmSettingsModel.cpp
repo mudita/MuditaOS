@@ -48,6 +48,18 @@ namespace app::bell_settings
         defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::Alarm).value_or(0);
     }
 
+    void AlarmFadeOnOffModel::setValue(bool value)
+    {
+        const auto valStr = std::to_string(static_cast<int>(value));
+        settings.setValue(bell::settings::Alarm::fadeActive, valStr, settings::SettingsScope::Global);
+    }
+
+    bool AlarmFadeOnOffModel::getValue() const
+    {
+        const auto str = settings.getValue(bell::settings::Alarm::fadeActive, settings::SettingsScope::Global);
+        return (utils::toNumeric(str) != 0);
+    }
+
     void AlarmLightOnOffModel::setValue(bool value)
     {
         const auto valStr = std::to_string(static_cast<int>(value));

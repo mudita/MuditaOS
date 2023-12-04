@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Audio.hpp"
@@ -32,7 +32,7 @@ namespace audio
         return currentOperation->SendEvent(std::move(evt));
     }
 
-    audio::RetCode Audio::SetOutputVolume(Volume vol)
+    audio::RetCode Audio::SetOutputVolume(float vol)
     {
         auto volToSet = vol;
         if (vol > maxVolume) {
@@ -145,7 +145,7 @@ namespace audio
     audio::RetCode Audio::Mute()
     {
         muted = Muted::True;
-        return SetOutputVolume(0);
+        return SetOutputVolume(0.0f);
     }
 
     void Audio::SendUpdateEventsToCurrentOperation()

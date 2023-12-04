@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -32,6 +32,15 @@ namespace app::bell_settings
         std::uint8_t defaultValue;
     };
 
+    class AlarmFadeOnOffModel : public gui::SettingsModel<bool>
+    {
+      public:
+        using SettingsModel::SettingsModel;
+
+        void setValue(bool value) override;
+        bool getValue() const override;
+    };
+
     class AlarmLightOnOffModel : public gui::SettingsModel<bool>
     {
       public:
@@ -55,10 +64,12 @@ namespace app::bell_settings
       public:
         AlarmSettingsModel(std::unique_ptr<AlarmToneModel> alarmToneModel,
                            std::unique_ptr<AlarmVolumeModel> alarmVolumeModel,
+                           std::unique_ptr<AlarmFadeOnOffModel> alarmFadeOnOffModel,
                            std::unique_ptr<AlarmLightOnOffModel> alarmLightOnOffModel,
                            std::unique_ptr<AlarmFrontlightModel> alarmFrontlightModel)
             : AbstractAlarmSettingsModel(std::move(alarmToneModel),
                                          std::move(alarmVolumeModel),
+                                         std::move(alarmFadeOnOffModel),
                                          std::move(alarmLightOnOffModel),
                                          std::move(alarmFrontlightModel))
         {}

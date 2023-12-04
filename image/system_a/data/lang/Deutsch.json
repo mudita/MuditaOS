@@ -73,6 +73,7 @@
     "app_bell_settings_alarm_settings": "Alarmeinstellungen",
     "app_bell_settings_alarm_settings_alarm_tone_and_light": "Hauptalarm",
     "app_bell_settings_alarm_settings_light": "Alarmleuchte",
+    "app_bell_settings_alarm_settings_fade": "Erhöht allmählich Alarmlautstärke",
     "app_bell_settings_alarm_settings_prewake_up": "Sanftes Wecken",
     "app_bell_settings_alarm_settings_prewake_up_chime_bottom_description": "vor dem Alarm",
     "app_bell_settings_alarm_settings_prewake_up_chime_tone": "Klang",

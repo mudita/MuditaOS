@@ -73,10 +73,13 @@ namespace app
         app->disconnect(typeid(service::AudioEOFNotification));
     }
 
-    void AudioModel::play(const std::string &filePath, PlaybackType type, OnStateChangeCallback &&callback)
+    void AudioModel::play(const std::string &filePath,
+                          PlaybackType type,
+                          OnStateChangeCallback &&callback,
+                          audio::FadeIn fadeIn)
     {
         playbackFinishedFlag = false;
-        auto msg  = std::make_unique<service::AudioStartPlaybackRequest>(filePath, convertPlaybackType(type));
+        auto msg  = std::make_unique<service::AudioStartPlaybackRequest>(filePath, convertPlaybackType(type), fadeIn);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
 
         auto cb = [_callback = callback, this](auto response) {

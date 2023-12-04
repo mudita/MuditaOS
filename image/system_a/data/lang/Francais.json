@@ -74,6 +74,7 @@
     "app_bell_settings_alarm_settings": "Alarme",
     "app_bell_settings_alarm_settings_alarm_tone_and_light": "Alarme principale",
     "app_bell_settings_alarm_settings_light": "Lumi\u00e8re de r\u00e9veil",
+    "app_bell_settings_alarm_settings_fade": "Augmentation graduelle du volume",
     "app_bell_settings_alarm_settings_prewake_up": "Pr\u00e9-r\u00e9veil",
     "app_bell_settings_alarm_settings_prewake_up_chime_bottom_description": "avant l'alarme",
     "app_bell_settings_alarm_settings_prewake_up_chime_tone": "M\u00e9lodie de pr\u00e9-r\u00e9veil",
