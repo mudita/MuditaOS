@@ -3,12 +3,12 @@ dataclasses==0.6
 dataclasses_json==0.5.4
 eyed3==0.9.6
 ghapi
-gitpython==3.1.11
+gitpython>=3.1.41
 iniconfig==1.1.1
 inotify==0.2.10
 packaging==20.4
 pluggy==0.13.1
-py==1.10.0
+py<=1.11.0
 pyparsing==2.4.7
 pyserial==3.5
 pytest==6.1.2
