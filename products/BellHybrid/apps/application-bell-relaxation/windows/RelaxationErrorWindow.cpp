@@ -53,9 +53,6 @@ namespace gui
     {
         timerCallback = [this](Item &, sys::Timer &timer) {
             application->switchWindow(gui::name::window::main_window);
-            if (errorType == RelaxationErrorType::FileDeleted) {
-                application->getWindow(gui::name::window::main_window)->rebuild();
-            }
             return true;
         };
     }
@@ -89,9 +86,6 @@ namespace gui
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             application->switchWindow(gui::name::window::main_window);
-            if (errorType == RelaxationErrorType::FileDeleted) {
-                application->getWindow(gui::name::window::main_window)->rebuild();
-            }
             return true;
         }
         return true;

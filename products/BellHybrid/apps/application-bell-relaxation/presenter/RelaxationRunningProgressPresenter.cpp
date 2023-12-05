@@ -8,6 +8,15 @@
 #include <common/models/TimeModel.hpp>
 #include <gsl/assert>
 
+namespace
+{
+    bool songLengthEqualsToSelectedPeriod(std::chrono::minutes period, std::chrono::seconds songLength)
+    {
+        auto periodInSeconds = std::chrono::duration_cast<std::chrono::seconds>(period);
+        return periodInSeconds.count() == songLength.count();
+    }
+} // namespace
+
 namespace app::relaxation
 {
     RelaxationRunningProgressPresenter::RelaxationRunningProgressPresenter(settings::Settings *settings,
@@ -31,15 +40,16 @@ namespace app::relaxation
     {
         Expects(timer != nullptr);
         AbstractRelaxationPlayer::PlaybackMode mode;
-        const auto value = settings->getValue(timerValueDBRecordName, settings::SettingsScope::AppLocal);
-        if (utils::is_number(value) && utils::getNumericValue<int>(value) != 0) {
-            timer->reset(std::chrono::minutes{utils::getNumericValue<int>(value)});
+        const auto value      = settings->getValue(timerValueDBRecordName, settings::SettingsScope::AppLocal);
+        const auto songLength = std::chrono::seconds{song.audioProperties.songLength};
+        if (utils::is_number(value) && utils::getNumericValue<int>(value) != 0 &&
+            !songLengthEqualsToSelectedPeriod(std::chrono::minutes{utils::getNumericValue<int>(value)}, songLength)) {
+            const auto playbackTimeInMinutes = std::chrono::minutes{utils::getNumericValue<int>(value)};
+            timer->reset(playbackTimeInMinutes);
             mode = AbstractRelaxationPlayer::PlaybackMode::Looped;
         }
         else {
-            const auto songLength = std::chrono::seconds{song.audioProperties.songLength};
-            mode                  = AbstractRelaxationPlayer::PlaybackMode::SingleShot;
-
+            mode = AbstractRelaxationPlayer::PlaybackMode::SingleShot;
             if (songLength > std::chrono::seconds::zero()) {
                 timer->reset(songLength);
             }

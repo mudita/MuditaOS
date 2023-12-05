@@ -4,6 +4,7 @@
 
 ### Fixed
 * Fixed eink crash while refreshing
+* Fixed problem with occasional background playback after song has finished
 
 ### Added
 * Added brightness fade in functionality
