@@ -80,22 +80,17 @@ namespace sys
     PowerManager::~PowerManager()
     {}
 
-    std::int32_t PowerManager::PowerOff()
+    int32_t PowerManager::PowerOff()
     {
         return lowPowerControl->PowerOff();
     }
 
-    std::int32_t PowerManager::Reboot()
+    int32_t PowerManager::Reboot()
     {
         return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::NormalRestart);
     }
 
-    std::int32_t PowerManager::RebootMSC()
-    {
-        return lowPowerControl->Reboot(bsp::LowPowerMode::RebootType::GoToMSC);
-    }
-
-    std::int32_t PowerManager::RebootToRecovery(RecoveryReason reason)
+    int32_t PowerManager::RebootToRecovery(RecoveryReason reason)
     {
         switch (reason) {
         case RecoveryReason::FactoryReset:
@@ -115,7 +110,7 @@ namespace sys
 
     [[nodiscard]] cpu::UpdateResult PowerManager::UpdateCpuFrequency()
     {
-        std::uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad();
+        uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad();
         cpu::UpdateResult retval;
         const cpu::AlgorithmData data{
             cpuLoad, lowPowerControl->GetCurrentFrequencyLevel(), GetMinimumCpuFrequencyRequested()};

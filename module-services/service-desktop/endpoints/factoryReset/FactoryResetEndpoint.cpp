@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/factoryReset/FactoryResetEndpoint.hpp>
@@ -19,14 +19,14 @@ namespace sdesktop::endpoints
     {
         if (context.getMethod() == http::Method::post) {
 
-            if (context.getBody()[json::factoryReset::factoryRequest] == true) {
+            if (context.getBody()[json::factoryRequest] == true) {
                 auto msg = std::make_shared<sdesktop::FactoryMessage>();
                 ownerServicePtr->bus.sendUnicast(msg, service::name::service_desktop);
 
-                context.setResponseBody(json11::Json::object({{json::factoryReset::factoryRequest, true}}));
+                context.setResponseBody(json11::Json::object({{json::factoryRequest, true}}));
             }
             else {
-                context.setResponseBody(json11::Json::object({{json::factoryReset::factoryRequest, false}}));
+                context.setResponseBody(json11::Json::object({{json::factoryRequest, false}}));
             }
 
             sender::putToSendQueue(context.createSimpleResponse());
@@ -34,7 +34,7 @@ namespace sdesktop::endpoints
             return;
         }
         else {
-            context.setResponseBody(json11::Json::object({{json::factoryReset::factoryRequest, false}}));
+            context.setResponseBody(json11::Json::object({{json::factoryRequest, false}}));
 
             sender::putToSendQueue(context.createSimpleResponse());
 

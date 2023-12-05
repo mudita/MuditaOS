@@ -51,7 +51,6 @@ namespace sys
         RegularPowerDown,
         OnboardingPowerDown,
         Reboot,
-        RebootMSC,
         RebootToRecovery,
         FactoryReset,
         SystemBrownout,

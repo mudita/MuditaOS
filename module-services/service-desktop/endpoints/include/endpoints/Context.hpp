@@ -47,7 +47,7 @@ namespace sdesktop::endpoints
             if (!body.is_object()) {
                 body = json11::Json();
             }
-            if (static_cast<unsigned>(endpoint) > lastEndpoint) {
+            if (static_cast<int>(endpoint) > lastEndpoint) {
                 endpoint = EndpointType::invalid;
             }
             if (method > http::Method::del) {

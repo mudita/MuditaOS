@@ -174,7 +174,7 @@ namespace sdesktop::endpoints
     {
         const auto &body = context.getBody();
 
-        if (body[json::update::update] != true || body[json::update::reboot] != true) {
+        if (body[json::update] != true || body[json::reboot] != true) {
             return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
         }
 

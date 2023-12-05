@@ -63,8 +63,6 @@ target_sources(
         security/SecurityEndpointHelper.cpp
         update/UpdateEndpoint.cpp
         update/UpdateHelper.cpp
-        reboot/RebootEndpoint.cpp
-        reboot/RebootHelper.cpp
     PUBLIC
         include/endpoints/backup/BackupEndpoint.hpp
         include/endpoints/backup/BackupHelper.hpp
@@ -90,8 +88,6 @@ target_sources(
         include/endpoints/security/SecurityEndpointHelper.hpp
         include/endpoints/update/UpdateEndpoint.hpp
         include/endpoints/update/UpdateHelper.hpp
-        include/endpoints/reboot/RebootEndpoint.hpp
-        include/endpoints/reboot/RebootHelper.hpp
 )
 
 target_include_directories(

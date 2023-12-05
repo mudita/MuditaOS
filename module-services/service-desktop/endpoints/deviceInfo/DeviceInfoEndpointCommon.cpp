@@ -26,9 +26,9 @@ namespace sdesktop::endpoints
     auto DeviceInfoEndpointCommon::handleGet(Context &context) -> http::Code
     {
         const auto &requestBody = context.getBody();
-        if (not requestBody.object_items().empty() and requestBody[json::deviceInfo::fileList].is_number()) {
+        if (not requestBody.object_items().empty() and requestBody[json::fileList].is_number()) {
 
-            const auto diagFileType = parseDiagnosticFileType(requestBody[json::deviceInfo::fileList]);
+            const auto diagFileType = parseDiagnosticFileType(requestBody[json::fileList]);
 
             if (!magic_enum::enum_contains<DiagnosticFileType>(diagFileType)) {
                 LOG_ERROR("Bad diagnostic type '%s' requested", magic_enum::enum_name(diagFileType).data());
@@ -100,7 +100,7 @@ namespace sdesktop::endpoints
             fileArray.push_back(file);
         }
 
-        return json11::Json::object{{json::deviceInfo::files, fileArray}};
+        return json11::Json::object{{json::files, fileArray}};
     }
 
     auto DeviceInfoEndpointCommon::listDirectory(const std::string &path) -> std::vector<std::string>

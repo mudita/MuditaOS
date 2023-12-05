@@ -1,9 +1,7 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
-
-#include <magic_enum.hpp>
 
 namespace sdesktop::endpoints
 {
@@ -24,10 +22,9 @@ namespace sdesktop::endpoints
         developerMode,
         bluetooth,
         usbSecurity,
-        outbox,
-        reboot
+        outbox
     };
 
-    inline constexpr auto lastEndpoint = magic_enum::enum_count<EndpointType>() - 1;
+    inline constexpr auto lastEndpoint = static_cast<int>(EndpointType::outbox);
 
 } // namespace sdesktop::endpoints

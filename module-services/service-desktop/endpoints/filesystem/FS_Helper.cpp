@@ -138,14 +138,14 @@ namespace sdesktop::endpoints
         catch (const std::runtime_error &e) {
             LOG_ERROR("Logs flush exception: %s", e.what());
 
-            json11::Json::object response({{json::common::reason, e.what()}});
+            json11::Json::object response({{json::reason, e.what()}});
             return ResponseContext{.status = http::Code::InternalServerError, .body = response};
         }
 
         if (!std::filesystem::exists(filePath)) {
             LOG_ERROR("File %s not found", filePath.c_str());
 
-            json11::Json::object response({{json::common::reason, json::fs::fileDoesNotExist}});
+            json11::Json::object response({{json::reason, json::fs::fileDoesNotExist}});
             return ResponseContext{.status = http::Code::NotFound, .body = response};
         }
 
@@ -166,13 +166,13 @@ namespace sdesktop::endpoints
             LOG_ERROR("FileOperations exception: %s", e.what());
 
             code     = http::Code::InternalServerError;
-            response = json11::Json::object({{json::common::reason, std::string(e.what())}});
+            response = json11::Json::object({{json::reason, std::string(e.what())}});
         }
         catch (std::exception &e) {
             LOG_ERROR("FileOperations exception: %s", e.what());
 
             code     = http::Code::BadRequest;
-            response = json11::Json::object({{json::common::reason, std::string(e.what())}});
+            response = json11::Json::object({{json::reason, std::string(e.what())}});
         }
 
         return ResponseContext{.status = code, .body = response};
@@ -190,7 +190,7 @@ namespace sdesktop::endpoints
         catch (std::exception &e) {
             LOG_ERROR("Exception during getting data: %s", e.what());
 
-            json11::Json::object response({{json::common::reason, e.what()}});
+            json11::Json::object response({{json::reason, e.what()}});
             return ResponseContext{.status = http::Code::BadRequest, .body = response};
         }
 
@@ -213,7 +213,7 @@ namespace sdesktop::endpoints
             LOG_ERROR("%s", errorReason.str().c_str());
 
             code     = http::Code::BadRequest;
-            response = json11::Json::object({{json::common::reason, errorReason.str()}});
+            response = json11::Json::object({{json::reason, errorReason.str()}});
         }
 
         return ResponseContext{.status = code, .body = response};
@@ -263,13 +263,13 @@ namespace sdesktop::endpoints
             LOG_ERROR("FileOperations exception: %s", e.what());
 
             code     = http::Code::InternalServerError;
-            response = json11::Json::object({{json::common::reason, std::string(e.what())}});
+            response = json11::Json::object({{json::reason, std::string(e.what())}});
         }
         catch (std::exception &e) {
             LOG_ERROR("FileOperations exception: %s", e.what());
 
             code     = http::Code::BadRequest;
-            response = json11::Json::object({{json::common::reason, std::string(e.what())}});
+            response = json11::Json::object({{json::reason, std::string(e.what())}});
         }
 
         return ResponseContext{.status = code, .body = response};
@@ -288,7 +288,7 @@ namespace sdesktop::endpoints
             LOG_ERROR("%s", errorReason.str().c_str());
 
             auto code     = http::Code::BadRequest;
-            auto response = json11::Json::object({{json::common::reason, errorReason.str()}});
+            auto response = json11::Json::object({{json::reason, errorReason.str()}});
 
             return ResponseContext{.status = code, .body = response};
         }
@@ -301,7 +301,7 @@ namespace sdesktop::endpoints
         catch (std::exception &e) {
             LOG_ERROR("Exception during sending data: %s", e.what());
             auto code     = http::Code::NotAcceptable;
-            auto response = json11::Json::object({{json::common::reason, e.what()}});
+            auto response = json11::Json::object({{json::reason, e.what()}});
 
             return ResponseContext{.status = code, .body = response};
         }

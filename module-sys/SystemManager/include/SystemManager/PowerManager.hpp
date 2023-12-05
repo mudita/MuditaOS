@@ -48,10 +48,9 @@ namespace sys
         explicit PowerManager(CpuStatistics &cpuStats, TaskStatistics &taskStats);
         ~PowerManager();
 
-        std::int32_t PowerOff();
-        std::int32_t Reboot();
-        std::int32_t RebootMSC();
-        std::int32_t RebootToRecovery(RecoveryReason reason);
+        int32_t PowerOff();
+        int32_t Reboot();
+        int32_t RebootToRecovery(RecoveryReason reason);
 
         /// called periodically to calculate the CPU requirement
         ///

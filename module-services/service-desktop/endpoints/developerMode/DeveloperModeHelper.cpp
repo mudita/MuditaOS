@@ -188,9 +188,9 @@ namespace sdesktop::endpoints
             if (keyValue == json::developerMode::simStateInfo) {
                 auto response = ResponseContext{
                     .body = json11::Json::object(
-                        {{json::deviceInfo::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
-                         {json::deviceInfo::sim, std::to_string(static_cast<int>(Store::GSM::get()->sim))},
-                         {json::deviceInfo::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))}})};
+                        {{json::selectedSim, std::to_string(static_cast<int>(Store::GSM::get()->selected))},
+                         {json::sim, std::to_string(static_cast<int>(Store::GSM::get()->sim))},
+                         {json::trayState, std::to_string(static_cast<int>(Store::GSM::get()->tray))}})};
                 response.status = http::Code::OK;
                 return {sent::no, std::move(response)};
             }

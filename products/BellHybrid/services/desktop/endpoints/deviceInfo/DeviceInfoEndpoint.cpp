@@ -37,27 +37,24 @@ namespace sdesktop::endpoints
         const auto [totalDeviceSpaceMiB, reservedSystemSpaceMiB, usedUserSpaceMiB] = getStorageInfo();
 
         context.setResponseBody(json11::Json::object(
-            {{json::deviceInfo::batteryLevel, std::to_string(Store::Battery::get().level)},
-             {json::deviceInfo::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
-             {json::deviceInfo::deviceSpaceTotal, std::to_string(totalDeviceSpaceMiB)},
-             {json::deviceInfo::systemReservedSpace, std::to_string(reservedSystemSpaceMiB)},
-             {json::deviceInfo::usedUserSpace, std::to_string(usedUserSpaceMiB)},
-             {json::deviceInfo::gitRevision, std::string(GIT_REV)},
-             {json::deviceInfo::gitBranch, std::string(GIT_BRANCH)},
-             {json::deviceInfo::currentRTCTime, std::to_string(static_cast<std::uint32_t>(std::time(nullptr)))},
-             {json::deviceInfo::version, std::string(VERSION)},
-             {json::deviceInfo::serialNumber, getSerialNumber()},
-             {json::deviceInfo::caseColour, getCaseColour()},
-             {json::deviceInfo::recoveryStatusFilePath,
+            {{json::batteryLevel, std::to_string(Store::Battery::get().level)},
+             {json::batteryState, std::to_string(static_cast<int>(Store::Battery::get().state))},
+             {json::deviceSpaceTotal, std::to_string(totalDeviceSpaceMiB)},
+             {json::systemReservedSpace, std::to_string(reservedSystemSpaceMiB)},
+             {json::usedUserSpace, std::to_string(usedUserSpaceMiB)},
+             {json::gitRevision, std::string(GIT_REV)},
+             {json::gitBranch, std::string(GIT_BRANCH)},
+             {json::currentRTCTime, std::to_string(static_cast<std::uint32_t>(std::time(nullptr)))},
+             {json::version, std::string(VERSION)},
+             {json::serialNumber, getSerialNumber()},
+             {json::caseColour, getCaseColour()},
+             {json::recoveryStatusFilePath,
               (purefs::dir::getTemporaryPath() / sdesktop::paths::recoveryStatusFilename).string()},
-             {json::deviceInfo::updateFilePath,
-              (purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename).string()},
-             {json::deviceInfo::backupFilePath,
-              (purefs::dir::getTemporaryPath() / sdesktop::paths::backupFilename).string()},
-             {json::deviceInfo::syncFilePath,
-              (purefs::dir::getTemporaryPath() / sdesktop::paths::syncFilename).string()},
-             {json::deviceInfo::mtpPath, getMtpPath().string()},
-             {json::deviceInfo::onboardingState, std::to_string(static_cast<int>(getOnboardingState()))}}));
+             {json::updateFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename).string()},
+             {json::backupFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::backupFilename).string()},
+             {json::syncFilePath, (purefs::dir::getTemporaryPath() / sdesktop::paths::syncFilename).string()},
+             {json::mtpPath, getMtpPath().string()},
+             {json::onboardingState, std::to_string(static_cast<int>(getOnboardingState()))}}));
 
         return http::Code::OK;
     }

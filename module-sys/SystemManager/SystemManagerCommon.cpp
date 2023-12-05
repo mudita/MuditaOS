@@ -115,9 +115,6 @@ namespace sys
         case SystemManagerCommon::State::Reboot:
             LOG_INFO("  --->  REBOOT <--- ");
             break;
-        case SystemManagerCommon::State::RebootMSC:
-            LOG_INFO("  --->  REBOOT MSC <--- ");
-            break;
         case SystemManagerCommon::State::ShutdownReady:
             LOG_INFO("  ---> SHUTDOWN <--- ");
             break;
@@ -137,9 +134,6 @@ namespace sys
         switch (state) {
         case State::Reboot:
             powerManager->Reboot();
-            break;
-        case State::RebootMSC:
-            powerManager->RebootMSC();
             break;
         case State::ShutdownReady:
             powerManager->PowerOff();
@@ -270,23 +264,9 @@ namespace sys
                                   service::name::system_manager);
     }
 
-    bool SystemManagerCommon::RegularPowerDown(Service *s)
-    {
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::CloseSystem, CloseReason::RegularPowerDown),
-                           service::name::system_manager);
-        return true;
-    }
-
     bool SystemManagerCommon::Reboot(Service *s)
     {
         s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::Reboot, CloseReason::Reboot),
-                           service::name::system_manager);
-        return true;
-    }
-
-    bool SystemManagerCommon::RebootMSC(Service *s)
-    {
-        s->bus.sendUnicast(std::make_shared<SystemManagerCmd>(Code::RebootMSC, CloseReason::RebootMSC),
                            service::name::system_manager);
         return true;
     }
@@ -566,9 +546,6 @@ namespace sys
                 case Code::Reboot:
                     RebootHandler();
                     break;
-                case Code::RebootMSC:
-                    RebootHandlerMSC();
-                    break;
                 case Code::RebootToRecovery:
                 case Code::FactoryReset:
                     RebootToRecoveryHandler(data->closeReason, data->recoveryReason);
@@ -734,10 +711,6 @@ namespace sys
             DestroyServices(getWhiteListFor(WhiteListType::RegularClose));
             set(State::Reboot);
             break;
-        case CloseReason::RebootMSC:
-            DestroyServices(getWhiteListFor(WhiteListType::RegularClose));
-            set(State::RebootMSC);
-            break;
         case CloseReason::RebootToRecovery:
         case CloseReason::FactoryReset:
             DestroyServices(getWhiteListFor(WhiteListType::Update));
@@ -765,11 +738,6 @@ namespace sys
     void SystemManagerCommon::RebootHandler()
     {
         CloseSystemHandler(CloseReason::Reboot);
-    }
-
-    void SystemManagerCommon::RebootHandlerMSC()
-    {
-        CloseSystemHandler(CloseReason::RebootMSC);
     }
 
     void SystemManagerCommon::RebootToRecoveryHandler(CloseReason closeReason, RecoveryReason recoveryReason)
