@@ -245,6 +245,7 @@ namespace gui
         const auto absoluteValue = std::lround(static_cast<float>(maxValue) * percent);
         setValue(absoluteValue);
     }
+
     int ArcProgressBar::getMaximum() const noexcept
     {
         return maxValue;
@@ -271,6 +272,11 @@ namespace gui
         }
         progressStartIndicator->setCenter(calculateStartIndicatorCenter());
         progressEndIndicator->setCenter(calculateEndIndicatorCenter());
+
+        const auto progressItemsVisible = ((dTheta != 0) || (change == ProgressChange::IncrementFromZero));
+        progressArc->setVisible(progressItemsVisible);
+        progressStartIndicator->setVisible(progressItemsVisible);
+        progressEndIndicator->setVisible(progressItemsVisible);
 
         Arc::buildDrawListImplementation(commands);
     }
