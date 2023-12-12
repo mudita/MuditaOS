@@ -33,12 +33,19 @@ namespace gui::relaxationStyle
 
     namespace relStyle
     {
-        namespace progress
+        namespace progressTime
         {
             inline constexpr auto radius                   = 192U;
             inline constexpr auto penWidth                 = 3U;
             inline constexpr auto verticalDeviationDegrees = 38U;
-        } // namespace progress
+        } // namespace progressTime
+
+        namespace progressVolume
+        {
+            inline constexpr auto radius                   = 192U;
+            inline constexpr auto penWidth                 = 3U;
+            inline constexpr auto verticalDeviationDegrees = 38U + 30U;
+        } // namespace progressVolume
 
         namespace timer
         {

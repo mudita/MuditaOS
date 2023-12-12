@@ -12,6 +12,7 @@
 * Added date format setting
 * Added colors of noise to Relaxation
 * Added gradual alarm volume increase
+* Added progress bar for all volume control windows
 
 ### Changed / Improved
 * Optimize the way Relaxation is loading music files

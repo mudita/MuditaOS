@@ -8,6 +8,7 @@
 #include <common/widgets/ListItems.hpp>
 #include <common/widgets/list_items/Text.hpp>
 #include <common/widgets/list_items/Numeric.hpp>
+#include <common/widgets/list_items/NumericWithBar.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 
 namespace app::bell_settings
@@ -52,10 +53,11 @@ namespace app::bell_settings
         constexpr auto volumeStep = 1U;
         constexpr auto volumeMin  = AbstractAudioModel::minVolume;
         constexpr auto volumeMax  = AbstractAudioModel::maxVolume;
-        auto alarmVolume =
-            new list_items::Numeric(list_items::Numeric::spinner_type::range{volumeMin, volumeMax, volumeStep},
-                                    settingsModel.getAlarmVolume(),
-                                    utils::translate("app_bell_settings_alarm_settings_volume"));
+        auto alarmVolume          = new list_items::NumericWithBar(
+            list_items::NumericWithBar::spinner_type::range{volumeMin, volumeMax, volumeStep},
+            settingsModel.getAlarmVolume(),
+            volumeMax,
+            utils::translate("app_bell_settings_alarm_settings_volume"));
         alarmVolume->set_on_value_change_cb([this](const auto &val) {
             if (onVolumeChange) {
                 onVolumeChange(val);

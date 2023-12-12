@@ -43,10 +43,10 @@ namespace gui
     void RelaxationRunningProgressWindow::buildLayout()
     {
         using namespace gui::relaxationStyle;
-        const auto progressArcRadius = relStyle::progress::radius;
-        const auto progressArcWidth  = relStyle::progress::penWidth;
-        const auto arcStartAngle     = -90 - relStyle::progress::verticalDeviationDegrees;
-        const auto arcSweepAngle     = 360 - (2 * relStyle::progress::verticalDeviationDegrees);
+        const auto progressArcRadius = relStyle::progressTime::radius;
+        const auto progressArcWidth  = relStyle::progressTime::penWidth;
+        const auto arcStartAngle     = -90 - relStyle::progressTime::verticalDeviationDegrees;
+        const auto arcSweepAngle     = 360 - (2 * relStyle::progressTime::verticalDeviationDegrees);
         const auto arcProgressSteps  = 1000;
 
         Arc::ShapeParams arcParams;

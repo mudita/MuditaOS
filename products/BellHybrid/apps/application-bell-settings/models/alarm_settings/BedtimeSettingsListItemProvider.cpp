@@ -4,7 +4,7 @@
 #include "BedtimeSettingsListItemProvider.hpp"
 #include "BellSettingsStyle.hpp"
 #include "common/models/AbstractAudioModel.hpp"
-#include <common/widgets/list_items/Numeric.hpp>
+#include <common/widgets/list_items/NumericWithBar.hpp>
 #include <common/widgets/list_items/Text.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
@@ -47,10 +47,11 @@ namespace app::bell_settings
         constexpr auto volumeStep = 1U;
         constexpr auto volumeMin  = AbstractAudioModel::minVolume;
         constexpr auto volumeMax  = AbstractAudioModel::maxVolume;
-        auto volume =
-            new list_items::Numeric(list_items::Numeric::spinner_type::range{volumeMin, volumeMax, volumeStep},
-                                    model->getBedtimeVolume(),
-                                    utils::translate("app_bell_settings_bedtime_settings_volume"));
+        auto volume               = new list_items::NumericWithBar(
+            list_items::NumericWithBar::spinner_type::range{volumeMin, volumeMax, volumeStep},
+            model->getBedtimeVolume(),
+            volumeMax,
+            utils::translate("app_bell_settings_bedtime_settings_volume"));
         volume->set_on_value_change_cb([this](const auto &val) {
             if (onVolumeChange) {
                 onVolumeChange(val);
