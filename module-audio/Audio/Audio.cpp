@@ -34,15 +34,7 @@ namespace audio
 
     audio::RetCode Audio::SetOutputVolume(float vol)
     {
-        auto volToSet = vol;
-        if (vol > maxVolume) {
-            volToSet = maxVolume;
-        }
-        if (vol < minVolume) {
-            volToSet = minVolume;
-        }
-
-        return currentOperation->SetOutputVolume(volToSet);
+        return currentOperation->SetOutputVolume(static_cast<float>(vol));
     }
 
     audio::RetCode Audio::SetInputGain(Gain gain)

@@ -22,9 +22,6 @@ namespace audio
 namespace audio
 {
     inline constexpr Volume defaultVolumeStep = 1;
-    inline constexpr Gain defaultGainStep     = 10;
-    inline constexpr Volume defaultVolume     = 5;
-    inline constexpr Gain defaultGain         = 5;
 
     inline constexpr Volume maxVolume = 10;
     inline constexpr Volume minVolume = 0;
@@ -32,10 +29,8 @@ namespace audio
     inline constexpr Gain maxGain = 100;
     inline constexpr Gain minGain = 0;
 
-    inline constexpr auto audioOperationTimeout = 1000U;
 
     inline constexpr auto audioDbPrefix   = "audio";
-    inline constexpr auto systemDbPrefix  = "system";
     inline constexpr auto dbPathSeparator = '/';
 
     enum class Setting

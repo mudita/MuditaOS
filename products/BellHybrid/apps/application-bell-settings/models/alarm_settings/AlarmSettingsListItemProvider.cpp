@@ -3,6 +3,7 @@
 
 #include "BellSettingsStyle.hpp"
 #include "AlarmSettingsListItemProvider.hpp"
+#include "common/models/AbstractAudioModel.hpp"
 #include <common/models/FrontlightModel.hpp>
 #include <common/widgets/ListItems.hpp>
 #include <common/widgets/list_items/Text.hpp>
@@ -49,8 +50,8 @@ namespace app::bell_settings
         internalData.emplace_back(alarmTone);
 
         constexpr auto volumeStep = 1U;
-        constexpr auto volumeMin  = 1U;
-        constexpr auto volumeMax  = 10U;
+        constexpr auto volumeMin  = AbstractAudioModel::minVolume;
+        constexpr auto volumeMax  = AbstractAudioModel::maxVolume;
         auto alarmVolume =
             new list_items::Numeric(list_items::Numeric::spinner_type::range{volumeMin, volumeMax, volumeStep},
                                     settingsModel.getAlarmVolume(),

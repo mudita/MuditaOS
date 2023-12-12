@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -43,6 +43,9 @@ namespace audio
         auto getSupportedFormats() -> std::vector<AudioFormat> final;
         auto getTraits() const -> Traits final;
         auto getSourceFormat() -> AudioFormat final;
+
+      protected:
+        AudioDevice::RetCode setOutputVolume(float vol) final;
 
       private:
         constexpr static TickType_t codecSettleTime                               = 20 * portTICK_PERIOD_MS;

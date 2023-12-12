@@ -21,6 +21,8 @@
 * Factory reset removes user files
 * Changed countdown progress bar design in Relaxation, Meditation and Power Nap apps
 * Removed minus sign in progress countdown timers in Relaxation, Meditation and Power Nap apps
+* Extended volume scale from 10 to 15 point scale
+* Modified volume approximation function for better user experience
 
 ## [2.2.3 2023-11-30]
 
