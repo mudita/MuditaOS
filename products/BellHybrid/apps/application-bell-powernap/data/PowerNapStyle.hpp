@@ -13,41 +13,40 @@ namespace gui::powerNapStyle
     {
         namespace progress
         {
-            constexpr inline auto radius                   = 192;
-            constexpr inline auto penWidth                 = 3;
-            constexpr inline auto verticalDeviationDegrees = 38;
+            inline constexpr auto radius                   = 192;
+            inline constexpr auto penWidth                 = 3;
+            inline constexpr auto verticalDeviationDegrees = 38;
         } // namespace progress
 
         namespace timer
         {
-            constexpr inline auto marginTop   = 41;
-            constexpr inline auto marginRight = 32;
-            constexpr inline auto font        = style::window::font::supersizeme;
-            constexpr inline auto maxSizeX    = 340;
-            constexpr inline auto maxSizeY    = 198;
+            inline constexpr auto marginTop = 41;
+            inline constexpr auto font      = style::window::font::supersizeme;
+            inline constexpr auto maxSizeX  = 340;
+            inline constexpr auto maxSizeY  = 198;
         } // namespace timer
 
         namespace pauseIcon
         {
-            constexpr inline auto image     = "big_pause";
-            constexpr inline auto marginTop = 39;
-            constexpr inline auto maxSizeX  = 203;
-            constexpr inline auto maxSizeY  = 203;
+            inline constexpr auto image     = "big_pause";
+            inline constexpr auto marginTop = 39;
+            inline constexpr auto maxSizeX  = 203;
+            inline constexpr auto maxSizeY  = 203;
         } // namespace pauseIcon
 
         namespace ringIcon
         {
-            constexpr inline auto image     = "big_bell_ringing";
-            constexpr inline auto marginTop = 39;
-            constexpr inline auto maxSizeX  = 210;
-            constexpr inline auto maxSizeY  = 203;
+            inline constexpr auto image     = "big_bell_ringing";
+            inline constexpr auto marginTop = 39;
+            inline constexpr auto maxSizeX  = 210;
+            inline constexpr auto maxSizeY  = 203;
         } // namespace ringIcon
 
         namespace clock
         {
-            constexpr inline auto marginTop = 17;
-            constexpr inline auto maxSizeX  = 340;
-            constexpr inline auto maxSizeY  = 84;
+            inline constexpr auto marginTop = 17;
+            inline constexpr auto maxSizeX  = 340;
+            inline constexpr auto maxSizeY  = 84;
         } // namespace clock
     }
 } // namespace gui::powerNapStyle

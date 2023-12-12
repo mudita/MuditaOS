@@ -1,13 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeFixedWidget.hpp"
 #include <ListView.hpp>
 #include <Style.hpp>
-#include <time/time_conversion.hpp>
 #include <time/time_date_validation.hpp>
-#include "DateAndTimeStyle.hpp"
-#include <time/TimeZone.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
 
 namespace
@@ -30,8 +27,6 @@ namespace
 
 namespace gui
 {
-    namespace date_and_time = style::window::date_and_time;
-
     TimeFixedWidget::LeftBox::LeftBox(uint32_t digitsCount) : container{digitsCount}
     {}
 
@@ -177,12 +172,12 @@ namespace gui
         info.minusWidth    = minusVisible ? leftBox.minus->getTextFormat().getFont()->getPixelWidth(minusSign) : 0;
 
         auto maximumWidthNeededForLeftBox = (info.digitMaxWidth * leftBox.container.digits.size()) + info.minusWidth;
-        auto avaliableEvenWidth           = (info.mainBoxWidth - info.colonWidth) / 2;
+        auto availableEvenWidth           = (info.mainBoxWidth - info.colonWidth) / 2;
 
-        info.leftBoxWidth  = avaliableEvenWidth;
-        info.rightBoxWidth = avaliableEvenWidth;
+        info.leftBoxWidth  = availableEvenWidth;
+        info.rightBoxWidth = availableEvenWidth;
 
-        if (avaliableEvenWidth < maximumWidthNeededForLeftBox) {
+        if (availableEvenWidth < maximumWidthNeededForLeftBox) {
 
             info.leftBoxWidth  = maximumWidthNeededForLeftBox;
             info.rightBoxWidth = info.mainBoxWidth - info.minusWidth - info.leftBoxWidth;
@@ -190,5 +185,4 @@ namespace gui
 
         return info;
     }
-
 } /* namespace gui */
