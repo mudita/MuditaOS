@@ -17,7 +17,8 @@
 * Disabled Address Sanitizer for the Linux simulator
 * Changed misleading factory reset translations in Polish
 * Time setting updated
-* Factory reset removes user files 
+* Factory reset removes user files
+* Changed countdown progress bar design in Relaxation, Meditation and Power Nap apps
 
 ## [2.2.3 2023-11-30]
 

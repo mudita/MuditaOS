@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,21 +7,7 @@
 
 namespace app::meditationStyle
 {
-    namespace icStyle
-    {
-        namespace text
-        {
-            constexpr inline auto font = style::window::font::supersizemelight;
-        } // namespace text
-
-        namespace minute
-        {
-            constexpr inline auto font = style::window::font::largelight;
-        } // namespace minute
-
-    } // namespace icStyle
-
-    namespace mrStyle
+    namespace runningStyle
     {
         namespace progress
         {
@@ -52,23 +38,23 @@ namespace app::meditationStyle
             constexpr inline auto maxSizeX  = 340;
             constexpr inline auto maxSizeY  = 84;
         } // namespace clock
-    }     // namespace mrStyle
+    }     // namespace runningStyle
 
-    namespace mcStyle
+    namespace countdownStyle
     {
         namespace progress
         {
-            constexpr inline auto radius                   = mrStyle::progress::radius;
-            constexpr inline auto penWidth                 = mrStyle::progress::penWidth;
-            constexpr inline auto verticalDeviationDegrees = mrStyle::progress::verticalDeviationDegrees;
+            constexpr inline auto radius                   = runningStyle::progress::radius;
+            constexpr inline auto penWidth                 = 9;
+            constexpr inline auto verticalDeviationDegrees = runningStyle::progress::verticalDeviationDegrees;
         } // namespace progress
 
         namespace timer
         {
             constexpr inline auto marginTop = 23;
-            constexpr inline auto font      = mrStyle::timer::font;
-            constexpr inline auto maxSizeX  = mrStyle::timer::maxSizeX;
-            constexpr inline auto maxSizeY  = mrStyle::timer::maxSizeY;
+            constexpr inline auto font      = runningStyle::timer::font;
+            constexpr inline auto maxSizeX  = runningStyle::timer::maxSizeX;
+            constexpr inline auto maxSizeY  = runningStyle::timer::maxSizeY;
         } // namespace timer
 
         namespace description
@@ -78,25 +64,18 @@ namespace app::meditationStyle
             constexpr inline auto maxSizeX  = 380;
             constexpr inline auto maxSizeY  = 102;
         } // namespace description
-    }     // namespace mcStyle
+    }     // namespace countdownStyle
 
-    namespace mtStyle
+    namespace timerStyle
     {
         namespace text
         {
             constexpr inline auto font = style::window::font::supersizemelight;
-        } // namespace text
+        }
 
         namespace minute
         {
             constexpr inline auto font = style::window::font::largelight;
-        } // namespace minute
-
-        namespace list
-        {
-            constexpr inline auto timeUnitSingular = "common_minute_lower";
-            constexpr inline auto timeUnitPlural   = "common_minutes_lower";
-            constexpr inline auto timeUnitGenitive = "common_minutes_lower_genitive";
-        } // namespace list
-    }     // namespace mtStyle
+        }
+    } // namespace timerStyle
 } // namespace app::meditationStyle

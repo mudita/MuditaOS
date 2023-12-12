@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -13,9 +13,9 @@
 
 namespace
 {
-    inline constexpr auto meditationProgressTimerName = "MeditationProgressTimer";
-    inline constexpr std::chrono::seconds baseTick{1};
-    inline constexpr auto meditationProgressMode = app::ProgressCountdownMode::Increasing;
+    constexpr auto meditationProgressTimerName{"MeditationProgressTimer"};
+    constexpr std::chrono::seconds meditationProgressTimerPeriod{1};
+    constexpr auto meditationProgressMode{app::ProgressCountdownMode::Increasing};
 } // namespace
 
 namespace gui
@@ -44,41 +44,45 @@ namespace gui
     void MeditationRunningWindow::buildLayout()
     {
         using namespace app::meditationStyle;
-        const auto progressArcRadius = mrStyle::progress::radius;
-        const auto progressArcWidth  = mrStyle::progress::penWidth;
-        const auto arcStartAngle     = -90 - mrStyle::progress::verticalDeviationDegrees;
-        const auto arcSweepAngle     = 360 - (2 * mrStyle::progress::verticalDeviationDegrees);
+        const auto progressArcRadius = runningStyle::progress::radius;
+        const auto progressArcWidth  = runningStyle::progress::penWidth;
+        const auto arcStartAngle =
+            -90 - runningStyle::progress::verticalDeviationDegrees; // -90 to start drawing the circle from top
+        const auto arcSweepAngle     = 360 - (2 * runningStyle::progress::verticalDeviationDegrees);
         const auto arcProgressSteps  = 1000;
 
         Arc::ShapeParams arcParams;
         arcParams.setCenterPoint(Point(getWidth() / 2, getHeight() / 2))
             .setRadius(progressArcRadius)
-            .setStartAngle(arcStartAngle) // Start drawing the circle from top.
+            .setStartAngle(arcStartAngle)
             .setSweepAngle(arcSweepAngle)
             .setPenWidth(progressArcWidth)
             .setBorderColor(ColorFullBlack);
 
-        progress = new ArcProgressBar(this, arcParams, ArcProgressBar::ProgressDirection::CounterClockwise);
+        progress = new ArcProgressBar(this,
+                                      arcParams,
+                                      ArcProgressBar::ProgressDirection::CounterClockwise,
+                                      ArcProgressBar::ProgressChange::DecrementFromFull);
         progress->setMaximum(arcProgressSteps);
 
         mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
 
         clock = new BellStatusClock(mainVBox);
-        clock->setMaximumSize(mrStyle::clock::maxSizeX, mrStyle::clock::maxSizeY);
+        clock->setMaximumSize(runningStyle::clock::maxSizeX, runningStyle::clock::maxSizeY);
         clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        clock->setMargins(gui::Margins(0, mrStyle::clock::marginTop, 0, 0));
+        clock->setMargins(gui::Margins(0, runningStyle::clock::marginTop, 0, 0));
 
-        timer = new gui::TimeFixedWidget(mainVBox, 0, 0, mrStyle::timer::maxSizeX, mrStyle::timer::maxSizeY);
-        timer->setFontAndDimensions(mrStyle::timer::font);
-        timer->setMinimumSize(mrStyle::timer::maxSizeX, mrStyle::timer::maxSizeY);
-        timer->setMargins(gui::Margins(0, mrStyle::timer::marginTop, 0, 0));
+        timer = new gui::TimeFixedWidget(mainVBox, 0, 0, runningStyle::timer::maxSizeX, runningStyle::timer::maxSizeY);
+        timer->setFontAndDimensions(runningStyle::timer::font);
+        timer->setMinimumSize(runningStyle::timer::maxSizeX, runningStyle::timer::maxSizeY);
+        timer->setMargins(gui::Margins(0, runningStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         icon = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
-        icon->setMinimumSize(mrStyle::pauseIcon::maxSizeX, mrStyle::pauseIcon::maxSizeY);
-        icon->setMargins(gui::Margins(0, mrStyle::pauseIcon::marginTop, 0, 0));
+        icon->setMinimumSize(runningStyle::pauseIcon::maxSizeX, runningStyle::pauseIcon::maxSizeY);
+        icon->setMargins(gui::Margins(0, runningStyle::pauseIcon::marginTop, 0, 0));
         icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        icon->image->set(mrStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
+        icon->image->set(runningStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
         icon->setVisible(false);
 
         mainVBox->resizeItems();
@@ -108,7 +112,7 @@ namespace gui
             return true;
         }
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
-            reinterpret_cast<app::Application *>(application)->resumeIdleTimer();
+            static_cast<app::Application *>(application)->resumeIdleTimer();
             presenter->abandon();
             return true;
         }
@@ -143,7 +147,7 @@ namespace gui
     void MeditationRunningWindow::configureTimer()
     {
         auto progressTimer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
-            application, *this, meditationProgressTimerName, baseTick, meditationProgressMode);
+            application, *this, meditationProgressTimerName, meditationProgressTimerPeriod, meditationProgressMode);
         progressTimer->attach(progress);
         progressTimer->attach(timer);
         presenter->setTimer(std::move(progressTimer));

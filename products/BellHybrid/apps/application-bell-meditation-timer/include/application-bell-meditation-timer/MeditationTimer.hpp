@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,7 +25,7 @@ namespace app
                                  std::string parent                  = "",
                                  StatusIndicators statusIndicators   = StatusIndicators{},
                                  StartInBackground startInBackground = {false},
-                                 uint32_t stackDepth                 = 4096 * 2);
+                                 std::uint32_t stackDepth            = 1024 * 8);
         ~MeditationTimer();
 
         sys::ReturnCodes InitHandler() override;

@@ -12,9 +12,9 @@
 
 namespace
 {
-    inline constexpr auto relaxationProgressTimerName = "RelaxationProgressTimer";
-    inline constexpr std::chrono::seconds baseTick{1};
-    inline constexpr auto relaxationProgressMode = app::ProgressCountdownMode::Increasing;
+    constexpr auto relaxationProgressTimerName{"RelaxationProgressTimer"};
+    constexpr std::chrono::seconds relaxationProgressTimerPeriod{1};
+    constexpr auto relaxationProgressMode{app::ProgressCountdownMode::Increasing};
 } // namespace
 
 namespace gui
@@ -57,7 +57,10 @@ namespace gui
             .setPenWidth(progressArcWidth)
             .setBorderColor(ColorFullBlack);
 
-        progress = new ArcProgressBar(this, arcParams, ArcProgressBar::ProgressDirection::CounterClockwise);
+        progress = new ArcProgressBar(this,
+                                      arcParams,
+                                      ArcProgressBar::ProgressDirection::CounterClockwise,
+                                      ArcProgressBar::ProgressChange::DecrementFromFull);
         progress->setMaximum(arcProgressSteps);
 
         mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
@@ -147,7 +150,7 @@ namespace gui
     void RelaxationRunningProgressWindow::configureTimer()
     {
         auto progressTimer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
-            application, *this, relaxationProgressTimerName, baseTick, relaxationProgressMode);
+            application, *this, relaxationProgressTimerName, relaxationProgressTimerPeriod, relaxationProgressMode);
         progressTimer->attach(progress);
         progressTimer->attach(timer);
         presenter->setTimer(std::move(progressTimer));
@@ -177,6 +180,7 @@ namespace gui
         auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::UnsupportedMediaType);
         application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
     }
+
     void RelaxationRunningProgressWindow::handleDeletedFile()
     {
         auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::FileDeleted);
