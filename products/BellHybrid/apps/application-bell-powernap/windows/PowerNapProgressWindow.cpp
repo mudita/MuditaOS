@@ -67,11 +67,11 @@ namespace gui
         clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         clock->setMargins(gui::Margins(0, progressStyle::clock::marginTop, 0, 0));
 
-        timer = new gui::TimeFixedWidget(
-            mainVBox, 0, 0, progressStyle::timer::maxSizeX, progressStyle::timer::maxSizeY, true);
+        timer =
+            new gui::TimeFixedWidget(mainVBox, 0, 0, progressStyle::timer::maxSizeX, progressStyle::timer::maxSizeY);
         timer->setFontAndDimensions(progressStyle::timer::font);
         timer->setMinimumSize(progressStyle::timer::maxSizeX, progressStyle::timer::maxSizeY);
-        timer->setMargins(gui::Margins(0, progressStyle::timer::marginTop, progressStyle::timer::marginRight, 0));
+        timer->setMargins(gui::Margins(0, progressStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         iconPause = new Icon(mainVBox, 0, 0, 0, 0, {}, {});

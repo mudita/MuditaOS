@@ -15,14 +15,12 @@ namespace gui::relaxationStyle
 
     namespace ended
     {
-        static constexpr auto image_top_margin    = 170U;
-        static constexpr auto image_bottom_margin = 30U;
+        inline constexpr auto image_top_margin    = 170U;
+        inline constexpr auto image_bottom_margin = 30U;
     } // namespace ended
 
     namespace title
     {
-        inline constexpr auto bottomDescTopMargin = 15U;
-        inline constexpr auto maxProgressValue    = 16U;
         inline constexpr auto maxLines            = 2U;
         inline constexpr auto width               = 400U;
     } // namespace title
@@ -33,49 +31,42 @@ namespace gui::relaxationStyle
         inline constexpr auto minWidth = 300U;
     } // namespace text
 
-    namespace pause
-    {
-        inline constexpr auto textH = 200U;
-    }
-
     namespace relStyle
     {
         namespace progress
         {
-            constexpr inline auto radius                   = 192U;
-            constexpr inline auto penWidth                 = 3U;
-            constexpr inline auto verticalDeviationDegrees = 38U;
+            inline constexpr auto radius                   = 192U;
+            inline constexpr auto penWidth                 = 3U;
+            inline constexpr auto verticalDeviationDegrees = 38U;
         } // namespace progress
 
         namespace timer
         {
-            constexpr inline auto marginTop   = 41U;
-            constexpr inline auto marginRight = 32U;
-            constexpr inline auto font        = style::window::font::supersizeme;
-            constexpr inline auto maxSizeX    = 340U;
-            constexpr inline auto maxSizeY    = 198U;
+            inline constexpr auto marginTop = 41U;
+            inline constexpr auto font      = style::window::font::supersizeme;
+            inline constexpr auto maxSizeX  = 340U;
+            inline constexpr auto maxSizeY  = 198U;
         } // namespace timer
 
         namespace pauseIcon
         {
-            constexpr inline auto image     = "big_pause";
-            constexpr inline auto marginTop = 39U;
-            constexpr inline auto maxSizeX  = 203U;
-            constexpr inline auto maxSizeY  = 203U;
+            inline constexpr auto image     = "big_pause";
+            inline constexpr auto marginTop = 39U;
+            inline constexpr auto maxSizeX  = 203U;
+            inline constexpr auto maxSizeY  = 203U;
         } // namespace pauseIcon
 
         namespace clock
         {
-            constexpr inline auto marginTop = 17U;
-            constexpr inline auto maxSizeX  = 340U;
-            constexpr inline auto maxSizeY  = 84U;
+            inline constexpr auto marginTop = 17U;
+            inline constexpr auto maxSizeX  = 340U;
+            inline constexpr auto maxSizeY  = 84U;
         } // namespace clock
     }     // namespace relStyle
 
     namespace error
     {
-        constexpr inline auto imageMarginTop = 122U;
-        constexpr inline auto textPaddingTop = 30U;
+        inline constexpr auto imageMarginTop = 122U;
+        inline constexpr auto textPaddingTop = 30U;
     } // namespace error
-
 } // namespace gui::relaxationStyle
