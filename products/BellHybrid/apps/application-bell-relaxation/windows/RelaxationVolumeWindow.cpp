@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationVolumeWindow.hpp"
@@ -7,6 +7,7 @@
 
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <popups/data/PopupData.hpp>
+#include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 
 namespace gui
 {
@@ -35,6 +36,25 @@ namespace gui
         topMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         topMessage->setText(utils::translate("app_settings_volume"));
         topMessage->drawUnderline(false);
+
+        using namespace gui::relaxationStyle;
+        const auto progressArcRadius = relStyle::progressVolume::radius;
+        const auto progressArcWidth  = relStyle::progressVolume::penWidth;
+        const auto arcStartAngle     = -90 - relStyle::progressVolume::verticalDeviationDegrees;
+        const auto arcSweepAngle     = 360 - (2 * (relStyle::progressVolume::verticalDeviationDegrees));
+        const auto arcProgressSteps  = app::AbstractAudioModel::maxVolume;
+
+        Arc::ShapeParams arcParams;
+        arcParams.setCenterPoint(Point(getWidth() / 2, getHeight() / 2))
+            .setRadius(progressArcRadius)
+            .setStartAngle(arcStartAngle)
+            .setSweepAngle(arcSweepAngle)
+            .setPenWidth(progressArcWidth)
+            .setBorderColor(ColorFullBlack);
+
+        progress = new ArcProgressBar(this, arcParams, ArcProgressBar::ProgressDirection::CounterClockwise);
+        progress->setMaximum(arcProgressSteps);
+        progress->setValue(presenter->getVolume());
 
         auto data = presenter->getVolumeData();
         spinner   = new U8IntegerSpinner({static_cast<U8IntegerSpinner::value_type>(data.min),
@@ -65,6 +85,7 @@ namespace gui
         auto data              = presenter->getVolumeData();
         const auto ret         = body->onInput(inputEvent);
         const auto selectedVal = spinner->value();
+        progress->setValue(presenter->getVolume());
         body->setMinMaxArrowsVisibility(selectedVal == data.min, selectedVal == data.max);
         return ret;
     }

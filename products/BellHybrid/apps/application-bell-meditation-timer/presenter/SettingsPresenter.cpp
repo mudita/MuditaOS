@@ -11,6 +11,7 @@
 #include <ApplicationCommon.hpp>
 #include <common/widgets/list_items/Fraction.hpp>
 #include <common/widgets/list_items/Numeric.hpp>
+#include <common/widgets/list_items/NumericWithBar.hpp>
 #include <common/LanguageUtils.hpp>
 #include <apps-common/InternalModel.hpp>
 #include <apps-common/widgets/spinners/Spinners.hpp>
@@ -75,10 +76,12 @@ namespace app::meditation
                                                      utils::translate("app_bell_meditation_start_delay"),
                                                      utils::translate("common_second_lower")};
 
-        auto chimeVolume = new list_items::Numeric{
-            list_items::Numeric::spinner_type::range{AbstractAudioModel::minVolume, AbstractAudioModel::maxVolume, 1},
-            chimeVolumeModel,
-            utils::translate("app_bell_meditation_chime_volume")};
+        auto chimeVolume =
+            new list_items::NumericWithBar{list_items::NumericWithBar::spinner_type::range{
+                                               AbstractAudioModel::minVolume, AbstractAudioModel::maxVolume, 1},
+                                           chimeVolumeModel,
+                                           AbstractAudioModel::maxVolume,
+                                           utils::translate("app_bell_meditation_chime_volume")};
 
         listItemsProvider =
             std::make_shared<BellListItemProvider>(BellListItemProvider::Items{startDelay, chimeInterval, chimeVolume});
