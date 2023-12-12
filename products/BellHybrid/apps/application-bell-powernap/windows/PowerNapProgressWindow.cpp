@@ -10,8 +10,8 @@
 
 namespace
 {
-    constexpr auto powerNapTimerName   = "PowerNapTimer";
-    constexpr auto powerNapTimerPeriod = std::chrono::seconds{1};
+    constexpr auto powerNapTimerName{"PowerNapTimer"};
+    constexpr auto powerNapTimerPeriod{std::chrono::seconds{1}};
 } // namespace
 
 namespace gui
@@ -40,10 +40,10 @@ namespace gui
     void PowerNapProgressWindow::buildLayout()
     {
         using namespace gui::powerNapStyle;
-        const auto progressArcRadius = pnStyle::progress::radius;
-        const auto progressArcWidth  = pnStyle::progress::penWidth;
-        const auto arcStartAngle     = -90 - pnStyle::progress::verticalDeviationDegrees;
-        const auto arcSweepAngle     = 360 - (2 * pnStyle::progress::verticalDeviationDegrees);
+        const auto progressArcRadius = progressStyle::progress::radius;
+        const auto progressArcWidth  = progressStyle::progress::penWidth;
+        const auto arcStartAngle     = -90 - progressStyle::progress::verticalDeviationDegrees;
+        const auto arcSweepAngle     = 360 - (2 * progressStyle::progress::verticalDeviationDegrees);
         const auto arcProgressSteps  = 1000;
 
         Arc::ShapeParams arcParams;
@@ -54,34 +54,38 @@ namespace gui
             .setPenWidth(progressArcWidth)
             .setBorderColor(ColorFullBlack);
 
-        progress = new ArcProgressBar(this, arcParams, ArcProgressBar::ProgressDirection::CounterClockwise);
+        progress = new ArcProgressBar(this,
+                                      arcParams,
+                                      ArcProgressBar::ProgressDirection::CounterClockwise,
+                                      ArcProgressBar::ProgressChange::DecrementFromFull);
         progress->setMaximum(arcProgressSteps);
 
         mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
 
         clock = new BellStatusClock(mainVBox);
-        clock->setMaximumSize(pnStyle::clock::maxSizeX, pnStyle::clock::maxSizeY);
+        clock->setMaximumSize(progressStyle::clock::maxSizeX, progressStyle::clock::maxSizeY);
         clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        clock->setMargins(gui::Margins(0, pnStyle::clock::marginTop, 0, 0));
+        clock->setMargins(gui::Margins(0, progressStyle::clock::marginTop, 0, 0));
 
-        timer = new gui::TimeFixedWidget(mainVBox, 0, 0, pnStyle::timer::maxSizeX, pnStyle::timer::maxSizeY, true);
-        timer->setFontAndDimensions(pnStyle::timer::font);
-        timer->setMinimumSize(pnStyle::timer::maxSizeX, pnStyle::timer::maxSizeY);
-        timer->setMargins(gui::Margins(0, pnStyle::timer::marginTop, pnStyle::timer::marginRight, 0));
+        timer = new gui::TimeFixedWidget(
+            mainVBox, 0, 0, progressStyle::timer::maxSizeX, progressStyle::timer::maxSizeY, true);
+        timer->setFontAndDimensions(progressStyle::timer::font);
+        timer->setMinimumSize(progressStyle::timer::maxSizeX, progressStyle::timer::maxSizeY);
+        timer->setMargins(gui::Margins(0, progressStyle::timer::marginTop, progressStyle::timer::marginRight, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         iconPause = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
-        iconPause->setMinimumSize(pnStyle::pauseIcon::maxSizeX, pnStyle::pauseIcon::maxSizeY);
-        iconPause->setMargins(gui::Margins(0, pnStyle::pauseIcon::marginTop, 0, 0));
+        iconPause->setMinimumSize(progressStyle::pauseIcon::maxSizeX, progressStyle::pauseIcon::maxSizeY);
+        iconPause->setMargins(gui::Margins(0, progressStyle::pauseIcon::marginTop, 0, 0));
         iconPause->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        iconPause->image->set(pnStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
+        iconPause->image->set(progressStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
         iconPause->setVisible(false);
 
         iconRing = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
-        iconRing->setMinimumSize(pnStyle::ringIcon::maxSizeX, pnStyle::ringIcon::maxSizeY);
-        iconRing->setMargins(gui::Margins(0, pnStyle::ringIcon::marginTop, 0, 0));
+        iconRing->setMinimumSize(progressStyle::ringIcon::maxSizeX, progressStyle::ringIcon::maxSizeY);
+        iconRing->setMargins(gui::Margins(0, progressStyle::ringIcon::marginTop, 0, 0));
         iconRing->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        iconRing->image->set(pnStyle::ringIcon::image, ImageTypeSpecifier::W_G);
+        iconRing->image->set(progressStyle::ringIcon::image, ImageTypeSpecifier::W_G);
         iconRing->setVisible(false);
 
         mainVBox->resizeItems();

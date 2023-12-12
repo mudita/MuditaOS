@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -76,9 +76,17 @@ namespace gui
             Clockwise,
             CounterClockwise
         };
+
+        enum class ProgressChange
+        {
+            IncrementFromZero,
+            DecrementFromFull
+        };
+
         ArcProgressBar(Item *parent,
                        const Arc::ShapeParams &shape,
-                       ProgressDirection direction = ProgressDirection::Clockwise);
+                       ProgressDirection direction = ProgressDirection::Clockwise,
+                       ProgressChange change       = ProgressChange::IncrementFromZero);
 
         void setMaximum(unsigned int value) noexcept override;
         auto setValue(unsigned int value) noexcept -> bool override;
@@ -97,9 +105,12 @@ namespace gui
 
         unsigned int maxValue       = 0U;
         unsigned int currentValue   = 0U;
+
         Arc *progressArc            = nullptr;
         Arc *progressStartIndicator = nullptr;
         Arc *progressEndIndicator   = nullptr;
+
         ProgressDirection direction = ProgressDirection::Clockwise;
+        ProgressChange change       = ProgressChange::IncrementFromZero;
     };
 } // namespace gui

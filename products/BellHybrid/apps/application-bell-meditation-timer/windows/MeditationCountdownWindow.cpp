@@ -13,9 +13,9 @@
 
 namespace
 {
-    inline constexpr auto meditationCountdownTimerName = "MeditationCountdownTimer";
-    inline constexpr std::chrono::seconds baseTick{1};
-    inline constexpr auto meditationCountdownMode = app::ProgressCountdownMode::Increasing;
+    constexpr auto meditationCountdownTimerName{"MeditationCountdownTimer"};
+    constexpr std::chrono::seconds meditationCountdownTimerPeriod{1};
+    constexpr auto meditationCountdownMode{app::ProgressCountdownMode::Increasing};
 } // namespace
 
 namespace gui
@@ -44,10 +44,10 @@ namespace gui
     void MeditationCountdownWindow::buildLayout()
     {
         using namespace app::meditationStyle;
-        const auto progressArcRadius = mcStyle::progress::radius;
-        const auto progressArcWidth  = mcStyle::progress::penWidth;
-        const auto arcStartAngle     = -90 + mcStyle::progress::verticalDeviationDegrees;
-        const auto arcSweepAngle     = 360 - (2 * mcStyle::progress::verticalDeviationDegrees);
+        const auto progressArcRadius = countdownStyle::progress::radius;
+        const auto progressArcWidth  = countdownStyle::progress::penWidth;
+        const auto arcStartAngle     = -90 + countdownStyle::progress::verticalDeviationDegrees;
+        const auto arcSweepAngle     = 360 - (2 * countdownStyle::progress::verticalDeviationDegrees);
 
         Arc::ShapeParams arcParams;
         arcParams.setCenterPoint(Point(getWidth() / 2, getHeight() / 2))
@@ -63,22 +63,22 @@ namespace gui
 
         description = new Text(mainVBox, 0, 0, 0, 0);
         description->setText(utils::translate("app_meditation_countdown_desc"));
-        description->setMaximumSize(mcStyle::description::maxSizeX, mcStyle::description::maxSizeY);
-        description->setFont(mcStyle::description::font);
+        description->setMaximumSize(countdownStyle::description::maxSizeX, countdownStyle::description::maxSizeY);
+        description->setFont(countdownStyle::description::font);
         description->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        description->setMargins(gui::Margins(0, mcStyle::description::marginTop, 0, 0));
+        description->setMargins(gui::Margins(0, countdownStyle::description::marginTop, 0, 0));
 
         timer = new gui::TimeFixedWidget(mainVBox,
                                          0,
                                          0,
-                                         mrStyle::timer::maxSizeX,
-                                         mrStyle::timer::maxSizeY,
+                                         runningStyle::timer::maxSizeX,
+                                         runningStyle::timer::maxSizeY,
                                          true,
                                          1,
                                          TimeFixedWidget::RightBox::defaultSize);
-        timer->setFontAndDimensions(mcStyle::timer::font);
-        timer->setMinimumSize(mcStyle::timer::maxSizeX, mcStyle::timer::maxSizeY);
-        timer->setMargins(gui::Margins(0, mcStyle::timer::marginTop, 0, 0));
+        timer->setFontAndDimensions(countdownStyle::timer::font);
+        timer->setMinimumSize(countdownStyle::timer::maxSizeX, countdownStyle::timer::maxSizeY);
+        timer->setMargins(gui::Margins(0, countdownStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         mainVBox->resizeItems();
@@ -112,9 +112,8 @@ namespace gui
     void MeditationCountdownWindow::configureTimer()
     {
         auto progressTimer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
-            application, *this, meditationCountdownTimerName, baseTick, meditationCountdownMode);
+            application, *this, meditationCountdownTimerName, meditationCountdownTimerPeriod, meditationCountdownMode);
         progressTimer->attach(timer);
         presenter->setTimer(std::move(progressTimer));
     }
-
 } // namespace gui

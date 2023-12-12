@@ -1,9 +1,7 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "MeditationTimer.hpp"
 #include "MeditationCommon.hpp"
-#include "MeditationStyle.hpp"
 #include "MeditationTimerPresenter.hpp"
 
 #include <common/LanguageUtils.hpp>
@@ -11,11 +9,11 @@
 
 namespace
 {
-    constexpr inline auto spinnerMax   = 180U;
-    constexpr inline auto spinnerMin   = 1U;
-    constexpr inline auto spinnerStep  = 1U;
-    constexpr inline auto emptyValue   = 0U;
-    constexpr inline auto defaultValue = 15U;
+    constexpr auto spinnerMax   = 180U;
+    constexpr auto spinnerMin   = 1U;
+    constexpr auto spinnerStep  = 1U;
+    constexpr auto emptyValue   = 0U;
+    constexpr auto defaultValue = 15U;
 } // namespace
 
 namespace app::meditation
@@ -51,7 +49,6 @@ namespace app::meditation
 
     std::string MeditationTimerPresenter::getTimeUnitName(std::uint32_t value)
     {
-        using namespace app::meditationStyle::mtStyle::list;
         return utils::language::getCorrectMinutesNumeralForm(value);
     }
 

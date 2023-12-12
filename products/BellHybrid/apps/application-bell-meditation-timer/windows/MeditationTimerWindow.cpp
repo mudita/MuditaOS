@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -20,6 +20,8 @@ namespace app::meditation
 
     void MeditationTimerWindow::buildInterface()
     {
+        using namespace app::meditationStyle;
+
         AppWindow::buildInterface();
 
         statusBar->setVisible(false);
@@ -42,7 +44,7 @@ namespace app::meditation
             gui::Boundaries::Fixed);
         spinner->onValueChanged = [this](const auto val) { this->onValueChanged(val); };
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
-        spinner->setFont(app::meditationStyle::mtStyle::text::font);
+        spinner->setFont(timerStyle::text::font);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setEdges(RectangleEdge::None);
         spinner->setFocusEdges(RectangleEdge::None);
@@ -55,7 +57,7 @@ namespace app::meditation
 
         bottomDescription = new Label(body->lastBox);
         bottomDescription->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
-        bottomDescription->setFont(app::meditationStyle::mtStyle::minute::font);
+        bottomDescription->setFont(timerStyle::minute::font);
         bottomDescription->setEdges(RectangleEdge::None);
         bottomDescription->activeItem = false;
         bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));

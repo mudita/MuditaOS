@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,12 +7,9 @@
 
 namespace gui::powerNapStyle
 {
-    inline constexpr auto descriptionFont = style::window::font::largelight;
-    inline constexpr auto napTimerFont    = style::window::font::verybig;
-    inline constexpr auto napPeriodFont   = style::window::font::supersizeme;
-    inline constexpr auto clockFont       = style::window::font::verybiglight;
+    inline constexpr auto napPeriodFont = style::window::font::supersizeme;
 
-    namespace pnStyle
+    namespace progressStyle
     {
         namespace progress
         {
@@ -52,16 +49,5 @@ namespace gui::powerNapStyle
             constexpr inline auto maxSizeX  = 340;
             constexpr inline auto maxSizeY  = 84;
         } // namespace clock
-    }     // namespace pnStyle
-
-    namespace progress
-    {
-        inline constexpr auto bottomDescTopMargin = 20U;
-        inline constexpr auto boxesCount          = 16;
-    } // namespace progress
-
-    namespace sessionEnd
-    {
-        inline constexpr auto textH = 200U;
     }
 } // namespace gui::powerNapStyle

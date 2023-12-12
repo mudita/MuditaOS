@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ProgressTimerWithBarGraphAndCounter.hpp"
@@ -10,8 +10,9 @@
 
 namespace
 {
-    inline constexpr auto increasingModePrefix = "-";
+    constexpr auto increasingModePrefix = "-";
 }
+
 namespace app
 {
     void ProgressTimerWithBarGraphAndCounter::update()
@@ -31,7 +32,8 @@ namespace app
         const auto secondsRemaining = std::chrono::duration_cast<std::chrono::seconds>(duration - elapsed);
         const Duration remainingDuration{secondsRemaining};
         UTF8 timerText;
-        if (countdownMode == ProgressCountdownMode::Increasing && secondsRemaining != std::chrono::seconds::zero()) {
+        if ((countdownMode == ProgressCountdownMode::Increasing) &&
+            (secondsRemaining != std::chrono::seconds::zero())) {
             timerText += increasingModePrefix;
         }
         timerText += remainingDuration.str(displayFormat);

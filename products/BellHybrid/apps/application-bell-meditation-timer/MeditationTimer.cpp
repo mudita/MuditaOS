@@ -30,7 +30,7 @@ namespace app
                                      std::string parent,
                                      StatusIndicators statusIndicators,
                                      StartInBackground startInBackground,
-                                     uint32_t stackDepth)
+                                     std::uint32_t stackDepth)
         : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth)
     {
         getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &params) {

@@ -1,7 +1,6 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <log/log.hpp>
 #include <Math.hpp>
 
 #include "DrawCommand.hpp"
@@ -9,7 +8,8 @@
 
 namespace gui
 {
-    ProgressBar::ProgressBar(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect{parent, x, y, w, h}
+    ProgressBar::ProgressBar(Item *parent, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h)
+        : Rect{parent, x, y, w, h}
     {
         setFillColor(ColorFullBlack);
         setPenWidth(2);
@@ -19,7 +19,7 @@ namespace gui
 
     void ProgressBar::createWidgets()
     {
-        // fillRect is smaller, to avoid border overlaping
+        // fillRect is smaller, to avoid border overlapping
         fillRect = new gui::Rect(this, 0, 1, widgetArea.w, widgetArea.h - 2);
         fillRect->setRadius(widgetArea.h / 2 - 1);
         fillRect->setFilled(true);
@@ -60,7 +60,7 @@ namespace gui
         gui::Rect::buildDrawListImplementation(commands);
     }
 
-    bool ProgressBar::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    bool ProgressBar::onDimensionChanged([[maybe_unused]] const BoundingBox &oldDim, const BoundingBox &newDim)
     {
         fillRect->setSize(newDim.w, newDim.h);
         return true;
@@ -122,6 +122,7 @@ namespace gui
         const auto absoluteValue = std::lround(static_cast<float>(maxValue) * percent);
         setValue(absoluteValue);
     }
+
     int CircularProgressBar::getMaximum() const noexcept
     {
         return maxValue;
@@ -145,17 +146,21 @@ namespace gui
         Circle::buildDrawListImplementation(commands);
     }
 
-    bool CircularProgressBar::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    bool CircularProgressBar::onDimensionChanged([[maybe_unused]] const BoundingBox &oldDim,
+                                                 [[maybe_unused]] const BoundingBox &newDim)
     {
         return true;
     }
 
-    ArcProgressBar::ArcProgressBar(Item *parent, const Arc::ShapeParams &shape, ProgressDirection direction)
-        : Arc{parent, shape}, direction{direction}
+    ArcProgressBar::ArcProgressBar(Item *parent,
+                                   const Arc::ShapeParams &shape,
+                                   ProgressDirection direction,
+                                   ProgressChange change)
+        : Arc{parent, shape}, direction{direction}, change{change}
     {
         if (direction == ProgressDirection::CounterClockwise) {
             start -= sweep;
-        };
+        }
         createWidgets();
         updateDrawArea();
     }
@@ -175,13 +180,6 @@ namespace gui
             .setSweepAngle(0)
             .setPenWidth(progressArcWidth)
             .setBorderColor(ColorFullBlack);
-
-        if (direction == ProgressDirection::Clockwise) {
-            arcParams.setStartAngle(start);
-        }
-        else {
-            arcParams.setStartAngle(start + sweep);
-        }
         progressArc = new Arc(this, arcParams);
 
         Circle::ShapeParams indicatorStartParams;
@@ -227,7 +225,17 @@ namespace gui
 
     bool ArcProgressBar::setValue(unsigned int value) noexcept
     {
-        currentValue = std::clamp(value, 0U, maxValue);
+        switch (change) {
+        case ProgressChange::IncrementFromZero:
+            currentValue = std::clamp(value, 0U, maxValue);
+            break;
+        case ProgressChange::DecrementFromFull:
+            currentValue = maxValue - std::clamp(value, 0U, maxValue);
+            break;
+        default:
+            break;
+        }
+
         return value == currentValue;
     }
 
@@ -252,13 +260,14 @@ namespace gui
 
     void ArcProgressBar::buildDrawListImplementation(std::list<Command> &commands)
     {
-        if (direction == ProgressDirection::Clockwise) {
-            progressArc->setSweepAngle(std::ceil(getPercentageValue() * sweep));
+        const auto dTheta = std::ceil(getPercentageValue() * sweep);
+
+        progressArc->setSweepAngle(dTheta);
+        if ((direction == ProgressDirection::Clockwise) != (change == ProgressChange::IncrementFromZero)) {
+            progressArc->setStartAngle(start + sweep - dTheta);
         }
         else {
-            progressArc->setStartAngle(start + sweep -
-                                       std::ceil(getPercentageValue() * sweep)); // Start drawing the circle from top.
-            progressArc->setSweepAngle(std::ceil(getPercentageValue() * sweep));
+            progressArc->setStartAngle(start);
         }
         progressStartIndicator->setCenter(calculateStartIndicatorCenter());
         progressEndIndicator->setCenter(calculateEndIndicatorCenter());
@@ -266,9 +275,9 @@ namespace gui
         Arc::buildDrawListImplementation(commands);
     }
 
-    bool ArcProgressBar::onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim)
+    bool ArcProgressBar::onDimensionChanged([[maybe_unused]] const BoundingBox &oldDim,
+                                            [[maybe_unused]] const BoundingBox &newDim)
     {
         return true;
     }
-
 } /* namespace gui */

@@ -13,14 +13,14 @@
 
 namespace
 {
-    inline constexpr auto relaxationTimerName = "RelaxationLoopTimer";
-    inline constexpr std::chrono::seconds timerTick{1};
-    inline constexpr units::SOC dischargingLevelShowTop = 20;
-    inline constexpr units::SOC dischargingLowBattery   = 10;
-    inline constexpr auto ellipsisSpace                 = 2u;
-    inline constexpr auto ellipsis                      = "...";
+    constexpr auto relaxationLoopTimerName{"RelaxationLoopTimer"};
+    constexpr std::chrono::seconds relaxationLoopTimerPeriod{1};
+    constexpr units::SOC dischargingLevelShowTop{20};
+    constexpr units::SOC dischargingLowBattery{10};
+    constexpr auto ellipsisSpace{2U};
+    constexpr auto ellipsis{"..."};
     /* charsMultiplier is set a little bit less than max lines which is 2, because of final text formatting */
-    inline constexpr auto charsMultiplier = 1.8f;
+    constexpr auto charsMultiplier{1.8f};
 
     bool isBatteryCharging(const Store::Battery::State state)
     {
@@ -81,10 +81,10 @@ namespace
         if (title.length() <= maxTitleLength) {
             return title;
         }
-        auto newTittle = title.substr(0, maxTitleLength - ellipsisSpace);
-        newTittle += ellipsis;
 
-        return newTittle;
+        auto newTitle = title.substr(0, maxTitleLength - ellipsisSpace);
+        newTitle += ellipsis;
+        return newTitle;
     }
 } // namespace
 
@@ -153,8 +153,11 @@ namespace gui
 
     void RelaxationRunningLoopWindow::configureTimer()
     {
-        auto timer = std::make_unique<app::ProgressTimer>(
-            application, *this, relaxationTimerName, timerTick, app::ProgressCountdownMode::Increasing);
+        auto timer = std::make_unique<app::ProgressTimer>(application,
+                                                          *this,
+                                                          relaxationLoopTimerName,
+                                                          relaxationLoopTimerPeriod,
+                                                          app::ProgressCountdownMode::Increasing);
         presenter->setTimer(std::move(timer));
     }
 
