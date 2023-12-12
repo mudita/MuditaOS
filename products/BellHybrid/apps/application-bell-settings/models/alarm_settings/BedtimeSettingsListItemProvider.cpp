@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BedtimeSettingsListItemProvider.hpp"
 #include "BellSettingsStyle.hpp"
+#include "common/models/AbstractAudioModel.hpp"
 #include <common/widgets/list_items/Numeric.hpp>
 #include <common/widgets/list_items/Text.hpp>
 #include <apps-common/ApplicationCommon.hpp>
@@ -44,8 +45,8 @@ namespace app::bell_settings
         };
         internalData.emplace_back(chimeTone);
         constexpr auto volumeStep = 1U;
-        constexpr auto volumeMin  = 1U;
-        constexpr auto volumeMax  = 10U;
+        constexpr auto volumeMin  = AbstractAudioModel::minVolume;
+        constexpr auto volumeMax  = AbstractAudioModel::maxVolume;
         auto volume =
             new list_items::Numeric(list_items::Numeric::spinner_type::range{volumeMin, volumeMax, volumeStep},
                                     model->getBedtimeVolume(),

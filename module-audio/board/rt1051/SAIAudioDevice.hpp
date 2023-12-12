@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,16 +27,13 @@ namespace audio
         void initiateRxTransfer();
         void initiateTxTransfer();
         RetCode setOutputVolume(float vol) override;
+        void scaleOutputVolume(audio::Stream::Span &span);
 
         I2S_Type *_base;
         sai_edma_handle_t *rx = nullptr;
         sai_edma_handle_t *tx = nullptr;
         bool txEnabled        = false;
         bool rxEnabled        = false;
-
-      private:
-        void scaleOutputVolume(audio::Stream::Span &span);
-
         float volumeFactor{1.0};
     };
 

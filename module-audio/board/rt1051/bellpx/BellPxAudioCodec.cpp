@@ -1,14 +1,21 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellPxAudioCodec.hpp"
 #include "board.h"
 #include <log/log.hpp>
+#include <cmath>
 
 #include "board/BoardDefinitions.hpp"
 #include "board/rt1051/common/audio.hpp"
 
 using audio::codec::Configuration;
+
+namespace
+{
+    constexpr auto maxBellVolume = 15.0f;
+    constexpr auto minBellVolume = 0.0f;
+} // namespace
 
 namespace audio
 {
@@ -73,7 +80,7 @@ namespace audio
         codecParams.sampleRate = sampleRate;
         /// Set the codec output volume to max possible value. Volume control is implemented
         /// using software scaling instead of hardware gain control.
-        codecParams.outVolume = maxVolume;
+        codecParams.outVolume = maxBellVolume;
         codecParams.inGain    = currentFormat.inputGain;
 
         /// Set the initial volume used by the software volume control
@@ -216,6 +223,18 @@ namespace audio
 
         auto isMono = (currentFormat.flags & static_cast<unsigned int>(audio::codec::Flags::InputStereo)) == 0;
         return audio::AudioFormat{currentFormat.sampleRate_Hz, currentFormat.bitWidth, isMono ? 1U : 2U};
+    }
+
+    AudioDevice::RetCode BellPxAudioCodec::setOutputVolume(float vol)
+    {
+        /// Calculated for a curve with a dynamic range of 52dB
+        /// For more info check: https://www.dr-lex.be/info-stuff/volumecontrols.html
+        constexpr auto a = 2.512e-3f;
+        constexpr auto b = 5.986721f;
+
+        vol          = std::clamp(vol, minBellVolume, maxBellVolume);
+        volumeFactor = std::clamp(a * std::exp(b * (vol / maxBellVolume)), 0.f, 1.f);
+        return AudioDevice::RetCode::Success;
     }
 
     void rxAudioCodecCallback(I2S_Type *base, sai_edma_handle_t *handle, status_t status, void *userData)

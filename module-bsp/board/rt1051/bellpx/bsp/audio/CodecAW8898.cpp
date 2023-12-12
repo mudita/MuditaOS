@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CodecAW8898.hpp"
@@ -21,21 +21,22 @@ using namespace bsp::audio;
 
 namespace
 {
-    constexpr auto ReadStatusRetries = 5;
     constexpr auto OneByteAddressing = 1;
     constexpr auto PositiveLogic     = 0;
-    constexpr auto maxInVolume       = 10;
+    constexpr auto maxInVolume       = 15;
     constexpr auto minInVolume       = 0;
 
-    /// Higher layers operate using 0-10 range. Here we are transforming it into more usable one.
-    /// Anything above 9 is going to distort the speaker and values below 5 are too quiet.
-    constexpr float transformVolumeLvl(float value)
+    /// Higher layers operate using 0-15 range. Here we are transforming it into more usable one.
+    /// Anything above 13.5 is going to distort the speaker and values below 7.5 are too quiet.
+
+    float transformVolumeLvl(float value)
     {
-        constexpr auto maxOutVolume = 9;
-        constexpr auto minOutVolume = 5;
+        constexpr auto maxOutVolume = 13.5f;
+        constexpr auto minOutVolume = 7.5f;
         constexpr auto inputRange   = std::make_pair(minInVolume, maxInVolume);
         constexpr auto outputRange  = std::make_pair(minOutVolume, maxOutVolume);
-        constexpr float slope = 1.0 * (outputRange.second - outputRange.first) / (inputRange.second - inputRange.first);
+        constexpr float slope =
+            1.0f * (outputRange.second - outputRange.first) / (inputRange.second - inputRange.first);
         return outputRange.first + slope * (value - inputRange.first);
     }
 } // namespace

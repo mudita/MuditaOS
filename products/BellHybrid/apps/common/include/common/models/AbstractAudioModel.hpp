@@ -14,9 +14,9 @@ namespace app
     class AbstractAudioModel
     {
       public:
-        /// 0-10 range
+        /// 0-15 range
         static constexpr auto minVolume  = 1;
-        static constexpr auto maxVolume  = 10;
+        static constexpr auto maxVolume  = 15;
         using Volume                     = std::uint32_t;
         using OnStateChangeCallback      = std::function<void(const audio::RetCode code)>;
         using OnGetValueCallback         = std::function<void(const audio::RetCode, Volume)>;
