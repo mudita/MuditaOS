@@ -19,6 +19,7 @@ namespace utils::anonymize
     constexpr auto cellularSubstringATD  = "ATD";
     constexpr auto cellularSubstringCPBR = "CPBR";
     constexpr auto cellularSubstringCSPN = "CSPN";
+    constexpr auto cellularSubstringCOPS = "COPS";
 
     std::string anonymizeInQuotationMarks(const std::string &textToAnonymize, std::size_t singsToLeaveAtEnd)
     {
@@ -129,6 +130,8 @@ namespace utils::anonymize
             {cellularSubstringCPBR,
              [&text]() { return anonymizeInQuotationMarks(text, SIGNS_TO_LEAVE_FOR_PHONE_NUMBERS); }},
             {cellularSubstringCSPN,
+             [&text]() { return anonymizeInQuotationMarks(text, SIGNS_TO_LEAVE_FOR_NET_PROVIDER_NAME); }},
+            {cellularSubstringCOPS,
              [&text]() { return anonymizeInQuotationMarks(text, SIGNS_TO_LEAVE_FOR_NET_PROVIDER_NAME); }}};
 
         for (const auto &[key, anonymizeFunction] : anonymizeOption) {
