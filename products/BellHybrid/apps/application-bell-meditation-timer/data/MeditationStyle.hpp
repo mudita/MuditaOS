@@ -51,8 +51,9 @@ namespace app::meditationStyle
 
         namespace timer
         {
-            constexpr inline auto marginTop = 23;
-            constexpr inline auto font      = runningStyle::timer::font;
+            constexpr inline auto marginTop  = 23;
+            constexpr inline auto marginLeft = 43;
+            constexpr inline auto font       = runningStyle::timer::font;
             constexpr inline auto maxSizeX  = runningStyle::timer::maxSizeX;
             constexpr inline auto maxSizeY  = runningStyle::timer::maxSizeY;
         } // namespace timer

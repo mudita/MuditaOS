@@ -16,6 +16,7 @@ namespace
     constexpr auto meditationCountdownTimerName{"MeditationCountdownTimer"};
     constexpr std::chrono::seconds meditationCountdownTimerPeriod{1};
     constexpr auto meditationCountdownMode{app::ProgressCountdownMode::Increasing};
+    constexpr auto leftBoxSize{1};
 } // namespace
 
 namespace gui
@@ -73,12 +74,12 @@ namespace gui
                                          0,
                                          runningStyle::timer::maxSizeX,
                                          runningStyle::timer::maxSizeY,
-                                         true,
-                                         1,
+                                         false,
+                                         leftBoxSize,
                                          TimeFixedWidget::RightBox::defaultSize);
         timer->setFontAndDimensions(countdownStyle::timer::font);
         timer->setMinimumSize(countdownStyle::timer::maxSizeX, countdownStyle::timer::maxSizeY);
-        timer->setMargins(gui::Margins(0, countdownStyle::timer::marginTop, 0, 0));
+        timer->setMargins(gui::Margins(countdownStyle::timer::marginLeft, countdownStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         mainVBox->resizeItems();
