@@ -62,6 +62,7 @@ namespace app::bell_settings
         timeSetListItem =
             new gui::TimeSetListItem(0U, 0U, 0, 0, utils::translate("app_bell_settings_time_units_time_message"));
         internalData.push_back(timeSetListItem);
+        timeSetListItem->getTimeFormat = [this](void) { return timeFmtSetListItem->getTimeFmt(); };
 
         timeFmtSetListItem = new gui::TimeFormatSetListItem(
             0, 0, 0, 0, utils::translate("app_bell_settings_time_units_time_fmt_top_message"));
@@ -103,9 +104,9 @@ namespace app::bell_settings
     void DateTimeUnitsModel::saveData()
     {
         const auto date       = daySetListItem->dateSetSpinner->getDate();
-        const auto year   = date.year().operator int();
-        const auto month  = static_cast<int>(date.month().operator unsigned int());
-        const auto day    = static_cast<int>(date.day().operator unsigned int());
+        const auto year       = date.year().operator int();
+        const auto month      = static_cast<int>(date.month().operator unsigned int());
+        const auto day        = static_cast<int>(date.day().operator unsigned int());
         const auto hour       = timeSetListItem->timeSetSpinner->getHour();
         const auto minute     = timeSetListItem->timeSetSpinner->getMinute();
         const auto timeFormat = timeFmtSetListItem->getTimeFmt();
@@ -133,6 +134,7 @@ namespace app::bell_settings
         const auto timeFormat = stm::api::timeFormat();
         const auto dateFormat = stm::api::dateFormat();
         timeSetListItem->timeSetSpinner->setTime(now);
+        timeSetListItem->timeSetSpinner->setTimeFormat(timeFormat);
         yearSetListItem->dateSetSpinner->setDate(
             date::year_month_day{date::floor<date::days>(std::chrono::system_clock::now())});
 
@@ -190,7 +192,7 @@ namespace app::bell_settings
         using namespace date::literals;
 
         /// Default date/time after factory reset: 2023/01/01 12:00PM
-        const auto factoryResetDate   = 2023_y / jan / 1_d;
+        const auto factoryResetDate    = 2023_y / jan / 1_d;
         const auto factoryResetTimeFmt = utils::time::Locale::TimeFormat::FormatTime24H;
         const auto factoryResetDateFmt = utils::time::Locale::DateFormat::DD_MM_YYYY;
 
