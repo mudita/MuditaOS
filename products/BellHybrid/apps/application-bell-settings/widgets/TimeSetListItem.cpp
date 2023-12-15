@@ -20,7 +20,7 @@ namespace gui
     {
         setupTopTextBox(description);
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
-        timeSetSpinner = new TimeSetSpinner(body->getCenterBox());
+        timeSetSpinner = new TimeSetFmtSpinner(body->getCenterBox());
         timeSetSpinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         timeSetSpinner->setFont(focusFontName, noFocusFontName);
         timeSetSpinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
@@ -33,6 +33,9 @@ namespace gui
         };
 
         focusChangedCallback = [&](Item &item) {
+            if (getTimeFormat != nullptr) {
+                timeSetSpinner->setTimeFormat(getTimeFormat());
+            }
             setFocusItem(focus ? body : nullptr);
             return true;
         };
