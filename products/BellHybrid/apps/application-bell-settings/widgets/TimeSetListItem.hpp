@@ -6,6 +6,7 @@
 #include <widgets/BellSideListItem.hpp>
 
 #include <string>
+#include "widgets/TimeSetFmtSpinner.hpp"
 
 namespace gui
 {
@@ -14,7 +15,8 @@ namespace gui
     class TimeSetListItem : public BellSideListItem
     {
       public:
-        TimeSetSpinner *timeSetSpinner = nullptr;
+        TimeSetFmtSpinner *timeSetSpinner                                  = nullptr;
+        std::function<utils::time::Locale::TimeFormat(void)> getTimeFormat = nullptr;
 
         TimeSetListItem(gui::Length x, gui::Length y, gui::Length w, gui::Length h, std::string description);
     };
