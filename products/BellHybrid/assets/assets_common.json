@@ -28,6 +28,7 @@
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_battery_lvl4_W_M.vpi", "output": "assets/images/bell_battery_lvl4_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_battery_charging_W_M.vpi", "output": "assets/images/bell_battery_charging_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/alarm_colon_W_M.vpi", "output": "assets/images/alarm_colon_W_M.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/alarm_large_colon_W_M.vpi", "output": "assets/images/alarm_large_colon_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/big_check_W_M.vpi", "output": "assets/images/big_check_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_lightning_W_M.vpi", "output": "assets/images/bell_lightning_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_battery_lvl5_W_M.vpi", "output": "assets/images/bell_battery_lvl5_W_M.vpi"},
