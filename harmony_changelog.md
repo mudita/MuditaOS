@@ -5,6 +5,7 @@
 ### Fixed
 * Fixed eink crash while refreshing
 * Fixed problem with occasional background playback after song has finished
+* Increase clock font in Relaxation, Meditation, Power nap mode
 
 ### Added
 * Added brightness fade in functionality

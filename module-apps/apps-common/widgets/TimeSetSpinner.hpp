@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,6 +21,7 @@ namespace style::time_set_spinner
     inline constexpr auto big_margin   = 6U;
     inline constexpr auto gargantuan_margin_left  = 14U;
     inline constexpr auto gargantuan_margin_right = 7U;
+    inline constexpr auto align_margin            = -12;
 } // namespace style::time_set_spinner
 
 namespace gui
@@ -50,6 +51,7 @@ namespace gui
             {style::window::font::verybiglight, "alarm_colon_W_M"},
             {style::window::font::veryverybiglight, "alarm_colon_W_M"},
             {style::window::font::largelight, "alarm_colon_W_M"},
+            {style::window::font::large, "alarm_large_colon_W_M"},
             {style::window::font::supersizeme, "alarm_colon_select_W_M"},
             {style::window::font::supersizemelight, "alarm_colon_select_W_M"},
             {style::window::font::huge, "alarm_colon_clock_W_M"},
@@ -62,6 +64,11 @@ namespace gui
              {style::time_set_spinner::very_small_margin, 0, style::time_set_spinner::very_small_margin, 0}},
             {style::window::font::largelight,
              {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, 0}},
+            {style::window::font::large,
+             {style::time_set_spinner::small_margin,
+              0,
+              style::time_set_spinner::small_margin,
+              style::time_set_spinner::align_margin}},
             {style::window::font::supersizeme,
              {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
             {style::window::font::supersizemelight,
