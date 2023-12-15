@@ -13,9 +13,9 @@ namespace
     // 4kB is too small because internally drflac_open() uses cache which by default has 4kB.
     // Alternatively smaller DR_FLAC_BUFFER_SIZE could be defined.
     constexpr auto stackSize            = 1024 * 8;
-    constexpr auto defaultVolume        = "7";
-    constexpr auto defaultSnoozeVolume  = "6";
-    constexpr auto defaultBedtimeVolume = "8";
+    constexpr auto defaultVolume        = "11";
+    constexpr auto defaultSnoozeVolume  = "10";
+    constexpr auto defaultBedtimeVolume = "12";
     constexpr auto maxVolumeToSet       = 15.f;
     constexpr auto minVolumeToSet       = 0.f;
     constexpr auto profileType          = audio::Profile::Type::PlaybackLoudspeaker;
