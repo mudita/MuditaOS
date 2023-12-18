@@ -1,15 +1,14 @@
 # MuditaOS changelog - PurePhone
 
-## Unreleased
+## [1.11.0 2023-12-15]
 
 ### Added
 
-* Added VoLTE support in Denmark, United Kingdom, Netherlands, Canada and Austria
+* Added VoLTE support in Denmark, United Kingdom, Netherlands, Canada and Austria.
 
 ### Changed / Improved
 
-* Hide the SOS label during onboarding when the modem is not ready for an emergency call.
-* Anonymization sensitive data in logs added.
+* Added anonymization of sensitive data in logs.
 
 ### Fixed
 
