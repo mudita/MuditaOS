@@ -16,7 +16,5 @@ namespace gui
 
       private:
         std::list<Option> settingsOptionsList();
-        const UTF8 resetStr;
-        const UTF8 backStr;
     };
 } /* namespace gui */

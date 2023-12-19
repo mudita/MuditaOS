@@ -37,9 +37,9 @@ namespace gui
             icon->resizeItems();
         }
     }
+
     bool BellFactoryReset::onInput(const InputEvent &)
     {
         return false;
     }
-
 } // namespace gui

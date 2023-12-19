@@ -16,7 +16,7 @@ namespace gui
         constexpr auto option_layout_height   = 2U * one_option_height;
         constexpr auto description_height     = 175U;
         constexpr auto max_description_height = description_height + 16U;
-        constexpr auto top_center_margin      = -8;
+        constexpr auto top_center_margin      = -14;
     } // namespace
 
     BellOptionWithDescriptionWindow::BellOptionWithDescriptionWindow(app::ApplicationCommon *app,
@@ -65,27 +65,29 @@ namespace gui
     {
         auto titleBody = new TextFixedSize(body->firstBox);
         titleBody->drawUnderline(false);
-        titleBody->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        titleBody->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         titleBody->setFont(style::window::font::largelight);
-        titleBody->setMinimumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
+        titleBody->setMinimumWidth(style::bell_base_layout::outer_layouts_w);
         titleBody->setEdges(RectangleEdge::None);
         titleBody->setEditMode(EditMode::Browse);
         titleBody->setRichText(title);
+        titleBody->setMinimumHeightToFitText();
 
+        /* Hack to make box's height equal to title height */
+        body->firstBox->setMaximumHeight(titleBody->widgetMinimumArea.h);
         body->firstBox->resizeItems();
+        body->resizeItems();
     }
 
     void BellOptionWithDescriptionWindow::setListDescription(const std::string &title)
     {
-        auto titleBody = new TextFixedSize(body->centerBox);
-
-        titleBody->drawUnderline(false);
-        titleBody->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        titleBody->setFont(style::window::font::verybiglight);
-        titleBody->setMinimumSize(style::window_width, description_height);
-        titleBody->setEdges(RectangleEdge::None);
-        titleBody->setEditMode(EditMode::Browse);
-        titleBody->setRichText(title);
+        auto descriptionBody = new TextFixedSize(body->centerBox);
+        descriptionBody->drawUnderline(false);
+        descriptionBody->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        descriptionBody->setFont(style::window::font::verybiglight);
+        descriptionBody->setMinimumSize(style::window_width, description_height);
+        descriptionBody->setEditMode(EditMode::Browse);
+        descriptionBody->setRichText(title);
 
         body->centerBox->setMargins(gui::Margins{0, top_center_margin, 0, 0});
         body->centerBox->setMaximumHeight(max_description_height);
@@ -104,11 +106,8 @@ namespace gui
     void BellOptionWithDescriptionWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (auto message = dynamic_cast<gui::OptionsWindowOptions *>(data)) {
-            LOG_DEBUG("Options load!");
             options = message->takeOptions();
         }
-
         optionsList->rebuildList(listview::RebuildType::InPlace);
     }
-
-} /* namespace gui */
+} // namespace gui
