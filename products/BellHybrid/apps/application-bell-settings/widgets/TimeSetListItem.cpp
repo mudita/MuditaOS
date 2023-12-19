@@ -35,6 +35,7 @@ namespace gui
         focusChangedCallback = [&](Item &item) {
             if (getTimeFormat != nullptr) {
                 timeSetSpinner->setTimeFormat(getTimeFormat());
+                body->resizeItems();
             }
             setFocusItem(focus ? body : nullptr);
             return true;
