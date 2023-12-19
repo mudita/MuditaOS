@@ -52,7 +52,7 @@ namespace gui
         [[nodiscard]] auto getTime() const noexcept -> std::time_t;
         [[nodiscard]] auto getHour() const noexcept -> int;
         /// Always returns current hour in 24-hour format, even if the currently set format is set to 12-hour clock.
-        [[nodiscard]] auto getHour24Format() const noexcept -> std::chrono::hours;
+        [[nodiscard]] auto getHour24Format() const noexcept -> int;
         [[nodiscard]] auto getMinute() const noexcept -> int;
         [[nodiscard]] auto isPM() const noexcept -> bool;
 
