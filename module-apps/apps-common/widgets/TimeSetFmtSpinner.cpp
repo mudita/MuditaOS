@@ -296,14 +296,14 @@ namespace gui
         period == Period::AM ? fmt->set_value(utils::time::Locale::getAM())
                              : fmt->set_value(utils::time::Locale::getPM());
     }
-    auto TimeSetFmtSpinner::getHour24Format() const noexcept -> std::chrono::hours
+    auto TimeSetFmtSpinner::getHour24Format() const noexcept -> int
     {
         using namespace utils::time;
         if (timeFormat == Locale::TimeFormat::FormatTime24H) {
-            return std::chrono::hours{timeSetSpinner->getHour()};
+            return timeSetSpinner->getHour();
         }
-
-        return date::make24(std::chrono::hours{timeSetSpinner->getHour()}, isPM());
+        auto hours = std::chrono::hours(timeSetSpinner->getHour());
+        return date::make24(hours, isPM()).count();
     }
 
 } // namespace gui
