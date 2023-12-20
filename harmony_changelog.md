@@ -3,29 +3,36 @@
 ## Unreleased
 
 ### Fixed
+* Increase clock font in Relaxation, Meditation, Power nap mode
+
+### Added
+* Added gradual alarm volume increase
+* Added progress bar for all volume control windows
+
+### Changed / Improved
+* Factory reset removes user files
+* Changed countdown progress bar design in Relaxation, Meditation and Power Nap apps
+* Removed minus sign in progress countdown timers in Relaxation, Meditation and Power Nap apps
+* Extended volume scale from 10 to 15 point scale
+* Modified volume control characteristic for better user experience
+
+## [2.3.0 2023-12-20]
+
+### Fixed
 * Fixed eink crash while refreshing
 * Fixed problem with occasional background playback after song has finished
-* Increase clock font in Relaxation, Meditation, Power nap mode
-* Fixed time format in Settings and Onboarding
 
 ### Added
 * Added brightness fade in functionality
 * Added labels to Relaxation
 * Added date format setting
 * Added colors of noise to Relaxation
-* Added gradual alarm volume increase
-* Added progress bar for all volume control windows
 
 ### Changed / Improved
 * Optimize the way Relaxation is loading music files
 * Disabled Address Sanitizer for the Linux simulator
 * Changed misleading factory reset translations in Polish
 * Time setting updated
-* Factory reset removes user files
-* Changed countdown progress bar design in Relaxation, Meditation and Power Nap apps
-* Removed minus sign in progress countdown timers in Relaxation, Meditation and Power Nap apps
-* Extended volume scale from 10 to 15 point scale
-* Modified volume approximation function for better user experience
 
 ## [2.2.3 2023-11-30]
 
