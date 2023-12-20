@@ -11,7 +11,7 @@ namespace gui::relaxationStyle
     inline constexpr auto titleFont       = style::window::font::largelight;
     inline constexpr auto clockFont       = style::window::font::largelight;
     inline constexpr auto timerValueFont  = style::window::font::supersizemelight;
-    inline constexpr auto valumeValueFont = style::window::font::supersizemelight;
+    inline constexpr auto volumeValueFont = style::window::font::supersizemelight;
 
     namespace ended
     {

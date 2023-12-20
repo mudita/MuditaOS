@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeSetSpinner.hpp"
@@ -8,13 +8,15 @@
 #include <gui/widgets/ImageBox.hpp>
 #include <gui/widgets/text/Label.hpp>
 
-static constexpr auto hourMin         = 0;
-static constexpr auto hourMax         = 23;
-static constexpr auto hourDoubleDigit = 10;
-static constexpr auto hourStep        = 1;
-static constexpr auto minuteMin       = 0;
-static constexpr auto minuteMax       = 59;
-static constexpr auto minuteStep      = 1;
+namespace
+{
+    constexpr auto hourMin    = 0;
+    constexpr auto hourMax    = 23;
+    constexpr auto hourStep   = 1;
+    constexpr auto minuteMin  = 0;
+    constexpr auto minuteMax  = 59;
+    constexpr auto minuteStep = 1;
+} // namespace
 
 namespace gui
 {
@@ -231,7 +233,13 @@ namespace gui
 
     auto TimeSetSpinner::getColonMargins(const std::string &colonFont) const noexcept -> Margins
     {
-        return colonMarginsMap.find(colonFont)->second;
+        const auto colonMargins = colonMarginsMap.find(colonFont);
+        if (colonMargins == colonMarginsMap.end()) {
+            LOG_ERROR("Missing margins map entry for font '%s', update margins map! Fallback value (zero) will be set.",
+                      colonFont.c_str());
+            return Margins();
+        }
+        return colonMargins->second;
     }
 
     auto TimeSetSpinner::applySizeRestrictions() -> void

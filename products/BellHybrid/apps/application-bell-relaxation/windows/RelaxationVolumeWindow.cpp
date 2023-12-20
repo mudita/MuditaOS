@@ -62,7 +62,7 @@ namespace gui
                                         static_cast<U8IntegerSpinner::value_type>(data.step)},
                                        Boundaries::Fixed);
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
-        spinner->setFont(relaxationStyle::valumeValueFont);
+        spinner->setFont(relaxationStyle::volumeValueFont);
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setFocusEdges(RectangleEdge::None);
         spinner->set_value(static_cast<U8IntegerSpinner::value_type>(presenter->getVolume()));

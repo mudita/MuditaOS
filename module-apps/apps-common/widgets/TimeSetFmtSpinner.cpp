@@ -10,7 +10,6 @@
 
 namespace gui
 {
-
     TimeSetFmtSpinner::TimeSetFmtSpinner(Item *parent) : HBox{parent}
     {
         using namespace utils;
@@ -27,7 +26,6 @@ namespace gui
         updateFmtFont(noFocusFontName);
         fmt->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         fmt->setMargins(getFmtMargins(noFocusFontName));
-        fmt->setEdges(RectangleEdge::None);
         fmt->setVisible(false);
         fmt->setPenFocusWidth(style::time_set_spinner::focus::size);
         fmt->setEdges(RectangleEdge::Bottom);
@@ -85,6 +83,7 @@ namespace gui
             }
 
         } break;
+
         case utils::time::Locale::TimeFormat::FormatTime24H: {
             fmt->setVisible(false);
             auto hours = std::chrono::hours(timeSetSpinner->getHour());
@@ -98,6 +97,7 @@ namespace gui
                 }
             }
         } break;
+
         default:
             break;
         }
@@ -138,7 +138,13 @@ namespace gui
 
     auto TimeSetFmtSpinner::getFmtMargins(const std::string &fmtFont) const noexcept -> Margins
     {
-        return fmtMarginsMap.find(fmtFont)->second;
+        const auto fmtMargin = fmtMarginsMap.find(fmtFont);
+        if (fmtMargin == fmtMarginsMap.end()) {
+            LOG_ERROR("Missing margins map entry for font '%s', update margins map! Fallback value (zero) will be set.",
+                      fmtFont.c_str());
+            return Margins();
+        }
+        return fmtMargin->second;
     }
 
     auto TimeSetFmtSpinner::setHour(int value) noexcept -> void
@@ -291,11 +297,13 @@ namespace gui
 
         HBox::handleContentChanged();
     }
+
     auto TimeSetFmtSpinner::set12HPeriod(const Period period) -> void
     {
         period == Period::AM ? fmt->set_value(utils::time::Locale::getAM())
                              : fmt->set_value(utils::time::Locale::getPM());
     }
+
     auto TimeSetFmtSpinner::getHour24Format() const noexcept -> int
     {
         using namespace utils::time;
@@ -305,5 +313,4 @@ namespace gui
         auto hours = std::chrono::hours(timeSetSpinner->getHour());
         return date::make24(hours, isPM()).count();
     }
-
 } // namespace gui
