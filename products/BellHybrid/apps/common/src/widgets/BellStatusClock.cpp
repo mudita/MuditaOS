@@ -2,18 +2,15 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/widgets/BellStatusClock.hpp>
-
 #include <common/data/StyleCommon.hpp>
 
 namespace gui
 {
-
     BellStatusClock::BellStatusClock(Item *parent) : TimeSetFmtSpinner{parent}
     {
-        setFont(bell_style::statusClockFont);
+        setFont(bell_style::font_status_clock);
         setEditMode(EditMode::Browse);
         activeItem = false;
         setTimeFormatSpinnerVisibility(true);
     }
-
 } // namespace gui

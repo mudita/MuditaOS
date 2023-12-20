@@ -21,7 +21,7 @@ namespace style::time_set_spinner
     inline constexpr auto big_margin   = 6U;
     inline constexpr auto gargantuan_margin_left  = 14U;
     inline constexpr auto gargantuan_margin_right = 7U;
-    inline constexpr auto align_margin            = -12;
+    inline constexpr auto bottom_align_margin     = -12;
 } // namespace style::time_set_spinner
 
 namespace gui
@@ -47,7 +47,7 @@ namespace gui
         [[nodiscard]] auto getMinute() const noexcept -> int;
 
       private:
-        std::map<std::string, std::string> colonFontMap = {
+        const std::map<std::string, std::string> colonFontMap = {
             {style::window::font::verybiglight, "alarm_colon_W_M"},
             {style::window::font::veryverybiglight, "alarm_colon_W_M"},
             {style::window::font::largelight, "alarm_colon_W_M"},
@@ -57,29 +57,17 @@ namespace gui
             {style::window::font::huge, "alarm_colon_clock_W_M"},
             {style::window::font::gargantuan, "alarm_colon_clock_W_M"}};
 
-        std::map<std::string, Margins> colonMarginsMap = {
-            {style::window::font::verybiglight,
-             {style::time_set_spinner::very_small_margin, 0, style::time_set_spinner::very_small_margin, 0}},
-            {style::window::font::veryverybiglight,
-             {style::time_set_spinner::very_small_margin, 0, style::time_set_spinner::very_small_margin, 0}},
-            {style::window::font::largelight,
-             {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, 0}},
-            {style::window::font::large,
-             {style::time_set_spinner::small_margin,
-              0,
-              style::time_set_spinner::small_margin,
-              style::time_set_spinner::align_margin}},
-            {style::window::font::supersizeme,
-             {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
-            {style::window::font::supersizemelight,
-             {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
-            {style::window::font::huge,
-             {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
-            {style::window::font::gargantuan,
-             {style::time_set_spinner::gargantuan_margin_left,
-              0,
-              style::time_set_spinner::gargantuan_margin_right,
-              0}}};
+        // clang-format off
+        const std::map<std::string, Margins> colonMarginsMap = {
+            {style::window::font::verybiglight, {style::time_set_spinner::very_small_margin, 0, style::time_set_spinner::very_small_margin, 0}},
+            {style::window::font::veryverybiglight, {style::time_set_spinner::very_small_margin, 0, style::time_set_spinner::very_small_margin, 0}},
+            {style::window::font::largelight, {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, 0}},
+            {style::window::font::large, {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, style::time_set_spinner::bottom_align_margin}},
+            {style::window::font::supersizeme, {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
+            {style::window::font::supersizemelight, {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
+            {style::window::font::huge, {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
+            {style::window::font::gargantuan, {style::time_set_spinner::gargantuan_margin_left, 0, style::time_set_spinner::gargantuan_margin_right, 0}}};
+        // clang-format on
 
         U8IntegerSpinner *hour        = nullptr;
         ImageBox *colon              = nullptr;

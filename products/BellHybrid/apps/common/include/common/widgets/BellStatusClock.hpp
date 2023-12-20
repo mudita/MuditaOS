@@ -12,5 +12,4 @@ namespace gui
       public:
         explicit BellStatusClock(Item *parent = nullptr);
     };
-
 } // namespace gui

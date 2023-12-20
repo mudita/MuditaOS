@@ -69,19 +69,23 @@ namespace gui
 
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt, bool informContentChanged) noexcept -> void;
 
-        std::map<std::string, Margins> fmtMarginsMap = {
+        // clang-format off
+        const std::map<std::string, Margins> fmtMarginsMap = {
             {style::window::font::verybiglight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
             {style::window::font::veryverybiglight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
             {style::window::font::largelight, {style::time_set_fmt_spinner::small_margin, 0, 0, 0}},
+            {style::window::font::large, {style::time_set_fmt_spinner::small_margin, 0, style::time_set_fmt_spinner::small_margin, 0}},
+            {style::window::font::supersizeme, {style::time_set_fmt_spinner::big_margin, 0, style::time_set_fmt_spinner::big_margin, 0}},
             {style::window::font::supersizemelight, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}},
             {style::window::font::huge, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}},
             {style::window::font::gargantuan, {style::time_set_fmt_spinner::big_margin, 0, 0, 0}}};
-        [[nodiscard]] auto getFmtMargins(const std::string &fmtFont) const noexcept -> Margins;
+        // clang-format on
 
         auto onInput(const InputEvent &inputEvent) -> bool override;
         auto handleEnterKey() -> bool;
         auto handleRightFunctionKey() -> bool;
         void handleContentChanged() override;
+        [[nodiscard]] auto getFmtMargins(const std::string &fmtFont) const noexcept -> Margins;
 
         TimeSetSpinner *timeSetSpinner{nullptr};
         StringSpinner *fmt{nullptr};
@@ -91,5 +95,4 @@ namespace gui
 
         utils::time::Locale::TimeFormat timeFormat{utils::time::Locale::TimeFormat::FormatTime12H};
     };
-
 } // namespace gui
