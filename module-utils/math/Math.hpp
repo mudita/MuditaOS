@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,7 +10,7 @@ namespace trigonometry
 {
     using SideLength = std::int32_t;
     using Degrees    = std::int32_t;
-    using Radians    = double;
+    using Radians    = float;
 
     constexpr Degrees FullAngle  = 360;
     constexpr Degrees HalfAngle  = 180;
@@ -23,12 +23,12 @@ namespace trigonometry
 
     struct AdjacentSide
     {
-        static auto fromAngle(Radians angle, SideLength hypotenuse) -> SideLength
+        static inline auto fromAngle(Radians angle, SideLength hypotenuse) -> SideLength
         {
             return std::round(std::cos(angle) * hypotenuse);
         }
 
-        static auto fromCosine(double cosine, SideLength hypotenuse) -> SideLength
+        static inline auto fromCosine(float cosine, SideLength hypotenuse) -> SideLength
         {
             return std::round(cosine * hypotenuse);
         }
@@ -36,12 +36,12 @@ namespace trigonometry
 
     struct OppositeSide
     {
-        static auto fromAngle(Radians angle, SideLength hypotenuse) -> SideLength
+        static inline auto fromAngle(Radians angle, SideLength hypotenuse) -> SideLength
         {
             return std::round(std::sin(angle) * hypotenuse);
         }
 
-        static auto fromSine(double sine, SideLength hypotenuse) -> SideLength
+        static inline auto fromSine(float sine, SideLength hypotenuse) -> SideLength
         {
             return std::round(sine * hypotenuse);
         }

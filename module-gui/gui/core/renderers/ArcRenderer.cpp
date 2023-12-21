@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ArcRenderer.hpp"
@@ -43,17 +43,17 @@ namespace gui::renderer
 
         const auto start = trigonometry::toRadians(begin);
         const auto end   = trigonometry::toRadians(begin + sweep);
-        double step;
+        trigonometry::Radians step;
 
         if (radius < RadiusPrecisionLimit) {
-            step = 0.01;
+            step = 0.01f;
         }
         else {
-            step = 0.001;
+            step = 0.001f;
         }
 
-        double cosine, sine;
-        for (double radians = start; radians <= end; radians += step) {
+        trigonometry::Radians cosine, sine;
+        for (trigonometry::Radians radians = start; radians <= end; radians += step) {
             cosine = std::cos(radians);
             sine   = std::sin(radians);
             for (Length i = 0; i < width; ++i) {
@@ -74,17 +74,17 @@ namespace gui::renderer
     {
         const auto start = trigonometry::toRadians(begin);
         const auto end   = trigonometry::toRadians(begin + sweep);
-        double step;
+        trigonometry::Radians step;
 
         if (radius < RadiusPrecisionLimit) {
-            step = 0.01;
+            step = 0.01f;
         }
         else {
-            step = 0.001;
+            step = 0.001f;
         }
 
         long int x, y;
-        for (double radians = start; radians <= end; radians += step) {
+        for (trigonometry::Radians radians = start; radians <= end; radians += step) {
             x = trigonometry::AdjacentSide::fromAngle(radians, radius);
             y = trigonometry::OppositeSide::fromAngle(radians, radius);
             PixelRenderer::draw(ctx, Point(center.x + x, center.y + y), color);
