@@ -15,6 +15,7 @@
 * Removed minus sign in progress countdown timers in Relaxation, Meditation and Power Nap apps
 * Extended volume scale from 10 to 15 point scale
 * Modified volume control characteristic for better user experience
+* Reducing power consumption for meditation and power nap applications
 
 ## [2.3.0 2023-12-20]
 
