@@ -733,5 +733,7 @@
     "tethering_menu_access_decline": "<text>Tethering w\u0142\u0105czony.<br /><br />Aby przej\u015b\u0107 do menu,<br />wy\u0142\u0105cz tethering.</text>",
     "tethering_phone_mode_change_prohibited": "<text>Tethering w\u0142\u0105czony.<br /><br />Ten tryb powoduje, \u017ce inne tryby (Po\u0142\u0105czony, Nie przeszkadza\u0107,<br />Offline) nie dzia\u0142aj\u0105.</text>",
     "tethering_turn_off_question": "Wy\u0142\u0105czy\u0107 tethering?",
-    "unsaved_changes": "Niezapisane zmiany"
+    "unsaved_changes": "Niezapisane zmiany",
+    "battery_low": "Niski poziom baterii",
+    "battery_remaining": "<text>Pozosta\u0142o <token>$BATTERY</token>% baterii</text>"
 }

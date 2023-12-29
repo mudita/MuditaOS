@@ -734,5 +734,7 @@
     "tethering_menu_access_decline": "<text>Tethering ist eingeschaltet.<br /><br />Schalten Sie Tethering aus,<br />um auf das Men\u00fc zuzugreifen</text>",
     "tethering_phone_mode_change_prohibited": "<text>Tethering ist eingeschaltet.<br /><br />Andere Betriebsarten (Verbunden, DND,<br />Offline) werden von dieser Betriebsart \u00fcberlagert<br />und funktionieren nicht.</text>",
     "tethering_turn_off_question": "Tethering ausschalten?",
-    "unsaved_changes": "Ungespeicherte \u00c4nderungen"
+    "unsaved_changes": "Ungespeicherte \u00c4nderungen",
+    "battery_low": "Niedriger Batteriestand",
+    "battery_remaining": "<text><token>$BATTERY</token>% Batterie verbleibend</text>"
 }

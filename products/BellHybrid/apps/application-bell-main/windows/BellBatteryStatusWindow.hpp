@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,10 +17,12 @@ namespace gui
       public:
         struct Data : public gui::SwitchData
         {
-            Data(std::uint32_t lvl, bool chargeState) : chargeLevel{lvl}, isCharging{chargeState}
+            Data(std::uint32_t lvl, bool chargeState, bool lowBatteryWaring = false)
+                : chargeLevel{lvl}, isCharging{chargeState}, isLowBatteryWarning{lowBatteryWaring}
             {}
             const std::uint32_t chargeLevel;
             const bool isCharging;
+            const bool isLowBatteryWarning;
         };
         static constexpr auto name = "BellBatteryStatusWindow";
         explicit BellBatteryStatusWindow(app::ApplicationCommon *app);
@@ -28,7 +30,7 @@ namespace gui
       private:
         static constexpr auto top_description_font          = style::window::font::largelight;
         static constexpr auto bottom_description_font       = style::window::font::verybiglight;
-        static constexpr auto bottom_description_max_size_w = 85U;
+        static constexpr auto bottom_description_max_size_w = style::bell_base_layout::outer_layouts_w;
         static constexpr auto bottom_description_max_size_h = 85U;
 
         void buildInterface() override;

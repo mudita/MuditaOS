@@ -734,5 +734,7 @@
     "tethering_menu_access_decline": "<text>El anclaje de red est\u00e1 activado.<br /><br />Para acceder al men\u00fa,<br />desactiva el tethering.</text>",
     "tethering_phone_mode_change_prohibited": "<text>El anclaje de red est\u00e1 activado.<br /><br />Este modo anula otros modos (Conectado, No molestar,<br />Desconectado) <br />y hace que dejen de funcionar.</text>",
     "tethering_turn_off_question": "\u00bfDesactivar el anclaje de red?",
-    "unsaved_changes": "Cambios no guardados"
+    "unsaved_changes": "Cambios no guardados",
+    "battery_low": "Bater\u00EDa baja",
+    "battery_remaining": "<text>Queda un <token>$BATTERY</token>% de bater\u00EDa</text>"
 }

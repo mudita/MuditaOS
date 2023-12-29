@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
@@ -104,11 +104,18 @@ namespace app
             return ret;
         }
 
-        timeModel           = std::make_unique<app::TimeModel>();
-        batteryModel        = std::make_unique<app::BatteryModel>(this);
-        temperatureModel    = std::make_unique<app::home_screen::TemperatureModel>(this);
-        homeScreenPresenter = std::make_shared<app::home_screen::HomeScreenPresenter>(
-            this, *alarmModel, *batteryModel, *temperatureModel, *timeModel);
+        timeModel                     = std::make_unique<app::TimeModel>();
+        batteryModel                  = std::make_unique<app::BatteryModel>(this);
+        temperatureModel              = std::make_unique<app::home_screen::TemperatureModel>(this);
+        userSessionModel              = std::make_unique<app::UserSessionModel>(this);
+        batteryLevelNotificationModel = std::make_unique<app::BatteryLevelNotificationModel>();
+        homeScreenPresenter           = std::make_shared<app::home_screen::HomeScreenPresenter>(this,
+                                                                                      *alarmModel,
+                                                                                      *batteryModel,
+                                                                                      *temperatureModel,
+                                                                                      *timeModel,
+                                                                                      *userSessionModel,
+                                                                                      *batteryLevelNotificationModel);
 
         createUserInterface();
 
@@ -191,6 +198,7 @@ namespace app
             const auto newWindowName = msg->getWindowName();
             if (newWindowName == gui::name::window::main_window) {
                 stopIdleTimer();
+                startUserSessionEndTimer();
             }
             else if (newWindowName == gui::window::name::bell_main_menu ||
                      newWindowName == gui::window::name::bell_main_menu_dialog ||
@@ -211,6 +219,11 @@ namespace app
         const auto layoutGenerator = homeScreenLayoutsList.at(layoutName);
         homeScreenPresenter->setLayout(layoutGenerator);
         return true;
+    }
+
+    void ApplicationBellMain::startUserSessionEndTimer()
+    {
+        userSessionModel->deactivateUserSessionWithDelay();
     }
 
     ApplicationBellMain::~ApplicationBellMain() = default;

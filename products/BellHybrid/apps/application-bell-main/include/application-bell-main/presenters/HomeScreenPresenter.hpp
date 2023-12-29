@@ -1,10 +1,12 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
 #include <common/models/AbstractAlarmModel.hpp>
+#include <common/models/UserSessionModel.hpp>
+#include <common/models/BatteryLevelNotificationModel.hpp>
 #include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <common/layouts/HomeScreenLayouts.hpp>
 #include <gui/Common.hpp>
@@ -22,8 +24,10 @@ namespace app
 {
     class AbstractTimeModel;
     class AbstractBatteryModel;
+    class AbstractBatteryLevelNotificationModel;
     class ApplicationCommon;
     class TemperatureModel;
+    class AbstractUserSessionModel;
     class ProgressTimerWithSnoozeTimer;
 } // namespace app
 
@@ -97,8 +101,13 @@ namespace app::home_screen
         virtual void decAlarmMinute()                                                            = 0;
         virtual void switchToMenu()                                                              = 0;
         virtual void switchToBatteryStatus()                                                     = 0;
+        virtual void switchToLowBatteryWarning()                                                 = 0;
         virtual UTF8 getGreeting()                                                               = 0;
         virtual void setUSBStatusConnected()                                                     = 0;
+        virtual void handleLowBatteryWarning()                                                   = 0;
+        virtual bool isLowBatteryWarningNeeded()                                                 = 0;
+        virtual void updateBatteryLevelInterval()                                                = 0;
+        virtual void refreshUserSession()                                                        = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -110,7 +119,9 @@ namespace app::home_screen
                             AbstractAlarmModel &alarmModel,
                             AbstractBatteryModel &batteryModel,
                             AbstractTemperatureModel &temperatureModel,
-                            AbstractTimeModel &timeModel);
+                            AbstractTimeModel &timeModel,
+                            AbstractUserSessionModel &userSessionModel,
+                            AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel);
         virtual ~HomeScreenPresenter();
         HomeScreenPresenter()        = delete;
         HomeScreenPresenter &operator=(const HomeScreenPresenter &oth) = delete;
@@ -140,11 +151,16 @@ namespace app::home_screen
         bool isAlarmActivatedByLatch() const override;
         void setUSBStatusConnected() override;
 
-        void incAlarmMinute();
-        void decAlarmMinute();
-        void switchToMenu();
-        void switchToBatteryStatus();
-        UTF8 getGreeting();
+        void incAlarmMinute() override;
+        void decAlarmMinute() override;
+        void switchToMenu() override;
+        void switchToBatteryStatus() override;
+        void switchToLowBatteryWarning() override;
+        UTF8 getGreeting() override;
+        void handleLowBatteryWarning() override;
+        bool isLowBatteryWarningNeeded() override;
+        void updateBatteryLevelInterval() override;
+        void refreshUserSession() override;
 
         void setLayout(gui::LayoutGenerator layoutGenerator) override;
 
@@ -155,6 +171,8 @@ namespace app::home_screen
         AbstractBatteryModel &batteryModel;
         AbstractTemperatureModel &temperatureModel;
         AbstractTimeModel &timeModel;
+        AbstractUserSessionModel &userSessionModel;
+        AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel;
         std::unique_ptr<AbstractController> stateController;
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
         std::unique_ptr<std::mt19937> rngEngine;

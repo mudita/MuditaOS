@@ -18,7 +18,9 @@ target_sources(application-bell-common
         src/AudioModel.cpp
         src/LanguageUtils.cpp
         src/TimeModel.cpp
+        src/UserSessionModel.cpp
         src/BatteryModel.cpp
+        src/BatteryLevelNotificationModel.cpp
         src/SoundsRepository.cpp
         src/BellListItemProvider.cpp
         src/SoundsProvider.cpp
@@ -95,7 +97,9 @@ target_sources(application-bell-common
         include/common/models/SettingsModel.hpp
         include/common/models/BedtimeModel.hpp
         include/common/models/BatteryModel.hpp
+        include/common/models/BatteryLevelNotificationModel.hpp
         include/common/models/TimeModel.hpp
+        include/common/models/UserSessionModel.hpp
         include/common/models/AudioModel.hpp
         include/common/models/FrontlightModel.hpp
         include/common/models/AlarmSettingsModel.hpp

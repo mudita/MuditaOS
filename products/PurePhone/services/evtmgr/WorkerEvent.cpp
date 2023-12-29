@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerEvent.hpp"
@@ -79,7 +79,7 @@ bool WorkerEvent::handleMessage(std::uint32_t queueID)
         if (notification == bsp::cellular::statusPin) {
             auto GSMstatus = bsp::cellular::status::getStatus();
             LOG_DEBUG("GSM Status pin change: %s",
-                      (GSMstatus == bsp::cellular::status::value::ACTIVE ? "ACTIVE" : "INACTIVE"));
+                      (GSMstatus == bsp::cellular::status::value::ACTIVE ? "Active" : "Inactive"));
 
             auto message   = std::make_shared<sevm::StatusStateMessage>(MessageType::EVMModemStatus);
             message->state = GSMstatus;

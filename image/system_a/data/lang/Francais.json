@@ -705,5 +705,7 @@
     "tethering_menu_access_decline": "<text>Le partage de connexion est activ\u00e9.<br /><br />Pour acc\u00e9der au menu, veuillez<br />d\u00e9sactiver le partage de connextion.</text>",
     "tethering_phone_mode_change_prohibited": "<text>Le partage de connexion est activ\u00e9.<br /><br />Ce mode-ci remplace et d\u00e9sactive les autres modes<br />(Connect\u00e9, NPD, Hors ligne)</text>",
     "tethering_turn_off_question": "Voulez-vous d\u00e9sactiver le partage de connexion?",
-    "unsaved_changes": "Modifications non enregistr\u00e9es"
+    "unsaved_changes": "Modifications non enregistr\u00e9es",
+    "battery_low": "Batterie faible",
+    "battery_remaining": "<text><token>$BATTERY</token>% de batterie restant</text>"
 }
