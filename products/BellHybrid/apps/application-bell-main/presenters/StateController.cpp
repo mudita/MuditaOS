@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StateController.hpp"
@@ -65,9 +65,15 @@ namespace app::home_screen
                 return true;
             };
 
-            auto switchToMenu          = [](AbstractPresenter &presenter) { presenter.switchToMenu(); };
-            auto switchToBatteryStatus = [](AbstractPresenter &presenter) { presenter.switchToBatteryStatus(); };
-            auto updateTemperature     = [](AbstractView &view, AbstractTemperatureModel &temperatureModel) {
+            auto switchToMenu              = [](AbstractPresenter &presenter) { presenter.switchToMenu(); };
+            auto isLowBatteryWarningToShow = [](AbstractPresenter &presenter) {
+                return presenter.isLowBatteryWarningNeeded();
+            };
+            auto showLowBatteryWarning   = [](AbstractPresenter &presenter) { presenter.handleLowBatteryWarning(); };
+            auto endUserSessionWithDelay = [](AbstractUserSessionModel &userSession) {
+                userSession.deactivateUserSessionWithDelay();
+            };
+            auto updateTemperature = [](AbstractView &view, AbstractTemperatureModel &temperatureModel) {
                 view.setTemperature(temperatureModel.getTemperature());
             };
             auto setNewAlarmTime = [](AbstractView &view, AbstractAlarmModel &alarmModel) {
@@ -84,6 +90,7 @@ namespace app::home_screen
             auto updateBatteryStatus = [](AbstractView &view, AbstractBatteryModel &batteryModel) {
                 view.setBatteryLevelState(batteryModel.getLevelState());
             };
+            auto switchToBatteryStatus = [](AbstractPresenter &presenter) { presenter.switchToBatteryStatus(); };
 
         } // namespace Helpers
 
@@ -115,6 +122,8 @@ namespace app::home_screen
             {};
             struct BatteryUpdate
             {};
+            struct LowBatteryWarning
+            {};
         } // namespace Events
 
         namespace Init
@@ -135,11 +144,13 @@ namespace app::home_screen
             auto entry = [](AbstractController &controller,
                             AbstractView &view,
                             AbstractTemperatureModel &temperatureModel,
-                            AbstractBatteryModel &batteryModel) {
+                            AbstractBatteryModel &batteryModel,
+                            AbstractUserSessionModel &userSession) {
                 controller.snooze(false);
                 view.setViewState(ViewState::Deactivated);
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setBatteryLevelState(batteryModel.getLevelState());
+                userSession.deactivateUserSessionWithDelay();
             };
         } // namespace Deactivated
 
@@ -212,12 +223,14 @@ namespace app::home_screen
                             AbstractView &view,
                             AbstractAlarmModel &alarmModel,
                             AbstractTemperatureModel &temperatureModel,
-                            AbstractBatteryModel &batteryModel) {
+                            AbstractBatteryModel &batteryModel,
+                            AbstractUserSessionModel &userSession) {
                 controller.snooze(false);
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setViewState(ViewState::Activated);
                 view.setAlarmTime(alarmModel.getAlarmTime());
                 view.setBatteryLevelState(batteryModel.getLevelState());
+                userSession.deactivateUserSessionWithDelay();
             };
         } // namespace Activated
 
@@ -262,11 +275,13 @@ namespace app::home_screen
             auto entry = [](AbstractView &view,
                             AbstractAlarmModel &alarmModel,
                             AbstractTemperatureModel &temperatureModel,
-                            AbstractBatteryModel &batteryModel) {
+                            AbstractBatteryModel &batteryModel,
+                            AbstractUserSessionModel &userSession) {
                 view.setViewState(ViewState::AlarmSnoozed);
                 view.setSnoozeTime(Clock::to_time_t(alarmModel.getTimeOfNextSnooze()));
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setBatteryLevelState(batteryModel.getLevelState());
+                userSession.deactivateUserSessionWithDelay();
             };
             auto exit = [](AbstractPresenter &presenter) { presenter.stopSnoozeTimer(); };
         } // namespace AlarmSnoozed
@@ -285,13 +300,15 @@ namespace app::home_screen
                                              "Init"_s + event<Events::ModelReady> [Helpers::shouldSwitchToActivated] = "Activated"_s,
 
                                              "Deactivated"_s + sml::on_entry<_> / Deactivated::entry,
-                                             "Deactivated"_s + event<Events::LightPress>/ Helpers::switchToMenu,
-                                             "Deactivated"_s + event<Events::RotateLeftPress> = "DeactivatedEdit"_s,
-                                             "Deactivated"_s + event<Events::RotateRightPress> = "DeactivatedEdit"_s,
-                                             "Deactivated"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
+                                             "Deactivated"_s + event<Events::LightPress> [not Helpers::isLowBatteryWarningToShow] / Helpers::switchToMenu,
+                                             "Deactivated"_s + event<Events::RotateLeftPress> [not Helpers::isLowBatteryWarningToShow] = "DeactivatedEdit"_s,
+                                             "Deactivated"_s + event<Events::RotateRightPress> [not Helpers::isLowBatteryWarningToShow] = "DeactivatedEdit"_s,
+                                             "Deactivated"_s + event<Events::DeepUpPress> [not Helpers::isLowBatteryWarningToShow] = "ActivatedWait"_s,
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
-                                             "Deactivated"_s + event<Events::LongBackPress>  / Helpers::switchToBatteryStatus,
+                                             "Deactivated"_s + event<Events::BackPress> / Helpers::endUserSessionWithDelay,
+                                             "Deactivated"_s + event<Events::LongBackPress> [not Helpers::isLowBatteryWarningToShow]  / Helpers::switchToBatteryStatus,
                                              "Deactivated"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
+                                             "Deactivated"_s + event<Events::LowBatteryWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning,
 
                                              "DeactivatedWait"_s + sml::on_entry<_> / DeactivatedWait::entry,
                                              "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
@@ -334,14 +351,16 @@ namespace app::home_screen
 
                                              "Activated"_s + sml::on_entry<_> / Activated::entry,
                                              "Activated"_s [not Helpers::isAlarmActive] = "Deactivated"_s,
-                                             "Activated"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Activated"_s,
-                                             "Activated"_s + event<Events::RotateLeftPress> = "ActivatedEdit"_s,
-                                             "Activated"_s + event<Events::RotateRightPress> = "ActivatedEdit"_s,
+                                             "Activated"_s + event<Events::LightPress> [not Helpers::isLowBatteryWarningToShow]/ Helpers::switchToMenu = "Activated"_s,
+                                             "Activated"_s + event<Events::RotateLeftPress> [not Helpers::isLowBatteryWarningToShow] = "ActivatedEdit"_s,
+                                             "Activated"_s + event<Events::RotateRightPress> [not Helpers::isLowBatteryWarningToShow] = "ActivatedEdit"_s,
                                              "Activated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
-                                             "Activated"_s + event<Events::DeepDownPress>  = "DeactivatedWait"_s,
+                                             "Activated"_s + event<Events::DeepDownPress> [not Helpers::isLowBatteryWarningToShow]  = "DeactivatedWait"_s,
                                              "Activated"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
-                                             "Activated"_s + event<Events::LongBackPress>  / Helpers::switchToBatteryStatus,
+                                             "Activated"_s + event<Events::BackPress>  / Helpers::endUserSessionWithDelay,
+                                             "Activated"_s + event<Events::LongBackPress> [not Helpers::isLowBatteryWarningToShow]  / Helpers::switchToBatteryStatus,
                                              "Activated"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
+                                             "Activated"_s + event<Events::LowBatteryWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning,
 
                                              "ActivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "ActivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
@@ -389,11 +408,12 @@ namespace app::home_screen
                                              "AlarmSnoozed"_s + sml::on_entry<_> / AlarmSnoozed::exit,
                                              "AlarmSnoozed"_s + event<Events::ModelReady> [not Helpers::isSnoozeActive] = "Activated"_s,
                                              "AlarmSnoozed"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
-                                             "AlarmSnoozed"_s + event<Events::DeepDownPress> = "DeactivatedWait"_s,
-                                             "AlarmSnoozed"_s + event<Events::LightPress>/Helpers::switchToMenu,
+                                             "AlarmSnoozed"_s + event<Events::DeepDownPress> [not Helpers::isLowBatteryWarningToShow] = "DeactivatedWait"_s,
+                                             "AlarmSnoozed"_s + event<Events::LightPress> [not Helpers::isLowBatteryWarningToShow]/Helpers::switchToMenu,
                                              "AlarmSnoozed"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
-                                             "AlarmSnoozed"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
-                                             "AlarmSnoozed"_s + event<Events::LongBackPress>  / Helpers::switchToBatteryStatus
+                                             "AlarmSnoozed"_s + event<Events::BatteryUpdate> / Helpers::updateBatteryStatus,
+                                             "AlarmSnoozed"_s + event<Events::LongBackPress> [not Helpers::isLowBatteryWarningToShow]  / Helpers::switchToBatteryStatus,
+                                             "AlarmSnoozed"_s + event<Events::LowBatteryWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning
                     );
                 // clang-format on
             }
@@ -416,9 +436,11 @@ namespace app::home_screen
              AbstractBatteryModel &batteryModel,
              AbstractTemperatureModel &temperatureModel,
              AbstractAlarmModel &alarmModel,
-             AbstractTimeModel &timeModel)
+             AbstractTimeModel &timeModel,
+             AbstractUserSessionModel &userSessionModel)
             : controller{controller}, view{view}, presenter{presenter}, batteryModel{batteryModel},
-              temperatureModel{temperatureModel}, alarmModel{alarmModel}, timeModel{timeModel}
+              temperatureModel{temperatureModel}, alarmModel{alarmModel}, timeModel{timeModel}, userSessionModel{
+                                                                                                    userSessionModel}
         {
             resetSM();
         }
@@ -445,7 +467,8 @@ namespace app::home_screen
                 batteryModel,
                 temperatureModel,
                 alarmModel,
-                timeModel};
+                timeModel,
+                userSessionModel};
         }
 
         AbstractController &controller;
@@ -455,6 +478,7 @@ namespace app::home_screen
         AbstractTemperatureModel &temperatureModel;
         AbstractAlarmModel &alarmModel;
         AbstractTimeModel &timeModel;
+        AbstractUserSessionModel &userSessionModel;
     };
 
     StateController::StateController(AbstractView &view,
@@ -462,9 +486,10 @@ namespace app::home_screen
                                      AbstractBatteryModel &batteryModel,
                                      AbstractTemperatureModel &temperatureModel,
                                      AbstractAlarmModel &alarmModel,
-                                     AbstractTimeModel &timeModel)
+                                     AbstractTimeModel &timeModel,
+                                     AbstractUserSessionModel &userSessionModel)
         : pimpl{std::make_unique<StateController::Impl>(
-              *this, view, presenter, batteryModel, temperatureModel, alarmModel, timeModel)},
+              *this, view, presenter, batteryModel, temperatureModel, alarmModel, timeModel, userSessionModel)},
           presenter{presenter}
     {}
 
@@ -474,6 +499,10 @@ namespace app::home_screen
     {
         using namespace sml;
         const auto key = mapKey(inputEvent.getKeyCode());
+
+        presenter.refreshUserSession();
+        presenter.updateBatteryLevelInterval();
+
         switch (key) {
         case KeyMap::Back:
             if (inputEvent.getState() == gui::InputEvent::State::keyReleasedLong) {
@@ -500,6 +529,10 @@ namespace app::home_screen
             break;
         default:
             break;
+        }
+
+        if (key != KeyMap::DeepPressUp && key != KeyMap::DeepPressDown && presenter.isLowBatteryWarningNeeded()) {
+            pimpl->sm->process_event(Events::LowBatteryWarning{});
         }
 
         return true;

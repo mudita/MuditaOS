@@ -745,5 +745,7 @@
     "tethering_menu_access_decline": "<text>Tethering is on.<br /><br />To access menu,<br />turn tethering off.</text>",
     "tethering_phone_mode_change_prohibited": "<text>Tethering is on.<br /><br />Other modes (Connected, DND,<br />Offline) are overriden by this mode<br />and are not working.</text>",
     "tethering_turn_off_question": "Turn tethering off?",
-    "unsaved_changes": "Unsaved changes"
+    "unsaved_changes": "Unsaved4 changes",
+    "battery_low": "Low battery",
+    "battery_remaining": "<text><token>$BATTERY</token>% battery remaining</text>"
 }

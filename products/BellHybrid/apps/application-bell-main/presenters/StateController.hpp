@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <common/models/AbstractAlarmModel.hpp>
+#include <common/models/UserSessionModel.hpp>
 #include <gui/input/InputEvent.hpp>
 
 #include <chrono>
@@ -46,7 +47,8 @@ namespace app::home_screen
                         AbstractBatteryModel &batteryModel,
                         AbstractTemperatureModel &temperatureModel,
                         AbstractAlarmModel &alarmModel,
-                        AbstractTimeModel &timeModel);
+                        AbstractTimeModel &timeModel,
+                        AbstractUserSessionModel &userSessionModel);
         ~StateController();
 
         void resetStateMachine() override;

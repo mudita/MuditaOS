@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-bell-main/presenters/HomeScreenPresenter.hpp"
@@ -75,9 +75,13 @@ namespace app::home_screen
                                              AbstractAlarmModel &alarmModel,
                                              AbstractBatteryModel &batteryModel,
                                              AbstractTemperatureModel &temperatureModel,
-                                             AbstractTimeModel &timeModel)
-        : app{app}, alarmModel{alarmModel}, batteryModel{batteryModel}, temperatureModel{temperatureModel},
-          timeModel{timeModel}, rngEngine{std::make_unique<std::mt19937>(bsp::trng::getRandomValue())}
+                                             AbstractTimeModel &timeModel,
+                                             AbstractUserSessionModel &userSessionModel,
+                                             AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel)
+        : app{app}, alarmModel{alarmModel}, batteryModel{batteryModel},
+          temperatureModel{temperatureModel}, timeModel{timeModel}, userSessionModel{userSessionModel},
+          batteryLevelNotificationModel{batteryLevelNotificationModel}, rngEngine{std::make_unique<std::mt19937>(
+                                                                            bsp::trng::getRandomValue())}
     {}
 
     gui::RefreshModes HomeScreenPresenter::handleUpdateTimeEvent()
@@ -131,8 +135,8 @@ namespace app::home_screen
     }
     void HomeScreenPresenter::createData()
     {
-        stateController =
-            std::make_unique<StateController>(*getView(), *this, batteryModel, temperatureModel, alarmModel, timeModel);
+        stateController = std::make_unique<StateController>(
+            *getView(), *this, batteryModel, temperatureModel, alarmModel, timeModel, userSessionModel);
     }
 
     void HomeScreenPresenter::refreshWindow()
@@ -250,6 +254,13 @@ namespace app::home_screen
                           std::make_unique<gui::BellBatteryStatusWindow::Data>(getBatteryLvl(), isBatteryCharging()));
     }
 
+    void HomeScreenPresenter::switchToLowBatteryWarning()
+    {
+        app->switchWindow(
+            gui::BellBatteryStatusWindow::name,
+            std::make_unique<gui::BellBatteryStatusWindow::Data>(getBatteryLvl(), isBatteryCharging(), true));
+    }
+
     UTF8 HomeScreenPresenter::getGreeting()
     {
         const auto greetingCollection = utils::translate_array("app_bell_greeting_msg");
@@ -265,6 +276,36 @@ namespace app::home_screen
     void HomeScreenPresenter::setUSBStatusConnected()
     {
         getView()->setUSBStatusConnected();
+    }
+
+    bool HomeScreenPresenter::isLowBatteryWarningNeeded()
+    {
+        batteryLevelNotificationModel.updateBatteryLevelInterval(getBatteryLvl());
+        return !userSessionModel.isActiveUserSessionHandled() &&
+               !batteryLevelNotificationModel.isBatteryIntervalHandled() && !isBatteryCharging();
+    }
+
+    void HomeScreenPresenter::handleLowBatteryWarning()
+    {
+        if (batteryLevelNotificationModel.getBatteryLevelInterval() != BatteryLevelInterval::Unknown &&
+            batteryLevelNotificationModel.getBatteryLevelInterval() != BatteryLevelInterval::Above15Percent) {
+            switchToLowBatteryWarning();
+        }
+        else {
+            userSessionModel.setCurrentUserSessionAsHandled();
+        }
+        batteryLevelNotificationModel.setCurrentBatteryIntervalAsHandled();
+        userSessionModel.setCurrentUserSessionAsHandled();
+    }
+
+    void HomeScreenPresenter::refreshUserSession()
+    {
+        userSessionModel.activateUserSession();
+    }
+
+    void HomeScreenPresenter::updateBatteryLevelInterval()
+    {
+        batteryLevelNotificationModel.updateBatteryLevelInterval(getBatteryLvl());
     }
 
 } // namespace app::home_screen

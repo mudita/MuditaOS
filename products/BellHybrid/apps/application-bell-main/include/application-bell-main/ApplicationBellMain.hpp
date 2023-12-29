@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -46,10 +46,13 @@ namespace app
         void onStart() override;
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
         bool setHomeScreenLayout(std::string layoutName);
+        void startUserSessionEndTimer();
 
         std::unique_ptr<AbstractTimeModel> timeModel;
         std::unique_ptr<AbstractBatteryModel> batteryModel;
         std::unique_ptr<home_screen::AbstractTemperatureModel> temperatureModel;
+        std::unique_ptr<AbstractUserSessionModel> userSessionModel;
+        std::unique_ptr<AbstractBatteryLevelNotificationModel> batteryLevelNotificationModel;
         std::shared_ptr<app::home_screen::HomeScreenPresenter> homeScreenPresenter;
     };
 
