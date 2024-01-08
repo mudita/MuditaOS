@@ -77,6 +77,10 @@ namespace gui
 
     bool RelaxationVolumeWindow::onInput(const InputEvent &inputEvent)
     {
+        //TODO: rotation works fine here?
+        if (inputEvent.isShortRelease() && presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             application->returnToPreviousWindow();
             return true;

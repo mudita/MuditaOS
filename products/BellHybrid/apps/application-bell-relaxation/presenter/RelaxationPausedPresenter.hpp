@@ -5,6 +5,7 @@
 
 #include <common/models/TimeModel.hpp>
 #include <apps-common/BasePresenter.hpp>
+#include <common/models/AbstractAlarmModel.hpp>
 
 namespace app
 {
@@ -30,17 +31,20 @@ namespace app::relaxation
           public:
             virtual void handleUpdateTimeEvent() = 0;
             virtual void onBeforeShow()          = 0;
+            virtual bool handleIfPreWakeupIsToTurnOffFirst()  = 0;
         };
     };
 
     class RelaxationPausedPresenter : public RelaxationPausedContract::Presenter
     {
         std::unique_ptr<AbstractTimeModel> timeModel;
+        AbstractAlarmModel &alarmModel;
 
         void handleUpdateTimeEvent() override;
         void onBeforeShow() override;
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
 
       public:
-        RelaxationPausedPresenter(std::unique_ptr<AbstractTimeModel> timeModel);
+        RelaxationPausedPresenter(std::unique_ptr<AbstractTimeModel> timeModel, AbstractAlarmModel &alarm);
     };
 } // namespace app::relaxation

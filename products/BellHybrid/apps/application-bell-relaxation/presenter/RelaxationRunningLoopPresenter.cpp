@@ -13,8 +13,9 @@ namespace app::relaxation
     RelaxationRunningLoopPresenter::RelaxationRunningLoopPresenter(settings::Settings *settings,
                                                                    AbstractRelaxationPlayer &player,
                                                                    AbstractBatteryModel &battery,
-                                                                   std::unique_ptr<AbstractTimeModel> timeModel)
-        : settings{settings}, player{player}, batteryModel{battery}, timeModel{std::move(timeModel)}
+                                                                   std::unique_ptr<AbstractTimeModel> timeModel,
+                                                                   AbstractAlarmModel &alarm)
+        : settings{settings}, player{player}, batteryModel{battery}, timeModel{std::move(timeModel)}, alarmModel{alarm}
     {}
 
     void RelaxationRunningLoopPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
@@ -134,5 +135,14 @@ namespace app::relaxation
     bool RelaxationRunningLoopPresenter::isBatteryCharging(Store::Battery::State state) const
     {
         return batteryModel.isBatteryCharging(state);
+    }
+
+    bool RelaxationRunningLoopPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 } // namespace app::relaxation

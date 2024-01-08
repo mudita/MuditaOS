@@ -21,8 +21,9 @@ namespace app::relaxation
 {
     RelaxationRunningProgressPresenter::RelaxationRunningProgressPresenter(settings::Settings *settings,
                                                                            AbstractRelaxationPlayer &player,
-                                                                           std::unique_ptr<AbstractTimeModel> timeModel)
-        : settings{settings}, player{player}, timeModel{std::move(timeModel)}
+                                                                           std::unique_ptr<AbstractTimeModel> timeModel,
+                                                                           AbstractAlarmModel &alarm)
+        : settings{settings}, player{player}, timeModel{std::move(timeModel)}, alarmModel{alarm}
     {
         timerFinished = false;
     }
@@ -144,5 +145,13 @@ namespace app::relaxation
     bool RelaxationRunningProgressPresenter::isTimerFinished()
     {
         return timerFinished;
+    }
+    bool RelaxationRunningProgressPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 } // namespace app::relaxation

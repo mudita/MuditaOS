@@ -109,6 +109,7 @@ namespace app::home_screen
         virtual void updateBatteryLevelInterval()                                                = 0;
         virtual void refreshUserSession()                                                        = 0;
         virtual bool isLowBatteryLevel() const                                                   = 0;
+        virtual bool isPreWakeUpActive()                                                         = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -163,6 +164,7 @@ namespace app::home_screen
         void updateBatteryLevelInterval() override;
         void refreshUserSession() override;
         bool isLowBatteryLevel() const override;
+        bool isPreWakeUpActive() override;
 
         void setLayout(gui::LayoutGenerator layoutGenerator) override;
 

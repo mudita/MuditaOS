@@ -232,6 +232,26 @@ namespace app
         update(callback);
     }
 
+    bool AlarmModel::isPreWakeUpActive()
+    {
+        // figure out how to get the info from api here :)  //TODO: clean up after figuring out
+        bool isPreWakeUpActive = false;
+        if (!alarms::AlarmServiceAPI::requestGetPreWakeUpStatus(app, isPreWakeUpActive)) {
+            LOG_WARN("Unable to check if the Pre-wake up is active. "
+                     "Pre-wake up status not considered active");
+            return false;
+        }
+        LOG_WARN("----AlarmModel::isPreWakeUpActive():%d",
+                 static_cast<int>(isPreWakeUpActive)); // TODO: clean up this log
+        return isPreWakeUpActive;
+    }
+
+    bool AlarmModel::turnOffPreWakeUp()
+    {
+        LOG_WARN("----AlarmModel::turnOffPreWakeup()"); // TODO: clean up this log
+        return alarms::AlarmServiceAPI::requestTurnOffPreWakeUp(app);
+    }
+
     alarms::AlarmStatus AlarmModel::getAlarmStatus()
     {
         return alarmStatus;

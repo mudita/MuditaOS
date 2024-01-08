@@ -9,6 +9,7 @@
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
 #include <tags_fetcher/TagsFetcher.hpp>
 #include <time/time_locale.hpp>
+#include <common/models/AbstractAlarmModel.hpp>
 
 namespace app
 {
@@ -58,6 +59,7 @@ namespace app::relaxation
             virtual void handleUpdateTimeEvent()                                           = 0;
             virtual bool isPaused()                                                        = 0;
             virtual void onBeforeShow()                                                    = 0;
+            virtual bool handleIfPreWakeupIsToTurnOffFirst()                               = 0;
         };
     };
 
@@ -69,6 +71,7 @@ namespace app::relaxation
         AbstractRelaxationPlayer &player;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
+        AbstractAlarmModel &alarmModel;
         bool timerFinished;
 
         void activate(const db::multimedia_files::MultimediaFilesRecord &tags) override;
@@ -81,12 +84,14 @@ namespace app::relaxation
         void handleUpdateTimeEvent() override;
         bool isPaused() override;
         void onBeforeShow() override;
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
 
         void onFinished();
 
       public:
         RelaxationRunningProgressPresenter(settings::Settings *settings,
                                            AbstractRelaxationPlayer &player,
-                                           std::unique_ptr<AbstractTimeModel> timeModel);
+                                           std::unique_ptr<AbstractTimeModel> timeModel,
+                                           AbstractAlarmModel &alarm);
     };
 } // namespace app::relaxation

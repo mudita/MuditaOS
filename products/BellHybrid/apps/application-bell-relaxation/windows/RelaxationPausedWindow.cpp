@@ -57,6 +57,10 @@ namespace gui
 
     bool RelaxationPausedWindow::onInput(const InputEvent &inputEvent)
     {
+        if (inputEvent.isShortRelease() && presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
+
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             application->returnToPreviousWindow();
             return true;

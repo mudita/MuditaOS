@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTimeName.hpp"
@@ -10,7 +10,7 @@
 
 namespace alarms
 {
-
+    // update api to handle pre wakeup
     namespace AlarmServiceAPI
     {
         template <class requestType, typename... Types>
@@ -73,6 +73,27 @@ namespace alarms
         bool requestRegisterActiveAlarmsIndicatorHandler(sys::Service *serv)
         {
             return sendRequest<RegisterActiveAlarmsIndicatorHandlerRequestMessage>(serv);
+        }
+
+        bool requestGetPreWakeUpStatus(sys::Service *serv, bool &response)
+        {
+            //            return sendRequest<GetPreWakeUpRequestMessage>(serv); // TODO: clean up
+            auto msg = std::make_shared<GetPreWakeUpRequestMessage>();
+            auto ret = serv->bus.sendUnicastSync(msg, service::name::service_time, 1000);
+
+            if (ret.first == sys::ReturnCodes::Success) {
+                auto getPreWakeUpResponse = std::dynamic_pointer_cast<GetPreWakeUpResponseMessage>(ret.second);
+                if ((getPreWakeUpResponse != nullptr) && (getPreWakeUpResponse->retCode == sys::ReturnCodes::Success)) {
+                    LOG_DEBUG("Is Pre-wake up active: %s", getPreWakeUpResponse->active ? "yes" : "no");
+                    response = getPreWakeUpResponse->active;
+                    return true;
+                }
+            }
+            return false;
+        }
+        bool requestTurnOffPreWakeUp(sys::Service *serv)
+        {
+            return sendRequest<TurnOffPreWakeUpRequestMessage>(serv);
         }
     }; // namespace AlarmServiceAPI
 

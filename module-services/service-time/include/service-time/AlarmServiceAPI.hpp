@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -31,6 +31,8 @@ namespace alarms
         bool requestStopAllSnoozedAlarms(sys::Service *serv);
         bool requestRegisterSnoozedAlarmsCountChangeCallback(sys::Service *serv);
         bool requestRegisterActiveAlarmsIndicatorHandler(sys::Service *serv);
+        bool requestTurnOffPreWakeUp(sys::Service *serv);
+        bool requestGetPreWakeUpStatus(sys::Service *serv, bool &response);
     }; // namespace AlarmServiceAPI
 
 } // namespace alarms

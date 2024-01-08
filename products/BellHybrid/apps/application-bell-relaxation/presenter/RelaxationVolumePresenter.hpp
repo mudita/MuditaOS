@@ -4,6 +4,7 @@
 #pragma once
 
 #include <common/models/AbstractAudioModel.hpp>
+#include <common/models/AbstractAlarmModel.hpp>
 
 namespace app
 {
@@ -25,6 +26,7 @@ namespace app::relaxation
         virtual VolumeData getVolumeData()                        = 0;
         virtual void setVolume(AbstractAudioModel::Volume volume) = 0;
         virtual AbstractAudioModel::Volume getVolume()            = 0;
+        virtual bool handleIfPreWakeupIsToTurnOffFirst()            = 0;
     };
 
     class RelaxationVolumePresenter : public AbstractRelaxationVolumePresenter
@@ -36,12 +38,14 @@ namespace app::relaxation
         static constexpr AbstractAudioModel::Volume defaultVolume = 5;
 
         AbstractAudioModel &audioModel;
+        AbstractAlarmModel &alarmModel;
 
         VolumeData getVolumeData() override;
         void setVolume(AbstractAudioModel::Volume volume) override;
         AbstractAudioModel::Volume getVolume() override;
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
 
       public:
-        explicit RelaxationVolumePresenter(AbstractAudioModel &audioModel);
+        explicit RelaxationVolumePresenter(AbstractAudioModel &audioModel, AbstractAlarmModel &alarm);
     };
 } // namespace app::relaxation

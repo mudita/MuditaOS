@@ -7,8 +7,8 @@
 
 namespace app::relaxation
 {
-    RelaxationPausedPresenter::RelaxationPausedPresenter(std::unique_ptr<AbstractTimeModel> timeModel)
-        : timeModel{std::move(timeModel)}
+    RelaxationPausedPresenter::RelaxationPausedPresenter(std::unique_ptr<AbstractTimeModel> timeModel, AbstractAlarmModel &alarm)
+        : timeModel{std::move(timeModel)}, alarmModel{alarm}
     {}
 
     void RelaxationPausedPresenter::handleUpdateTimeEvent()
@@ -19,5 +19,14 @@ namespace app::relaxation
     void RelaxationPausedPresenter::onBeforeShow()
     {
         getView()->setTimeFormat(timeModel->getTimeFormat());
+    }
+
+    bool RelaxationPausedPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 } // namespace app::relaxation

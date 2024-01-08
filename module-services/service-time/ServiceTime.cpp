@@ -35,8 +35,7 @@ namespace stm
     }
 
     ServiceTime::~ServiceTime()
-    {
-    }
+    {}
 
     sys::ReturnCodes ServiceTime::InitHandler()
     {
@@ -214,6 +213,13 @@ namespace stm
             auto message = static_cast<sevm::BatteryStateChangeMessage *>(request);
             alarmMessageHandler->handleBatteryStateChange(message);
             return std::make_shared<sys::ResponseMessage>();
+        });
+        connect(typeid(alarms::TurnOffPreWakeUpRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleTurnOffPreWakeUp(
+                static_cast<alarms::TurnOffPreWakeUpRequestMessage *>(request));
+        });
+        connect(typeid(alarms::GetPreWakeUpRequestMessage), [&](sys::Message * /*request*/) -> sys::MessagePointer {
+            return alarmMessageHandler->handlePreWakeUpStatus();
         });
     }
 

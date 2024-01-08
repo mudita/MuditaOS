@@ -5,7 +5,8 @@
 
 namespace app::relaxation
 {
-    RelaxationVolumePresenter::RelaxationVolumePresenter(AbstractAudioModel &audioModel) : audioModel{audioModel}
+    RelaxationVolumePresenter::RelaxationVolumePresenter(AbstractAudioModel &audioModel, AbstractAlarmModel &alarm)
+        : audioModel{audioModel}, alarmModel{alarm}
     {}
 
     VolumeData RelaxationVolumePresenter::getVolumeData()
@@ -20,5 +21,14 @@ namespace app::relaxation
     AbstractAudioModel::Volume RelaxationVolumePresenter::getVolume()
     {
         return audioModel.getVolume(AbstractAudioModel::PlaybackType::Multimedia).value_or(defaultVolume);
+    }
+
+    bool RelaxationVolumePresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 } // namespace app::relaxation

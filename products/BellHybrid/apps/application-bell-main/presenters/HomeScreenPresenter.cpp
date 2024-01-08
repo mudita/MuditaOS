@@ -315,4 +315,9 @@ namespace app::home_screen
                (batteryStatus.level < constants::lowBatteryInfoThreshold);
     }
 
+    bool HomeScreenPresenter::isPreWakeUpActive()
+    {
+        return alarmModel.isPreWakeUpActive();
+    }
+
 } // namespace app::home_screen

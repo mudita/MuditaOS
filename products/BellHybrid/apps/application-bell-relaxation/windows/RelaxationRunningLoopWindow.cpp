@@ -154,6 +154,9 @@ namespace gui
     bool RelaxationRunningLoopWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease()) {
+            if (presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+                return true;
+            }
             if (inputEvent.is(KeyCode::KEY_RF)) {
                 presenter->stop();
                 application->returnToPreviousWindow();

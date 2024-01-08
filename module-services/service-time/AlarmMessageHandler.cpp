@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmMessageHandler.hpp"
@@ -8,6 +8,8 @@
 #include <module-db/Interface/EventRecord.hpp>
 
 #include <service-time/AlarmMessage.hpp>
+
+// add messages to handle pre wake up //TODO: clean
 
 namespace alarms
 {
@@ -184,6 +186,19 @@ namespace alarms
             alarmOperations->handleCriticalBatteryLevel();
             break;
         }
+    }
+
+    auto AlarmMessageHandler::handleTurnOffPreWakeUp(TurnOffPreWakeUpRequestMessage *request)
+        -> std::shared_ptr<TurnOffPreWakeUpResponseMessage>
+    {
+        return handleWithCallback<TurnOffPreWakeUpRequestMessage, TurnOffPreWakeUpResponseMessage, bool>(
+            request, [&](TurnOffPreWakeUpRequestMessage *request, IAlarmOperations::OnTurnOffPreWakeUp callback) {
+                alarmOperations->turnOffPreWakeUp(callback);
+            });
+    }
+    auto AlarmMessageHandler::handlePreWakeUpStatus() -> std::shared_ptr<GetPreWakeUpResponseMessage>
+    {
+        return std::make_shared<GetPreWakeUpResponseMessage>(alarmOperations->isPreWakeUpActive());
     }
 
     template <class RequestType, class ResponseType, class CallbackParamType>

@@ -33,6 +33,7 @@ namespace app
       private:
         std::unique_ptr<AbstractAudioModel> audioModel;
         std::unique_ptr<AbstractBatteryModel> batteryModel;
+        std::unique_ptr<AbstractAlarmModel> alarmModel;
         std::unique_ptr<AbstractLowBatteryInfoModel> lowBatteryInfoModel;
         std::unique_ptr<relaxation::RelaxationPlayer> player;
         sys::TimerHandle relaxationRebuildTimerHandle{};

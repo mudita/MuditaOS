@@ -10,6 +10,7 @@
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
 #include <service-db/Settings.hpp>
 #include <time/time_locale.hpp>
+#include <common/models/AbstractAlarmModel.hpp>
 
 namespace app
 {
@@ -58,6 +59,7 @@ namespace app::relaxation
             virtual void onBeforeShow()                                                    = 0;
             virtual Store::Battery getBatteryState()                                       = 0;
             virtual bool isBatteryCharging(Store::Battery::State state) const              = 0;
+            virtual bool handleIfPreWakeupIsToTurnOffFirst()                               = 0;
         };
     };
 
@@ -70,6 +72,7 @@ namespace app::relaxation
         AbstractBatteryModel &batteryModel;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
+        AbstractAlarmModel &alarmModel;
 
         void activate(const db::multimedia_files::MultimediaFilesRecord &tags) override;
         void stop() override;
@@ -82,6 +85,7 @@ namespace app::relaxation
         void onBeforeShow() override;
         Store::Battery getBatteryState() override;
         bool isBatteryCharging(Store::Battery::State state) const override;
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
 
         void onFinished();
 
@@ -89,6 +93,7 @@ namespace app::relaxation
         RelaxationRunningLoopPresenter(settings::Settings *settings,
                                        AbstractRelaxationPlayer &player,
                                        AbstractBatteryModel &batteryModel,
-                                       std::unique_ptr<AbstractTimeModel> timeModel);
+                                       std::unique_ptr<AbstractTimeModel> timeModel,
+                                       AbstractAlarmModel &alarm);
     };
 } // namespace app::relaxation

@@ -205,6 +205,11 @@ namespace gui
             alarm->setEditMode(EditMode::Browse);
             removeTextDescription();
             break;
+        case app::home_screen::ViewState::PreWakeUpActive:
+            setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+            alarm->setEditMode(EditMode::Browse);
+            removeTextDescription();
+            break;
         }
     }
 

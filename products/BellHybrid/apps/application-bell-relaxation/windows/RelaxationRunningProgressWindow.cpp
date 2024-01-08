@@ -101,6 +101,9 @@ namespace gui
     bool RelaxationRunningProgressWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease()) {
+            if (presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+                return true;
+            }
             if (inputEvent.is(KeyCode::KEY_RF)) {
                 presenter->stop();
                 return true;
