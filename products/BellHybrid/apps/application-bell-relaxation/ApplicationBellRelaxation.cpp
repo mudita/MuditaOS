@@ -28,6 +28,7 @@
 #include <common/windows/AppsBatteryStatusWindow.hpp>
 #include <audio/AudioMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <system/messages/SentinelRegistrationMessage.hpp>
 
 #include <log/log.hpp>
 
@@ -50,7 +51,11 @@ namespace app
         bus.channels.push_back(sys::BusChannel::ServiceAudioNotifications);
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     }
-    ApplicationBellRelaxation::~ApplicationBellRelaxation() = default;
+
+    ApplicationBellRelaxation::~ApplicationBellRelaxation()
+    {
+        cpuSentinel->BlockWfiMode(false);
+    }
 
     sys::ReturnCodes ApplicationBellRelaxation::InitHandler()
     {
@@ -58,6 +63,11 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
+
+        cpuSentinel                  = std::make_shared<sys::CpuSentinel>(applicationBellRelaxationName, this);
+        auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+        bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
+        cpuSentinel->BlockWfiMode(true);
 
         batteryModel                 = std::make_unique<app::BatteryModel>(this);
         lowBatteryInfoModel          = std::make_unique<app::LowBatteryInfoModel>();
@@ -111,12 +121,11 @@ namespace app
                                   return std::make_unique<gui::RelaxationRunningLoopWindow>(app, std::move(presenter));
                               });
 
-        windowsFactory.attach(
-            gui::window::name::relaxationPaused, [this](ApplicationCommon *app, const std::string &name) {
-                auto timeModel = std::make_unique<app::TimeModel>();
-                auto presenter = std::make_unique<relaxation::RelaxationPausedPresenter>(std::move(timeModel));
-                return std::make_unique<gui::RelaxationPausedWindow>(app, std::move(presenter));
-            });
+        windowsFactory.attach(gui::window::name::relaxationPaused, [](ApplicationCommon *app, const std::string &name) {
+            auto timeModel = std::make_unique<app::TimeModel>();
+            auto presenter = std::make_unique<relaxation::RelaxationPausedPresenter>(std::move(timeModel));
+            return std::make_unique<gui::RelaxationPausedWindow>(app, std::move(presenter));
+        });
 
         windowsFactory.attach(gui::popup::window::volume_window,
                               [this](ApplicationCommon *app, const std::string &name) {

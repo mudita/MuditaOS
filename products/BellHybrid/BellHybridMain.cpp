@@ -23,7 +23,6 @@
 #include <audio/ServiceAudio.hpp>
 #include <db/ServiceDB.hpp>
 #include <evtmgr/EventManager.hpp>
-#include <Service/ServiceCreator.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-desktop/ServiceDesktop.hpp>
 #include <service-eink/ServiceEink.hpp>
@@ -31,20 +30,12 @@
 #include <service-time/ServiceTime.hpp>
 #include <service-fileindexer/ServiceFileIndexer.hpp>
 
-#include <Application.hpp>
-#include <ApplicationLauncher.hpp>
-#include <log/log.hpp>
 #include <logdump/logdump.h>
 #include <Logger.hpp>
 #include <product/version.hpp>
 #include <sys/SystemManager.hpp>
-#include <SystemWatchdog/SystemWatchdog.hpp>
-#include <thread.hpp>
 #include <time/AlarmOperations.hpp>
 #include <Paths.hpp>
-
-#include <memory>
-#include <vector>
 
 #if SYSTEM_VIEW_ENABLED
 #include <SEGGER/SEGGER_SYSVIEW.h>

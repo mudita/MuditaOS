@@ -2,6 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051LPM.hpp"
+#include "WfiController.hpp"
 
 namespace bsp
 {
@@ -10,4 +11,24 @@ namespace bsp
 
     void RT1051LPM::DisableDcdcPowerSaveMode()
     {}
+
+    void RT1051LPM::AllowEnteringWfiMode()
+    {
+        allowEnteringWfiMode();
+    }
+
+    void RT1051LPM::BlockEnteringWfiMode()
+    {
+        blockEnteringWfiMode();
+    }
+
+    std::uint32_t RT1051LPM::EnterWfiModeIfAllowed()
+    {
+        return enterWfiModeIfAllowed();
+    }
+
+    std::uint32_t RT1051LPM::GetLastTimeSpentInWfi()
+    {
+        return getLastTimeSpentInWfi();
+    }
 } // namespace bsp

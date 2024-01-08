@@ -10,14 +10,10 @@
 #include <timers.h>
 #include <bsp/switches/switches.hpp>
 #include <board/BoardDefinitions.hpp>
-#include <board.h>
 #include <fsl_common.h>
 #include <switches/LatchState.hpp>
 
 #include <chrono>
-#include <stdio.h>
-#include <stdint.h>
-#include <assert.h>
 #include <map>
 #include <vector>
 #include <magic_enum.hpp>
@@ -56,7 +52,7 @@ namespace bsp::bell_switches
         void createTimer(TimerCallback callback, const std::chrono::milliseconds timeout)
         {
             timer =
-                xTimerCreate(magic_enum::enum_name(id).data(), pdMS_TO_TICKS(timeout.count()), false, this, callback);
+                xTimerCreate(magic_enum::enum_name(id).data(), pdMS_TO_TICKS(timeout.count()), pdFALSE, this, callback);
         }
     };
 

@@ -453,6 +453,9 @@ void BOARD_BootClockRUN(void)
     /* PRE_PERIPH_CLK <- PLL1/2 = 432MHz */
     CLOCK_SetMux(kCLOCK_PeriphMux, 0); // CBCDR  (25) 0 - pre_periph_clk_sel, 1 - periph_clk2_clk_divided
 
+    /* Enable clock of ARM platform memories when entering LPM */
+    CCM->CGPR |= CCM_CGPR_INT_MEM_CLK_LPM_MASK;
+
     /* Set SystemCoreClock variable. */
     SystemCoreClockUpdate();
 }

@@ -95,11 +95,11 @@ namespace service::eink
         settings->init(service::ServiceProxy(shared_from_this()));
         initStaticData();
 
-        const auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display->getDevice());
-        bus.sendUnicast(deviceRegistrationMsg, service::name::system_manager);
+        auto deviceRegistrationMsg = std::make_shared<sys::DeviceRegistrationMessage>(display->getDevice());
+        bus.sendUnicast(std::move(deviceRegistrationMsg), service::name::system_manager);
 
-        const auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(eInkSentinel);
-        bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+        auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(eInkSentinel);
+        bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
 
         eInkSentinel->HoldMinimumFrequency();
 

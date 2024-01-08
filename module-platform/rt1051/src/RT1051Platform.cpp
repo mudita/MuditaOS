@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <platform/rt1051/RT1051Platform.hpp>
@@ -16,7 +16,7 @@ using platform::rt1051::RT1051Platform;
 RT1051Platform::RT1051Platform()
 {
     bsp::board_init();
-    bsp::register_exit_functions(Log::Logger::destroyInstance);
+    bsp::register_exit_function(Log::Logger::destroyInstance);
 }
 
 void RT1051Platform::init()
@@ -33,7 +33,7 @@ void RT1051Platform::initFilesystem()
     auto blockDeviceFactory = std::make_unique<BlockDeviceFactory>();
     vfs                     = purefs::subsystem::initialize(std::move(blockDeviceFactory));
 
-    if (int err = purefs::subsystem::mount_defaults(); err != 0) {
+    if (const auto err = purefs::subsystem::mount_defaults(); err != 0) {
         throw std::runtime_error("Failed to initiate filesystem: " + std::to_string(err));
     }
 
@@ -42,7 +42,7 @@ void RT1051Platform::initFilesystem()
 void platform::rt1051::RT1051Platform::deinit()
 {
     if (usesFilesystem) {
-        if (int err = purefs::subsystem::unmount_all(); err != 0) {
+        if (const auto err = purefs::subsystem::unmount_all(); err != 0) {
             throw std::runtime_error("Failed to unmount all: " + std::to_string(err));
         }
         usesFilesystem = false;

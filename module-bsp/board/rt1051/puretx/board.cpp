@@ -15,7 +15,7 @@ namespace
         using namespace drivers;
         auto gpio_power = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::POWER_SWITCH_HOLD_GPIO),
                                              DriverGPIOParams{});
-        gpio_power->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 0);
+        gpio_power->WritePin(static_cast<std::uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 0);
     }
 
     void board_reset()
@@ -26,15 +26,20 @@ namespace
 
 namespace bsp
 {
-    void board_exit(rebootState state)
+    void board_configure()
+    {
+        // no-op for Pure
+    }
+
+    void board_exit(RebootState state)
     {
         switch (state) {
-        case rebootState::none:
+        case RebootState::None:
             break;
-        case rebootState::poweroff:
+        case RebootState::Poweroff:
             board_shutdown();
             break;
-        case rebootState::reboot:
+        case RebootState::Reboot:
             board_reset();
             break;
         }

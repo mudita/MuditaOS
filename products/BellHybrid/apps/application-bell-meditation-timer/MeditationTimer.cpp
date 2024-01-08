@@ -25,6 +25,8 @@
 #include <common/windows/SessionPausedWindow.hpp>
 #include <common/windows/AppsBatteryStatusWindow.hpp>
 
+#include <system/messages/SentinelRegistrationMessage.hpp>
+
 namespace app
 {
     MeditationTimer::MeditationTimer(std::string name,
@@ -54,6 +56,11 @@ namespace app
         if (ret != sys::ReturnCodes::Success) {
             return ret;
         }
+
+        cpuSentinel                  = std::make_shared<sys::CpuSentinel>(defaultName, this);
+        auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
+        bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
+        cpuSentinel->BlockWfiMode(true);
 
         audioModel         = std::make_unique<AudioModel>(this);
         chimeIntervalModel = std::make_unique<meditation::models::ChimeInterval>(this);
@@ -139,5 +146,8 @@ namespace app
 
         return handleAsyncResponse(resp);
     }
-    MeditationTimer::~MeditationTimer() = default;
+    MeditationTimer::~MeditationTimer()
+    {
+        cpuSentinel->BlockWfiMode(false);
+    }
 } // namespace app

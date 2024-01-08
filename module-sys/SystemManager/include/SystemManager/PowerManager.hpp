@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -29,10 +29,8 @@ namespace sys
         explicit CpuFrequencyMonitor(const std::string &name);
 
         [[nodiscard]] auto GetName() const noexcept -> std::string;
-        [[nodiscard]] auto GetPeriodRuntimePercentage(const TickType_t periodTicksIncrease) const noexcept
-            -> std::uint32_t;
-        [[nodiscard]] auto GetTotalRuntimePercentage(const TickType_t totalTicksIncrease) const noexcept
-            -> std::uint32_t;
+        [[nodiscard]] auto GetPeriodRuntimePercentage(TickType_t periodTicksIncrease) const noexcept -> std::uint32_t;
+        [[nodiscard]] auto GetTotalRuntimePercentage(TickType_t totalTicksIncrease) const noexcept -> std::uint32_t;
         void IncreaseTicks(TickType_t ticks);
         void SavePeriodTicks();
 
@@ -45,7 +43,7 @@ namespace sys
     class PowerManager
     {
       public:
-        explicit PowerManager(CpuStatistics &cpuStats, TaskStatistics &taskStats);
+        PowerManager(CpuStatistics &cpuStats, TaskStatistics &taskStats);
         ~PowerManager();
 
         std::int32_t PowerOff();
@@ -70,19 +68,20 @@ namespace sys
         bool IsCpuPermanentFrequency();
         void SetPermanentFrequency(bsp::CpuFrequencyMHz freq);
         void ResetPermanentFrequency();
-
+        void BlockWfiMode(const std::string &sentinelName, bool block);
+        void EnterWfiIfReady();
         void LogPowerManagerStatistics();
 
       private:
         void SetCpuFrequency(bsp::CpuFrequencyMHz freq);
-
         void UpdateCpuFrequencyMonitor(bsp::CpuFrequencyMHz currentFreq);
+        void UpdateCpuFrequencyMonitor(const std::string &name, std::uint32_t tickIncrease);
         [[nodiscard]] auto GetMinimumCpuFrequencyRequested() const noexcept -> sentinel::View;
 
         TickType_t lastCpuFrequencyChangeTimestamp{0};
         TickType_t lastLogStatisticsTimestamp{0};
 
-        std::vector<CpuFrequencyMonitor> cpuFrequencyMonitor;
+        std::vector<CpuFrequencyMonitor> cpuFrequencyMonitors;
 
         std::shared_ptr<drivers::DriverSEMC> driverSEMC;
         std::unique_ptr<bsp::LowPowerMode> lowPowerControl;
@@ -94,5 +93,4 @@ namespace sys
         CpuStatistics &cpuStatistics;
         TaskStatistics &taskStatistics;
     };
-
 } // namespace sys

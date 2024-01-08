@@ -51,18 +51,30 @@ namespace
 
 namespace bsp
 {
-    void board_exit(rebootState state)
+    void board_configure()
+    {
+        /* See *
+         * https://patchwork.kernel.org/project/linux-arm-kernel/patch/1471885400-9140-1-git-send-email-Anson.Huang@nxp.com/
+         */
+        CCM->CGPR |= CCM_CGPR_INT_MEM_CLK_LPM_MASK;
+
+        /* ERR050143 */
+        IOMUXC_GPR->GPR1 |= IOMUXC_GPR_GPR1_GINT_MASK;
+    }
+
+    void board_exit(RebootState state)
     {
         switch (state) {
-        case rebootState::none:
+        case RebootState::None:
             break;
-        case rebootState::poweroff:
+        case RebootState::Poweroff:
             power_off();
             break;
-        case rebootState::reboot:
+        case RebootState::Reboot:
             reset();
             break;
         }
+
         while (true) {}
     }
 } // namespace bsp

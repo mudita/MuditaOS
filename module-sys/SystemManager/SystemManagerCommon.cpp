@@ -24,6 +24,7 @@
 #include <system/messages/SentinelRegistrationMessage.hpp>
 #include <system/messages/RequestCpuFrequencyMessage.hpp>
 #include <system/messages/HoldCpuFrequency.hpp>
+#include <system/messages/BlockWfiMode.hpp>
 #include <time/ScopedTime.hpp>
 #include "Timers/TimerFactory.hpp"
 #include <service-appmgr/StartupType.hpp>
@@ -240,7 +241,7 @@ namespace sys
         // Start System manager
         StartService();
 
-        freqTimer = sys::TimerFactory::createPeriodicTimer(
+        freqTimer = sys::TimerFactory::createSingleShotTimer(
             this, "cpuTick", constants::timerInitInterval, [this](sys::Timer &) { FreqUpdateTick(); });
         freqTimer.start();
 
@@ -654,6 +655,15 @@ namespace sys
             return sys::MessageNone{};
         });
 
+        connect(typeid(sys::BlockWfiModeMessage), [this](sys::Message *message) -> sys::MessagePointer {
+            auto msg = static_cast<sys::BlockWfiModeMessage *>(message);
+            powerManager->BlockWfiMode(msg->getName(), msg->getRequest());
+            if (msg->getHandle() != nullptr) {
+                xTaskNotifyGive(msg->getHandle());
+            }
+            return sys::MessageNone{};
+        });
+
         connect(typeid(sys::IsCpuPermanent), [this](sys::Message *message) -> sys::MessagePointer {
             return std::make_shared<sys::IsCpuPermanentResponse>(powerManager->IsCpuPermanentFrequency());
         });
@@ -787,6 +797,8 @@ namespace sys
 
         auto ret = powerManager->UpdateCpuFrequency();
         cpuStatistics->TrackChange(ret);
+        powerManager->EnterWfiIfReady();
+        freqTimer.restart(constants::timerPeriodInterval);
     }
 
     void SystemManagerCommon::UpdateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency)

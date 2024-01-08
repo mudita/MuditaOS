@@ -236,10 +236,6 @@ namespace bsp
              * immediately reset board's main DCDC converter
              * using the WDOG_B pin. This will reset the
              * whole board. */
-            if (status & kPMU_1P1BrownoutOnOutput) {
-                WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
-            }
-
             if (status & kPMU_2P5BrownoutOnOutput) {
                 WDOG1->WCR &= ~WDOG_WCR_WDA_MASK;
             }

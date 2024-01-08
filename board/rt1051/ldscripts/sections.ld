@@ -17,6 +17,8 @@ __ocram_noncached_end = ORIGIN(SRAM_OC) + LENGTH(SRAM_OC);
 __dtcm_ram_start = ORIGIN(SRAM_DTC);
 __dtcm_ram_end = ORIGIN(SRAM_DTC) + LENGTH(SRAM_DTC);
 
+__sdram_start = ORIGIN(BOARD_SDRAM_TEXT);
+
 __sdram_cached_start = ORIGIN(BOARD_SDRAM_HEAP);
 __sdram_cached_end = ORIGIN(BOARD_SDRAM_HEAP) + LENGTH(BOARD_SDRAM_HEAP);
 
@@ -49,7 +51,7 @@ SECTIONS
     .text : ALIGN(4)
     {
         FILL(0x00)
-        __vectors_start__ = ABSOLUTE(.) ;
+        __vectors_start__ = ABSOLUTE(.);
         KEEP(*(.isr_vector))
         /* Global Section Table */
         . = ALIGN(4) ;
@@ -64,6 +66,11 @@ SECTIONS
         LONG(    ADDR(.data));
         LONG(  SIZEOF(.data));
         __data_section_table_end = .;
+        __ocramtext_section_table = .;
+        LONG(LOADADDR(.ocramtext));
+        LONG(ADDR(.ocramtext));
+        LONG(SIZEOF(.ocramtext));
+        __ocramtext_section_table_end = .;
         __bss_section_table = .;
         /* System bss */
         LONG(    ADDR(.sysbss));
@@ -105,10 +112,18 @@ SECTIONS
         *libusb_stack.a:*(.data*)
     } > SRAM_DTC AT > BOARD_SDRAM_TEXT
 
+    /* Place WFI and SDRAM driver code in OCRAM to enable switching SDRAM to self-refresh before executing WFI */
+    .ocramtext : ALIGN(4)
+    {
+        *(.wficode*)
+        *fsl_semc.c.obj(.text*)
+    } > SRAM_OC AT > BOARD_SDRAM_TEXT
+
     /* MAIN TEXT SECTION */
     .text : ALIGN(4)
     {
-        *(.text*)
+        /* Place here all .text* sections except for the ones in fsl_semc.c.obj file */
+        *(EXCLUDE_FILE (*fsl_semc.c.obj) .text*)
         *(.rodata .rodata.* .constdata .constdata.*)
         . = ALIGN(4);
 
@@ -190,13 +205,6 @@ SECTIONS
         *(.sdram)
         *(.sdram.*)
     } >BOARD_SDRAM_HEAP
-
-    /* DMA buffers */
-    .intramnoncacheable (NOLOAD) : ALIGN(4)
-    {
-        *(.intramnoncacheable)
-        *(.intramnoncacheable.*)
-    } > SRAM_OC
 
     /* Place system stack at the very end of DTCM */
     _StackSize = 0x1000;

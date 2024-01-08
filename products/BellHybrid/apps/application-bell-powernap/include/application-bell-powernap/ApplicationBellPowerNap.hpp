@@ -22,6 +22,7 @@ namespace app
     {
       private:
         std::unique_ptr<AbstractAudioModel> audioModel;
+        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
         void onStop() override;
 
       public:
