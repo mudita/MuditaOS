@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <AlarmOperations.hpp>
@@ -105,14 +105,16 @@ namespace
         std::unique_ptr<alarms::PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
         std::unique_ptr<alarms::SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider,
         std::unique_ptr<alarms::OnboardingSettingsProvider> &&onboardingSettingsProvider,
-        std::unique_ptr<alarms::AbstractBedtimeSettingsProvider> &&bedtimeSettingsProvider)
+        std::unique_ptr<alarms::AbstractBedtimeSettingsProvider> &&bedtimeSettingsProvider,
+        alarms::PreWakeUp::ChangeStateCallback callback = nullptr)
     {
         return std::make_unique<alarms::AlarmOperations>(std::move(alarmRepo),
                                                          timeInjector,
                                                          std::move(preWakeUpSettingsProvider),
                                                          std::move(snoozeChimeSettingsProvider),
                                                          std::move(onboardingSettingsProvider),
-                                                         std::move(bedtimeSettingsProvider));
+                                                         std::move(bedtimeSettingsProvider),
+                                                         std::move(callback));
     }
 } // namespace
 
@@ -127,9 +129,11 @@ std::unique_ptr<alarms::IAlarmOperations> AlarmOperationsFixture::getMockedAlarm
                                       std::make_unique<MockedBedtimeModel>());
 }
 
+std::function<void(bool)> changeStateCallback = [](bool state) {};
+
 TEST(PreWakeUp, TooEarlyForPreWakeUp)
 {
-    alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>());
+    alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>(), std::move(changeStateCallback));
     auto event           = AlarmEventRecord(1, AlarmTime{5h, 6min}, defMusic, defEnabled, defSnooze, defRRule);
     const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
@@ -141,7 +145,7 @@ TEST(PreWakeUp, TooEarlyForPreWakeUp)
 
 TEST(PreWakeUp, TimeToPlayChime)
 {
-    alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>());
+    alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>(), std::move(changeStateCallback));
     auto event           = AlarmEventRecord(1, AlarmTime{5h, 5min}, defMusic, defEnabled, defSnooze, defRRule);
     const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
@@ -155,7 +159,7 @@ TEST(PreWakeUp, TimeToPlayChimeButDisabled)
 {
     auto settingsProvider = std::make_unique<MockedPreWakeUpSettingsProvider>();
     settingsProvider->setChimeSettings(false, std::chrono::minutes::zero());
-    alarms::PreWakeUp preWakeUp(std::move(settingsProvider));
+    alarms::PreWakeUp preWakeUp(std::move(settingsProvider), std::move(changeStateCallback));
     auto event           = AlarmEventRecord(1, AlarmTime{5h, 5min}, defMusic, defEnabled, defSnooze, defRRule);
     const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
@@ -167,7 +171,7 @@ TEST(PreWakeUp, TimeToPlayChimeButDisabled)
 
 TEST(PreWakeUp, TimeToLightFrontlight)
 {
-    alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>());
+    alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>(), std::move(changeStateCallback));
     auto event           = AlarmEventRecord(1, AlarmTime{5h, 2min}, defMusic, defEnabled, defSnooze, defRRule);
     const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
@@ -181,7 +185,7 @@ TEST(PreWakeUp, TimeToLightFrontlightButDisabled)
 {
     auto settingsProvider = std::make_unique<MockedPreWakeUpSettingsProvider>();
     settingsProvider->setFrontlightSettings(false, std::chrono::minutes::zero());
-    alarms::PreWakeUp preWakeUp(std::move(settingsProvider));
+    alarms::PreWakeUp preWakeUp(std::move(settingsProvider), std::move(changeStateCallback));
     auto event           = AlarmEventRecord(1, AlarmTime{5h, 2min}, defMusic, defEnabled, defSnooze, defRRule);
     const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());
@@ -189,6 +193,19 @@ TEST(PreWakeUp, TimeToLightFrontlightButDisabled)
     const auto decision = preWakeUp.decide(timeInjector(), nextEvent);
     ASSERT_FALSE(decision.timeForChime);
     ASSERT_FALSE(decision.timeForFrontlight);
+}
+
+TEST(PreWakeUp, CallbackWhenSetActive)
+{
+    testing::MockFunction<void(bool)> mockCallback;
+    std::function<void(bool)> changeCallback = [&](bool state) { mockCallback.Call(state); };
+    alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>(), std::move(changeCallback));
+    EXPECT_CALL(mockCallback, Call(true)).Times(2);
+    EXPECT_CALL(mockCallback, Call(false)).Times(2);
+    preWakeUp.setActive(true);
+    preWakeUp.setActive(false);
+    preWakeUp.setActive(true);
+    preWakeUp.setActive(false);
 }
 
 TEST(Bedtime, TimeToBedDisabled)
@@ -215,7 +232,7 @@ TEST(Bedtime, TimeToBedEnabled)
 
 TEST(PreWakeUp, TimePointIsNotRoundedToFullMinute)
 {
-    alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>());
+    alarms::PreWakeUp preWakeUp(std::make_unique<MockedPreWakeUpSettingsProvider>(), std::move(changeStateCallback));
     auto event           = AlarmEventRecord(1, AlarmTime{5h, 5min}, defMusic, defEnabled, defSnooze, defRRule);
     const auto nextEvent = event.getNextSingleEvent(TimePointFromStringWithShift("2022-11-11 05:00:00"));
     EXPECT_TRUE(static_cast<EventInfo>(nextEvent).isValid());

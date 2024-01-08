@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmMessageHandler.hpp"
@@ -184,6 +184,15 @@ namespace alarms
             alarmOperations->handleCriticalBatteryLevel();
             break;
         }
+    }
+
+    auto AlarmMessageHandler::handleTurnOffPreWakeUp(TurnOffPreWakeUpRequestMessage *request)
+        -> std::shared_ptr<TurnOffPreWakeUpResponseMessage>
+    {
+        return handleWithCallback<TurnOffPreWakeUpRequestMessage, TurnOffPreWakeUpResponseMessage, bool>(
+            request, [&](TurnOffPreWakeUpRequestMessage *request, IAlarmOperations::OnTurnOffPreWakeUp callback) {
+                alarmOperations->turnOffPreWakeUp(callback);
+            });
     }
 
     template <class RequestType, class ResponseType, class CallbackParamType>

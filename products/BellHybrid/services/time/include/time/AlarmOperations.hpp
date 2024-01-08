@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -64,13 +64,14 @@ namespace alarms
     class PreWakeUp
     {
       public:
+        using ChangeStateCallback = std::function<void(bool)>;
         struct Decision
         {
             bool timeForChime;
             bool timeForFrontlight;
         };
 
-        explicit PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider);
+        PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider, ChangeStateCallback &&callback);
         auto decide(TimePoint now, const SingleEventRecord &event) -> Decision;
         auto isActive() const -> bool;
         auto setActive(bool state) -> void;
@@ -82,6 +83,7 @@ namespace alarms
 
         std::unique_ptr<PreWakeUpSettingsProvider> settingsProvider;
         bool active{false};
+        ChangeStateCallback onChangeStateCallback;
     };
 
     class Bedtime
@@ -104,7 +106,10 @@ namespace alarms
                         std::unique_ptr<PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
                         std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider,
                         std::unique_ptr<OnboardingSettingsProvider> &&onboardingSettingsProvider,
-                        std::unique_ptr<AbstractBedtimeSettingsProvider> &&BedtimeModel);
+                        std::unique_ptr<AbstractBedtimeSettingsProvider> &&BedtimeModel,
+                        PreWakeUp::ChangeStateCallback &&callback);
+
+        void turnOffPreWakeUp(OnTurnOffPreWakeUp callback) override;
 
       private:
         void minuteUpdated(TimePoint now) override;

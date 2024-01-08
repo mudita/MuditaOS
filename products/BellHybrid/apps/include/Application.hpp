@@ -6,6 +6,7 @@
 #include <ApplicationCommon.hpp>
 #include <common/models/AlarmModel.hpp>
 #include <common/models/BatteryModel.hpp>
+#include <common/models/PreWakeUpModel.hpp>
 
 namespace app
 {
@@ -35,6 +36,7 @@ namespace app
 
         std::unique_ptr<app::AlarmModel> alarmModel;
         std::unique_ptr<AbstractBatteryModel> batteryModel;
+        std::unique_ptr<AbstractPreWakeUpModel> preWakeUpModel;
 
       private:
         sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl) override;
@@ -42,6 +44,8 @@ namespace app
         sys::MessagePointer handleAppClose(sys::Message *msgl) override;
         sys::MessagePointer handleAppFocusLost(sys::Message *msgl) override;
         void updateStatuses(gui::AppWindow *window) const override;
+        sys::MessagePointer handlePreWakeUpChangeState(sys::Message *msgl);
+        bool isInputEventToHandlePreWakeUp(const gui::InputEvent inputEvent);
 
         virtual void onKeyPressed();
         virtual void onStart();

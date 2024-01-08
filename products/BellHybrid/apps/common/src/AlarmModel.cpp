@@ -232,6 +232,11 @@ namespace app
         update(callback);
     }
 
+    bool AlarmModel::turnOffPreWakeUp()
+    {
+        return alarms::AlarmServiceAPI::requestTurnOffPreWakeUp(app);
+    }
+
     alarms::AlarmStatus AlarmModel::getAlarmStatus()
     {
         return alarmStatus;

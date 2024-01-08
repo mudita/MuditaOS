@@ -24,7 +24,8 @@ namespace app::home_screen
         AlarmRinging,
         AlarmRingingDeactivatedWait,
         AlarmSnoozedWait,
-        AlarmSnoozed
+        AlarmSnoozed,
+        PreWakeUpActive
     };
 };
 

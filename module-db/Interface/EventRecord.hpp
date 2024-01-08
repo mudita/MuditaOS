@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -60,9 +60,11 @@ struct SingleEventRecord : public Record, public EventInfo
                       TimePoint startDate,
                       TimePoint endDate,
                       bool wasHandledDuringCall = false)
-        : EventInfo{startDate, endDate}, parent{parent}, wasHandledDuringPhoneCall(wasHandledDuringCall){};
+        : EventInfo{startDate, endDate}, parent{parent}, wasHandledDuringPhoneCall(wasHandledDuringCall),
+          isPreWakeUpAlreadyHandledByUser(false){};
 
     auto isValid() const -> bool;
 
     bool wasHandledDuringPhoneCall;
+    bool isPreWakeUpAlreadyHandledByUser;
 };
