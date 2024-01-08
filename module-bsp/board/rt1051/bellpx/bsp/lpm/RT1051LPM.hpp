@@ -12,5 +12,10 @@ namespace bsp
       public:
         void EnableDcdcPowerSaveMode() final;
         void DisableDcdcPowerSaveMode() final;
+
+        void AllowEnteringWfiMode() final;
+        void BlockEnteringWfiMode() final;
+        std::uint32_t EnterWfiModeIfAllowed() final;
+        std::uint32_t GetLastTimeSpentInWfi() final;
     };
 } // namespace bsp

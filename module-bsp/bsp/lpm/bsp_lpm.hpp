@@ -51,6 +51,13 @@ namespace bsp
         virtual void EnableDcdcPowerSaveMode()  = 0;
         virtual void DisableDcdcPowerSaveMode() = 0;
 
+        virtual void AllowEnteringWfiMode() = 0;
+        virtual void BlockEnteringWfiMode() = 0;
+        virtual std::uint32_t EnterWfiModeIfAllowed() = 0;
+        virtual std::uint32_t GetLastTimeSpentInWfi() = 0;
+
+        virtual void DisableSysTick() = 0;
+        virtual void EnableSysTick() = 0;
       protected:
         CpuFrequencyMHz currentFrequency = CpuFrequencyMHz::Level_6;
     };

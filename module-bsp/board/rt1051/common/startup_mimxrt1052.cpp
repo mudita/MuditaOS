@@ -681,10 +681,10 @@ __attribute__((section(".after_vectors.init_bss"))) void bss_init(unsigned int s
 // contains the load address, execution address and length of each RW data
 // section and the execution and length of each BSS (zero initialized) section.
 //*****************************************************************************
-extern unsigned int __textram_section_table;
-extern unsigned int __textram_section_table_end;
 extern unsigned int __data_section_table;
 extern unsigned int __data_section_table_end;
+extern unsigned int __ocramtext_section_table;
+extern unsigned int __ocramtext_section_table_end;
 extern unsigned int __bss_section_table;
 extern unsigned int __bss_section_table_end;
 
@@ -706,8 +706,20 @@ __attribute__((section(".after_vectors.reset"))) void ResetISR(void)
     // Load base address of Global Section Table
     SectionTableAddr = &__data_section_table;
 
-    // Copy the data sections from flash to SRAM.
+    // Copy the data sections from flash to SRAM
     while (SectionTableAddr < &__data_section_table_end) {
+        LoadAddr   = *SectionTableAddr++;
+        ExeAddr    = *SectionTableAddr++;
+        SectionLen = *SectionTableAddr++;
+        if (LoadAddr != ExeAddr) {
+            data_init(LoadAddr, ExeAddr, SectionLen);
+        }
+    }
+
+    // Load address of OCRAM text section entry in GST
+    SectionTableAddr = &__ocramtext_section_table;
+    // Copy code from SDRAM to OCRAM
+    while (SectionTableAddr < &__ocramtext_section_table_end) {
         LoadAddr   = *SectionTableAddr++;
         ExeAddr    = *SectionTableAddr++;
         SectionLen = *SectionTableAddr++;

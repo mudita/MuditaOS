@@ -36,6 +36,7 @@ namespace app
         std::unique_ptr<AbstractLowBatteryInfoModel> lowBatteryInfoModel;
         std::unique_ptr<relaxation::RelaxationPlayer> player;
         sys::TimerHandle relaxationRebuildTimerHandle{};
+        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
 
         void onStop() override;
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;

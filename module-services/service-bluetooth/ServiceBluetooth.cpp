@@ -75,7 +75,7 @@ sys::ReturnCodes ServiceBluetooth::InitHandler()
     cpuSentinel = std::make_shared<sys::CpuSentinel>(service::name::bluetooth, this);
 
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
-    bus.sendUnicast(sentinelRegistrationMsg, service::name::system_manager);
+    bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
 
     connectionTimeoutTimer =
         sys::TimerFactory::createSingleShotTimer(this, "btTimeoutTimer", connectionTimeout, [this](sys::Timer &_) {

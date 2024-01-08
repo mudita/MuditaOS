@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SystemManager/cpu/algorithm/FrequencyHold.hpp"
@@ -12,6 +12,8 @@
 #include <log/log.hpp>
 #include <Logger.hpp>
 #include <Utils.hpp>
+#include <FreeRTOS.h>
+#include <ticks.hpp>
 
 namespace sys
 {
@@ -20,6 +22,7 @@ namespace sys
         constexpr auto lowestLevelName{"lowestCpuFrequency"};
         constexpr auto middleLevelName{"middleCpuFrequency"};
         constexpr auto highestLevelName{"highestCpuFrequency"};
+        constexpr auto WfiName{"WFI"};
 
         constexpr bsp::CpuFrequencyMHz logDumpFrequencyToHold{bsp::CpuFrequencyMHz::Level_4};
     } // namespace
@@ -72,9 +75,10 @@ namespace sys
         cpuAlgorithms->emplace(sys::cpu::AlgoID::FrequencyStepping,
                                std::make_unique<sys::cpu::FrequencyStepping>(powerProfile));
 
-        cpuFrequencyMonitor.push_back(CpuFrequencyMonitor(lowestLevelName));
-        cpuFrequencyMonitor.push_back(CpuFrequencyMonitor(middleLevelName));
-        cpuFrequencyMonitor.push_back(CpuFrequencyMonitor(highestLevelName));
+        cpuFrequencyMonitors.push_back(CpuFrequencyMonitor(lowestLevelName));
+        cpuFrequencyMonitors.push_back(CpuFrequencyMonitor(middleLevelName));
+        cpuFrequencyMonitors.push_back(CpuFrequencyMonitor(highestLevelName));
+        cpuFrequencyMonitors.push_back(CpuFrequencyMonitor(WfiName));
     }
 
     PowerManager::~PowerManager()
@@ -115,7 +119,7 @@ namespace sys
 
     [[nodiscard]] cpu::UpdateResult PowerManager::UpdateCpuFrequency()
     {
-        std::uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad();
+        const std::uint32_t cpuLoad = cpuStatistics.GetPercentageCpuLoad();
         cpu::UpdateResult retval;
         const cpu::AlgorithmData data{
             cpuLoad, lowPowerControl->GetCurrentFrequencyLevel(), GetMinimumCpuFrequencyRequested()};
@@ -147,7 +151,7 @@ namespace sys
 
     void PowerManager::RemoveSentinel(std::string sentinelName) const
     {
-        cpuGovernor->RemoveSentinel(sentinelName);
+        cpuGovernor->RemoveSentinel(std::move(sentinelName));
     }
 
     void PowerManager::SetCpuFrequencyRequest(const std::string &sentinelName, bsp::CpuFrequencyMHz request)
@@ -162,6 +166,11 @@ namespace sys
         cpuGovernor->ResetCpuFrequencyRequest(sentinelName);
         auto ret = UpdateCpuFrequency();
         cpuStatistics.TrackChange(ret);
+    }
+
+    void PowerManager::BlockWfiMode(const std::string &sentinelName, bool block)
+    {
+        cpuGovernor->BlockWfiMode(sentinelName, block);
     }
 
     bool PowerManager::IsCpuPermanentFrequency()
@@ -210,13 +219,42 @@ namespace sys
                              ? lowestLevelName
                              : (currentFreq == bsp::CpuFrequencyMHz::Level_6 ? highestLevelName : middleLevelName);
 
-        for (auto &level : cpuFrequencyMonitor) {
+        for (auto &level : cpuFrequencyMonitors) {
             if (level.GetName() == levelName) {
                 level.IncreaseTicks(ticks - lastCpuFrequencyChangeTimestamp);
             }
         }
 
         lastCpuFrequencyChangeTimestamp = ticks;
+    }
+
+    void PowerManager::UpdateCpuFrequencyMonitor(const std::string &name, std::uint32_t tickIncrease)
+    {
+        for (auto &level : cpuFrequencyMonitors) {
+            if (level.GetName() == name) {
+                level.IncreaseTicks(tickIncrease);
+            }
+        }
+    }
+
+    void PowerManager::EnterWfiIfReady()
+    {
+        if (cpuGovernor->IsWfiBlocked()) {
+            return;
+        }
+
+        const auto timeSpentInWFI = lowPowerControl->EnterWfiModeIfAllowed();
+        if (timeSpentInWFI > 0) {
+            /* We increase the frequency immediately after exiting WFI so that the xTaskCatchUpTicks procedure has
+             * time to execute and does not block the button press detection mechanism. */
+            SetCpuFrequency(bsp::CpuFrequencyMHz::Level_4);
+            portENTER_CRITICAL();
+            lowPowerControl->DisableSysTick();
+            xTaskCatchUpTicks(cpp_freertos::Ticks::MsToTicks(timeSpentInWFI));
+            lowPowerControl->EnableSysTick();
+            portEXIT_CRITICAL();
+            UpdateCpuFrequencyMonitor(WfiName, timeSpentInWFI);
+        }
     }
 
     void PowerManager::LogPowerManagerStatistics()
@@ -226,7 +264,7 @@ namespace sys
         UpdateCpuFrequencyMonitor(lowPowerControl->GetCurrentFrequencyLevel());
 
         std::string log{"Last period (total): "};
-        for (auto &level : cpuFrequencyMonitor) {
+        for (auto &level : cpuFrequencyMonitors) {
             log.append(level.GetName() + ": " + std::to_string(level.GetPeriodRuntimePercentage(periodTickIncrease)) +
                        "% (" + std::to_string(level.GetTotalRuntimePercentage(tickCount)) + "%) ");
             level.SavePeriodTicks();

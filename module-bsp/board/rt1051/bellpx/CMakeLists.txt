@@ -20,6 +20,8 @@ target_sources(
         bsp/eink/eink_gpio.cpp
         bsp/lpm/PowerProfile.cpp
         bsp/lpm/RT1051LPM.cpp
+        bsp/lpm/WfiController.cpp
+        bsp/lpm/EnterSleepMode.c
         bsp/rotary_encoder/rotary_encoder.cpp
         bsp/rtc/rtc_configuration.cpp
         bsp/switches/switches.cpp

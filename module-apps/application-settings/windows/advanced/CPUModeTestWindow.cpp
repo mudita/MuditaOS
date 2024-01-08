@@ -37,7 +37,7 @@ namespace gui
         });
 
         auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuModeTester);
-        application->bus.sendUnicastSync(sentinelRegistrationMsg, service::name::system_manager, 30);
+        application->bus.sendUnicastSync(std::move(sentinelRegistrationMsg), service::name::system_manager, 30);
 
         AppWindow::buildInterface();
 

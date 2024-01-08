@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,10 +18,13 @@ namespace bsp
         void SetCpuFrequency(CpuFrequencyMHz freq) final;
         [[nodiscard]] std::uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
+        void DisableSysTick() final;
+        void EnableSysTick() final;
 
       private:
         void onChangeUp(CpuFrequencyMHz freq, CpuFrequencyMHz newFrequency);
         void onChangeDown(CpuFrequencyMHz freq);
+        std::string getFrequencyChangedLog();
 
         std::unique_ptr<bsp::CpuFreqLPM> CpuFreq;
         std::shared_ptr<drivers::DriverSEMC> driverSEMC;

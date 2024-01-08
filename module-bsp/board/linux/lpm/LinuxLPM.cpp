@@ -33,4 +33,27 @@ namespace bsp
 
     void LinuxLPM::DisableDcdcPowerSaveMode()
     {}
+
+    void LinuxLPM::AllowEnteringWfiMode()
+    {}
+
+    void LinuxLPM::BlockEnteringWfiMode()
+    {}
+
+    std::uint32_t LinuxLPM::EnterWfiModeIfAllowed()
+    {
+        return 0;
+    }
+
+    std::uint32_t LinuxLPM::GetLastTimeSpentInWfi()
+    {
+        return 0;
+    }
+
+    void LinuxLPM::DisableSysTick()
+    {}
+
+    void LinuxLPM::EnableSysTick()
+    {}
+
 } // namespace bsp

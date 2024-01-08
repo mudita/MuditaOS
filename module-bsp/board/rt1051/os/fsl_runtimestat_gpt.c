@@ -1,7 +1,11 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "fsl_gpt.h"
+#include <fsl_runtimestat_gpt.h>
+#include <fsl_gpt.h>
+
+static const uint32_t millisecondsInSecond = 1000U;
+static const uint32_t runTimeStatsClockHz  = 10000U;
 
 static inline GPT_Type *vPortGetGptBase(void)
 {
@@ -31,7 +35,17 @@ void vConfigureTimerForRunTimeStats(void)
     GPT_StartTimer(pxGptBase);
 }
 
+uint32_t ulHighFrequencyTimerTicksToMs(uint32_t ticks)
+{
+    return (ticks / (runTimeStatsClockHz / millisecondsInSecond));
+}
+
 uint32_t ulHighFrequencyTimerTicks(void)
 {
     return GPT_GetCurrentTimerCount(vPortGetGptBase());
+}
+
+uint32_t ulHighFrequencyTimerMs(void)
+{
+    return ulHighFrequencyTimerTicksToMs(ulHighFrequencyTimerTicks());
 }

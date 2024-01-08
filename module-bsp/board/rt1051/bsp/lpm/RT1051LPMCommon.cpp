@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051LPMCommon.hpp"
 #include <log/log.hpp>
+#include <fsl_device_registers.h>
 #include <fsl_clock.h>
 #include <bsp/bsp.hpp>
 #include "Oscillator.hpp"
@@ -66,6 +67,9 @@ namespace bsp
     void RT1051LPMCommon::onChangeUp(CpuFrequencyMHz freq, CpuFrequencyMHz newFrequency)
     {
         if ((freq <= CpuFrequencyMHz::Level_1) && (newFrequency > CpuFrequencyMHz::Level_1)) {
+            /* Block entering WFI mode */
+            BlockEnteringWfiMode();
+
             /* Switch to external crystal oscillator */
             SwitchOscillatorSource(LowPowerMode::OscillatorSource::External);
 
@@ -86,6 +90,8 @@ namespace bsp
             if (driverSEMC) {
                 driverSEMC->SwitchToPeripheralClockSource();
             }
+            /* Allow entering WFI mode */
+            AllowEnteringWfiMode();
         }
     }
 
@@ -140,7 +146,7 @@ namespace bsp
             onChangeDown(freq);
         }
 
-        LOG_INFO("CPU frequency changed to %lu", CLOCK_GetFreq(kCLOCK_CpuClk));
+        LOG_INFO("%s", getFrequencyChangedLog().c_str());
         currentFrequency = freq;
     }
 
@@ -160,5 +166,24 @@ namespace bsp
             SwitchToExternalOscillator();
             break;
         }
+    }
+
+    void RT1051LPMCommon::DisableSysTick()
+    {
+        SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
+    }
+
+    void RT1051LPMCommon::EnableSysTick()
+    {
+        SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
+    }
+
+    std::string RT1051LPMCommon::getFrequencyChangedLog()
+    {
+        auto logMsg = "CPU frequency changed to " + std::to_string(CLOCK_GetCpuClkFreq());
+        if (currentFrequency <= CpuFrequencyMHz::Level_1) {
+            logMsg += " (WFI time: " + std::to_string(GetLastTimeSpentInWfi()) + " ms)";
+        }
+        return logMsg;
     }
 } // namespace bsp

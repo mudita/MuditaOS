@@ -9,6 +9,8 @@
 * Added setting onboarding year to build date year
 * Added low battery notification on the home screen
 * Added low battery notification before using the application
+* Added entering WFI when CPU is idle to reduce power consumption
+* Added switching SDRAM to self-refresh before entering WFI for further power consumption reduction
 
 ### Changed / Improved
 
@@ -17,7 +19,6 @@
 ### Added
 * Added gradual alarm volume increase
 * Added progress bar for all volume control windows
-* Improved factory reset procedure to remove user files
 
 ### Changed / Improved
 * Increased clock font in Relaxation, Meditation, Power nap mode
@@ -26,6 +27,7 @@
 * Extended volume scale from 10 to 15 point scale
 * Modified volume control characteristic for better user experience
 * Reduced power consumption for Meditation and Power Nap applications
+* Improved factory reset procedure to remove user files
 
 ## [2.3.0 2023-12-20]
 

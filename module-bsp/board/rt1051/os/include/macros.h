@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,11 +17,6 @@
 #define CACHEABLE_SECTION_SDRAM_ALIGN(var, alignbytes)                                                                 \
     __attribute__((section(".sdram"))) __attribute__((aligned(alignbytes))) var
 
-#define NONCACHEABLE_SECTION_DMA(var) __attribute__((section(".intramnoncacheable"))) var
-
-#define NONCACHEABLE_SECTION_DMA_ALIGN(var, alignbytes)                                                                \
-    __attribute__((section(".intramnoncacheable"))) var __attribute__((aligned(alignbytes)))
-
 #define NONCACHEABLE_SECTION_SDRAM(var) var
 
 #define NONCACHEABLE_SECTION_SDRAM_ALIGN(var, alignbytes) var __attribute__((aligned(alignbytes)))
@@ -35,6 +30,8 @@
 
 #define NONCACHEABLE_SECTION_ALIGN(var, alignbytes)                                                                    \
     __attribute__((section("NonCacheable,\"aw\",%nobits @"))) var __attribute__((aligned(alignbytes)))
+
+#define WFI_CODE_SECTION(var) __attribute__((section(".wficode"), noinline)) var
 
 static inline uint32_t IS_MEM_ADDR_CACHED(void *addr)
 {

@@ -68,6 +68,16 @@ namespace sys
         requestedFrequency = newFrequency;
     }
 
+    void GovernorSentinel::BlockWfiMode(bool request)
+    {
+        wfiBlocked = request;
+    }
+
+    [[nodiscard]] auto GovernorSentinel::IsWfiBlocked() const noexcept -> bool
+    {
+        return wfiBlocked;
+    }
+
     bool CpuGovernor::RegisterNewSentinel(std::shared_ptr<CpuSentinel> newSentinel)
     {
         if (newSentinel) {
@@ -149,6 +159,25 @@ namespace sys
         SetCpuFrequencyRequest(sentinelName, bsp::CpuFrequencyMHz::Level_0);
     }
 
+    void CpuGovernor::BlockWfiMode(const std::string &sentinelName, bool request)
+    {
+        auto isSentinelRecognized = false;
+        for (auto &sentinel : sentinels) {
+            auto sentinelWeakPointer = sentinel->GetSentinel();
+            if (!sentinelWeakPointer.expired()) {
+                std::shared_ptr<CpuSentinel> sharedResource = sentinelWeakPointer.lock();
+                if (sharedResource->GetName() == sentinelName) {
+                    sentinel->BlockWfiMode(request);
+                    isSentinelRecognized = true;
+                    break;
+                }
+            }
+        }
+        if (!isSentinelRecognized) {
+            LOG_WARN("Sentinel %s is not recognized!", sentinelName.c_str());
+        }
+    }
+
     [[nodiscard]] auto CpuGovernor::GetMinimumFrequencyRequested() noexcept -> sentinel::View
     {
         sentinel::View d;
@@ -172,6 +201,16 @@ namespace sys
             d.reason = "cant lock";
         }
         return d;
+    }
+
+    [[nodiscard]] auto CpuGovernor::IsWfiBlocked() noexcept -> bool
+    {
+        for (auto &sentinel : sentinels) {
+            if (sentinel->IsWfiBlocked()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     void CpuGovernor::InformSentinelsAboutCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency) noexcept
