@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <BellAlarmHandler.hpp>
@@ -192,6 +192,7 @@ namespace alarms
         AlarmOperationsCommon::minuteUpdated(now);
         auto prewakeupStarted  = processPreWakeUp(now);
         auto snoozeChimePlayed = processSnoozeChime(now);
+        // inform the state controler that the PreWakeUp is Active
 
         // If we are during snooze or its prewakeup time, we decided to skip bedtime handling at all
         if (!prewakeupStarted && !snoozeChimePlayed && isBedtimeAllowed()) {
@@ -345,6 +346,26 @@ namespace alarms
             disablePreWakeUp(event);
         }
         AlarmOperationsCommon::handleAlarmEvent(event, alarmType, newStateOn);
+    }
+
+    void AlarmOperations::getPreWakeUpStatus(IAlarmOperations::OnPreWakeUpStatus callback)
+    {
+        if (callback) {
+            callback(preWakeUp.isActive());
+        }
+    }
+
+    void AlarmOperations::turnOffPreWakeUp(IAlarmOperations::OnTurnOffPreWakeUp callback)
+    {
+        auto nextEvent = getNextPreWakeUpEvent();
+        if (nextEvent.isValid()) {
+            if (auto event = std::dynamic_pointer_cast<AlarmEventRecord>(nextEvent.parent); event) {
+                disablePreWakeUp(event);
+                if (callback) {
+                    callback(true);
+                }
+            }
+        }
     }
 
     PreWakeUp::PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider)

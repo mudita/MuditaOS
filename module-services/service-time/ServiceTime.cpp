@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTime.hpp"
@@ -210,6 +210,14 @@ namespace stm
             auto message = static_cast<sevm::BatteryStateChangeMessage *>(request);
             alarmMessageHandler->handleBatteryStateChange(message);
             return std::make_shared<sys::ResponseMessage>();
+        });
+        connect(typeid(alarms::TurnOffPreWakeUpRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handleTurnOffPreWakeUp(
+                static_cast<alarms::TurnOffPreWakeUpRequestMessage *>(request));
+        });
+        connect(typeid(alarms::GetPreWakeUpRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            return alarmMessageHandler->handlePreWakeUpStatus(
+                static_cast<alarms::GetPreWakeUpRequestMessage *>(request));
         });
     }
 

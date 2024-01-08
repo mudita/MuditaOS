@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StateController.hpp"
@@ -84,6 +84,7 @@ namespace app::home_screen
             auto updateBatteryStatus = [](AbstractView &view, AbstractBatteryModel &batteryModel) {
                 view.setBatteryLevelState(batteryModel.getLevelState());
             };
+            auto turnOffPreWakeUp = [](AbstractAlarmModel &alarmModel) { alarmModel.turnOffPreWakeUp(); };
 
         } // namespace Helpers
 
@@ -114,6 +115,8 @@ namespace app::home_screen
             struct ModelReady
             {};
             struct BatteryUpdate
+            {};
+            struct PreWakeUp
             {};
         } // namespace Events
 

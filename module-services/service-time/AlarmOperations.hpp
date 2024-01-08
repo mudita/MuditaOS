@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,6 +17,7 @@ namespace alarms
 {
     class IAlarmOperations
     {
+        // add new function to get prewakeup info
       public:
         using OnGetAlarmProcessed           = std::function<void(AlarmEventRecord)>;
         using OnGetAlarmWithStatusProcessed = std::function<void(std::pair<AlarmEventRecord, AlarmStatus>)>;
@@ -34,6 +35,8 @@ namespace alarms
         using OnToggleAllProcessed          = std::function<void(bool)>;
         using CheckIfPhoneCallIsOngoing     = std::function<bool(void)>;
         using OnAlarmDuringPhoneCall        = std::function<void(void)>;
+        using OnPreWakeUpStatus             = std::function<void(bool)>;
+        using OnTurnOffPreWakeUp            = std::function<void(bool)>;
 
         virtual ~IAlarmOperations() noexcept = default;
 
@@ -70,6 +73,8 @@ namespace alarms
         virtual void handleNormalBatteryLevel()                                                              = 0;
         virtual void addCheckIfPhoneCallIsOngoingCallback(CheckIfPhoneCallIsOngoing)                         = 0;
         virtual void addAlarmDuringPhoneCallCallback(OnAlarmDuringPhoneCall)                                 = 0;
+        virtual void getPreWakeUpStatus(OnPreWakeUpStatus)                                                   = 0;
+        virtual void turnOffPreWakeUp(OnTurnOffPreWakeUp)                                                    = 0;
     };
 
     class IAlarmOperationsFactory
@@ -118,6 +123,8 @@ namespace alarms
         void handleNormalBatteryLevel() override;
         void addCheckIfPhoneCallIsOngoingCallback(CheckIfPhoneCallIsOngoing callback) override;
         void addAlarmDuringPhoneCallCallback(OnAlarmDuringPhoneCall callback) override;
+        void getPreWakeUpStatus(OnPreWakeUpStatus callback) override;
+        void turnOffPreWakeUp(OnTurnOffPreWakeUp callback) override;
 
       protected:
         std::unique_ptr<AbstractAlarmEventsRepository> alarmEventsRepo;

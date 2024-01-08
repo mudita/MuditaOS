@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "layouts/HomeScreenLayoutClassic.hpp"
@@ -169,6 +169,11 @@ namespace gui
             break;
         case app::home_screen::ViewState::AlarmSnoozed:
             setHeaderViewMode(HeaderViewMode::SnoozeIconAndTime);
+            alarm->setEditMode(EditMode::Browse);
+            removeTextDescription();
+            break;
+        case app::home_screen::ViewState::PreWakeUpActive:
+            setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
             alarm->setEditMode(EditMode::Browse);
             removeTextDescription();
             break;

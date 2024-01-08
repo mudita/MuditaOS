@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/AlarmModel.hpp"
@@ -13,6 +13,8 @@
 
 namespace app
 {
+
+    // AlarmModel -> AlarmApi -> AlarmMessagehandler -> AlarmOperation
     AlarmModel::AlarmModel(ApplicationCommon *app) : app::AsyncCallbackReceiver{app}, app{app}
     {
         state = State::InitInProgress;
@@ -227,6 +229,20 @@ namespace app
     {
         auto callback = [this, state]() { activate(state); };
         update(callback);
+    }
+
+    bool AlarmModel::isPreWakeUpActive()
+    {
+        // figure out how to get the info from api here :)
+        return alarms::AlarmServiceAPI::requestGetPreWakeUpStatus(app);
+    }
+
+    bool AlarmModel::turnOffPreWakeUp()
+    {
+        if (isPreWakeUpActive()) {
+            return alarms::AlarmServiceAPI::requestTurnOffPreWakeUp(app);
+        }
+        return false;
     }
 
     alarms::AlarmStatus AlarmModel::getAlarmStatus()

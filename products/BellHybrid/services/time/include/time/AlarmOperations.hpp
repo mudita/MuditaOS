@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -105,6 +105,9 @@ namespace alarms
                         std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettingsProvider,
                         std::unique_ptr<OnboardingSettingsProvider> &&onboardingSettingsProvider,
                         std::unique_ptr<AbstractBedtimeSettingsProvider> &&BedtimeModel);
+
+        void getPreWakeUpStatus(OnPreWakeUpStatus callback) override;
+        void turnOffPreWakeUp(OnTurnOffPreWakeUp callback) override;
 
       private:
         void minuteUpdated(TimePoint now) override;
