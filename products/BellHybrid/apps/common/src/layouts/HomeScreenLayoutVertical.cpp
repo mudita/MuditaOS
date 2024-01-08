@@ -106,6 +106,8 @@ namespace gui
             alarmMainTime->setVisible(false);
             setScreenMode(ScreenMode::Main);
             break;
+        case app::home_screen::ViewState::PreWakeUpActive:
+            break;
         }
     }
 

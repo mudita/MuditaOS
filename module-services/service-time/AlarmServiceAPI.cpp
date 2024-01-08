@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTimeName.hpp"
@@ -10,7 +10,6 @@
 
 namespace alarms
 {
-
     namespace AlarmServiceAPI
     {
         template <class requestType, typename... Types>
@@ -73,6 +72,11 @@ namespace alarms
         bool requestRegisterActiveAlarmsIndicatorHandler(sys::Service *serv)
         {
             return sendRequest<RegisterActiveAlarmsIndicatorHandlerRequestMessage>(serv);
+        }
+
+        bool requestTurnOffPreWakeUp(sys::Service *serv)
+        {
+            return sendRequest<TurnOffPreWakeUpRequestMessage>(serv);
         }
     }; // namespace AlarmServiceAPI
 

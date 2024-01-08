@@ -211,6 +211,7 @@ namespace app::home_screen
                             AbstractPresenter &presenter,
                             AbstractAlarmModel &alarmModel,
                             AbstractTimeModel &timeModel) {
+                alarmModel.turnOffPreWakeUp();
                 alarmModel.activate(true);
                 presenter.spawnTimer();
                 view.setTextDescription(utils::time::getBottomDescription(

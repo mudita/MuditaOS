@@ -17,6 +17,9 @@
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <common/popups/ChargingNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
+#include <service-time/AlarmMessage.hpp>
+#include <service-evtmgr/KbdMessage.hpp>
+#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
 
 namespace app
 {
@@ -33,10 +36,15 @@ namespace app
                         (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
                         (isCurrentWindow(gui::BellTurnOffWindow::name)));
             if (val == true) {
-                LOG_ERROR("Block popup - as curent window is in higher order popup");
+                LOG_ERROR("Block popup - as current window is in higher order popup");
             }
             return val ? gui::popup::FilterType::Ignore : gui::popup::FilterType::Show;
         });
+
+        preWakeUpModel = std::make_unique<PreWakeUpModel>(this);
+        bus.channels.push_back(sys::BusChannel::AlarmNotifications);
+        connect(typeid(alarms::PreWakeUpChangeState),
+                [&](sys::Message *msg) { return handlePreWakeUpChangeState(msg); });
     }
 
     sys::ReturnCodes Application::InitHandler()
@@ -134,6 +142,18 @@ namespace app
     sys::MessagePointer Application::handleKBDKeyEvent(sys::Message *msgl)
     {
         onKeyPressed();
+        if (preWakeUpModel && preWakeUpModel->isActive()) {
+            if (this->getState() != app::ApplicationCommon::State::ACTIVE_FORGROUND) {
+                LOG_FATAL("Terrible terrible damage! Application with no focus grabbed key!");
+                return sys::msgNotHandled();
+            }
+            const auto msg        = static_cast<sevm::KbdMessage *>(msgl);
+            const auto inputEvent = keyTranslator->translate(msg->key);
+            if (!inputEvent.is(gui::KeyCode::KEY_UNDEFINED) && isInputEventToHandlePreWakeUp(inputEvent)) {
+                preWakeUpModel->turnOffPreWakeUp();
+                return sys::msgHandled();
+            }
+        }
         return ApplicationCommon::handleKBDKeyEvent(msgl);
     }
 
@@ -153,6 +173,16 @@ namespace app
     {
         onStop();
         return ApplicationCommon::handleAppFocusLost(msgl);
+    }
+
+    sys::MessagePointer Application::handlePreWakeUpChangeState(sys::Message *msg)
+    {
+        auto *message = dynamic_cast<alarms::PreWakeUpChangeState *>(msg);
+        if (message == nullptr) {
+            return sys::msgNotHandled();
+        }
+        preWakeUpModel->setActive(message->isActive());
+        return sys::msgHandled();
     }
 
     void Application::onKeyPressed()
@@ -201,9 +231,20 @@ namespace app
         startIdleTimer();
         idleTimerActiveFlag = true;
     }
+
     void Application::suspendIdleTimer()
     {
         stopIdleTimer();
         idleTimerActiveFlag = false;
+    }
+
+    bool Application::isInputEventToHandlePreWakeUp(const gui::InputEvent inputEvent)
+    {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight && key != KeyMap::DeepPressDown &&
+            key != KeyMap::DeepPressUp) {
+            return true;
+        }
+        return false;
     }
 } // namespace app

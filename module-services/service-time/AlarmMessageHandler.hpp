@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -48,6 +48,8 @@ namespace alarms
         auto handleGetSnoozedAlarms(GetSnoozedAlarmsRequestMessage *request)
             -> std::shared_ptr<GetSnoozedAlarmsResponseMessage>;
         auto handleBatteryStateChange(sevm::BatteryStateChangeMessage *request) -> void;
+        auto handleTurnOffPreWakeUp(TurnOffPreWakeUpRequestMessage *request)
+            -> std::shared_ptr<TurnOffPreWakeUpResponseMessage>;
 
       private:
         stm::ServiceTime *service = nullptr;
