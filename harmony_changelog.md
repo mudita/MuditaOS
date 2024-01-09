@@ -8,6 +8,7 @@
 ### Added
 * Added setting onboarding year to build date year
 * Added low battery notification on the home screen
+* Added low battery notification before using the application
 
 ### Changed / Improved
 

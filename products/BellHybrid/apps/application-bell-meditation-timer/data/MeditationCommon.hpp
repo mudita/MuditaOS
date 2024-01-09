@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,8 +11,9 @@ namespace app::meditation
 {
     namespace windows
     {
-        static constexpr auto meditationCountdown = "MeditationCountdown";
-        static constexpr auto meditationProgress  = "MeditationProgress";
+        inline constexpr auto meditationCountdown  = "MeditationCountdown";
+        inline constexpr auto meditationProgress   = "MeditationProgress";
+        inline constexpr auto meditationLowBattery = "MeditationLowBatteryWindow";
     }; // namespace windows
 
     constexpr auto meditationDBRecordName = "MeditationTimer";

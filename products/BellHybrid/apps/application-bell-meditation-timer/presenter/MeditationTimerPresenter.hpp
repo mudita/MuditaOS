@@ -1,10 +1,12 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
+#include <common/models/BatteryModel.hpp>
+#include <common/models/LowBatteryInfoModel.hpp>
 
 namespace app
 {
@@ -43,7 +45,10 @@ namespace app::meditation
     class MeditationTimerPresenter : public MeditationTimerContract::Presenter
     {
       public:
-        MeditationTimerPresenter(app::ApplicationCommon *app, settings::Settings *settings);
+        MeditationTimerPresenter(app::ApplicationCommon *app,
+                                 settings::Settings *settings,
+                                 AbstractBatteryModel &batteryModel,
+                                 AbstractLowBatteryInfoModel &lowBatteryInfoModel);
 
         std::uint8_t getMinValue() override;
         std::uint8_t getMaxValue() override;
@@ -53,7 +58,9 @@ namespace app::meditation
         void activate(std::uint32_t value) override;
 
       private:
-        app::ApplicationCommon *app  = nullptr;
-        settings::Settings *settings = nullptr;
+        app::ApplicationCommon *app{nullptr};
+        settings::Settings *settings{nullptr};
+        AbstractBatteryModel &batteryModel;
+        AbstractLowBatteryInfoModel &lowBatteryInfoModel;
     };
 } // namespace app::meditation

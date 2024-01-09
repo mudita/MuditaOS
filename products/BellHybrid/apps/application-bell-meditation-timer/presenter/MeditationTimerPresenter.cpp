@@ -1,25 +1,37 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationCommon.hpp"
 #include "MeditationTimerPresenter.hpp"
 
 #include <common/LanguageUtils.hpp>
+#include <common/data/BatteryStatusSwitchData.hpp>
 #include <service-db/Settings.hpp>
+#include <Units.hpp>
 
 namespace
 {
+    using State                 = Store::Battery::State;
     constexpr auto spinnerMax   = 180U;
     constexpr auto spinnerMin   = 1U;
     constexpr auto spinnerStep  = 1U;
     constexpr auto emptyValue   = 0U;
     constexpr auto defaultValue = 15U;
+    constexpr units::SOC lowBatteryThreshold{10};
+
+    bool isBatteryCharging(const State state)
+    {
+        return state == State::Charging or state == State::ChargingDone;
+    }
 } // namespace
 
 namespace app::meditation
 {
-    MeditationTimerPresenter::MeditationTimerPresenter(app::ApplicationCommon *app, settings::Settings *settings)
-        : app{app}, settings{settings}
+    MeditationTimerPresenter::MeditationTimerPresenter(app::ApplicationCommon *app,
+                                                       settings::Settings *settings,
+                                                       AbstractBatteryModel &batteryModel,
+                                                       AbstractLowBatteryInfoModel &lowBatteryInfoModel)
+        : app{app}, settings{settings}, batteryModel{batteryModel}, lowBatteryInfoModel{lowBatteryInfoModel}
     {}
 
     std::uint8_t MeditationTimerPresenter::getMinValue()
@@ -55,6 +67,20 @@ namespace app::meditation
     void MeditationTimerPresenter::activate(std::uint32_t value)
     {
         settings->setValue(meditationDBRecordName, utils::to_string(value), settings::SettingsScope::AppLocal);
-        app->switchWindow(windows::meditationCountdown);
+
+        auto switchToNextScreen = [this]() { app->switchWindow(windows::meditationCountdown); };
+
+        const auto batteryState = batteryModel.getLevelState();
+        const units::SOC soc    = batteryState.level;
+        const bool isCharging   = isBatteryCharging(batteryState.state);
+        if (not lowBatteryInfoModel.isInfoHandled() && not isCharging && soc < lowBatteryThreshold) {
+            auto lowBatterySwitchData =
+                std::make_unique<gui::AppsBatteryStatusSwitchData>(soc, isCharging, switchToNextScreen);
+            app->switchWindow(windows::meditationLowBattery, std::move(lowBatterySwitchData));
+            lowBatteryInfoModel.handleInfo();
+        }
+        else {
+            switchToNextScreen();
+        }
     }
 } // namespace app::meditation

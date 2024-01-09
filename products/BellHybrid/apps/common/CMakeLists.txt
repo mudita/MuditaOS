@@ -30,11 +30,14 @@ target_sources(application-bell-common
         src/windows/BellWelcomeWindow.cpp
         src/windows/SessionPausedWindow.cpp
         src/windows/ShortcutsWindow.cpp
+        src/windows/BellBatteryStatusWindow.cpp
+        src/windows/AppsBatteryStatusWindow.cpp
         src/BellSideListItemWithCallbacks.cpp
         src/TimeUtils.cpp
         src/TimeUtils.cpp
         src/models/SettingsModel.cpp
         src/models/BedtimeModel.cpp
+        src/models/LowBatteryInfoModel.cpp
         src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmActivatedWindow.cpp
         src/popups/BedtimeNotificationWindow.cpp
@@ -86,9 +89,12 @@ target_sources(application-bell-common
         include/common/windows/SessionPausedWindow.hpp
         include/common/windows/ShortcutsWindowContract.hpp
         include/common/windows/ShortcutsWindow.hpp
+        include/common/windows/BellBatteryStatusWindow.hpp
+        include/common/windows/AppsBatteryStatusWindow.hpp
         include/common/TimeUtils.hpp
         include/common/data/BatteryUtils.hpp
         include/common/data/FrontlightUtils.hpp
+        include/common/data/BatteryStatusSwitchData.hpp
         include/common/models/AbstractAlarmModel.hpp
         include/common/models/AbstractBedtimeModel.hpp
         include/common/models/AbstractSettingsModel.hpp
@@ -105,6 +111,7 @@ target_sources(application-bell-common
         include/common/models/AlarmSettingsModel.hpp
         include/common/models/AbstractAlarmSettingsModel.hpp
         include/common/models/LayoutModel.hpp
+        include/common/models/LowBatteryInfoModel.hpp
         include/common/popups/presenter/AlarmActivatedPresenter.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp

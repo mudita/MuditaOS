@@ -6,13 +6,14 @@
 #include "models/TemperatureModel.hpp"
 
 #include <windows/BellHomeScreenWindow.hpp>
-#include <windows/BellBatteryStatusWindow.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/models/BatteryModel.hpp>
 #include <common/widgets/ProgressTimerWithSnoozeTimer.hpp>
+#include <common/windows/BellBatteryStatusWindow.hpp>
+#include <common/data/BatteryStatusSwitchData.hpp>
 #include <Timers/SystemTimer.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <service-db/DBNotificationMessage.hpp>
@@ -250,15 +251,14 @@ namespace app::home_screen
 
     void HomeScreenPresenter::switchToBatteryStatus()
     {
-        app->switchWindow(gui::BellBatteryStatusWindow::name,
-                          std::make_unique<gui::BellBatteryStatusWindow::Data>(getBatteryLvl(), isBatteryCharging()));
+        app->switchWindow(gui::BellBatteryStatusWindow::windowName,
+                          std::make_unique<gui::BatteryStatusSwitchData>(getBatteryLvl(), isBatteryCharging()));
     }
 
     void HomeScreenPresenter::switchToLowBatteryWarning()
     {
-        app->switchWindow(
-            gui::BellBatteryStatusWindow::name,
-            std::make_unique<gui::BellBatteryStatusWindow::Data>(getBatteryLvl(), isBatteryCharging(), true));
+        app->switchWindow(gui::BellBatteryStatusWindow::windowName,
+                          std::make_unique<gui::BatteryStatusSwitchData>(getBatteryLvl(), isBatteryCharging(), true));
     }
 
     UTF8 HomeScreenPresenter::getGreeting()

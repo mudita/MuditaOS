@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -23,6 +23,7 @@
 #include <common/models/AudioModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/SessionPausedWindow.hpp>
+#include <common/windows/AppsBatteryStatusWindow.hpp>
 
 namespace app
 {
@@ -59,6 +60,8 @@ namespace app
         chimeVolumeModel   = std::make_unique<meditation::models::ChimeVolume>(*audioModel);
         startDelayModel    = std::make_unique<meditation::models::StartDelay>(this);
         statisticsModel    = std::make_unique<meditation::models::Statistics>(this);
+        batteryModel        = std::make_unique<app::BatteryModel>(this);
+        lowBatteryInfoModel = std::make_unique<app::LowBatteryInfoModel>();
 
         createUserInterface();
 
@@ -67,11 +70,10 @@ namespace app
 
     void MeditationTimer::createUserInterface()
     {
-        windowsFactory.attach(
-            meditation::MeditationMainWindow::defaultName, [this](ApplicationCommon *app, const std::string &name) {
-                auto presenter = std::make_unique<app::meditation::MeditationTimerPresenter>(app, settings.get());
-                return std::make_unique<meditation::MeditationMainWindow>(app);
-            });
+        windowsFactory.attach(meditation::MeditationMainWindow::defaultName,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<meditation::MeditationMainWindow>(app);
+                              });
 
         windowsFactory.attach(meditation::SettingsWindow::name,
                               [this](ApplicationCommon *app, const std::string &name) {
@@ -86,11 +88,12 @@ namespace app
                 return std::make_unique<meditation::StatisticsWindow>(app, std::move(presenter));
             });
 
-        windowsFactory.attach(
-            meditation::MeditationTimerWindow::name, [this](ApplicationCommon *app, const std::string &name) {
-                auto presenter = std::make_unique<app::meditation::MeditationTimerPresenter>(app, settings.get());
-                return std::make_unique<meditation::MeditationTimerWindow>(app, std::move(presenter));
-            });
+        windowsFactory.attach(meditation::MeditationTimerWindow::name,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  auto presenter = std::make_unique<app::meditation::MeditationTimerPresenter>(
+                                      app, settings.get(), *batteryModel, *lowBatteryInfoModel);
+                                  return std::make_unique<meditation::MeditationTimerWindow>(app, std::move(presenter));
+                              });
 
         windowsFactory.attach(
             meditation::windows::meditationCountdown, [this](ApplicationCommon *app, const std::string &name) {
@@ -111,6 +114,10 @@ namespace app
         windowsFactory.attach(gui::window::bell_finished::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellFinishedWindow>(app, name);
+                              });
+        windowsFactory.attach(meditation::windows::meditationLowBattery,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::AppsBatteryStatusWindow>(app, name);
                               });
 
         attachPopups({gui::popup::ID::AlarmActivated,

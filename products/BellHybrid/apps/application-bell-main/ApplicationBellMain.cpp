@@ -7,7 +7,6 @@
 #include "windows/BellBatteryShutdownWindow.hpp"
 #include "windows/BellHomeScreenWindow.hpp"
 #include "windows/BellMainMenuWindow.hpp"
-#include "windows/BellBatteryStatusWindow.hpp"
 
 #include <apps-common/messages/AppMessage.hpp>
 #include <common/BellPowerOffPresenter.hpp>
@@ -17,6 +16,7 @@
 #include <common/models/LayoutModel.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <common/windows/BellFactoryReset.hpp>
+#include <common/windows/BellBatteryStatusWindow.hpp>
 #include <common/BellFactoryResetPresenter.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
@@ -155,9 +155,10 @@ namespace app
             return std::make_unique<gui::BellFactoryReset>(app, std::make_unique<gui::BellFactoryResetPresenter>(app));
         });
 
-        windowsFactory.attach(gui::BellBatteryStatusWindow::name, [](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<gui::BellBatteryStatusWindow>(app);
-        });
+        windowsFactory.attach(gui::BellBatteryStatusWindow::windowName,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellBatteryStatusWindow>(app);
+                              });
 
         windowsFactory.attach(
             gui::window::name::bell_main_menu_dialog,
@@ -202,7 +203,7 @@ namespace app
             }
             else if (newWindowName == gui::window::name::bell_main_menu ||
                      newWindowName == gui::window::name::bell_main_menu_dialog ||
-                     newWindowName == gui::BellBatteryStatusWindow::name) {
+                     newWindowName == gui::BellBatteryStatusWindow::windowName) {
                 startIdleTimer();
                 clearPendingPopups();
             }

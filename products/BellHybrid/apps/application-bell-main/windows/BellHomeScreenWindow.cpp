@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellHomeScreenWindow.hpp"
-#include "BellBatteryStatusWindow.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/actions/AlarmRingingData.hpp>

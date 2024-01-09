@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationTimerSelectWindow.hpp"
@@ -6,16 +6,20 @@
 #include <ApplicationBellRelaxation.hpp>
 
 #include <apps-common/widgets/BellBaseLayout.hpp>
+#include <common/data/BatteryStatusSwitchData.hpp>
 #include <common/LanguageUtils.hpp>
 #include <i18n/i18n.hpp>
 #include <Utils.hpp>
+#include <Units.hpp>
 
 namespace
 {
+    using State   = Store::Battery::State;
     using minutes = std::chrono::minutes;
     using namespace std::chrono_literals;
     constexpr minutes onceValue{minutes::zero()};
     constexpr minutes loopValue{8760h};
+    constexpr units::SOC lowBatteryThreshold{10};
 
     const std::string getOnceValueText()
     {
@@ -57,6 +61,11 @@ namespace
             range.push_back(timerValueToUTF8(value));
         }
         return range;
+    }
+
+    bool isBatteryCharging(const State state)
+    {
+        return state == State::Charging or state == State::ChargingDone;
     }
 } // namespace
 namespace gui
@@ -183,13 +192,26 @@ namespace gui
             auto currentValue = UTF8ToTimerValue(spinner->value());
             presenter->setTimerValue(currentValue);
 
-            auto audioSwitchData = std::make_unique<RelaxationSwitchData>(std::move(audioContext));
-            audioSwitchData->ignoreCurrentWindowOnStack = true;
-            if (currentValue == loopValue) {
-                application->switchWindow(gui::window::name::relaxationRunningLoop, std::move(audioSwitchData));
+            auto switchToNextScreen = [this, currentValue]() {
+                auto switchWindowName = (currentValue == loopValue) ? gui::window::name::relaxationRunningLoop
+                                                                    : gui::window::name::relaxationRunningProgress;
+                auto audioSwitchData  = std::make_unique<RelaxationSwitchData>(std::move(audioContext));
+                audioSwitchData->ignoreCurrentWindowOnStack = true;
+                application->switchWindow(std::move(switchWindowName), std::move(audioSwitchData));
+            };
+
+            const auto batteryState = presenter->getBatteryState();
+            const units::SOC soc    = batteryState.level;
+            const bool isCharging   = isBatteryCharging(batteryState.state);
+            if (not presenter->isLowBatteryWindowHandled() && not isCharging && soc < lowBatteryThreshold) {
+                auto lowBatterySwitchData =
+                    std::make_unique<AppsBatteryStatusSwitchData>(soc, isCharging, switchToNextScreen);
+                lowBatterySwitchData->ignoreCurrentWindowOnStack = true;
+                application->switchWindow(gui::window::name::relaxationLowBattery, std::move(lowBatterySwitchData));
+                presenter->handleLowBatteryWindow();
             }
             else {
-                application->switchWindow(gui::window::name::relaxationRunningProgress, std::move(audioSwitchData));
+                switchToNextScreen();
             }
 
             return true;

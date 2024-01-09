@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellRelaxation.hpp"
@@ -9,7 +9,6 @@
 #include "presenter/RelaxationVolumePresenter.hpp"
 #include "presenter/RelaxationPausedPresenter.hpp"
 #include "presenter/RelaxationEndedPresenter.hpp"
-#include "presenter/RelaxationLowBatteryPresenter.hpp"
 #include "presenter/RelaxationErrorPresenter.hpp"
 #include "windows/RelaxationMainWindow.hpp"
 #include "windows/RelaxationPausedWindow.hpp"
@@ -18,7 +17,6 @@
 #include "windows/RelaxationTimerSelectWindow.hpp"
 #include "windows/RelaxationVolumeWindow.hpp"
 #include "windows/RelaxationEndedWindow.hpp"
-#include "windows/RelaxationLowBatteryWindow.hpp"
 #include "windows/RelaxationErrorWindow.hpp"
 #include "widgets/RelaxationPlayer.hpp"
 #include <Paths.hpp>
@@ -27,6 +25,7 @@
 #include <common/models/TimeModel.hpp>
 #include <common/models/BatteryModel.hpp>
 #include <common/models/AudioModel.hpp>
+#include <common/windows/AppsBatteryStatusWindow.hpp>
 #include <audio/AudioMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 
@@ -61,6 +60,7 @@ namespace app
         }
 
         batteryModel                 = std::make_unique<app::BatteryModel>(this);
+        lowBatteryInfoModel          = std::make_unique<app::LowBatteryInfoModel>();
         player                       = std::make_unique<relaxation::RelaxationPlayer>(*audioModel);
         relaxationRebuildTimerHandle = sys::TimerFactory::createSingleShotTimer(
             this, relaxationRebuildTimer, relaxationRebuildTimerInterval, [this](sys::Timer &) {
@@ -88,11 +88,12 @@ namespace app
             auto presenter  = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(songsModel));
             return std::make_unique<gui::RelaxationMainWindow>(app, std::move(presenter));
         });
-        windowsFactory.attach(
-            gui::window::name::relaxationTimerSelect, [this](ApplicationCommon *app, const std::string &name) {
-                auto presenter = std::make_unique<relaxation::RelaxationTimerSelectPresenter>(settings.get());
-                return std::make_unique<gui::RelaxationTimerSelectWindow>(app, std::move(presenter));
-            });
+        windowsFactory.attach(gui::window::name::relaxationTimerSelect,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  auto presenter = std::make_unique<relaxation::RelaxationTimerSelectPresenter>(
+                                      settings.get(), *batteryModel, *lowBatteryInfoModel);
+                                  return std::make_unique<gui::RelaxationTimerSelectWindow>(app, std::move(presenter));
+                              });
 
         windowsFactory.attach(
             gui::window::name::relaxationRunningProgress, [this](ApplicationCommon *app, const std::string &name) {
@@ -130,8 +131,7 @@ namespace app
 
         windowsFactory.attach(gui::window::name::relaxationLowBattery,
                               [](ApplicationCommon *app, const std::string &name) {
-                                  auto presenter = std::make_unique<relaxation::RelaxationLowBatteryPresenter>(app);
-                                  return std::make_unique<gui::RelaxationLowBatteryWindow>(app, std::move(presenter));
+                                  return std::make_unique<gui::AppsBatteryStatusWindow>(app, name);
                               });
 
         windowsFactory.attach(gui::window::name::relaxationError, [](ApplicationCommon *app, const std::string &name) {
