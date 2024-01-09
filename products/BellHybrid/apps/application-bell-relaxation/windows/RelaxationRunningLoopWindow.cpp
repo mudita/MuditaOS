@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationRunningLoopWindow.hpp"
@@ -13,18 +13,17 @@
 
 namespace
 {
+    using State = Store::Battery::State;
     constexpr auto relaxationLoopTimerName{"RelaxationLoopTimer"};
     constexpr std::chrono::seconds relaxationLoopTimerPeriod{1};
     constexpr units::SOC dischargingLevelShowTop{20};
-    constexpr units::SOC dischargingLowBattery{10};
     constexpr auto ellipsisSpace{2U};
     constexpr auto ellipsis{"..."};
     /* charsMultiplier is set a little bit less than max lines which is 2, because of final text formatting */
     constexpr auto charsMultiplier{1.8f};
 
-    bool isBatteryCharging(const Store::Battery::State state)
+    bool isBatteryCharging(const State state)
     {
-        using State = Store::Battery::State;
         return state == State::Charging or state == State::ChargingDone;
     }
 
@@ -111,15 +110,12 @@ namespace gui
         }
 
         if (data && typeid(*data) == typeid(RelaxationSwitchData)) {
-            const auto batteryStatus  = presenter->handleBatteryStatus();
             auto *audioSwitchData     = static_cast<RelaxationSwitchData *>(data);
             audioContext              = audioSwitchData->getAudioContext();
             const auto maxCharsInLine = title->getTextFormat().getFont()->getCharCountInSpace(
                 audioContext->getSound().tags.title, title->getWidth());
             title->setText(adjustDisplayedTitle(audioContext->getSound().tags.title, maxCharsInLine));
-            if (batteryStatus.level > dischargingLowBattery) {
-                presenter->activate(audioContext->getSound());
-            }
+            presenter->activate(audioContext->getSound());
         }
     }
 
@@ -215,12 +211,10 @@ namespace gui
 
     bool RelaxationRunningLoopWindow::updateBatteryStatus()
     {
-        auto batteryStatus = presenter->handleBatteryStatus();
+        auto batteryStatus = presenter->getBatteryState();
 
         units::SOC soc = batteryStatus.level;
         auto state     = batteryStatus.state;
-
-        checkLowBatteryLevel(soc);
 
         if (soc < dischargingLevelShowTop) {
             battery->update(soc, isBatteryCharging(state));
@@ -237,14 +231,6 @@ namespace gui
         return true;
     }
 
-    void RelaxationRunningLoopWindow::checkLowBatteryLevel(units::SOC soc)
-    {
-        if (soc <= dischargingLowBattery) {
-            presenter->stop();
-            application->switchWindow(gui::window::name::relaxationLowBattery,
-                                      std::make_unique<gui::RelaxationLowBatterySwitchData>(soc));
-        }
-    }
     void RelaxationRunningLoopWindow::handleError()
     {
         auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::UnsupportedMediaType);

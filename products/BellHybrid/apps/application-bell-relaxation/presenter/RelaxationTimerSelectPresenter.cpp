@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationTimerSelectPresenter.hpp"
@@ -17,7 +17,10 @@ namespace
 
 namespace app::relaxation
 {
-    RelaxationTimerSelectPresenter::RelaxationTimerSelectPresenter(settings::Settings *settings) : settings{settings}
+    RelaxationTimerSelectPresenter::RelaxationTimerSelectPresenter(settings::Settings *settings,
+                                                                   AbstractBatteryModel &batteryModel,
+                                                                   AbstractLowBatteryInfoModel &lowBatteryInfoModel)
+        : settings{settings}, batteryModel{batteryModel}, lowBatteryInfoModel{lowBatteryInfoModel}
     {}
 
     const RelaxationTimerSelectContract::Range &RelaxationTimerSelectPresenter::getTimerValuesRange() const noexcept
@@ -38,4 +41,20 @@ namespace app::relaxation
     {
         settings->setValue(timerValueDBRecordName, utils::to_string(value.count()), settings::SettingsScope::AppLocal);
     }
+
+    Store::Battery RelaxationTimerSelectPresenter::getBatteryState()
+    {
+        return batteryModel.getLevelState();
+    }
+
+    bool RelaxationTimerSelectPresenter::isLowBatteryWindowHandled() const
+    {
+        return lowBatteryInfoModel.isInfoHandled();
+    }
+
+    void RelaxationTimerSelectPresenter::handleLowBatteryWindow()
+    {
+        lowBatteryInfoModel.handleInfo();
+    }
+
 } // namespace app::relaxation

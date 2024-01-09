@@ -1,8 +1,8 @@
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "BellBatteryStatusWindow.hpp"
-
+#include "windows/BellBatteryStatusWindow.hpp"
+#include <data/BatteryStatusSwitchData.hpp>
 #include <common/data/BatteryUtils.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/ImageBox.hpp>
@@ -15,7 +15,11 @@ namespace
 {
     using namespace std::chrono_literals;
 
-    constexpr auto imageType = gui::ImageTypeSpecifier::W_G;
+    constexpr auto top_description_font          = style::window::font::largelight;
+    constexpr auto bottom_description_font       = style::window::font::verybiglight;
+    constexpr auto bottom_description_max_size_w = style::bell_base_layout::outer_layouts_w;
+    constexpr auto bottom_description_max_size_h = 85U;
+    constexpr auto imageType                     = gui::ImageTypeSpecifier::W_G;
     constexpr auto batteryEntries =
         std::array<battery_utils::BatteryLevelEntry, 6>{{{{0, 9}, "bell_status_battery_lvl0"},
                                                          {{10, 19}, "bell_status_battery_lvl1"},
@@ -31,7 +35,7 @@ namespace
 
 namespace gui
 {
-    BellBatteryStatusWindow::BellBatteryStatusWindow(app::ApplicationCommon *app)
+    BellBatteryStatusWindow::BellBatteryStatusWindow(app::ApplicationCommon *app, const std::string &name)
         : WindowWithTimer{app, name, windowLongTimeout}
     {
         buildInterface();
@@ -89,6 +93,7 @@ namespace gui
     bool BellBatteryStatusWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            detachTimerIfExists();
             application->returnToPreviousWindow();
             return true;
         }
@@ -110,18 +115,25 @@ namespace gui
     void BellBatteryStatusWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         if (data != nullptr) {
-            const auto &switchData = static_cast<Data &>(*data);
-            const auto image       = battery_utils::getBatteryLevelImage(batteryEntries, switchData.chargeLevel);
-            if (switchData.isLowBatteryWarning) {
+            const auto batteryData = dynamic_cast<BatteryStatusSwitchData *>(data);
+            if (batteryData == nullptr) {
+                LOG_ERROR("Received data nullptr");
+                return;
+            }
+            const auto soc                 = batteryData->getBatteryLevel();
+            const bool isCharging          = batteryData->isCharging();
+            const bool isLowBatteryWarning = batteryData->isLowBatteryWarning();
+            const auto image               = battery_utils::getBatteryLevelImage(batteryEntries, soc);
+            if (isLowBatteryWarning) {
                 topDescription->setText(utils::translate("battery_low"));
-                auto tokenMap = text::RichTextParser::TokenMap({{"$BATTERY", std::to_string(switchData.chargeLevel)}});
+                auto tokenMap = text::RichTextParser::TokenMap({{"$BATTERY", std::to_string(soc)}});
                 bottomDescription->setRichText(utils::translate("battery_remaining"), std::move(tokenMap));
                 chargingIcon->setVisible(false);
             }
             else {
                 topDescription->setText(utils::translate("app_settings_tech_info_battery"));
-                bottomDescription->setText(std::to_string(switchData.chargeLevel) + "%");
-                chargingIcon->setVisible(switchData.isCharging);
+                bottomDescription->setText(std::to_string(soc) + "%");
+                chargingIcon->setVisible(isCharging);
             }
             if (image) {
                 center->setImage(image->data(), imageType);

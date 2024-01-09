@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -56,7 +56,7 @@ namespace app::relaxation
             virtual void handleUpdateTimeEvent()                                           = 0;
             virtual bool isPaused()                                                        = 0;
             virtual void onBeforeShow()                                                    = 0;
-            virtual Store::Battery handleBatteryStatus()                                   = 0;
+            virtual Store::Battery getBatteryState()                                       = 0;
         };
     };
 
@@ -79,7 +79,7 @@ namespace app::relaxation
         void handleUpdateTimeEvent() override;
         bool isPaused() override;
         void onBeforeShow() override;
-        Store::Battery handleBatteryStatus() override;
+        Store::Battery getBatteryState() override;
 
         void onFinished();
 

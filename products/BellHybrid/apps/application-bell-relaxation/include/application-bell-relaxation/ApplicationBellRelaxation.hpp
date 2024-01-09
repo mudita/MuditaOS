@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,6 +6,7 @@
 #include <Application.hpp>
 #include <common/models/AbstractAudioModel.hpp>
 #include <common/models/BatteryModel.hpp>
+#include <common/models/LowBatteryInfoModel.hpp>
 #include <purefs/filesystem_paths.hpp>
 
 namespace gui::window::name
@@ -32,6 +33,7 @@ namespace app
       private:
         std::unique_ptr<AbstractAudioModel> audioModel;
         std::unique_ptr<AbstractBatteryModel> batteryModel;
+        std::unique_ptr<AbstractLowBatteryInfoModel> lowBatteryInfoModel;
         std::unique_ptr<relaxation::RelaxationPlayer> player;
         sys::TimerHandle relaxationRebuildTimerHandle{};
 

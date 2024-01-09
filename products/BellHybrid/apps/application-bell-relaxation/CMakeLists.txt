@@ -20,7 +20,6 @@ target_sources(application-bell-relaxation
         presenter/RelaxationVolumePresenter.cpp
         presenter/RelaxationPausedPresenter.cpp
         presenter/RelaxationEndedPresenter.cpp
-        presenter/RelaxationLowBatteryPresenter.cpp
         presenter/RelaxationErrorPresenter.cpp
         widgets/RelaxationPlayer.cpp
         widgets/RelaxationListView.cpp
@@ -33,7 +32,6 @@ target_sources(application-bell-relaxation
         windows/RelaxationTimerSelectWindow.cpp
         windows/RelaxationVolumeWindow.cpp
         windows/RelaxationEndedWindow.cpp
-        windows/RelaxationLowBatteryWindow.cpp
         windows/RelaxationErrorWindow.cpp
 
         data/RelaxationCommon.hpp
@@ -53,7 +51,6 @@ target_sources(application-bell-relaxation
         presenter/RelaxationVolumePresenter.hpp
         presenter/RelaxationPausedPresenter.hpp
         presenter/RelaxationEndedPresenter.hpp
-        presenter/RelaxationLowBatteryPresenter.hpp
         presenter/RelaxationErrorPresenter.cpp
         windows/RelaxationMainWindow.hpp
         windows/RelaxationPausedWindow.hpp
@@ -62,7 +59,6 @@ target_sources(application-bell-relaxation
         windows/RelaxationTimerSelectWindow.hpp
         windows/RelaxationVolumeWindow.hpp
         windows/RelaxationEndedWindow.hpp
-        windows/RelaxationLowBatteryWindow.hpp
         windows/RelaxationErrorWindow.hpp
         model/RelaxationSongsModel.hpp
         model/RelaxationSongsModel.cpp
