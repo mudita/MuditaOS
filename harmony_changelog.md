@@ -3,19 +3,25 @@
 ## Unreleased
 
 ### Fixed
-* Increase clock font in Relaxation, Meditation, Power nap mode
+
+### Added
+
+### Changed / Improved
+
+## [2.4.0 2024-01-11]
 
 ### Added
 * Added gradual alarm volume increase
 * Added progress bar for all volume control windows
+* Improved factory reset procedure to remove user files
 
 ### Changed / Improved
-* Factory reset removes user files
+* Increased clock font in Relaxation, Meditation, Power nap mode
 * Changed countdown progress bar design in Relaxation, Meditation and Power Nap apps
 * Removed minus sign in progress countdown timers in Relaxation, Meditation and Power Nap apps
 * Extended volume scale from 10 to 15 point scale
 * Modified volume control characteristic for better user experience
-* Reducing power consumption for meditation and power nap applications
+* Reduced power consumption for Meditation and Power Nap applications
 
 ## [2.3.0 2023-12-20]
 
