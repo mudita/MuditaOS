@@ -15,23 +15,23 @@ namespace bsp::torch
 {
     enum class State
     {
-        on,
-        off,
+        On,
+        Off
     };
 
     enum class ColourTemperature // Kelvin
     {
-        noChange = 0,
-        warmest = 1800,
-        coldest = 6500,
+        NoChange = 0,
+        Warmest = 1800,
+        Coldest = 6500
     };
 
     std::int32_t init();
     void deinit();
 
-    bool isPresent(void);
+    bool isPresent();
 
-    bool turn(State state, ColourTemperature = ColourTemperature::noChange);
+    bool turn(State state, ColourTemperature = ColourTemperature::NoChange);
     State getState();
     ColourTemperature getColorTemp();
     bool toggle();

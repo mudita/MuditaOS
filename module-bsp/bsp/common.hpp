@@ -30,10 +30,8 @@ namespace bsp
     {
         RT1051,
         Linux,
-        none
+        None
     };
-
-    constexpr auto HzPerMHz = 1000000U;
 
     [[nodiscard]] std::uint8_t CpuMHZToLevel(CpuFrequencyMHz val);
     [[nodiscard]] const char *c_str(Board board);

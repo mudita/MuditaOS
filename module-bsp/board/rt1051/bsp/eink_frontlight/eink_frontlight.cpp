@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/eink_frontlight/eink_frontlight.hpp"
@@ -11,23 +11,20 @@ namespace bsp::eink_frontlight
     namespace
     {
         std::shared_ptr<drivers::DriverPWM> pwm;
-        constexpr inline auto PWM_FREQUENCY_HZ = 20000;
-        float gammaFactor                      = 2.5f;
+        constexpr auto pwmOutputFrequencyHz = 5000;
+        constexpr auto pwmChannel = static_cast<drivers::PWMChannel>(BoardDefinitions::EINK_FRONTLIGHT_PWM_CHANNEL);
+        auto gammaFactor          = 2.5f;
 
         std::uint8_t gammaCorrection(BrightnessPercentage brightness)
         {
             std::clamp(brightness, 0.0f, 100.0f);
             return static_cast<std::uint8_t>(100 * std::pow((brightness / 100.0f), gammaFactor));
         }
-        constexpr auto pwmChannel = static_cast<drivers::PWMChannel>(BoardDefinitions::EINK_FRONTLIGHT_PWM_CHANNEL);
-
     } // namespace
 
     void init()
     {
-        drivers::DriverPWMParams pwmParams;
-        pwmParams.channel   = pwmChannel;
-        pwmParams.frequency = PWM_FREQUENCY_HZ;
+        const drivers::DriverPWMParams pwmParams{.channel = pwmChannel, .outputFrequency = pwmOutputFrequencyHz};
 
         pwm = drivers::DriverPWM::Create(
             static_cast<drivers::PWMInstances>(BoardDefinitions::EINK_FRONTLIGHT_PWM_INSTANCE),
@@ -62,9 +59,8 @@ namespace bsp::eink_frontlight
         gammaFactor = gamma;
     }
 
-    void updateClockFrequency(CpuFrequencyMHz newFrequency)
+    void updateClockFrequency()
     {
-        pwm->UpdateClockFrequency(newFrequency);
+        pwm->UpdateClockFrequency();
     }
-
 } // namespace bsp::eink_frontlight

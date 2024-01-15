@@ -9,24 +9,21 @@ namespace bsp::eink_frontlight
 {
     enum class Action
     {
-        turnOn,
-        turnOff,
-        setBrightness,
+        TurnOn,
+        TurnOff,
+        SetBrightness,
     };
 
     using BrightnessPercentage = float;
 
     void init();
-
     void deinit();
 
-    void setBrightness(BrightnessPercentage brightness);
-
     void turnOn();
-    
     void turnOff();
 
+    void setBrightness(BrightnessPercentage brightness);
     void setGammaFactor(float gamma);
 
-    void updateClockFrequency(CpuFrequencyMHz newFrequency);
-} // namespace bsp::eink_frontlight
+    void updateClockFrequency();
+}

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/torch.hpp"
@@ -11,6 +11,6 @@ namespace event::service::api
     bool isTorchOn()
     {
         auto isOn = bsp::torch::getState();
-        return isOn == bsp::torch::State::on;
+        return isOn == bsp::torch::State::On;
     }
 } // namespace event::service::api

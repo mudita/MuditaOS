@@ -1,65 +1,65 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/torch/torch.hpp"
 #include <log/log.hpp>
 
-namespace bsp
+namespace bsp::torch
 {
-    namespace torch
+    namespace
     {
-        State state_simulated               = State::off;
-        ColourTemperature currentColourTemp = ColourTemperature::warmest;
+        State simulatedState                = State::Off;
+        ColourTemperature currentColourTemp = ColourTemperature::Warmest;
+    } // namespace
 
-        std::int32_t init()
-        {
-            state_simulated = State::off;
-            return 1;
+    std::int32_t init()
+    {
+        simulatedState = State::Off;
+        return 1;
+    }
+
+    void deinit()
+    {}
+
+    bool isPresent()
+    {
+        return true;
+    }
+
+    bool turn(State state, ColourTemperature colourTemp)
+    {
+        simulatedState = state;
+        if (colourTemp != ColourTemperature::NoChange) {
+            currentColourTemp = colourTemp;
         }
 
-        void deinit()
-        {}
-
-        bool isPresent(void)
-        {
-            return true;
+        if (state == State::On) {
+            LOG_INFO("Torch is ON \U0001f526 (%s)",
+                     currentColourTemp == ColourTemperature::Warmest ? "warm \U0001f987" : "cold \U0001f535");
         }
-
-        bool turn(State state, ColourTemperature colourTemp)
-        {
-            state_simulated = state;
-            if (colourTemp != ColourTemperature::noChange) {
-                currentColourTemp = colourTemp;
-            }
-
-            if (state == State::on) {
-                LOG_INFO("Torch is ON \U0001f526 (%s)",
-                         currentColourTemp == ColourTemperature::warmest ? "warm \U0001f987" : "cold \U0001f535");
-            }
-            else {
-                LOG_INFO("Torch is OFF");
-            }
-            return true;
+        else {
+            LOG_INFO("Torch is OFF");
         }
+        return true;
+    }
 
-        State getState()
-        {
-            return state_simulated;
-        }
+    State getState()
+    {
+        return simulatedState;
+    }
 
-        ColourTemperature getColorTemp()
-        {
-            return currentColourTemp;
-        }
+    ColourTemperature getColorTemp()
+    {
+        return currentColourTemp;
+    }
 
-        bool toggle()
-        {
-            return turn(getState() == State::off ? State::on : State::off);
-        };
+    bool toggle()
+    {
+        return turn(getState() == State::Off ? State::On : State::Off);
+    };
 
-        bool setCurrent(const unsigned short mA)
-        {
-            return true;
-        }
-    } // namespace torch
-} // namespace bsp
+    bool setCurrent(const unsigned short mA)
+    {
+        return true;
+    }
+} // namespace bsp::torch
