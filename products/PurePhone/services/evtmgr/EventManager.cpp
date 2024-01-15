@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <evtmgr/EventManager.hpp>
@@ -108,23 +108,23 @@ void EventManager::initProductEvents()
 void EventManager::toggleTorchOnOff()
 {
     auto state    = bsp::torch::getState();
-    auto newState = (state == bsp::torch::State::off) ? bsp::torch::State::on : bsp::torch::State::off;
-    bsp::torch::turn(newState, bsp::torch::ColourTemperature::coldest);
+    auto newState = (state == bsp::torch::State::Off) ? bsp::torch::State::On : bsp::torch::State::Off;
+    bsp::torch::turn(newState, bsp::torch::ColourTemperature::Coldest);
 }
 
 void EventManager::toggleTorchOff()
 {
-    bsp::torch::turn(bsp::torch::State::off, bsp::torch::ColourTemperature::coldest);
+    bsp::torch::turn(bsp::torch::State::Off, bsp::torch::ColourTemperature::Coldest);
 }
 
 void EventManager::toggleTorchColor()
 {
     auto state = bsp::torch::getState();
-    if (state == bsp::torch::State::on) {
+    if (state == bsp::torch::State::On) {
         auto color    = bsp::torch::getColorTemp();
-        auto newColor = (color == bsp::torch::ColourTemperature::coldest) ? bsp::torch::ColourTemperature::warmest
-                                                                          : bsp::torch::ColourTemperature::coldest;
-        bsp::torch::turn(bsp::torch::State::on, newColor);
+        auto newColor = (color == bsp::torch::ColourTemperature::Coldest) ? bsp::torch::ColourTemperature::Warmest
+                                                                          : bsp::torch::ColourTemperature::Coldest;
+        bsp::torch::turn(bsp::torch::State::On, newColor);
     }
 }
 
@@ -197,22 +197,22 @@ void EventManager::handleKeyMoveEvent(RawKey key)
 void EventManager::processVibratorRequest(bsp::vibrator::Action act, std::chrono::milliseconds RepetitionTime)
 {
     switch (act) {
-    case bsp::vibrator::Action::pulse:
+    case bsp::vibrator::Action::Pulse:
         vibrator->Pulse();
         break;
-    case bsp::vibrator::Action::pulseRepeat:
+    case bsp::vibrator::Action::PulseRepeat:
         vibrator->PulseRepeat(RepetitionTime);
         break;
-    case bsp::vibrator::Action::pulseRepeatInfinite:
+    case bsp::vibrator::Action::PulseRepeatInfinite:
         vibrator->PulseRepeat();
         break;
-    case bsp::vibrator::Action::stop:
+    case bsp::vibrator::Action::Stop:
         vibrator->PulseRepeatStop();
         break;
     }
 }
 
-void EventManager::processVibratorLevel(unsigned int vibrationLevel)
+void EventManager::processVibratorLevel(unsigned vibrationLevel)
 {
     vibrator->SetVibrationLevel(vibrationLevel);
 }

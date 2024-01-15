@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -129,7 +129,7 @@ class ServiceCellular : public sys::Service
     std::unique_ptr<packet_data::PacketData> packetData;
     std::unique_ptr<sys::phone_modes::Observer> phoneModeObserver;
     std::unique_ptr<ConnectionManager> connectionManager;
-    bsp::Board board = bsp::Board::none;
+    bsp::Board board = bsp::Board::None;
 
     /// URC GSM notification handler
     std::optional<std::shared_ptr<sys::Message>> identifyNotification(const std::string &data);

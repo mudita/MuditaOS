@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Fixed
+* Fixed source clock frequency computation for PWM module
 
 ### Added
 

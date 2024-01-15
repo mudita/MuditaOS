@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -38,7 +38,7 @@ namespace drivers
     struct DriverPWMParams
     {
         PWMChannel channel;
-        std::uint32_t frequency;
+        std::uint32_t outputFrequency;
     };
 
     class DriverPWM
@@ -61,7 +61,7 @@ namespace drivers
 
         virtual void Stop(PWMChannel channel) = 0;
 
-        virtual void UpdateClockFrequency(bsp::CpuFrequencyMHz newFrequency) = 0;
+        virtual void UpdateClockFrequency() = 0;
 
       protected:
         PWMInstances instance;

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/eink_frontlight/eink_frontlight.hpp"
@@ -11,7 +11,7 @@ namespace bsp::eink_frontlight
     void deinit()
     {}
 
-    void setBrightness(BrightnessPercentage)
+    void setBrightness([[maybe_unused]] BrightnessPercentage brightness)
     {}
 
     void turnOn()
@@ -20,10 +20,9 @@ namespace bsp::eink_frontlight
     void turnOff()
     {}
 
-    void setGammaFactor(float)
+    void setGammaFactor([[maybe_unused]] float gamma)
     {}
 
-    void updateClockFrequency(CpuFrequencyMHz newFrequency)
+    void updateClockFrequency()
     {}
-
 } // namespace bsp::eink_frontlight

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/EVMessages.hpp"
@@ -189,6 +189,6 @@ void WorkerEventCommon::processKeyEvent(bsp::KeyEvents event, bsp::KeyCodes code
 
 void WorkerEventCommon::updateResourcesAfterCpuFrequencyChange(bsp::CpuFrequencyMHz newFrequency)
 {
-    bsp::eink_frontlight::updateClockFrequency(newFrequency);
-    bsp::vibrator::updateClockFrequency(newFrequency);
+    bsp::eink_frontlight::updateClockFrequency();
+    bsp::vibrator::updateClockFrequency();
 }

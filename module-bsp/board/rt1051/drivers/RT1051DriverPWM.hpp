@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,29 +13,30 @@
 #include <vector>
 #include <map>
 #include <array>
+
 namespace drivers
 {
-    class RT1051DriverPWM : public DriverPWM
+    class RT1051DriverPWM final : public DriverPWM
     {
       public:
         RT1051DriverPWM(PWMInstances inst, PWMModules mod, const DriverPWMParams &params);
 
-        ~RT1051DriverPWM() final;
+        ~RT1051DriverPWM();
 
-        void InitNextChannel(const DriverPWMParams &params) final;
+        void InitNextChannel(const DriverPWMParams &params);
 
-        void SetDutyCycle(std::uint8_t dutyCyclePercent, PWMChannel channel) final;
+        void SetDutyCycle(std::uint8_t dutyCyclePercent, PWMChannel channel);
 
-        void Start(PWMChannel channel) final;
+        void Start(PWMChannel channel);
 
-        void Stop(PWMChannel channel) final;
+        void Stop(PWMChannel channel);
 
-        void UpdateClockFrequency(bsp::CpuFrequencyMHz newFrequency) final;
+        void UpdateClockFrequency();
 
         enum class PwmState
         {
             Off,
-            On,
+            On
         };
 
       private:
@@ -43,7 +44,7 @@ namespace drivers
 
         void SetupPWMChannel(PWMChannel channel);
 
-        void SetupPWMInstance(pwm_signal_param_t *config, unsigned numOfChannels, std::uint32_t clockFrequency);
+        void SetupPWMInstance(pwm_signal_param_t *config, unsigned numOfChannels, std::uint32_t moduleClockFrequency);
 
         void ForceLowOutput(PWMChannel channel);
 
@@ -51,7 +52,7 @@ namespace drivers
 
         pwm_channels_t getChannelMask(PWMChannel channel);
 
-        bool channelNotEnabled(PWMChannel channel);
+        bool channelEnabled(PWMChannel channel);
 
         bool otherChannelRunning(PWMChannel channel);
 
@@ -65,8 +66,6 @@ namespace drivers
 
         pwm_submodule_t pwmModule = kPWM_Module_0;
 
-        std::uint8_t lastDutyCycle = 0;
-
         std::array<pwm_signal_param_t, 2> pwmSignalsConfig;
 
         std::vector<PWMChannel> enabledChannels;
@@ -75,7 +74,7 @@ namespace drivers
 
         cpp_freertos::MutexStandard frequencyChangeMutex;
 
-        std::uint32_t clockFrequency = 0;
+        std::uint32_t pwmModuleClockFrequency = 0;
     };
 
 } // namespace drivers

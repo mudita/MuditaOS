@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "endpoints/developerMode/event/ATRequest.hpp"
@@ -742,7 +742,7 @@ bool ServiceCellular::handle_power_up_request()
     case bsp::Board::Linux:
         priv->state->set(State::ST::PowerUpProcedure);
         break;
-    case bsp::Board::none:
+    case bsp::Board::None:
         return false;
         break;
     }
@@ -778,7 +778,7 @@ bool ServiceCellular::handle_power_up_procedure()
             break;
         }
     }
-    case bsp::Board::none:
+    case bsp::Board::None:
     default:
         LOG_FATAL("Unknown board!");
         assert(0);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -36,7 +36,7 @@ class EventManager : public EventManagerCommon
 
     void processVibratorRequest(bsp::vibrator::Action act,
                                 std::chrono::milliseconds RepetitionTime = std::chrono::milliseconds{1000});
-    void processVibratorLevel(unsigned int vibrationLevel);
+    void processVibratorLevel(unsigned vibrationLevel);
 
     void initProductEvents() final;
     auto createEventWorker() -> std::unique_ptr<WorkerEventCommon> final;
