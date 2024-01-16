@@ -124,4 +124,9 @@ namespace app::relaxation
     {
         return batteryModel.getLevelState();
     }
+
+    bool RelaxationRunningLoopPresenter::isBatteryCharging(Store::Battery::State state) const
+    {
+        return batteryModel.isBatteryCharging(state);
+    }
 } // namespace app::relaxation

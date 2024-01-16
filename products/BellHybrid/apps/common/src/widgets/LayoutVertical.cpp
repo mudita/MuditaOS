@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "widgets/LayoutVertical.hpp"
@@ -114,15 +114,21 @@ namespace gui
         setAlarmScreen->setVisible(false);
 
         // Activation / Deactivation
-        alarmActivatedDeactivatedScreen =
-            new Icon(this, 0, 0, style::window_width, style::window_height, "big_alarm_W_G", {});
+        alarmActivatedDeactivatedScreen = new Icon(this,
+                                                   0,
+                                                   0,
+                                                   style::window_width,
+                                                   style::window_height,
+                                                   "bell_status_battery_lvl0",
+                                                   {},
+                                                   gui::ImageTypeSpecifier::W_G);
         alarmActivatedDeactivatedScreen->setMinimumSize(style::window_width, style::window_height);
         alarmActivatedDeactivatedScreen->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        alarmActivatedDeactivatedScreen->image->setMargins(
-            {0, bell_style::popup_icon_top_margin, 0, bell_style::popup_icon_bottom_margin});
+        alarmActivatedDeactivatedScreen->image->setMargins({0, bell_style::warning_icon_top_margin, 0, 0});
         alarmActivatedDeactivatedScreen->image->setAlignment(
             Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        alarmActivatedDeactivatedScreen->text->setMaximumWidth(bell_style::warning_text_width);
         alarmActivatedDeactivatedScreen->text->setFont(style::window::font::verybiglight);
         alarmActivatedDeactivatedScreen->resizeItems();
         alarmActivatedDeactivatedScreen->setVisible(false);

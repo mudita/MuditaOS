@@ -91,6 +91,7 @@ namespace app::home_screen
                 view.setBatteryLevelState(batteryModel.getLevelState());
             };
             auto switchToBatteryStatus = [](AbstractPresenter &presenter) { presenter.switchToBatteryStatus(); };
+            auto isLowBatteryLevel     = [](AbstractPresenter &presenter) { return presenter.isLowBatteryLevel(); };
 
         } // namespace Helpers
 
@@ -122,7 +123,9 @@ namespace app::home_screen
             {};
             struct BatteryUpdate
             {};
-            struct LowBatteryWarning
+            struct LowBatterySessionWarning
+            {};
+            struct LowBatteryAlarmWarning
             {};
         } // namespace Events
 
@@ -217,6 +220,16 @@ namespace app::home_screen
             auto exit = [](AbstractView &view, AbstractPresenter &presenter) { presenter.detachTimer(); };
         } // namespace ActivatedWait
 
+        namespace ActivatedLowBattery
+        {
+            auto entry = [](AbstractView &view, AbstractPresenter &presenter, AbstractTimeModel &timeModel) {
+                presenter.spawnTimer();
+                view.setTextDescription(utils::translate("app_bell_alarm_lowBattery_info"));
+                view.setViewState(ViewState::ActivatedLowBattery);
+            };
+            auto exit = [](AbstractView &view, AbstractPresenter &presenter) { presenter.detachTimer(); };
+        } // namespace ActivatedLowBattery
+
         namespace Activated
         {
             auto entry = [](AbstractController &controller,
@@ -303,18 +316,20 @@ namespace app::home_screen
                                              "Deactivated"_s + event<Events::LightPress> [not Helpers::isLowBatteryWarningToShow] / Helpers::switchToMenu,
                                              "Deactivated"_s + event<Events::RotateLeftPress> [not Helpers::isLowBatteryWarningToShow] = "DeactivatedEdit"_s,
                                              "Deactivated"_s + event<Events::RotateRightPress> [not Helpers::isLowBatteryWarningToShow] = "DeactivatedEdit"_s,
-                                             "Deactivated"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
+                                             "Deactivated"_s + event<Events::DeepUpPress> [not Helpers::isLowBatteryLevel] = "ActivatedWait"_s,
+                                             "Deactivated"_s + event<Events::LowBatteryAlarmWarning> = "ActivatedLowBattery"_s,
                                              "Deactivated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
                                              "Deactivated"_s + event<Events::BackPress> / Helpers::endUserSessionWithDelay,
                                              "Deactivated"_s + event<Events::LongBackPress> [not Helpers::isLowBatteryWarningToShow]  / Helpers::switchToBatteryStatus,
                                              "Deactivated"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
-                                             "Deactivated"_s + event<Events::LowBatteryWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning,
+                                             "Deactivated"_s + event<Events::LowBatterySessionWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning,
 
                                              "DeactivatedWait"_s + sml::on_entry<_> / DeactivatedWait::entry,
                                              "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
                                              "DeactivatedWait"_s + event<Events::Timer> = "Deactivated"_s,
                                              "DeactivatedWait"_s + event<Events::LightPress> = "Deactivated"_s,
-                                             "DeactivatedWait"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
+                                             "DeactivatedWait"_s + event<Events::DeepUpPress> [not Helpers::isLowBatteryLevel] = "ActivatedWait"_s,
+                                             "DeactivatedWait"_s + event<Events::LowBatteryAlarmWarning> = "ActivatedLowBattery"_s,
                                              "DeactivatedWait"_s + event<Events::RotateLeftPress> = "DeactivatedEdit"_s,
                                              "DeactivatedWait"_s + event<Events::RotateRightPress> = "DeactivatedEdit"_s,
                                              "DeactivatedWait"_s + event<Events::BackPress> = "Deactivated"_s,
@@ -325,7 +340,8 @@ namespace app::home_screen
                                              "DeactivatedEdit"_s + event<Events::Timer> / AlarmEdit::revertChanges = "Deactivated"_s,
                                              "DeactivatedEdit"_s + event<Events::RotateLeftPress> / AlarmEdit::processRotateLeft,
                                              "DeactivatedEdit"_s + event<Events::RotateRightPress> / AlarmEdit::processRotateRight,
-                                             "DeactivatedEdit"_s + event<Events::DeepUpPress> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
+                                             "DeactivatedEdit"_s + event<Events::DeepUpPress> [not Helpers::isLowBatteryLevel] / Helpers::setNewAlarmTime = "ActivatedWait"_s,
+                                             "DeactivatedEdit"_s + event<Events::LowBatteryAlarmWarning> / Helpers::setNewAlarmTime = "ActivatedLowBattery"_s,
                                              "DeactivatedEdit"_s + event<Events::LightPress> / Helpers::setNewAlarmTime = "WaitForConfirmation"_s,
                                              "DeactivatedEdit"_s + event<Events::BackPress> / AlarmEdit::revertChanges = "Deactivated"_s,
                                              "DeactivatedEdit"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
@@ -333,11 +349,22 @@ namespace app::home_screen
                                              "WaitForConfirmation"_s + sml::on_entry<_> / WaitForConfirmation::entry,
                                              "WaitForConfirmation"_s + sml::on_exit<_> / WaitForConfirmation::exit,
                                              "WaitForConfirmation"_s + event<Events::Timer> = "Deactivated"_s,
-                                             "WaitForConfirmation"_s + event<Events::DeepUpPress> / WaitForConfirmation::action = "ActivatedWait"_s,
+                                             "WaitForConfirmation"_s + event<Events::DeepUpPress> [not Helpers::isLowBatteryLevel] / WaitForConfirmation::action = "ActivatedWait"_s,
+                                             "WaitForConfirmation"_s + event<Events::LowBatteryAlarmWarning> / WaitForConfirmation::action = "ActivatedLowBattery"_s,
                                              "WaitForConfirmation"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
                                              "WaitForConfirmation"_s + event<Events::BackPress> = "Deactivated"_s,
                                              "WaitForConfirmation"_s + event<Events::RotateLeftPress> = "DeactivatedEdit"_s,
                                              "WaitForConfirmation"_s + event<Events::RotateRightPress> = "DeactivatedEdit"_s,
+
+                                             "ActivatedLowBattery"_s + sml::on_entry<_> / ActivatedLowBattery::entry,
+                                             "ActivatedLowBattery"_s + sml::on_exit<_> / ActivatedLowBattery::exit,
+                                             "ActivatedLowBattery"_s + event<Events::Timer> = "ActivatedWait"_s,
+                                             "ActivatedLowBattery"_s + event<Events::LightPress> = "ActivatedWait"_s,
+                                             "ActivatedLowBattery"_s + event<Events::DeepDownPress> = "DeactivatedWait"_s,
+                                             "ActivatedLowBattery"_s + event<Events::BackPress> = "ActivatedWait"_s,
+                                             "ActivatedLowBattery"_s + event<Events::RotateLeftPress> = "ActivatedEdit"_s,
+                                             "ActivatedLowBattery"_s + event<Events::RotateRightPress> = "ActivatedEdit"_s,
+                                             "ActivatedLowBattery"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
 
                                              "ActivatedWait"_s + sml::on_entry<_> / ActivatedWait::entry,
                                              "ActivatedWait"_s + sml::on_exit<_> / ActivatedWait::exit,
@@ -360,7 +387,7 @@ namespace app::home_screen
                                              "Activated"_s + event<Events::BackPress>  / Helpers::endUserSessionWithDelay,
                                              "Activated"_s + event<Events::LongBackPress> [not Helpers::isLowBatteryWarningToShow]  / Helpers::switchToBatteryStatus,
                                              "Activated"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
-                                             "Activated"_s + event<Events::LowBatteryWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning,
+                                             "Activated"_s + event<Events::LowBatterySessionWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning,
 
                                              "ActivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "ActivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
@@ -391,7 +418,8 @@ namespace app::home_screen
                                              "AlarmRingingDeactivatedWait"_s + sml::on_entry<_> / AlarmRingingDeactivatedWait::entry,
                                              "AlarmRingingDeactivatedWait"_s + sml::on_exit<_> / AlarmRingingDeactivatedWait::exit,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::Timer> = "Deactivated"_s,
-                                             "AlarmRingingDeactivatedWait"_s + event<Events::DeepUpPress> = "ActivatedWait"_s,
+                                             "AlarmRingingDeactivatedWait"_s + event<Events::DeepUpPress> [not Helpers::isLowBatteryLevel] = "ActivatedWait"_s,
+                                             "AlarmRingingDeactivatedWait"_s + event<Events::LowBatteryAlarmWarning> = "ActivatedLowBattery"_s,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::BackPress> = "Deactivated"_s,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::LightPress>/ Helpers::switchToMenu = "Deactivated"_s,
                                              "AlarmRingingDeactivatedWait"_s + event<Events::RotateLeftPress> = "DeactivatedEdit"_s,
@@ -413,7 +441,7 @@ namespace app::home_screen
                                              "AlarmSnoozed"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
                                              "AlarmSnoozed"_s + event<Events::BatteryUpdate> / Helpers::updateBatteryStatus,
                                              "AlarmSnoozed"_s + event<Events::LongBackPress> [not Helpers::isLowBatteryWarningToShow]  / Helpers::switchToBatteryStatus,
-                                             "AlarmSnoozed"_s + event<Events::LowBatteryWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning
+                                             "AlarmSnoozed"_s + event<Events::LowBatterySessionWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning
                     );
                 // clang-format on
             }
@@ -523,6 +551,9 @@ namespace app::home_screen
             break;
         case KeyMap::DeepPressUp:
             pimpl->sm->process_event(Events::DeepUpPress{});
+            if (presenter.isLowBatteryLevel()) {
+                pimpl->sm->process_event(Events::LowBatteryAlarmWarning{});
+            }
             break;
         case KeyMap::DeepPressDown:
             pimpl->sm->process_event(Events::DeepDownPress{});
@@ -532,7 +563,7 @@ namespace app::home_screen
         }
 
         if (key != KeyMap::DeepPressUp && key != KeyMap::DeepPressDown && presenter.isLowBatteryWarningNeeded()) {
-            pimpl->sm->process_event(Events::LowBatteryWarning{});
+            pimpl->sm->process_event(Events::LowBatterySessionWarning{});
         }
 
         return true;

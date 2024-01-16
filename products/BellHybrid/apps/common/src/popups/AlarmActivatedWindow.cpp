@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <ApplicationCommon.hpp>
@@ -18,6 +18,7 @@
 namespace
 {
     constexpr unsigned int y_position = 22U;
+    constexpr std::chrono::seconds screenTimeout{5};
 } // namespace
 
 namespace gui
@@ -29,11 +30,6 @@ namespace gui
     {
         getPresenter()->attach(this);
         buildInterface();
-
-        timerCallback = [this](Item &, sys::Timer &) {
-            returnToPreviousWindow();
-            return true;
-        };
     }
 
     void AlarmActivatedWindow::buildInterface()
@@ -44,16 +40,59 @@ namespace gui
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
+        getPresenter()->getLayout() == app::popup::Layout::LowBatteryInfo ? buildLowBatteryLayout()
+                                                                          : buildAlarmInfoLayout();
+    }
+
+    void AlarmActivatedWindow::buildLowBatteryLayout()
+    {
+        icon = new Icon(this,
+                        0,
+                        0,
+                        style::window_width,
+                        style::window_height,
+                        "bell_status_battery_lvl0",
+                        {},
+                        gui::ImageTypeSpecifier::W_G);
+        icon->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        icon->image->setMargins({0, bell_style::warning_icon_top_margin, 0, 0});
+        icon->text->setMaximumWidth(bell_style::warning_text_width);
+        icon->text->setFont(style::window::font::verybiglight);
+        icon->text->setRichText(utils::translate("app_bell_alarm_lowBattery_info"));
+
+        timerCallback = [this](Item &, sys::Timer &timer) {
+            lowBatteryInfoHandled();
+            return true;
+        };
+        resetTimer(screenTimeout);
+    }
+
+    void AlarmActivatedWindow::buildAlarmInfoLayout()
+    {
         icon = new Icon(this, 0, 0, style::window_width, style::window_height, "big_alarm_W_G", {});
         icon->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
         icon->image->setMargins({0, bell_style::popup_icon_top_margin, 0, bell_style::popup_icon_bottom_margin});
         icon->text->setFont(style::window::font::verybiglight);
+        setAlarmTime(getPresenter()->getAlarmTime());
+
+        timerCallback = [this](Item &, sys::Timer &) {
+            returnToPreviousWindow();
+            return true;
+        };
+        resetTimer(screenTimeout);
     }
 
-    void AlarmActivatedWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    void AlarmActivatedWindow::rebuild()
     {
-        setAlarmTime(getPresenter()->getAlarmTime());
-        WindowWithTimer::onBeforeShow(mode, data);
+        erase();
+        buildInterface();
+    }
+
+    void AlarmActivatedWindow::lowBatteryInfoHandled()
+    {
+        getPresenter()->lowBatteryInfoHandled();
+        rebuild();
+        application->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
 
     void AlarmActivatedWindow::returnToPreviousWindow()
@@ -75,7 +114,12 @@ namespace gui
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             detachTimerIfExists();
-            returnToPreviousWindow();
+            if (getPresenter()->getLayout() == app::popup::Layout::LowBatteryInfo) {
+                lowBatteryInfoHandled();
+            }
+            else {
+                returnToPreviousWindow();
+            }
             return true;
         }
         return false;

@@ -13,7 +13,6 @@
 
 namespace
 {
-    using State = Store::Battery::State;
     constexpr auto relaxationLoopTimerName{"RelaxationLoopTimer"};
     constexpr std::chrono::seconds relaxationLoopTimerPeriod{1};
     constexpr units::SOC dischargingLevelShowTop{20};
@@ -21,11 +20,6 @@ namespace
     constexpr auto ellipsis{"..."};
     /* charsMultiplier is set a little bit less than max lines which is 2, because of final text formatting */
     constexpr auto charsMultiplier{1.8f};
-
-    bool isBatteryCharging(const State state)
-    {
-        return state == State::Charging or state == State::ChargingDone;
-    }
 
     gui::Text *createTitle(gui::VBox *parent)
     {
@@ -217,7 +211,7 @@ namespace gui
         auto state     = batteryStatus.state;
 
         if (soc < dischargingLevelShowTop) {
-            battery->update(soc, isBatteryCharging(state));
+            battery->update(soc, presenter->isBatteryCharging(state));
             bottomText->setVisible(false);
             battery->setVisible(true);
             battery->informContentChanged();

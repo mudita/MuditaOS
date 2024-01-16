@@ -108,6 +108,7 @@ namespace app::home_screen
         virtual bool isLowBatteryWarningNeeded()                                                 = 0;
         virtual void updateBatteryLevelInterval()                                                = 0;
         virtual void refreshUserSession()                                                        = 0;
+        virtual bool isLowBatteryLevel() const                                                   = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -161,6 +162,7 @@ namespace app::home_screen
         bool isLowBatteryWarningNeeded() override;
         void updateBatteryLevelInterval() override;
         void refreshUserSession() override;
+        bool isLowBatteryLevel() const override;
 
         void setLayout(gui::LayoutGenerator layoutGenerator) override;
 

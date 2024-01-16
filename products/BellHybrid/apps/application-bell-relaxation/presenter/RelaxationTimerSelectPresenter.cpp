@@ -47,6 +47,16 @@ namespace app::relaxation
         return batteryModel.getLevelState();
     }
 
+    bool RelaxationTimerSelectPresenter::isBatteryCharging(Store::Battery::State state) const
+    {
+        return batteryModel.isBatteryCharging(state);
+    }
+
+    bool RelaxationTimerSelectPresenter::isBatteryBelowLowLevelThreshold(units::SOC soc) const
+    {
+        return soc < constants::lowBatteryInfoThreshold;
+    }
+
     bool RelaxationTimerSelectPresenter::isLowBatteryWindowHandled() const
     {
         return lowBatteryInfoModel.isInfoHandled();

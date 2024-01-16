@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellAlarm.hpp"
@@ -53,7 +53,7 @@ namespace app
         });
 
         windowsFactory.attach(gui::window::name::bellAlarmSet, [&](ApplicationCommon *app, const std::string &) {
-            auto alarmPresenter = std::make_unique<bell_alarm::BellAlarmSetPresenter>(app, *alarmModel);
+            auto alarmPresenter = std::make_unique<bell_alarm::BellAlarmSetPresenter>(app, *alarmModel, *batteryModel);
             return std::make_unique<gui::BellAlarmSetWindow>(app, std::move(alarmPresenter));
         });
 

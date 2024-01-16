@@ -14,12 +14,10 @@
 
 namespace
 {
-    using State   = Store::Battery::State;
     using minutes = std::chrono::minutes;
     using namespace std::chrono_literals;
     constexpr minutes onceValue{minutes::zero()};
     constexpr minutes loopValue{8760h};
-    constexpr units::SOC lowBatteryThreshold{10};
 
     const std::string getOnceValueText()
     {
@@ -61,11 +59,6 @@ namespace
             range.push_back(timerValueToUTF8(value));
         }
         return range;
-    }
-
-    bool isBatteryCharging(const State state)
-    {
-        return state == State::Charging or state == State::ChargingDone;
     }
 } // namespace
 namespace gui
@@ -202,8 +195,9 @@ namespace gui
 
             const auto batteryState = presenter->getBatteryState();
             const units::SOC soc    = batteryState.level;
-            const bool isCharging   = isBatteryCharging(batteryState.state);
-            if (not presenter->isLowBatteryWindowHandled() && not isCharging && soc < lowBatteryThreshold) {
+            const bool isCharging   = presenter->isBatteryCharging(batteryState.state);
+            if (not presenter->isLowBatteryWindowHandled() && not isCharging &&
+                presenter->isBatteryBelowLowLevelThreshold(soc)) {
                 auto lowBatterySwitchData =
                     std::make_unique<AppsBatteryStatusSwitchData>(soc, isCharging, switchToNextScreen);
                 lowBatterySwitchData->ignoreCurrentWindowOnStack = true;
