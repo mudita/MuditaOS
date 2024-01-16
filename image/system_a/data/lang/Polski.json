@@ -116,6 +116,7 @@
     "app_bell_turn_off_question": "Wy\u0142\u0105czy\u0107 Mudita Harmony?",
     "app_bell_welcome_charge_message": "<text>Na\u0142aduj Harmony<br/>i kliknij lekko</text>",
     "app_bell_welcome_message": "<text>Mudita Harmony<br/>jest wy\u0142\u0105czony</text>",
+    "app_bell_alarm_lowBattery_info": "Naładuj Harmony aby mieć pewność, że alarm zadzwoni",
     "app_bellmain_alarm": "Alarm",
     "app_bellmain_bedtime": "Pora snu",
     "app_bellmain_home_screen_bottom_desc": "Alarm zadzwoni",

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "layouts/HomeScreenLayoutVertical.hpp"
@@ -47,6 +47,7 @@ namespace gui
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
             alarmTopIcon->setStatus(AlarmIcon::Status::DEACTIVATED);
             alarmActivatedDeactivatedScreen->image->set("big_no-alarm_W_G", {});
+            alarmActivatedDeactivatedScreen->image->setMaximumWidth(alarmActivatedDeactivatedScreen->image->getWidth());
             break;
         case app::home_screen::ViewState::WaitForConfirmation:
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
@@ -54,10 +55,16 @@ namespace gui
         case app::home_screen::ViewState::AlarmEdit:
             setScreenMode(ScreenMode::AlarmEdit);
             break;
+        case app::home_screen::ViewState::ActivatedLowBattery:
+            setScreenMode(ScreenMode::AlarmActivatedDeactivated);
+            alarmTopIcon->setStatus(AlarmIcon::Status::DEACTIVATED);
+            alarmActivatedDeactivatedScreen->image->set("bell_status_battery_lvl0", gui::ImageTypeSpecifier::W_G);
+            break;
         case app::home_screen::ViewState::ActivatedWait:
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
             alarmTopIcon->setStatus(AlarmIcon::Status::ACTIVATED);
             alarmActivatedDeactivatedScreen->image->set("big_alarm_W_G", {});
+            alarmActivatedDeactivatedScreen->image->setMaximumWidth(alarmActivatedDeactivatedScreen->image->getWidth());
             break;
         case app::home_screen::ViewState::Activated:
             alarmActivatedDeactivatedScreen->image->set("big_alarm_W_G", {});

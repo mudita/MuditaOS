@@ -13,6 +13,7 @@
 * Added entering WFI when CPU is idle to reduce power consumption
 * Added switching SDRAM to self-refresh before entering WFI for further power consumption reduction
 * Added watchdog protection to WFI mode
+* Added low battery warning when the alarm is activated
 
 ### Changed / Improved
 

@@ -117,6 +117,7 @@
     "app_bell_turn_off_question": "\u00c9teindre l'appareil ?",
     "app_bell_welcome_charge_message": "<text>Rechargez Harmony<br/>et appuyez l\u00e9g\u00e8rement</text>",
     "app_bell_welcome_message": "<text>Mudita Harmony<br/>est d\u00e9sactiv\u00e9</text>",
+    "app_bell_alarm_lowBattery_info": "Chargez votre Harmony pour vous assurer que l'alarme sonne",
     "app_bellmain_alarm": "Alarme",
     "app_bellmain_bedtime": "Heure du coucher",
     "app_bellmain_home_screen_bottom_desc": "La prochaine alarme sonnera",

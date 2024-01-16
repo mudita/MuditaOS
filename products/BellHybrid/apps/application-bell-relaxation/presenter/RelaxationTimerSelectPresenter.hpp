@@ -43,6 +43,8 @@ namespace app::relaxation
             virtual std::chrono::minutes getCurrentTimerValue() const = 0;
             virtual void setTimerValue(std::chrono::minutes)          = 0;
             virtual Store::Battery getBatteryState()                     = 0;
+            virtual bool isBatteryCharging(Store::Battery::State state) const  = 0;
+            virtual bool isBatteryBelowLowLevelThreshold(units::SOC soc) const = 0;
             [[nodiscard]] virtual bool isLowBatteryWindowHandled() const = 0;
             virtual void handleLowBatteryWindow()                        = 0;
         };
@@ -58,6 +60,8 @@ namespace app::relaxation
         std::chrono::minutes getCurrentTimerValue() const override;
         void setTimerValue(std::chrono::minutes) override;
         Store::Battery getBatteryState() override;
+        bool isBatteryCharging(Store::Battery::State state) const override;
+        bool isBatteryBelowLowLevelThreshold(units::SOC soc) const override;
         [[nodiscard]] bool isLowBatteryWindowHandled() const override;
         void handleLowBatteryWindow() override;
 

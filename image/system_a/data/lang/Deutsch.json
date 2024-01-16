@@ -116,6 +116,7 @@
     "app_bell_turn_off_question": "Schalten Sie das Ger\u00e4t aus?",
     "app_bell_welcome_charge_message": "<text>Charge Harmony<br/>und leicht dr\u00fccken</text>",
     "app_bell_welcome_message": "<text>Mudita Harmony<br/>ist ausgeschaltet</text>",
+    "app_bell_alarm_lowBattery_info": "Lade deinen Harmony, damit der Wecker auch sicher klingelt",
     "app_bellmain_alarm": "Alarm",
     "app_bellmain_bedtime": "Schlafenzeit",
     "app_bellmain_home_screen_bottom_desc": "Der n\u00e4chste Alarm klingelt",

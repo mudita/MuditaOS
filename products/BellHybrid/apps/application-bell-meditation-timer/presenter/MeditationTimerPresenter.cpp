@@ -11,18 +11,11 @@
 
 namespace
 {
-    using State                 = Store::Battery::State;
     constexpr auto spinnerMax   = 180U;
     constexpr auto spinnerMin   = 1U;
     constexpr auto spinnerStep  = 1U;
     constexpr auto emptyValue   = 0U;
     constexpr auto defaultValue = 15U;
-    constexpr units::SOC lowBatteryThreshold{10};
-
-    bool isBatteryCharging(const State state)
-    {
-        return state == State::Charging or state == State::ChargingDone;
-    }
 } // namespace
 
 namespace app::meditation
@@ -72,8 +65,8 @@ namespace app::meditation
 
         const auto batteryState = batteryModel.getLevelState();
         const units::SOC soc    = batteryState.level;
-        const bool isCharging   = isBatteryCharging(batteryState.state);
-        if (not lowBatteryInfoModel.isInfoHandled() && not isCharging && soc < lowBatteryThreshold) {
+        const bool isCharging   = batteryModel.isBatteryCharging(batteryState.state);
+        if (not lowBatteryInfoModel.isInfoHandled() && not isCharging && soc < constants::lowBatteryInfoThreshold) {
             auto lowBatterySwitchData =
                 std::make_unique<gui::AppsBatteryStatusSwitchData>(soc, isCharging, switchToNextScreen);
             app->switchWindow(windows::meditationLowBattery, std::move(lowBatterySwitchData));

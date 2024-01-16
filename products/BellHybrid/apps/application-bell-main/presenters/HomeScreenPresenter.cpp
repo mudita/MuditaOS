@@ -308,4 +308,11 @@ namespace app::home_screen
         batteryLevelNotificationModel.updateBatteryLevelInterval(getBatteryLvl());
     }
 
+    bool HomeScreenPresenter::isLowBatteryLevel() const
+    {
+        const auto batteryStatus = batteryModel.getLevelState();
+        return not batteryModel.isBatteryCharging(batteryStatus.state) &&
+               (batteryStatus.level < constants::lowBatteryInfoThreshold);
+    }
+
 } // namespace app::home_screen

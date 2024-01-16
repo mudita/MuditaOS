@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "layouts/HomeScreenLayoutClassic.hpp"
 #include "layouts/HomeScreenLayoutNames.hpp"
 #include "data/BellMainStyle.hpp"
+#include "data/StyleCommon.hpp"
 #include "widgets/BellBattery.hpp"
 #include "widgets/BellConnectionStatus.hpp"
 #include "widgets/DuoHBox.hpp"
@@ -15,6 +16,7 @@
 #include <time/time_constants.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
 #include <widgets/TimeSetFmtSpinner.hpp>
+#include <widgets/Icon.hpp>
 
 namespace
 {
@@ -111,6 +113,22 @@ namespace gui
         bottomText->drawUnderline(false);
         bottomText->setVisible(false);
 
+        lowBatteryWarning = new Icon(this,
+                                     0,
+                                     0,
+                                     style::window_width,
+                                     style::window_height,
+                                     "bell_status_battery_lvl0",
+                                     {},
+                                     gui::ImageTypeSpecifier::W_G);
+        lowBatteryWarning->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        lowBatteryWarning->image->setMargins({0, gui::bell_style::warning_icon_top_margin, 0, 0});
+        lowBatteryWarning->text->setMaximumWidth(gui::bell_style::warning_text_width);
+        lowBatteryWarning->text->setFont(style::window::font::verybiglight);
+        lowBatteryWarning->text->setRichText(utils::translate("app_bell_alarm_lowBattery_info"));
+        lowBatteryWarning->setVisible(false);
+
         resizeItems();
     }
 
@@ -125,12 +143,14 @@ namespace gui
         case app::home_screen::ViewState::Deactivated:
             alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
             setHeaderViewMode(HeaderViewMode::Empty);
+            setScreenMode(ScreenViewMode::Main);
             alarm->setEditMode(EditMode::Browse);
             removeTextDescription();
             break;
         case app::home_screen::ViewState::DeactivatedWait:
             alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
             setHeaderViewMode(HeaderViewMode::AlarmIcon);
+            setScreenMode(ScreenViewMode::Main);
             alarm->setEditMode(EditMode::Browse);
             break;
         case app::home_screen::ViewState::WaitForConfirmation:
@@ -139,36 +159,49 @@ namespace gui
         case app::home_screen::ViewState::AlarmEdit:
             alarm->setEditMode(EditMode::Edit);
             setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+            setScreenMode(ScreenViewMode::Main);
             removeTextDescription();
+            break;
+        case app::home_screen::ViewState::ActivatedLowBattery:
+            alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
+            setHeaderViewMode(HeaderViewMode::Empty);
+            setScreenMode(ScreenViewMode::Warning);
+            alarm->setEditMode(EditMode::Browse);
             break;
         case app::home_screen::ViewState::ActivatedWait:
             alarm->setAlarmStatus(AlarmSetSpinner::Status::ACTIVATED);
             setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+            setScreenMode(ScreenViewMode::Main);
             alarm->setEditMode(EditMode::Browse);
             break;
         case app::home_screen::ViewState::Activated:
             alarm->setAlarmStatus(AlarmSetSpinner::Status::ACTIVATED);
             setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
+            setScreenMode(ScreenViewMode::Main);
             alarm->setEditMode(EditMode::Browse);
             removeTextDescription();
             break;
         case app::home_screen::ViewState::AlarmRinging:
             alarm->setAlarmStatus(AlarmSetSpinner::Status::RINGING);
             setHeaderViewMode(HeaderViewMode::AlarmIcon);
+            setScreenMode(ScreenViewMode::Main);
             alarm->setEditMode(EditMode::Browse);
             removeTextDescription();
             break;
         case app::home_screen::ViewState::AlarmRingingDeactivatedWait:
             alarm->setAlarmStatus(AlarmSetSpinner::Status::DEACTIVATED);
             setHeaderViewMode(HeaderViewMode::AlarmIcon);
+            setScreenMode(ScreenViewMode::Main);
             alarm->setEditMode(EditMode::Browse);
             break;
         case app::home_screen::ViewState::AlarmSnoozedWait:
             setHeaderViewMode(HeaderViewMode::SnoozeIcon);
+            setScreenMode(ScreenViewMode::Main);
             alarm->setEditMode(EditMode::Browse);
             break;
         case app::home_screen::ViewState::AlarmSnoozed:
             setHeaderViewMode(HeaderViewMode::SnoozeIconAndTime);
+            setScreenMode(ScreenViewMode::Main);
             alarm->setEditMode(EditMode::Browse);
             removeTextDescription();
             break;
@@ -211,6 +244,28 @@ namespace gui
             snoozeTimer->setVisible(true);
             snoozeTimer->informContentChanged();
             snoozeTimer->setTimerVisible(false);
+            break;
+        }
+    }
+
+    void HomeScreenLayoutClassic::setScreenMode(ScreenViewMode mode)
+    {
+        switch (mode) {
+        case ScreenViewMode::Main:
+            lowBatteryWarning->setVisible(false);
+            firstBox->setVisible(true);
+            firstBox->informContentChanged();
+            lastBox->setVisible(true);
+            lastBox->informContentChanged();
+            centerBox->setVisible(true);
+            centerBox->informContentChanged();
+            break;
+        case ScreenViewMode::Warning:
+            firstBox->setVisible(false);
+            lastBox->setVisible(false);
+            centerBox->setVisible(false);
+            lowBatteryWarning->setVisible(true);
+            lowBatteryWarning->informContentChanged();
             break;
         }
     }

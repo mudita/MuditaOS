@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,6 +27,7 @@ namespace gui
     class BellBattery;
     class BellConnectionStatus;
     class DuoHBox;
+    class Icon;
 
     enum class LayoutClassicVersion
     {
@@ -42,6 +43,12 @@ namespace gui
         AlarmIconAndTime,
         SnoozeIcon,
         SnoozeIconAndTime,
+    };
+
+    enum class ScreenViewMode
+    {
+        Main,
+        Warning
     };
 
     class HomeScreenLayoutClassic : public BaseHomeScreenLayoutProvider, protected BellBaseLayout
@@ -66,6 +73,7 @@ namespace gui
 
       protected:
         void setHeaderViewMode(HeaderViewMode mode);
+        void setScreenMode(ScreenViewMode mode);
         virtual void buildInterface();
         virtual bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext);
         void removeTextDescription();
@@ -85,5 +93,6 @@ namespace gui
         TextFixedSize *bottomText              = nullptr;
         AlarmSetSpinner *alarm    = nullptr;
         SnoozeTimer *snoozeTimer  = nullptr;
+        Icon *lowBatteryWarning                = nullptr;
     };
 }; // namespace gui

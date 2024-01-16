@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Application.hpp>
@@ -48,6 +48,7 @@ namespace app
 
         alarmModel = std::make_unique<app::AlarmModel>(this);
         alarmModel->update(nullptr);
+        batteryModel = std::make_unique<app::BatteryModel>(this);
         return sys::ReturnCodes::Success;
     }
 
@@ -60,14 +61,16 @@ namespace app
             case ID::AlarmActivated:
                 windowsFactory.attach(
                     window::alarm_activated_window, [this](app::ApplicationCommon *app, const std::string &name) {
-                        auto presenter = std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel);
+                        auto presenter =
+                            std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel, *batteryModel);
                         return std::make_unique<gui::AlarmActivatedWindow>(app, std::move(presenter));
                     });
                 break;
             case ID::AlarmDeactivated:
                 windowsFactory.attach(
                     window::alarm_deactivated_window, [this](app::ApplicationCommon *app, const std::string &name) {
-                        auto presenter = std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel);
+                        auto presenter =
+                            std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel, *batteryModel);
                         return std::make_unique<gui::AlarmDeactivatedWindow>(app, std::move(presenter));
                     });
                 break;

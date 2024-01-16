@@ -57,6 +57,7 @@ namespace app::relaxation
             virtual bool isPaused()                                                        = 0;
             virtual void onBeforeShow()                                                    = 0;
             virtual Store::Battery getBatteryState()                                       = 0;
+            virtual bool isBatteryCharging(Store::Battery::State state) const              = 0;
         };
     };
 
@@ -80,6 +81,7 @@ namespace app::relaxation
         bool isPaused() override;
         void onBeforeShow() override;
         Store::Battery getBatteryState() override;
+        bool isBatteryCharging(Store::Battery::State state) const override;
 
         void onFinished();
 

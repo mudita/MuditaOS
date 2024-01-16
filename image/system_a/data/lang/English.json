@@ -150,6 +150,7 @@
     "app_bell_turn_off_question": "Turn off Mudita Harmony?",
     "app_bell_welcome_charge_message": "<text>Charge Harmony<br/>and press light click</text>",
     "app_bell_welcome_message": "<text>Mudita Harmony<br/>is switched OFF</text>",
+    "app_bell_alarm_lowBattery_info": "Charge your Harmony to make sure your alarm will ring",
     "app_bellmain_alarm": "Alarm",
     "app_bellmain_bedtime": "Bedtime",
     "app_bellmain_home_screen_bottom_desc": "Next alarm will ring",
