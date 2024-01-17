@@ -6,6 +6,8 @@
 * Fixed source clock frequency computation for PWM module
 
 ### Added
+* Added setting onboarding year to build date year
+* Added low battery notification on the home screen
 
 ### Changed / Improved
 
@@ -15,7 +17,6 @@
 * Added gradual alarm volume increase
 * Added progress bar for all volume control windows
 * Improved factory reset procedure to remove user files
-* Added low battery notification on the home screen
 
 ### Changed / Improved
 * Increased clock font in Relaxation, Meditation, Power nap mode

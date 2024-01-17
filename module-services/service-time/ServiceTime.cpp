@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceTime.hpp"
@@ -18,12 +18,16 @@
 
 namespace stm
 {
-    constexpr auto automaticTimezoneName  = "";
-    constexpr auto automaticTimezoneRules = "UTC0";
+    namespace
+    {
+        constexpr auto serviceTimeStackDepth  = 1024 * 16;
+        constexpr auto automaticTimezoneName  = "";
+        constexpr auto automaticTimezoneRules = "UTC0";
+    } // namespace
 
     ServiceTime::ServiceTime(std::shared_ptr<alarms::IAlarmOperationsFactory> alarmOperationsFactory)
-        : sys::Service(service::name::service_time, "", StackDepth), timeManager{std::make_unique<TimeManager>(
-                                                                         std::make_unique<RTCCommand>(this))},
+        : sys::Service(service::name::service_time, "", serviceTimeStackDepth),
+          timeManager{std::make_unique<TimeManager>(std::make_unique<RTCCommand>(this))},
           alarmOperationsFactory{std::move(alarmOperationsFactory)}
     {
         bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
@@ -218,7 +222,7 @@ namespace stm
     {
         auto message = static_cast<stm::message::SetAutomaticDateAndTimeRequest *>(request);
         if (stm::api::isAutomaticDateAndTime() == message->getValue()) {
-            LOG_WARN("The selected value is already set. Ignore.");
+            LOG_INFO("The selected automatic date and time value is already set, ignoring");
             return std::shared_ptr<sys::ResponseMessage>();
         }
         settings->setValue(settings::SystemProperties::automaticDateAndTimeIsOn, std::to_string(message->getValue()));
@@ -242,7 +246,7 @@ namespace stm
     {
         auto message = static_cast<stm::message::SetTimeFormatRequest *>(request);
         if (stm::api::timeFormat() == message->getTimeFormat()) {
-            LOG_WARN("The selected value is already set. Ignore.");
+            LOG_INFO("The selected time format value is already set, ignoring");
             return std::shared_ptr<sys::ResponseMessage>();
         }
         settings->setValue(settings::SystemProperties::timeFormat,
@@ -255,7 +259,7 @@ namespace stm
     {
         auto message = static_cast<stm::message::SetDateFormatRequest *>(request);
         if (stm::api::dateFormat() == message->getDateFormat()) {
-            LOG_WARN("The selected value is already set. Ignore.");
+            LOG_INFO("The selected date format value is already set, ignoring");
             return std::shared_ptr<sys::ResponseMessage>();
         }
         settings->setValue(settings::SystemProperties::dateFormat,
@@ -326,5 +330,4 @@ namespace stm
     {
         return std::make_shared<stm::message::GetAutomaticDateAndTimeResponse>(stm::api::isAutomaticDateAndTime());
     }
-
-} /* namespace stm */
+} // namespace stm

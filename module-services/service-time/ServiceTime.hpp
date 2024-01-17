@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -29,14 +29,9 @@ namespace stm
     class ServiceTime : public sys::Service
     {
       private:
-        static constexpr auto StackDepth = 2048 * 8;
-
         std::unique_ptr<TimeManager> timeManager;
-
         std::unique_ptr<settings::Settings> settings;
-
         std::unique_ptr<alarms::AlarmMessageHandler> alarmMessageHandler;
-
         std::shared_ptr<alarms::IAlarmOperationsFactory> alarmOperationsFactory;
 
         void registerMessageHandlers();
@@ -60,7 +55,6 @@ namespace stm
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp = nullptr) override;
     };
-
 } /* namespace stm */
 
 namespace sys
