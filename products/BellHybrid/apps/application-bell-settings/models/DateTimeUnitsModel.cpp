@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/DateTimeUnitsModel.hpp"
@@ -15,12 +15,19 @@
 #include <service-time/api/TimeSettingsApi.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <widgets/DateSetSpinner.hpp>
-#include <widgets/TimeSetFmtSpinner.hpp>
-
-#include <ctime>
 
 namespace app::bell_settings
 {
+    namespace
+    {
+        auto getBuildYear() -> date::year
+        {
+            constexpr auto yearOffset = 7;
+            constexpr auto yearString = &__DATE__[yearOffset]; // __DATE__ is a string in 'Mmm dd yyyy' format
+            return date::year{utils::toNumeric(yearString)};
+        }
+    } // namespace
+
     DateTimeUnitsModel::DateTimeUnitsModel(app::ApplicationCommon *app) : application(app)
     {}
 
@@ -191,10 +198,10 @@ namespace app::bell_settings
     {
         using namespace date::literals;
 
-        /// Default date/time after factory reset: 2023/01/01 12:00 (in 24h format)
-        const auto factoryResetDate    = 2023_y / jan / 1_d;
-        const auto factoryResetTimeFmt = utils::time::Locale::TimeFormat::FormatTime24H;
-        const auto factoryResetDateFmt = utils::time::Locale::DateFormat::DD_MM_YYYY;
+        /// Default date/time after factory reset: buildYear/01/01 12:00 (in 24h format)
+        constexpr auto factoryResetTimeFmt = utils::time::Locale::TimeFormat::FormatTime24H;
+        constexpr auto factoryResetDateFmt = utils::time::Locale::DateFormat::DD_MM_YYYY;
+        const auto factoryResetDate        = getBuildYear() / jan / 1_d;
 
         yearSetListItem->dateSetSpinner->setDate(factoryResetDate);
         timeSetListItem->timeSetSpinner->setTimeFormat(factoryResetTimeFmt);
