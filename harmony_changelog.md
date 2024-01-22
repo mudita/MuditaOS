@@ -4,6 +4,7 @@
 
 ### Fixed
 * Fixed source clock frequency computation for PWM module
+* Fixed initial watchdog configuration
 
 ### Added
 * Added setting onboarding year to build date year
@@ -11,6 +12,7 @@
 * Added low battery notification before using the application
 * Added entering WFI when CPU is idle to reduce power consumption
 * Added switching SDRAM to self-refresh before entering WFI for further power consumption reduction
+* Added watchdog protection to WFI mode
 
 ### Changed / Improved
 
