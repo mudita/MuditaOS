@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemWatchdog/SystemWatchdog.hpp>
@@ -12,7 +12,19 @@ namespace sys
 {
     using namespace cpp_freertos;
 
-    static constexpr uint16_t stackDepthWords = 256;
+    namespace
+    {
+        // Watchdog thread stack size
+        constexpr std::uint16_t stackDepthWords = 256;
+        // Timeout period for refresh - 90s
+        constexpr TickType_t refreshTimeoutPeriod = pdMS_TO_TICKS(90000);
+        // Timeout period for the actual watchdog (has to be longer than maximum allowed WFI time 60s) - 64s
+        constexpr TickType_t watchdogTimeoutPeriod = pdMS_TO_TICKS(64000);
+        // Period of actual watchdog refresh - 16s
+        constexpr TickType_t checkPeriod = pdMS_TO_TICKS(16000);
+        // Timeout period for watchdog thread closure - 2s
+        constexpr TickType_t closurePeriod = pdMS_TO_TICKS(2000);
+    } // namespace
 
     SystemWatchdog::SystemWatchdog()
         : Thread(threadName, stackDepthWords, static_cast<UBaseType_t>(ServicePriority::High))
@@ -58,14 +70,14 @@ namespace sys
         while (enableRunLoop) {
             Delay(checkPeriod);
 
-            if (timeout_occurred) {
+            if (timeoutOccurred) {
                 continue;
             }
 
             // Critical section not required (atomic 32-bit reads)
-            if (Ticks::GetTicks() - lastRefreshTimestamp >= refreshTimeoutPeriod) {
+            if ((Ticks::GetTicks() - lastRefreshTimestamp) >= refreshTimeoutPeriod) {
                 // Allow HW watchdog timeout to occur
-                timeout_occurred = true;
+                timeoutOccurred = true;
                 LOG_FATAL("System watchdog timeout, system will be reset soon!");
             }
             else {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/watchdog/watchdog.hpp"
@@ -23,7 +23,7 @@ namespace bsp::watchdog
         config.enableRtwdog         = true;
         config.clockSource          = kRTWDOG_ClockSource1;            // LPO_CLK clock (32.768kHz)
         config.prescaler            = kRTWDOG_ClockPrescalerDivide256; // 256 prescaler (effectively 128Hz clock)
-        config.workMode.enableWait  = false;
+        config.workMode.enableWait  = true;                            // Keep RTWDOG enabled in WFI
         config.workMode.enableStop  = false;
         config.workMode.enableDebug = false; // If true, RTWDOG will run when target is halted
         config.testMode             = kRTWDOG_TestModeDisabled;
