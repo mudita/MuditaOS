@@ -31,6 +31,8 @@ namespace
     constexpr auto windowLongTimeout{12s};
     // default screen timeout
     constexpr auto windowDefaultTimeout{3s};
+    // default screen timeout for low battery warning
+    constexpr auto windowDefaultTimeoutForLowBatteryWarning{6s};
 } // namespace
 
 namespace gui
@@ -129,6 +131,7 @@ namespace gui
                 auto tokenMap = text::RichTextParser::TokenMap({{"$BATTERY", std::to_string(soc)}});
                 bottomDescription->setRichText(utils::translate("battery_remaining"), std::move(tokenMap));
                 chargingIcon->setVisible(false);
+                resetTimer(windowDefaultTimeoutForLowBatteryWarning);
             }
             else {
                 topDescription->setText(utils::translate("app_settings_tech_info_battery"));
