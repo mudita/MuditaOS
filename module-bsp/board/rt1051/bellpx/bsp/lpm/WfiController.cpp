@@ -4,12 +4,12 @@
 #include "WfiController.hpp"
 #include "EnterSleepMode.h"
 #include <fsl_gpc.h>
-#include <fsl_rtwdog.h>
 #include <fsl_runtimestat_gpt.h>
 #include <Utils.hpp>
 #include <time/time_constants.hpp>
 #include <ticks.hpp>
 #include <timers.h>
+#include <watchdog/watchdog.hpp>
 
 namespace bsp
 {
@@ -19,8 +19,8 @@ namespace bsp
          * trigger after more than minute - this way no event will ever be missed */
         constexpr auto timersInactivityTimeMs{60 * utils::time::milisecondsInSecond};
 
-        bool wfiModeAllowed = false;
-        std::uint32_t timeSpentInWFI;
+        bool wfiModeAllowed{false};
+        std::uint32_t timeSpentInWFI{0};
 
         bool isTimerTaskScheduledSoon()
         {
@@ -137,7 +137,7 @@ namespace bsp
             return 0;
         }
 
-        RTWDOG_Refresh(RTWDOG);
+        watchdog::refresh();
         setWaitModeConfig();
         peripheralEnterDozeMode();
 
@@ -163,7 +163,7 @@ namespace bsp
         enableSystick();
 
         peripheralExitDozeMode();
-        RTWDOG_Refresh(RTWDOG);
+        watchdog::refresh();
         EnableGlobalIRQ(savedPrimask);
 
         blockEnteringWfiMode();

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -41,22 +41,11 @@ namespace sys
 
       private:
         SystemWatchdog();
-
-        // Timeout period for refresh
-        static constexpr TickType_t refreshTimeoutPeriod = pdMS_TO_TICKS(90000);
-        // Timeout period for the actual watchdog
-        static constexpr TickType_t watchdogTimeoutPeriod = pdMS_TO_TICKS(16000);
-        // Period of actual watchdog refresh
-        static constexpr TickType_t checkPeriod = pdMS_TO_TICKS(8000);
-        // Timeout period for watchdog thread closure
-        static constexpr TickType_t closurePeriod = pdMS_TO_TICKS(2000);
-
         void Run() final;
 
         TickType_t lastRefreshTimestamp{0};
-        bool timeout_occurred{false};
+        bool timeoutOccurred{false};
         bool enableRunLoop{false};
         cpp_freertos::BinarySemaphore taskEndedSem{false};
     };
-
 } // namespace sys
