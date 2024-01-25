@@ -109,20 +109,20 @@ void SystemInit(void)
     }
 
     /* Perform preliminary RTWDOG configuration */
+    /* Write RTWDOG update key to unlock */
+    if ((RTWDOG->CS & RTWDOG_CS_CMD32EN_MASK) != 0) {
+        RTWDOG->CNT = 0xD928C520U;
+    }
+    else {
+        RTWDOG->CNT = 0xC520;
+        RTWDOG->CNT = 0xD928;
+    }
 #if defined(DISABLE_WATCHDOG)
-    /* Write RTWDOG update key to unlock and wait for unlocking */
-    RTWDOG->CNT = 0xD928C520U;
-    while ((RTWDOG->CS & RTWDOG_CS_ULK_MASK) == 0) {}
-
     /* Disable RTWDOG and allow configuration updates, wait until config is applied */
     RTWDOG->TOVAL = 0xFFFF;
     RTWDOG->CS    = ((RTWDOG->CS & ~RTWDOG_CS_EN_MASK) | RTWDOG_CS_UPDATE_MASK);
     while ((RTWDOG->CS & RTWDOG_CS_RCS_MASK) == 0) {}
 #else
-    /* Write RTWDOG update key to unlock and wait for unlocking */
-    RTWDOG->CNT = 0xD928C520U;
-    while ((RTWDOG->CS & RTWDOG_CS_ULK_MASK) == 0) {}
-
     /* Set timeout value to 16s (assuming 128Hz clock - 32.768kHz from LPO_CLK, with 256 prescaler) */
     RTWDOG->TOVAL = 16 * 128;
 
