@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -594,6 +594,20 @@
 #define FSL_FEATURE_USDHC_HAS_SDR50_MODE (1)
 /* @brief Has SDR104 support (HOST_CTRL_CAP[SDR104_SUPPORT]) */
 #define FSL_FEATURE_USDHC_HAS_SDR104_MODE (1)
+/* @brief USDHC has reset control */
+#define FSL_FEATURE_USDHC_HAS_RESET (0)
+/* @brief USDHC has no bitfield WTMK_LVL[WR_BRST_LEN] and WTMK_LVL[RD_BRST_LEN] */
+#define FSL_FEATURE_USDHC_HAS_NO_RW_BURST_LEN (0)
+/* @brief If USDHC instance support 8 bit width */
+#define FSL_FEATURE_USDHC_INSTANCE_SUPPORT_8_BIT_WIDTHn(x) (((x) == USDHC1) ? (0) : (((x) == USDHC2) ? (1) : (-1)))
+/* @brief If USDHC instance support HS400 mode */
+#define FSL_FEATURE_USDHC_INSTANCE_SUPPORT_HS400_MODEn(x) (0)
+/* @brief If USDHC instance support 1v8 signal */
+#define FSL_FEATURE_USDHC_INSTANCE_SUPPORT_1V8_SIGNALn(x) (1)
+/* @brief Has no retuning time counter (HOST_CTRL_CAP[TIME_COUNT_RETURNING]) */
+#define FSL_FEATURE_USDHC_REGISTER_HOST_CTRL_CAP_HAS_NO_RETUNING_TIME_COUNTER (0)
+/* @brief Has no VSELECT bit in VEND_SPEC register */
+#define FSL_FEATURE_USDHC_HAS_NO_VOLTAGE_SELECT (0)
 
 /* XBARA module features */
 
