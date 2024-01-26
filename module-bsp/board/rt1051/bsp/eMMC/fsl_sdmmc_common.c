@@ -1,69 +1,55 @@
 /*
- * The Clear BSD License
  * Copyright (c) 2015, Freescale Semiconductor, Inc.
- * Copyright 2016-2017 NXP
+ * Copyright 2016-2020 NXP
  * All rights reserved.
  *
- * Redistribution and use in source and binary forms, with or without modification,
- * are permitted (subject to the limitations in the disclaimer below) provided
- *  that the following conditions are met:
- *
- * o Redistributions of source code must retain the above copyright notice, this list
- *   of conditions and the following disclaimer.
- *
- * o Redistributions in binary form must reproduce the above copyright notice, this
- *   list of conditions and the following disclaimer in the documentation and/or
- *   other materials provided with the distribution.
- *
- * o Neither the name of the copyright holder nor the names of its
- *   contributors may be used to endorse or promote products derived from this
- *   software without specific prior written permission.
- *
- * NO EXPRESS OR IMPLIED LICENSES TO ANY PARTY'S PATENT RIGHTS ARE GRANTED BY THIS LICENSE.
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
- * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
- * WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR
- * ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
- * (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
- * LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON
- * ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * SPDX-License-Identifier: BSD-3-Clause
  */
 
 #include "fsl_sdmmc_common.h"
 /*******************************************************************************
  * Variables
  ******************************************************************************/
-SDK_ALIGN(uint32_t g_sdmmc[SDK_SIZEALIGN(SDMMC_GLOBAL_BUFFER_SIZE, SDMMC_DATA_BUFFER_ALIGN_CACHE)],
-          MAX(SDMMC_DATA_BUFFER_ALIGN_CACHE, SDMMCHOST_DMA_BUFFER_ADDR_ALIGN));
+#if SDMMCHOST_SUPPORT_DDR50 || SDMMCHOST_SUPPORT_SDR104 || SDMMCHOST_SUPPORT_SDR50 || SDMMCHOST_SUPPORT_HS200 || \
+    SDMMCHOST_SUPPORT_HS400
+/* sdmmc tuning block */
+const uint32_t SDMMC_TuningBlockPattern4Bit[16U] = {
+    0xFF0FFF00U, 0xFFCCC3CCU, 0xC33CCCFFU, 0xFEFFFEEFU, 0xFFDFFFDDU, 0xFFFBFFFBU, 0xBFFF7FFFU, 0x77F7BDEFU,
+    0xFFF0FFF0U, 0x0FFCCC3CU, 0xCC33CCCFU, 0xFFEFFFEEU, 0xFFFDFFFDU, 0xDFFFBFFFU, 0xBBFFF7FFU, 0xF77F7BDEU,
+};
+const uint32_t SDMMC_TuningBlockPattern8Bit[32U] = {
+    0xffff00ffU, 0xffff0000U, 0xffffccccU, 0xcc33ccccU, 0xcc3333ccU, 0xccccffffU, 0xffeeffffU, 0xffeeeeffU,
+    0xffffddffU, 0xffffddddU, 0xffffffbbU, 0xffffffbbU, 0xbbffffffU, 0x77ffffffU, 0x7777ff77U, 0xbbddeeffU,
+    0xffffff00U, 0xffffff00U, 0x00ffffccU, 0xcccc33ccU, 0xcccc3333U, 0xccccccffU, 0xffffeeffU, 0xffffeeeeU,
+    0xffffffddU, 0xffffffddU, 0xddffffffU, 0xbbffffffU, 0xbbbbffffU, 0xff77ffffU, 0xff7777ffU, 0x77bbddeeU,
+};
+#endif
 /*******************************************************************************
  * Code
  ******************************************************************************/
-status_t SDMMC_SelectCard(SDMMCHOST_TYPE *base,
-                          SDMMCHOST_TRANSFER_FUNCTION transfer,
-                          uint32_t relativeAddress,
-                          bool isSelected)
+status_t SDMMC_SelectCard(sdmmchost_t *host, uint32_t relativeAddress, bool isSelected)
 {
-    assert(transfer);
+    sdmmchost_transfer_t content = {0};
+    sdmmchost_cmd_t command      = {0};
+    status_t error               = kStatus_Success;
 
-    SDMMCHOST_TRANSFER content = {0};
-    SDMMCHOST_COMMAND command  = {0};
-
-    command.index = kSDMMC_SelectCard;
-    if (isSelected) {
+    command.index = (uint32_t)kSDMMC_SelectCard;
+    if (isSelected)
+    {
         command.argument     = relativeAddress << 16U;
         command.responseType = kCARD_ResponseTypeR1;
     }
-    else {
+    else
+    {
         command.argument     = 0U;
         command.responseType = kCARD_ResponseTypeNone;
     }
 
     content.command = &command;
     content.data    = NULL;
-    if ((kStatus_Success != transfer(base, &content)) || (command.response[0U] & kSDMMC_R1ErrorAllFlag)) {
+    error           = SDMMCHOST_TransferFunction(host, &content);
+    if ((kStatus_Success != error) || ((command.response[0U] & SDMMC_R1_ALL_ERROR_FLAG) != 0U))
+    {
         return kStatus_SDMMC_TransferFailed;
     }
 
@@ -71,218 +57,110 @@ status_t SDMMC_SelectCard(SDMMCHOST_TYPE *base,
     return kStatus_Success;
 }
 
-status_t SDMMC_SendApplicationCommand(SDMMCHOST_TYPE *base,
-                                      SDMMCHOST_TRANSFER_FUNCTION transfer,
-                                      uint32_t relativeAddress)
+status_t SDMMC_SendApplicationCommand(sdmmchost_t *host, uint32_t relativeAddress)
 {
-    assert(transfer);
+    sdmmchost_transfer_t content = {0};
+    sdmmchost_cmd_t command      = {0};
+    status_t error               = kStatus_Success;
 
-    SDMMCHOST_TRANSFER content = {0};
-    SDMMCHOST_COMMAND command  = {0};
-
-    command.index        = kSDMMC_ApplicationCommand;
+    command.index        = (uint32_t)kSDMMC_ApplicationCommand;
     command.argument     = (relativeAddress << 16U);
     command.responseType = kCARD_ResponseTypeR1;
 
     content.command = &command;
-    content.data    = 0U;
-    if ((kStatus_Success != transfer(base, &content)) || (command.response[0U] & kSDMMC_R1ErrorAllFlag)) {
+    content.data    = NULL;
+    error           = SDMMCHOST_TransferFunction(host, &content);
+    if ((kStatus_Success != error) || ((command.response[0U] & SDMMC_R1_ALL_ERROR_FLAG) != 0U))
+    {
         return kStatus_SDMMC_TransferFailed;
     }
 
-    if (!(command.response[0U] & kSDMMC_R1ApplicationCommandFlag)) {
+    if (0U == (command.response[0U] & SDMMC_MASK(kSDMMC_R1ApplicationCommandFlag)))
+    {
         return kStatus_SDMMC_CardNotSupport;
     }
 
     return kStatus_Success;
 }
 
-status_t SDMMC_SetBlockCount(SDMMCHOST_TYPE *base, SDMMCHOST_TRANSFER_FUNCTION transfer, uint32_t blockCount)
+status_t SDMMC_SetBlockCount(sdmmchost_t *host, uint32_t blockCount)
 {
-    assert(transfer);
+    sdmmchost_transfer_t content = {0};
+    sdmmchost_cmd_t command      = {0};
+    status_t error               = kStatus_Success;
 
-    SDMMCHOST_TRANSFER content = {0};
-    SDMMCHOST_COMMAND command  = {0};
-
-    command.index        = kSDMMC_SetBlockCount;
+    command.index        = (uint32_t)kSDMMC_SetBlockCount;
     command.argument     = blockCount;
     command.responseType = kCARD_ResponseTypeR1;
 
     content.command = &command;
-    content.data    = 0U;
-    if ((kStatus_Success != transfer(base, &content)) || (command.response[0U] & kSDMMC_R1ErrorAllFlag)) {
+    content.data    = NULL;
+    error           = SDMMCHOST_TransferFunction(host, &content);
+    if ((kStatus_Success != error) || ((command.response[0U] & SDMMC_R1_ALL_ERROR_FLAG) != 0U))
+    {
         return kStatus_SDMMC_TransferFailed;
     }
 
     return kStatus_Success;
 }
 
-status_t SDMMC_GoIdle(SDMMCHOST_TYPE *base, SDMMCHOST_TRANSFER_FUNCTION transfer)
+status_t SDMMC_GoIdle(sdmmchost_t *host)
 {
-    assert(transfer);
+    sdmmchost_transfer_t content = {0};
+    sdmmchost_cmd_t command      = {0};
+    status_t error               = kStatus_Success;
 
-    SDMMCHOST_TRANSFER content = {0};
-    SDMMCHOST_COMMAND command  = {0};
-
-    command.index = kSDMMC_GoIdleState;
+    command.index = (uint32_t)kSDMMC_GoIdleState;
 
     content.command = &command;
-    content.data    = 0U;
-    if (kStatus_Success != transfer(base, &content)) {
+    content.data    = NULL;
+    error           = SDMMCHOST_TransferFunction(host, &content);
+    if (kStatus_Success != error)
+    {
         return kStatus_SDMMC_TransferFailed;
     }
 
     return kStatus_Success;
 }
 
-status_t SDMMC_SetBlockSize(SDMMCHOST_TYPE *base, SDMMCHOST_TRANSFER_FUNCTION transfer, uint32_t blockSize)
+status_t SDMMC_SetBlockSize(sdmmchost_t *host, uint32_t blockSize)
 {
-    assert(transfer);
+    sdmmchost_transfer_t content = {0};
+    sdmmchost_cmd_t command      = {0};
+    status_t error               = kStatus_Success;
 
-    SDMMCHOST_TRANSFER content = {0};
-    SDMMCHOST_COMMAND command  = {0};
-
-    command.index        = kSDMMC_SetBlockLength;
+    command.index        = (uint32_t)kSDMMC_SetBlockLength;
     command.argument     = blockSize;
     command.responseType = kCARD_ResponseTypeR1;
 
     content.command = &command;
-    content.data    = 0U;
-    if ((kStatus_Success != transfer(base, &content)) || (command.response[0U] & kSDMMC_R1ErrorAllFlag)) {
+    content.data    = NULL;
+    error           = SDMMCHOST_TransferFunction(host, &content);
+    if ((kStatus_Success != error) || ((command.response[0U] & SDMMC_R1_ALL_ERROR_FLAG) != 0U))
+    {
         return kStatus_SDMMC_TransferFailed;
     }
 
     return kStatus_Success;
 }
 
-status_t SDMMC_SetCardInactive(SDMMCHOST_TYPE *base, SDMMCHOST_TRANSFER_FUNCTION transfer)
+status_t SDMMC_SetCardInactive(sdmmchost_t *host)
 {
-    assert(transfer);
+    sdmmchost_transfer_t content = {0};
+    sdmmchost_cmd_t command      = {0};
+    status_t error               = kStatus_Success;
 
-    SDMMCHOST_TRANSFER content = {0};
-    SDMMCHOST_COMMAND command  = {0};
-
-    command.index        = kSDMMC_GoInactiveState;
+    command.index        = (uint32_t)kSDMMC_GoInactiveState;
     command.argument     = 0U;
     command.responseType = kCARD_ResponseTypeNone;
 
     content.command = &command;
-    content.data    = 0U;
-    if ((kStatus_Success != transfer(base, &content))) {
-        return kStatus_SDMMC_TransferFailed;
-    }
-
-    return kStatus_Success;
-}
-
-status_t SDMMC_SwitchVoltage(SDMMCHOST_TYPE *base, SDMMCHOST_TRANSFER_FUNCTION transfer)
-{
-    assert(transfer);
-
-    SDMMCHOST_TRANSFER content = {0};
-    SDMMCHOST_COMMAND command  = {0};
-
-    command.index        = kSD_VoltageSwitch;
-    command.argument     = 0U;
-    command.responseType = kCARD_ResponseTypeR1;
-
-    content.command = &command;
     content.data    = NULL;
-    if (kStatus_Success != transfer(base, &content)) {
+    error           = SDMMCHOST_TransferFunction(host, &content);
+    if ((kStatus_Success != error))
+    {
         return kStatus_SDMMC_TransferFailed;
     }
-    /* disable card clock */
-    SDMMCHOST_ENABLE_CARD_CLOCK(base, false);
-
-    /* check data line and cmd line status */
-    if ((GET_SDMMCHOST_STATUS(base) &
-         (CARD_DATA1_STATUS_MASK | CARD_DATA2_STATUS_MASK | CARD_DATA3_STATUS_MASK | CARD_DATA0_NOT_BUSY)) != 0U) {
-        return kStatus_SDMMC_SwitchVoltageFail;
-    }
-
-    /* host switch to 1.8V */
-    SDMMCHOST_SWITCH_VOLTAGE180V(base, true);
-
-    SDMMCHOST_Delay(100U);
-
-    /*enable sd clock*/
-    SDMMCHOST_ENABLE_CARD_CLOCK(base, true);
-    /*enable force clock on*/
-    SDMMCHOST_FORCE_SDCLOCK_ON(base, true);
-    /* dealy 1ms,not exactly correct when use while */
-    SDMMCHOST_Delay(10U);
-    /*disable force clock on*/
-    SDMMCHOST_FORCE_SDCLOCK_ON(base, false);
-
-    /* check data line and cmd line status */
-    if ((GET_SDMMCHOST_STATUS(base) &
-         (CARD_DATA1_STATUS_MASK | CARD_DATA2_STATUS_MASK | CARD_DATA3_STATUS_MASK | CARD_DATA0_NOT_BUSY)) == 0U) {
-        return kStatus_SDMMC_SwitchVoltageFail;
-    }
-
-    return kStatus_Success;
-}
-
-status_t SDMMC_ExecuteTuning(SDMMCHOST_TYPE *base,
-                             SDMMCHOST_TRANSFER_FUNCTION transfer,
-                             uint32_t tuningCmd,
-                             uint32_t blockSize)
-{
-    SDMMCHOST_TRANSFER content = {0U};
-    SDMMCHOST_COMMAND command  = {0U};
-    SDMMCHOST_DATA data        = {0U};
-    uint32_t buffer[32U]       = {0U};
-    bool tuningError           = true;
-
-    command.index        = tuningCmd;
-    command.argument     = 0U;
-    command.responseType = kCARD_ResponseTypeR1;
-
-    data.blockSize  = blockSize;
-    data.blockCount = 1U;
-    data.rxData     = buffer;
-    /* add this macro for adpter to different driver */
-    SDMMCHOST_ENABLE_TUNING_FLAG(data);
-
-    content.command = &command;
-    content.data    = &data;
-
-    /* enable the standard tuning */
-    SDMMCHOST_EXECUTE_STANDARD_TUNING_ENABLE(base, true);
-
-    while (true) {
-        /* send tuning block */
-        if ((kStatus_Success != transfer(base, &content))) {
-            return kStatus_SDMMC_TransferFailed;
-        }
-        SDMMCHOST_Delay(1U);
-
-        /*wait excute tuning bit clear*/
-        if ((SDMMCHOST_EXECUTE_STANDARD_TUNING_STATUS(base) != 0U)) {
-            continue;
-        }
-
-        /* if tuning error , re-tuning again */
-        if ((SDMMCHOST_CHECK_TUNING_ERROR(base) != 0U) && tuningError) {
-            tuningError = false;
-            /* enable the standard tuning */
-            SDMMCHOST_EXECUTE_STANDARD_TUNING_ENABLE(base, true);
-            SDMMCHOST_ADJUST_TUNING_DELAY(base, SDMMCHOST_STANDARD_TUNING_START);
-        }
-        else {
-            break;
-        }
-    }
-
-    /* delay to wait the host controller stable */
-    SDMMCHOST_Delay(100U);
-
-    /* check tuning result*/
-    if (SDMMCHOST_EXECUTE_STANDARD_TUNING_RESULT(base) == 0U) {
-        return kStatus_SDMMC_TuningFail;
-    }
-
-    SDMMCHOST_AUTO_STANDARD_RETUNING_TIMER(base);
 
     return kStatus_Success;
 }
