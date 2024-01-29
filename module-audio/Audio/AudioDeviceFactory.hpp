@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,7 +11,6 @@
 
 namespace audio
 {
-
     class AudioDeviceFactory
     {
       public:
@@ -22,6 +21,7 @@ namespace audio
         };
 
         explicit AudioDeviceFactory(Observer *observer = nullptr);
+        virtual ~AudioDeviceFactory() = default;
 
         void setObserver(Observer *observer) noexcept;
         std::shared_ptr<AudioDevice> CreateDevice(const Profile &profile);
@@ -33,5 +33,4 @@ namespace audio
       private:
         Observer *_observer = nullptr;
     };
-
 }; // namespace audio

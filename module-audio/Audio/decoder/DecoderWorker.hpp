@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,6 +16,8 @@ namespace audio
     {
       public:
         using EndOfFileCallback = std::function<void()>;
+        using FileDeletedCallback = std::function<void()>;
+
         enum class Command
         {
             EnablePlayback,
@@ -30,7 +32,8 @@ namespace audio
 
         DecoderWorker(AbstractStream *audioStreamOut,
                       Decoder *decoder,
-                      EndOfFileCallback endOfFileCallback,
+                      const EndOfFileCallback &endOfFileCallback,
+                      const FileDeletedCallback &fileDeletedCallback,
                       ChannelMode mode);
         ~DecoderWorker() override;
 
@@ -42,11 +45,11 @@ namespace audio
       private:
         static constexpr std::size_t stackDepth = 12 * 1024;
 
-        virtual auto handleMessage(uint32_t queueID) -> bool override;
+        virtual auto handleMessage(std::uint32_t queueID) -> bool override;
         void pushAudioData();
         bool stateChangeWait();
 
-        using BufferInternalType = int16_t;
+        using BufferInternalType = std::int16_t;
 
         static constexpr auto workerName            = "DecoderWorker";
         static constexpr auto workerPriority        = static_cast<UBaseType_t>(sys::ServicePriority::Idle);
@@ -55,7 +58,6 @@ namespace audio
 
         AbstractStream *audioStreamOut = nullptr;
         Decoder *decoder               = nullptr;
-        EndOfFileCallback endOfFileCallback;
         std::unique_ptr<StreamQueuedEventsListener> queueListener;
         bool playbackEnabled = false;
         cpp_freertos::BinarySemaphore stateSemaphore;
@@ -63,5 +65,8 @@ namespace audio
         const int bufferSize;
         std::unique_ptr<BufferInternalType[]> decoderBuffer;
         ChannelMode channelMode = ChannelMode::NoConversion;
+
+        EndOfFileCallback endOfFileCallback;
+        FileDeletedCallback fileDeletedCallback;
     };
 } // namespace audio

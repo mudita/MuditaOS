@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -298,6 +298,20 @@ namespace AudioServiceMessage
     {
       public:
         explicit EndOfFile(audio::Token &token) : token(token)
+        {}
+        const audio::Token &GetToken() const
+        {
+            return token;
+        }
+
+      private:
+        audio::Token token = audio::Token::MakeBadToken();
+    };
+
+    class FileDeleted : public sys::DataMessage
+    {
+      public:
+        explicit FileDeleted(audio::Token &token) : token(token)
         {}
         const audio::Token &GetToken() const
         {

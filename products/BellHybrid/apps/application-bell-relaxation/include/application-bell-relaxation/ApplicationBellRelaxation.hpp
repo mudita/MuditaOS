@@ -18,7 +18,6 @@ namespace gui::window::name
     inline constexpr auto relaxationEnded           = "RelaxationEndedWindow";
     inline constexpr auto relaxationLowBattery      = "RelaxationLowBatteryWindow";
     inline constexpr auto relaxationError           = "RelaxationError";
-
 } // namespace gui::window::name
 namespace app
 {
@@ -26,6 +25,7 @@ namespace app
     {
         class RelaxationPlayer;
     }
+
     inline constexpr auto applicationBellRelaxationName = "ApplicationBellRelaxation";
 
     class ApplicationBellRelaxation : public Application
@@ -46,7 +46,7 @@ namespace app
                                   std::string parent                  = "",
                                   StatusIndicators statusIndicators   = StatusIndicators{},
                                   StartInBackground startInBackground = {false},
-                                  uint32_t stackDepth                 = 4096 * 2);
+                                  std::uint32_t stackDepth            = 1024 * 8);
         ~ApplicationBellRelaxation();
         sys::ReturnCodes InitHandler() override;
 

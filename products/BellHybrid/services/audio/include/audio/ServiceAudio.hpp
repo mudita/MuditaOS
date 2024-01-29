@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -37,6 +37,7 @@ namespace service
         enum class StopReason
         {
             Eof,
+            FileDeleted,
             Other
         };
 
@@ -57,6 +58,7 @@ namespace service
         auto handleResume() -> std::unique_ptr<AudioResponseMessage>;
 
         void handleEOF(const audio::Token &token);
+        void handleFileDeleted(const audio::Token &token);
 
         auto AudioServicesCallback(const sys::Message *msg) -> std::optional<std::string>;
 

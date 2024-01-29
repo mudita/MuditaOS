@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlaybackOperation.hpp"
@@ -13,7 +13,6 @@
 
 namespace audio
 {
-
     using namespace AudioServiceMessage;
 
     PlaybackOperation::PlaybackOperation(const std::string &filePath,
@@ -28,9 +27,14 @@ namespace audio
 
         endOfFileCallback = [this]() {
             state          = State::Idle;
-            const auto req = AudioServiceMessage::EndOfFile(operationToken);
-            serviceCallback(&req);
-            return std::string();
+            const auto msg = AudioServiceMessage::EndOfFile(operationToken);
+            serviceCallback(&msg);
+        };
+
+        fileDeletedCallback = [this]() {
+            state          = State::Idle;
+            const auto msg = AudioServiceMessage::FileDeleted(operationToken);
+            serviceCallback(&msg);
         };
 
         dec = Decoder::Create(filePath);
@@ -66,7 +70,7 @@ namespace audio
         outputConnection = std::make_unique<StreamConnection>(dec.get(), audioDevice.get(), dataStreamOut.get());
 
         // decoder worker soft start - must be called after connection setup
-        dec->startDecodingWorker(endOfFileCallback);
+        dec->startDecodingWorker(endOfFileCallback, fileDeletedCallback);
 
         // start output device and enable audio connection
         auto ret = audioDevice->Start();
@@ -225,5 +229,4 @@ namespace audio
     {
         Stop();
     }
-
 } // namespace audio

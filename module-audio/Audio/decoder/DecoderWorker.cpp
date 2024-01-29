@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DecoderWorker.hpp"
@@ -7,11 +7,12 @@
 
 audio::DecoderWorker::DecoderWorker(audio::AbstractStream *audioStreamOut,
                                     Decoder *decoder,
-                                    EndOfFileCallback endOfFileCallback,
+                                    const EndOfFileCallback &endOfFileCallback,
+                                    const FileDeletedCallback &fileDeletedCallback,
                                     ChannelMode mode)
     : sys::Worker(DecoderWorker::workerName, DecoderWorker::workerPriority, stackDepth), audioStreamOut(audioStreamOut),
-      decoder(decoder), endOfFileCallback(std::move(endOfFileCallback)),
-      bufferSize(audioStreamOut->getInputTraits().blockSize / sizeof(BufferInternalType)), channelMode(mode)
+      decoder(decoder), bufferSize(audioStreamOut->getInputTraits().blockSize / sizeof(BufferInternalType)),
+      channelMode(mode), endOfFileCallback(endOfFileCallback), fileDeletedCallback(fileDeletedCallback)
 {}
 
 audio::DecoderWorker::~DecoderWorker()
@@ -41,7 +42,7 @@ auto audio::DecoderWorker::init(std::list<sys::WorkerQueueInfo> queues) -> bool
     return isSuccessful;
 }
 
-bool audio::DecoderWorker::handleMessage(uint32_t queueID)
+bool audio::DecoderWorker::handleMessage(std::uint32_t queueID)
 {
     auto queue      = queues[queueID];
     auto &queueName = queue->GetQueueName();
@@ -58,7 +59,6 @@ bool audio::DecoderWorker::handleMessage(uint32_t queueID)
         case Stream::Event::StreamFull:
             break;
         case Stream::Event::StreamHalfUsed:
-            [[fallthrough]];
         case Stream::Event::StreamEmpty:
             pushAudioData();
         }
@@ -88,13 +88,17 @@ bool audio::DecoderWorker::handleMessage(uint32_t queueID)
 
 void audio::DecoderWorker::pushAudioData()
 {
-    auto samplesRead             = 0;
-    const unsigned int readScale = channelMode == ChannelMode::ForceStereo ? 2 : 1;
+    const auto readScale     = (channelMode == ChannelMode::ForceStereo) ? channel::stereoSound : channel::monoSound;
+    std::int32_t samplesRead = 0;
 
     while (!audioStreamOut->isFull() && playbackEnabled) {
         auto buffer = decoderBuffer.get();
         samplesRead = decoder->decode(bufferSize / readScale, buffer);
 
+        if (samplesRead == Decoder::fileDeletedRetCode) {
+            fileDeletedCallback();
+            break;
+        }
         if (samplesRead == 0) {
             endOfFileCallback();
             break;
@@ -102,13 +106,13 @@ void audio::DecoderWorker::pushAudioData()
 
         // pcm mono to stereo force conversion
         if (channelMode == ChannelMode::ForceStereo) {
-            for (unsigned int i = bufferSize / 2; i > 0; i--) {
+            for (auto i = bufferSize / 2; i > 0; i--) {
                 buffer[i * 2 - 1] = buffer[i * 2 - 2] = buffer[i - 1];
             }
         }
 
         if (!audioStreamOut->push(decoderBuffer.get(), samplesRead * sizeof(BufferInternalType) * readScale)) {
-            LOG_FATAL("Decoder failed to push to stream.");
+            LOG_ERROR("Decoder failed to push to stream");
             break;
         }
     }
@@ -116,13 +120,13 @@ void audio::DecoderWorker::pushAudioData()
 
 bool audio::DecoderWorker::enablePlayback()
 {
-    return sendCommand({.command = static_cast<uint32_t>(Command::EnablePlayback), .data = nullptr}) &&
+    return sendCommand({.command = static_cast<std::uint32_t>(Command::EnablePlayback), .data = nullptr}) &&
            stateChangeWait();
 }
 
 bool audio::DecoderWorker::disablePlayback()
 {
-    return sendCommand({.command = static_cast<uint32_t>(Command::DisablePlayback), .data = nullptr}) &&
+    return sendCommand({.command = static_cast<std::uint32_t>(Command::DisablePlayback), .data = nullptr}) &&
            stateChangeWait();
 }
 

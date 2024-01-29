@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,14 +14,6 @@ namespace app
     class AbstractAudioModel
     {
       public:
-        /// 0-15 range
-        static constexpr auto minVolume  = 1;
-        static constexpr auto maxVolume  = 15;
-        using Volume                     = std::uint32_t;
-        using OnStateChangeCallback      = std::function<void(const audio::RetCode code)>;
-        using OnGetValueCallback         = std::function<void(const audio::RetCode, Volume)>;
-        using OnPlaybackFinishedCallback = std::function<void()>;
-
         enum class PlaybackType
         {
             Multimedia,
@@ -31,6 +23,20 @@ namespace app
             Bedtime,
             Meditation
         };
+
+        enum class PlaybackFinishStatus
+        {
+            Normal,
+            Error
+        };
+
+        /// 0-15 range
+        static constexpr auto minVolume  = 1;
+        static constexpr auto maxVolume  = 15;
+        using Volume                     = std::uint32_t;
+        using OnStateChangeCallback      = std::function<void(const audio::RetCode code)>;
+        using OnGetValueCallback         = std::function<void(const audio::RetCode, Volume)>;
+        using OnPlaybackFinishedCallback = std::function<void(PlaybackFinishStatus)>;
 
         virtual ~AbstractAudioModel() noexcept                                                              = default;
         virtual void setVolume(Volume volume, PlaybackType playbackType, OnStateChangeCallback &&callback)  = 0;
@@ -47,5 +53,4 @@ namespace app
         virtual void setPlaybackFinishedCb(OnPlaybackFinishedCallback &&callback)                           = 0;
         virtual bool hasPlaybackFinished()                                                                  = 0;
     };
-
 } // namespace app

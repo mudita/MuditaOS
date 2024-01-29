@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -30,9 +30,11 @@ namespace app
 
       private:
         audio::Token lastPlayedToken = audio::Token::MakeBadToken();
-        void stop(audio::Token token, OnStateChangeCallback &&callback);
-        std::function<void()> playbackFinishedCallback{nullptr};
         bool playbackFinishedFlag{false};
         ApplicationCommon *app{};
+
+        OnPlaybackFinishedCallback playbackFinishedCallback{nullptr};
+
+        void stop(audio::Token token, OnStateChangeCallback &&callback);
     };
 } // namespace app

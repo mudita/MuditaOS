@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/AudioModel.hpp"
@@ -50,27 +50,35 @@ namespace
         LOG_ERROR("Command %d Failed with %d error", msgType, static_cast<int>(ret.first));
         return std::make_shared<service::AudioResponseMessage>(audio::RetCode::Failed);
     }
-
 } // namespace
 
 namespace app
 {
-
     AudioModel::AudioModel(ApplicationCommon *app) : app::AsyncCallbackReceiver{app}, app{app}
     {
-        app->connect(typeid(service::AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
-            playbackFinishedFlag = true;
-            if (playbackFinishedCallback) {
-                playbackFinishedCallback();
-            }
+        app->connect(typeid(service::AudioEOFNotification),
+                     [&]([[maybe_unused]] sys::Message *msg) -> sys::MessagePointer {
+                         playbackFinishedFlag = true;
+                         if (playbackFinishedCallback) {
+                             playbackFinishedCallback(AbstractAudioModel::PlaybackFinishStatus::Normal);
+                         }
+                         return sys::msgHandled();
+                     });
 
-            return sys::msgHandled();
-        });
+        app->connect(typeid(service::AudioFileDeletedNotification),
+                     [&]([[maybe_unused]] sys::Message *msg) -> sys::MessagePointer {
+                         playbackFinishedFlag = true;
+                         if (playbackFinishedCallback) {
+                             playbackFinishedCallback(AbstractAudioModel::PlaybackFinishStatus::Error);
+                         }
+                         return sys::msgHandled();
+                     });
     }
 
     AudioModel::~AudioModel()
     {
         app->disconnect(typeid(service::AudioEOFNotification));
+        app->disconnect(typeid(service::AudioFileDeletedNotification));
     }
 
     void AudioModel::play(const std::string &filePath,
@@ -146,6 +154,7 @@ namespace app
         };
         task->execute(app, this, std::move(cb));
     }
+
     void AudioModel::pause(OnStateChangeCallback &&callback)
     {
         auto msg  = std::make_unique<service::AudioPauseRequest>();
@@ -164,6 +173,7 @@ namespace app
         };
         task->execute(app, this, std::move(cb));
     }
+
     void AudioModel::resume(OnStateChangeCallback &&callback)
     {
         auto msg  = std::make_unique<service::AudioResumeRequest>();
@@ -181,6 +191,7 @@ namespace app
         };
         task->execute(app, this, std::move(cb));
     }
+
     void AudioModel::getVolume(AbstractAudioModel::PlaybackType playbackType,
                                AbstractAudioModel::OnGetValueCallback &&callback)
     {
@@ -200,6 +211,7 @@ namespace app
         };
         task->execute(app, this, std::move(cb));
     }
+
     std::optional<AbstractAudioModel::Volume> AudioModel::getVolume(AbstractAudioModel::PlaybackType playbackType)
     {
         auto msg       = std::make_shared<service::AudioGetVolume>(convertPlaybackType(playbackType));
@@ -220,5 +232,4 @@ namespace app
     {
         return playbackFinishedFlag;
     }
-
 } // namespace app

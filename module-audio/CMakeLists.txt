@@ -21,9 +21,9 @@ target_sources(
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioFormat.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/AudioMux.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/Decoder.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderMP3.cpp
-                ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderWAV.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/DecoderFLAC.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/DecoderMP3.cpp
+                ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/DecoderWAV.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/DecoderWorker.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/encoder/Encoder.cpp
                 ${CMAKE_CURRENT_SOURCE_DIR}/Audio/encoder/EncoderWAV.cpp
@@ -54,11 +54,11 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC ${PROJECT_TARGET})
 target_include_directories(${PROJECT_NAME} PUBLIC ${PROJECT_INCLUDES})
 target_include_directories(${PROJECT_NAME} PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
-# supress warning for flac decoder
+# Suppress warnings for FLAC decoder
 set_source_files_properties(
         ${CMAKE_CURRENT_SOURCE_DIR}/Audio/decoder/decoderFLAC.cpp
         PROPERTIES COMPILE_FLAGS
-	"-Wno-implicit-fallthrough -Wno-error=maybe-uninitialized"
+        "-Wno-implicit-fallthrough -Wno-error=maybe-uninitialized"
 )
 
 target_link_libraries(${PROJECT_NAME}

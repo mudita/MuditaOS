@@ -29,6 +29,7 @@ namespace app::relaxation
     void RelaxationRunningLoopPresenter::activate(const db::multimedia_files::MultimediaFilesRecord &song)
     {
         Expects(timer != nullptr);
+
         AbstractRelaxationPlayer::PlaybackMode mode;
         const auto value = settings->getValue(timerValueDBRecordName, settings::SettingsScope::AppLocal);
         if (utils::is_number(value) && utils::getNumericValue<int>(value) != 0) {
@@ -54,12 +55,17 @@ namespace app::relaxation
             }
             else {
                 getView()->handleError();
-                return;
             }
         };
-        auto onErrorCallback = [this]() { getView()->handleDeletedFile(); };
 
-        player.start(song.fileInfo.path, mode, std::move(onStartCallback), std::move(onErrorCallback));
+        auto onFinishedCallback = [this](AbstractAudioModel::PlaybackFinishStatus status) {
+            if (status == AbstractAudioModel::PlaybackFinishStatus::Error) {
+                timer->stop();
+                getView()->handleDeletedFile(); // Deleted file is currently the only error handled by player
+            }
+        };
+
+        player.start(song.fileInfo.path, mode, std::move(onStartCallback), std::move(onFinishedCallback));
     }
 
     void RelaxationRunningLoopPresenter::stop()

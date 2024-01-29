@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <AudioMessage.hpp>
@@ -171,15 +171,19 @@ void ServiceAudio::ProcessCloseReason(sys::CloseReason closeReason)
 
 std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Message *msg)
 {
-    if (const auto *eof = dynamic_cast<const AudioServiceMessage::EndOfFile *>(msg); eof) {
-        bus.sendUnicast(std::make_shared<AudioInternalEOFNotificationMessage>(eof->GetToken()), service::name::audio);
+    if (const auto eofMsg = dynamic_cast<const AudioServiceMessage::EndOfFile *>(msg); eofMsg) {
+        bus.sendUnicast(std::make_shared<AudioInternalEOFNotificationMessage>(eofMsg->GetToken()),
+                        service::name::audio);
     }
-    else if (const auto *dbReq = dynamic_cast<const AudioServiceMessage::DbRequest *>(msg); dbReq) {
+    else if (const auto fileDeletedMsg = dynamic_cast<const AudioServiceMessage::FileDeleted *>(msg); fileDeletedMsg) {
+        bus.sendUnicast(std::make_shared<AudioInternalFileDeletedNotificationMessage>(fileDeletedMsg->GetToken()),
+                        service::name::audio);
+    }
+    else if (const auto dbRequestMsg = dynamic_cast<const AudioServiceMessage::DbRequest *>(msg); dbRequestMsg) {
+        const auto selectedPlayback = generatePlayback(dbRequestMsg->playback, dbRequestMsg->setting);
+        const auto selectedProfile  = generateProfile(dbRequestMsg->profile, dbRequestMsg->playback);
 
-        const auto selectedPlayback = generatePlayback(dbReq->playback, dbReq->setting);
-        const auto selectedProfile  = generateProfile(dbReq->profile, dbReq->playback);
-
-        const auto &path = dbPath(dbReq->setting, selectedPlayback, selectedProfile);
+        const auto &path = dbPath(dbRequestMsg->setting, selectedPlayback, selectedProfile);
         LOG_DEBUG("ServiceAudio::DBbCallback(%s)", path.c_str());
         const auto settings_it = settingsCache.find(path);
 
@@ -207,7 +211,7 @@ std::optional<std::string> ServiceAudio::AudioServicesCallback(const sys::Messag
         }
     }
     else {
-        LOG_DEBUG("Message received but not handled - no effect.");
+        LOG_DEBUG("Message received but not handled - no effect");
     }
 
     return std::nullopt;
@@ -553,19 +557,25 @@ auto ServiceAudio::StopInput(audio::AudioMux::Input *input, StopReason stopReaso
     if (input->audio->GetCurrentState() == Audio::State::Idle) {
         return audio::RetCode::Success;
     }
-    const auto rCode = input->audio->Stop();
+    const auto retCode = input->audio->Stop();
+
     // Send notification that audio file was stopped
     std::shared_ptr<AudioNotificationMessage> msg;
-    if (stopReason == StopReason::Eof) {
+    switch (stopReason) {
+    case StopReason::Eof:
         msg = std::make_shared<AudioEOFNotification>(input->token);
-    }
-    else {
+        break;
+    case StopReason::FileDeleted:
+        msg = std::make_shared<AudioFileDeletedNotification>(input->token);
+        break;
+    default:
         msg = std::make_shared<AudioStopNotification>(input->token);
+        break;
     }
     bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceAudioNotifications);
     audioMux.ResetInput(input);
     VibrationUpdate();
-    return rCode;
+    return retCode;
 }
 
 void ServiceAudio::HandleEOF(const Token &token)
@@ -580,6 +590,13 @@ void ServiceAudio::HandleEOF(const Token &token)
         else {
             StopInput(*input, StopReason::Eof);
         }
+    }
+}
+
+void ServiceAudio::HandleFileDeleted(const audio::Token &token)
+{
+    if (const auto input = audioMux.GetInput(token); input) {
+        StopInput(*input, StopReason::FileDeleted);
     }
 }
 
@@ -650,6 +667,10 @@ sys::MessagePointer ServiceAudio::DataReceivedHandler(sys::DataMessage *msgl, sy
     if (msgType == typeid(AudioInternalEOFNotificationMessage)) {
         auto *msg = static_cast<AudioInternalEOFNotificationMessage *>(msgl);
         HandleEOF(msg->token);
+    }
+    else if (msgType == typeid(AudioInternalFileDeletedNotificationMessage)) {
+        auto *msg = static_cast<AudioInternalEOFNotificationMessage *>(msgl);
+        HandleFileDeleted(msg->token);
     }
     else if (msgType == typeid(AudioGetSetting)) {
         auto *msg   = static_cast<AudioGetSetting *>(msgl);

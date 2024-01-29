@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AudioMux.hpp"
@@ -25,7 +25,7 @@ namespace audio
     {
         audioInputsCount = audioInputsCount > 0 ? audioInputsCount : 1;
         audioInputsInternal.reserve(audioInputsCount);
-        for (size_t i = 0; i < audioInputsCount; i++) {
+        for (std::size_t i = 0; i < audioInputsCount; i++) {
             audioInputsInternal.emplace_back(Input(std::make_unique<Audio>(callback), refToken.IncrementToken()));
         }
     }

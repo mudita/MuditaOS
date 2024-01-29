@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationRunningProgressPresenter.hpp"
@@ -10,9 +10,9 @@
 
 namespace
 {
-    bool songLengthEqualsToSelectedPeriod(std::chrono::minutes period, std::chrono::seconds songLength)
+    bool isSongLengthEqualToPeriod(std::chrono::seconds songLength, std::chrono::minutes period)
     {
-        auto periodInSeconds = std::chrono::duration_cast<std::chrono::seconds>(period);
+        const auto periodInSeconds = std::chrono::duration_cast<std::chrono::seconds>(period);
         return periodInSeconds.count() == songLength.count();
     }
 } // namespace
@@ -39,11 +39,12 @@ namespace app::relaxation
     void RelaxationRunningProgressPresenter::activate(const db::multimedia_files::MultimediaFilesRecord &song)
     {
         Expects(timer != nullptr);
+
         AbstractRelaxationPlayer::PlaybackMode mode;
         const auto value      = settings->getValue(timerValueDBRecordName, settings::SettingsScope::AppLocal);
         const auto songLength = std::chrono::seconds{song.audioProperties.songLength};
-        if (utils::is_number(value) && utils::getNumericValue<int>(value) != 0 &&
-            !songLengthEqualsToSelectedPeriod(std::chrono::minutes{utils::getNumericValue<int>(value)}, songLength)) {
+        if (utils::is_number(value) && (utils::getNumericValue<int>(value) != 0) &&
+            !isSongLengthEqualToPeriod(songLength, std::chrono::minutes{utils::getNumericValue<int>(value)})) {
             const auto playbackTimeInMinutes = std::chrono::minutes{utils::getNumericValue<int>(value)};
             timer->reset(playbackTimeInMinutes);
             mode = AbstractRelaxationPlayer::PlaybackMode::Looped;
@@ -58,18 +59,24 @@ namespace app::relaxation
                 return;
             }
         }
+
         auto onStartCallback = [this](audio::RetCode retCode) {
             if (retCode == audio::RetCode::Success) {
                 timer->start();
             }
             else {
                 getView()->handleError();
-                return;
             }
         };
 
-        auto onErrorCallback = [this]() { getView()->handleDeletedFile(); };
-        player.start(song.fileInfo.path, mode, std::move(onStartCallback), std::move(onErrorCallback));
+        auto onFinishedCallback = [this](AbstractAudioModel::PlaybackFinishStatus status) {
+            if (status == AbstractAudioModel::PlaybackFinishStatus::Error) {
+                timer->stop();
+                getView()->handleDeletedFile(); // Deleted file is currently the only error handled by player
+            }
+        };
+
+        player.start(song.fileInfo.path, mode, std::move(onStartCallback), std::move(onFinishedCallback));
     }
 
     void RelaxationRunningProgressPresenter::stop()
@@ -90,7 +97,7 @@ namespace app::relaxation
 
     void RelaxationRunningProgressPresenter::pause()
     {
-        if (not timer->isStopped()) {
+        if (!timer->isStopped()) {
             auto onPauseCallback = [this](audio::RetCode retCode) {
                 if (retCode == audio::RetCode::Success) {
                     timer->stop();

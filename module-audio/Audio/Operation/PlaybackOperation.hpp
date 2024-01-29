@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,13 +10,8 @@
 #include "Audio/decoder/Decoder.hpp"
 
 #include <chrono>
-using namespace std::chrono_literals;
 
-namespace audio::playbackDefaults
-{
-    constexpr audio::Volume defaultLoudspeakerVolume = 10;
-    constexpr audio::Volume defaultHeadphonesVolume  = 2;
-} // namespace audio::playbackDefaults
+using namespace std::chrono_literals;
 
 namespace audio
 {
@@ -49,6 +44,6 @@ namespace audio
         std::unique_ptr<StreamConnection> outputConnection;
 
         DecoderWorker::EndOfFileCallback endOfFileCallback;
+        DecoderWorker::FileDeletedCallback fileDeletedCallback;
     };
-
 } // namespace audio

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceAudio.hpp"
@@ -12,7 +12,7 @@ namespace
 {
     // 4kB is too small because internally drflac_open() uses cache which by default has 4kB.
     // Alternatively smaller DR_FLAC_BUFFER_SIZE could be defined.
-    constexpr auto stackSize            = 1024 * 8;
+    constexpr auto serviceAudioStackSize = 1024 * 8;
     constexpr auto defaultVolume        = "11";
     constexpr auto defaultSnoozeVolume  = "10";
     constexpr auto defaultBedtimeVolume = "12";
@@ -26,18 +26,18 @@ namespace
         using namespace audio;
         // clang-format off
         constexpr std::initializer_list<std::pair<audio::DbPathElement, const char *>> values{
-            {DbPathElement{Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackLoudspeaker},defaultVolume},
-            {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker},defaultVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackLoudspeaker}, defaultVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackLoudspeaker}, defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackLoudspeaker}, defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Bedtime, Profile::Type::PlaybackLoudspeaker}, defaultBedtimeVolume},
-            {DbPathElement{Setting::Volume, PlaybackType::PreWakeUp, Profile::Type::PlaybackLoudspeaker},defaultSnoozeVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::PreWakeUp, Profile::Type::PlaybackLoudspeaker}, defaultSnoozeVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Snooze, Profile::Type::PlaybackLoudspeaker}, defaultSnoozeVolume},
 
             /// Profiles below are not used but unfortunately, must exist in order to satisfy audio module requirements
-            {DbPathElement{Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackHeadphones},defaultVolume},
-            {DbPathElement{Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackBluetoothA2DP},defaultVolume},
-            {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones},defaultVolume},
-            {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBluetoothA2DP},defaultVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackHeadphones}, defaultVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackBluetoothA2DP}, defaultVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackHeadphones}, defaultVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::Multimedia, Profile::Type::PlaybackBluetoothA2DP}, defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackHeadphones}, defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Alarm, Profile::Type::PlaybackBluetoothA2DP}, defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Bedtime, Profile::Type::PlaybackHeadphones}, defaultVolume},
@@ -50,19 +50,29 @@ namespace
         // clang-format on
     } // namespace initializer
 
-    class AudioInternalEOFNotificationMessage : public service::AudioNotificationMessage
+    namespace internal
     {
-      public:
-        explicit AudioInternalEOFNotificationMessage(audio::Token token) : AudioNotificationMessage(token)
-        {}
-    };
+        class AudioEOFNotificationMessage : public service::AudioNotificationMessage
+        {
+          public:
+            explicit AudioEOFNotificationMessage(audio::Token token) : AudioNotificationMessage(token)
+            {}
+        };
+
+        class AudioFileDeletedNotificationMessage : public service::AudioNotificationMessage
+        {
+          public:
+            explicit AudioFileDeletedNotificationMessage(audio::Token token) : AudioNotificationMessage(token)
+            {}
+        };
+    } // namespace internal
 } // namespace
 
 namespace service
 {
     Audio::Audio()
-        : sys::Service(audioServiceName, "", stackSize, sys::ServicePriority::Idle),
-          audioMux([this](auto... params) { return this->AudioServicesCallback(params...); }),
+        : sys::Service(audioServiceName, "", serviceAudioStackSize, sys::ServicePriority::Idle),
+          audioMux([this](auto... params) { return AudioServicesCallback(params...); }),
           cpuSentinel(std::make_shared<sys::CpuSentinel>(audioServiceName, this)),
           settingsProvider(std::make_unique<settings::Settings>())
     {
@@ -86,11 +96,18 @@ namespace service
             return handleStart(audio::Operation::Type::Playback, msgl->fadeIn, msgl->fileName, msgl->playbackType);
         });
 
-        connect(typeid(AudioInternalEOFNotificationMessage), [this](sys::Message *msg) -> sys::MessagePointer {
-            auto *msgl = static_cast<AudioInternalEOFNotificationMessage *>(msg);
+        connect(typeid(internal::AudioEOFNotificationMessage), [this](sys::Message *msg) -> sys::MessagePointer {
+            auto *msgl = static_cast<internal::AudioEOFNotificationMessage *>(msg);
             handleEOF(msgl->token);
             return sys::msgHandled();
         });
+
+        connect(typeid(internal::AudioFileDeletedNotificationMessage),
+                [this](sys::Message *msg) -> sys::MessagePointer {
+                    auto *msgl = static_cast<internal::AudioEOFNotificationMessage *>(msg);
+                    handleFileDeleted(msgl->token);
+                    return sys::msgHandled();
+                });
 
         connect(typeid(AudioStopRequest), [this](sys::Message *msg) -> sys::MessagePointer {
             volumeFadeIn->Stop();
@@ -211,13 +228,19 @@ namespace service
             return audio::RetCode::Success;
         }
         const auto retCode = input->audio->Stop();
+
         // Send notification that audio file was stopped
         std::shared_ptr<AudioNotificationMessage> msg;
-        if (stopReason == StopReason::Eof) {
+        switch (stopReason) {
+        case StopReason::Eof:
             msg = std::make_shared<AudioEOFNotification>(input->token);
-        }
-        else {
+            break;
+        case StopReason::FileDeleted:
+            msg = std::make_shared<AudioFileDeletedNotification>(input->token);
+            break;
+        default:
             msg = std::make_shared<AudioStopNotification>(input->token);
+            break;
         }
         bus.sendMulticast(std::move(msg), sys::BusChannel::ServiceAudioNotifications);
         audioMux.ResetInput(input);
@@ -257,23 +280,36 @@ namespace service
         }
     }
 
+    void Audio::handleFileDeleted(const audio::Token &token)
+    {
+        if (const auto input = audioMux.GetInput(token); input) {
+            stopInput(*input, StopReason::FileDeleted);
+        }
+    }
+
     auto Audio::AudioServicesCallback(const sys::Message *msg) -> std::optional<std::string>
     {
         std::optional<std::string> ret;
-        if (const auto *eof = dynamic_cast<const AudioServiceMessage::EndOfFile *>(msg); eof) {
-            bus.sendUnicast(std::make_shared<AudioInternalEOFNotificationMessage>(eof->GetToken()), audioServiceName);
+        if (const auto eofMsg = dynamic_cast<const AudioServiceMessage::EndOfFile *>(msg); eofMsg) {
+            bus.sendUnicast(std::make_shared<internal::AudioEOFNotificationMessage>(eofMsg->GetToken()),
+                            audioServiceName);
         }
-        else if (const auto *dbReq = dynamic_cast<const AudioServiceMessage::DbRequest *>(msg); dbReq) {
-            auto selectedPlayback = dbReq->playback;
-            auto selectedProfile  = dbReq->profile;
+        else if (const auto fileDeletedMsg = dynamic_cast<const AudioServiceMessage::FileDeleted *>(msg);
+                 fileDeletedMsg) {
+            bus.sendUnicast(std::make_shared<internal::AudioFileDeletedNotificationMessage>(fileDeletedMsg->GetToken()),
+                            audioServiceName);
+        }
+        else if (const auto dbRequestMsg = dynamic_cast<const AudioServiceMessage::DbRequest *>(msg); dbRequestMsg) {
+            auto selectedPlayback = dbRequestMsg->playback;
+            auto selectedProfile  = dbRequestMsg->profile;
             if (const auto result =
-                    settingsProvider->getValue(dbPath(dbReq->setting, selectedPlayback, selectedProfile));
+                    settingsProvider->getValue(dbPath(dbRequestMsg->setting, selectedPlayback, selectedProfile));
                 not result.empty()) {
                 ret.emplace(result);
             }
         }
         else {
-            LOG_DEBUG("Message received but not handled - no effect.");
+            LOG_DEBUG("Message received but not handled - no effect");
         }
 
         return ret;

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,10 +16,12 @@ namespace app
     class AbstractBatteryModel;
     class ApplicationCommon;
 } // namespace app
+
 namespace gui
 {
     class Item;
 } // namespace gui
+
 namespace settings
 {
     class Settings;

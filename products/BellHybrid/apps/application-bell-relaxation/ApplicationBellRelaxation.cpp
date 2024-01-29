@@ -26,11 +26,8 @@
 #include <common/models/BatteryModel.hpp>
 #include <common/models/AudioModel.hpp>
 #include <common/windows/AppsBatteryStatusWindow.hpp>
-#include <audio/AudioMessage.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
-
-#include <log/log.hpp>
 
 namespace
 {
@@ -44,7 +41,7 @@ namespace app
                                                          std::string parent,
                                                          StatusIndicators statusIndicators,
                                                          StartInBackground startInBackground,
-                                                         uint32_t stackDepth)
+                                                         std::uint32_t stackDepth)
         : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth),
           audioModel{std::make_unique<AudioModel>(this)}
     {
