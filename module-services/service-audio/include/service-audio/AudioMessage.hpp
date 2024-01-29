@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -35,7 +35,16 @@ class AudioResponseMessage : public sys::ResponseMessage
 class AudioInternalEOFNotificationMessage : public AudioMessage
 {
   public:
-    explicit AudioInternalEOFNotificationMessage(audio::Token token) : token(token)
+    explicit AudioInternalEOFNotificationMessage(audio::Token token) : token{token}
+    {}
+
+    const audio::Token token;
+};
+
+class AudioInternalFileDeletedNotificationMessage : public AudioMessage
+{
+  public:
+    explicit AudioInternalFileDeletedNotificationMessage(audio::Token token) : token{token}
     {}
 
     const audio::Token token;
@@ -61,6 +70,13 @@ class AudioEOFNotification : public AudioNotificationMessage
 {
   public:
     explicit AudioEOFNotification(audio::Token token) : AudioNotificationMessage{token}
+    {}
+};
+
+class AudioFileDeletedNotification : public AudioNotificationMessage
+{
+  public:
+    explicit AudioFileDeletedNotification(audio::Token token) : AudioNotificationMessage{token}
     {}
 };
 

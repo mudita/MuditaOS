@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <application-music-player/ApplicationMusicPlayer.hpp>
@@ -78,6 +78,11 @@ namespace app
             return audioNotificationHandler.handleAudioStopNotification(notification);
         });
         connect(typeid(AudioEOFNotification), [&](sys::Message *msg) -> sys::MessagePointer {
+            const auto notification = static_cast<AudioStopNotification *>(msg);
+            music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
+            return audioNotificationHandler.handleAudioEofNotification(notification);
+        });
+        connect(typeid(AudioFileDeletedNotification), [&](sys::Message *msg) -> sys::MessagePointer {
             const auto notification = static_cast<AudioStopNotification *>(msg);
             music_player::AudioNotificationsHandler audioNotificationHandler{priv->songsPresenter};
             return audioNotificationHandler.handleAudioEofNotification(notification);

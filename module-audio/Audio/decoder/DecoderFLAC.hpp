@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,16 +8,13 @@
 
 namespace audio
 {
-
-    class decoderFLAC : public Decoder
+    class DecoderFLAC : public Decoder
     {
-
       public:
-        explicit decoderFLAC(const std::string &filePath);
+        explicit DecoderFLAC(const std::string &filePath);
+        ~DecoderFLAC();
 
-        ~decoderFLAC();
-
-        uint32_t decode(uint32_t samplesToRead, int16_t *pcmData) override;
+        std::int32_t decode(std::uint32_t samplesToRead, std::int16_t *pcmData) override;
 
         void setPosition(float pos) override;
 
@@ -25,7 +22,8 @@ namespace audio
         drflac *flac = nullptr;
 
         /* Data encoded in UTF-8 */
-        void flac_parse_text(uint8_t *in, uint32_t taglen, uint32_t datalen, uint8_t *out, uint32_t outlen);
+        void parseText(
+            std::uint8_t *in, std::uint32_t taglen, std::uint32_t datalen, std::uint8_t *out, std::uint32_t outlen);
 
         // Callback for when data needs to be read from the client.
         //
@@ -37,7 +35,7 @@ namespace audio
         //
         // A return value of less than bytesToRead indicates the end of the stream. Do _not_ return from this callback
         // until either the entire bytesToRead is filled or you have reached the end of the stream.
-        static size_t drflac_read(void *pUserData, void *pBufferOut, size_t bytesToRead);
+        static std::size_t drflacRead(void *pUserData, void *pBufferOut, std::size_t bytesToRead);
 
         // Callback for when data needs to be seeked.
         //
@@ -45,12 +43,11 @@ namespace audio
         // offset    [in] The number of bytes to move, relative to the origin. Will never be negative.
         // origin    [in] The origin of the seek - the current position or the start of the stream.
         //
-        // Returns whether or not the seek was successful.
+        // Returns whether the seek was successful.
         //
-        // The offset will never be negative. Whether or not it is relative to the beginning or current position is
+        // The offset will never be negative. Whether it is relative to the beginning or current position is
         // determined by the "origin" parameter which will be either drflac_seek_origin_start or
         // drflac_seek_origin_current.
-        static drflac_bool32 drflac_seek(void *pUserData, int offset, drflac_seek_origin origin);
+        static drflac_bool32 drflacSeek(void *pUserData, int offset, drflac_seek_origin origin);
     };
-
 } // namespace audio

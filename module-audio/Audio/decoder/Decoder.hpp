@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -16,19 +16,19 @@ namespace audio
 {
     namespace channel
     {
-        constexpr inline auto monoSound   = 1;
-        constexpr inline auto stereoSound = 2;
+        inline constexpr auto monoSound   = 1;
+        inline constexpr auto stereoSound = 2;
     } // namespace channel
 
     class Decoder : public Source
     {
-
       public:
-        Decoder(const std::string &path);
+        static constexpr auto fileDeletedRetCode = -1;
 
+        explicit Decoder(const std::string &path);
         virtual ~Decoder();
 
-        virtual std::uint32_t decode(std::uint32_t samplesToRead, std::int16_t *pcmData) = 0;
+        virtual std::int32_t decode(std::uint32_t samplesToRead, std::int16_t *pcmData) = 0;
 
         // Range 0 - 1
         virtual void setPosition(float pos) = 0;
@@ -38,9 +38,9 @@ namespace audio
             return sampleRate;
         }
 
-        std::uint32_t getChannelNumber()
+        std::uint32_t getChannelCount()
         {
-            return chanNumber;
+            return channelCount;
         }
 
         float getCurrentPosition()
@@ -57,7 +57,8 @@ namespace audio
 
         auto getTraits() const -> Endpoint::Traits override;
 
-        void startDecodingWorker(const DecoderWorker::EndOfFileCallback &endOfFileCallback);
+        void startDecodingWorker(const DecoderWorker::EndOfFileCallback &endOfFileCallback,
+                                 const DecoderWorker::FileDeletedCallback &fileDeletedCallback);
         void stopDecodingWorker();
 
         // Factory method
@@ -68,12 +69,13 @@ namespace audio
         {
             return bitsPerSample;
         }
+
         virtual std::unique_ptr<tags::fetcher::Tags> fetchTags();
 
         static constexpr Endpoint::Traits decoderCaps = {.usesDMA = false};
 
         std::uint32_t sampleRate = 0;
-        std::uint32_t chanNumber = 0;
+        std::uint32_t channelCount = 0;
         std::uint32_t bitsPerSample;
         float position = 0;
         std::FILE *fd  = nullptr;
@@ -84,9 +86,7 @@ namespace audio
         std::unique_ptr<tags::fetcher::Tags> tags;
         bool isInitialized = false;
 
-        // decoding worker
+        // Decoding worker
         std::unique_ptr<DecoderWorker> audioWorker;
-        DecoderWorker::EndOfFileCallback _endOfFileCallback;
     };
-
 } // namespace audio

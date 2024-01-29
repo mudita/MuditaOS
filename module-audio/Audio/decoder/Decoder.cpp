@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <cstdio>
 #include <Utils.hpp>
 #include "Decoder.hpp"
-#include "decoderMP3.hpp"
-#include "decoderFLAC.hpp"
-#include "decoderWAV.hpp"
+#include "DecoderMP3.hpp"
+#include "DecoderFLAC.hpp"
+#include "DecoderWAV.hpp"
 
 #include "tag.h"
 #include <tags_fetcher/TagsFetcher.hpp>
@@ -15,12 +15,12 @@ namespace audio
 {
     Decoder::Decoder(const std::string &path) : filePath(path)
     {
-        fd = std::fopen(path.c_str(), "r");
+        fd = std::fopen(path.c_str(), "rb");
         if (fd == nullptr) {
             return;
         }
 
-        constexpr size_t streamBufferSize = 16 * 1024;
+        constexpr std::size_t streamBufferSize = 16 * 1024;
         streamBuffer                      = std::make_unique<char[]>(streamBufferSize);
         setvbuf(fd, streamBuffer.get(), _IOFBF, streamBufferSize);
 
@@ -55,13 +55,13 @@ namespace audio
         std::unique_ptr<Decoder> dec;
 
         if (extensionLowercase == ".wav") {
-            dec = std::make_unique<decoderWAV>(filePath);
+            dec = std::make_unique<DecoderWAV>(filePath);
         }
         else if (extensionLowercase == ".mp3") {
-            dec = std::make_unique<decoderMP3>(filePath);
+            dec = std::make_unique<DecoderMP3>(filePath);
         }
         else if (extensionLowercase == ".flac") {
-            dec = std::make_unique<decoderFLAC>(filePath);
+            dec = std::make_unique<DecoderFLAC>(filePath);
         }
         else {
             return nullptr;
@@ -74,16 +74,16 @@ namespace audio
         return dec;
     }
 
-    void Decoder::startDecodingWorker(const DecoderWorker::EndOfFileCallback &endOfFileCallback)
+    void Decoder::startDecodingWorker(const DecoderWorker::EndOfFileCallback &endOfFileCallback,
+                                      const DecoderWorker::FileDeletedCallback &fileDeletedCallback)
     {
         assert(_stream != nullptr);
-        if (!audioWorker) {
+        if (audioWorker == nullptr) {
+            const auto channelMode = (tags->num_channel == 1) ? DecoderWorker::ChannelMode::ForceStereo
+                                                              : DecoderWorker::ChannelMode::NoConversion;
+
             audioWorker =
-                std::make_unique<DecoderWorker>(_stream,
-                                                this,
-                                                endOfFileCallback,
-                                                tags->num_channel == 1 ? DecoderWorker::ChannelMode::ForceStereo
-                                                                       : DecoderWorker::ChannelMode::NoConversion);
+                std::make_unique<DecoderWorker>(_stream, this, endOfFileCallback, fileDeletedCallback, channelMode);
             audioWorker->init();
             audioWorker->run();
         }
@@ -120,7 +120,7 @@ namespace audio
         auto bitWidth = getBitWidth();
         // this is a decoder mono to stereo hack, will be removed when proper
         // transcoding implementation is added
-        auto channels = tags->num_channel == 1 ? 2U : tags->num_channel;
+        auto channels = (tags->num_channel == 1) ? 2U : tags->num_channel;
 
         return AudioFormat{tags->sample_rate, bitWidth, channels};
     }
@@ -134,5 +134,4 @@ namespace audio
     {
         return Endpoint::Traits{};
     }
-
 } // namespace audio

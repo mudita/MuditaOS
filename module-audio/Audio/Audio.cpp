@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Audio.hpp"
@@ -9,10 +9,8 @@
 
 namespace audio
 {
-
     Audio::Audio(AudioServiceMessage::Callback callback) : currentOperation(), serviceCallback(callback)
     {
-
         auto ret = Operation::Create(Operation::Type::Idle, "", audio::PlaybackType::None, callback);
         if (ret) {
             currentOperation = std::move(ret);

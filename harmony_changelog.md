@@ -6,6 +6,7 @@
 * Fixed source clock frequency computation for PWM module
 * Fixed initial watchdog configuration
 * Fixed alarm rings when deactivated during snooze
+* Fixed popup about file deletion showing in Relaxation app even if no file was deleted
 
 ### Added
 * Added setting onboarding year to build date year

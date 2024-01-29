@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -80,6 +80,7 @@ class ServiceAudio : public sys::Service
     enum class StopReason
     {
         Eof,
+        FileDeleted,
         Other
     };
 
@@ -89,6 +90,7 @@ class ServiceAudio : public sys::Service
     auto HandlePause(std::optional<audio::AudioMux::Input *> input) -> std::unique_ptr<AudioResponseMessage>;
     auto HandleResume(const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>;
     void HandleEOF(const audio::Token &token);
+    void HandleFileDeleted(const audio::Token &token);
     auto HandleKeyPressed(const int step) -> sys::MessagePointer;
     void MuteCurrentOperation();
     void VibrationUpdate(const audio::PlaybackType &type               = audio::PlaybackType::None,

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <EventStore.hpp>
@@ -9,9 +9,8 @@
 namespace
 {
     constexpr auto usb_connected_status     = "app_bellmain_usb_status_connected";
-    constexpr inline auto status_text_max_w = 350U;
-    constexpr inline auto status_text_max_h = 102U;
-
+    constexpr auto status_text_max_w        = 350U;
+    constexpr auto status_text_max_h        = 102U;
 } // namespace
 
 namespace gui
@@ -46,5 +45,4 @@ namespace gui
     {
         statusText->setVisible(true);
     }
-
 } // namespace gui

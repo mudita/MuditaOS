@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StreamQueuedEventsListener.hpp"
@@ -30,7 +30,7 @@ void StreamQueuedEventsListener::onEvent(AbstractStream *stream, Stream::Event e
     }
 }
 
-StreamQueuedEventsListener::queuedEvent StreamQueuedEventsListener::waitForEvent()
+StreamQueuedEventsListener::QueuedEvent StreamQueuedEventsListener::waitForEvent()
 {
     EventStorage queueStorage;
     if (queue->Dequeue(&queueStorage)) {
@@ -44,7 +44,7 @@ std::size_t StreamQueuedEventsListener::getEventsCount() const
     return queue->NumItems();
 }
 
-StreamQueuedEventsListener::queuedEvent StreamQueuedEventsListener::getEvent()
+StreamQueuedEventsListener::QueuedEvent StreamQueuedEventsListener::getEvent()
 {
     EventStorage queueStorage;
 
