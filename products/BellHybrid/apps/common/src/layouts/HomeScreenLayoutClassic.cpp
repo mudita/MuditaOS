@@ -157,9 +157,9 @@ namespace gui
             setTextDescription(utils::translate("app_bellmain_home_screen_bottom_desc_dp"));
             break;
         case app::home_screen::ViewState::AlarmEdit:
-            alarm->setEditMode(EditMode::Edit);
             setHeaderViewMode(HeaderViewMode::AlarmIconAndTime);
             setScreenMode(ScreenViewMode::Main);
+            alarm->setEditMode(EditMode::Edit);
             removeTextDescription();
             break;
         case app::home_screen::ViewState::ActivatedLowBattery:
