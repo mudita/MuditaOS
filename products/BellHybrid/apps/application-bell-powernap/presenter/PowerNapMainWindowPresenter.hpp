@@ -1,9 +1,11 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
+#include <common/models/BatteryModel.hpp>
+#include <common/models/LowBatteryInfoModel.hpp>
 #include <memory>
 
 namespace gui
@@ -45,15 +47,25 @@ namespace app::powernap
 
     class PowerNapMainWindowPresenter : public PowerNapMainWindowContract::Presenter
     {
-        app::ApplicationCommon *app  = nullptr;
-        settings::Settings *settings = nullptr;
-        std::shared_ptr<PowerNapModel> model;
-
       public:
-        PowerNapMainWindowPresenter(app::ApplicationCommon *app, settings::Settings *settings);
+        PowerNapMainWindowPresenter(app::ApplicationCommon *app,
+                                    settings::Settings *settings,
+                                    AbstractBatteryModel &batteryModel,
+                                    AbstractLowBatteryInfoModel &lowBatteryInfoModel);
         auto getNapTimeProvider() -> std::shared_ptr<gui::ListItemProvider> override;
 
         void loadNapTimeList() override;
         void activate() override;
+
+      private:
+        bool isBatteryCharging(Store::Battery::State state) const;
+        bool isBatteryBelowLowLevelThreshold(units::SOC soc) const;
+        void conditionalSwitchScreen();
+
+        app::ApplicationCommon *app{nullptr};
+        settings::Settings *settings{nullptr};
+        std::shared_ptr<PowerNapModel> model;
+        AbstractBatteryModel &batteryModel;
+        AbstractLowBatteryInfoModel &lowBatteryInfoModel;
     };
 } // namespace app::powernap

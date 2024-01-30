@@ -19,9 +19,11 @@ target_sources(application-bell-powernap
         presenter/PowerNapMainWindowPresenter.cpp
         presenter/PowerNapProgressPresenter.cpp
         presenter/PowerNapSessionEndedPresenter.cpp
+        presenter/PowerNapWarningPresenter.cpp
         windows/PowerNapMainWindow.cpp
         windows/PowerNapProgressWindow.cpp
         windows/PowerNapSessionEndedWindow.cpp
+        windows/PowerNapWarningWindow.cpp
         data/PowerNapListItem.cpp
         models/PowerNapModel.cpp
         models/PowerNapFrontlightModel.cpp
@@ -29,9 +31,11 @@ target_sources(application-bell-powernap
         presenter/PowerNapMainWindowPresenter.hpp
         presenter/PowerNapProgressPresenter.hpp
         presenter/PowerNapSessionEndedPresenter.hpp
+        presenter/PowerNapWarningPresenter.hpp
         windows/PowerNapMainWindow.hpp
         windows/PowerNapProgressWindow.hpp
         windows/PowerNapSessionEndedWindow.hpp
+        windows/PowerNapWarningWindow.hpp
         data/PowerNapListItem.hpp
         data/PowerNapStyle.hpp
         data/PowerNapCommon.hpp

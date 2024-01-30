@@ -61,16 +61,14 @@ namespace app
             case ID::AlarmActivated:
                 windowsFactory.attach(
                     window::alarm_activated_window, [this](app::ApplicationCommon *app, const std::string &name) {
-                        auto presenter =
-                            std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel, *batteryModel);
+                        auto presenter = std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel);
                         return std::make_unique<gui::AlarmActivatedWindow>(app, std::move(presenter));
                     });
                 break;
             case ID::AlarmDeactivated:
                 windowsFactory.attach(
                     window::alarm_deactivated_window, [this](app::ApplicationCommon *app, const std::string &name) {
-                        auto presenter =
-                            std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel, *batteryModel);
+                        auto presenter = std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel);
                         return std::make_unique<gui::AlarmDeactivatedWindow>(app, std::move(presenter));
                     });
                 break;
