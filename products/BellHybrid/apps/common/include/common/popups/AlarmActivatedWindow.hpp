@@ -18,16 +18,13 @@ namespace gui
       public:
         AlarmActivatedWindow(app::ApplicationCommon *app,
                              std::shared_ptr<app::popup::AlarmActivatedPresenter> presenter);
-        void rebuild() override;
 
       private:
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void returnToPreviousWindow();
         void setAlarmTime(time_t alarmTime);
-        void buildLowBatteryLayout();
-        void buildAlarmInfoLayout();
-        void lowBatteryInfoHandled();
 
         Icon *icon{};
     };

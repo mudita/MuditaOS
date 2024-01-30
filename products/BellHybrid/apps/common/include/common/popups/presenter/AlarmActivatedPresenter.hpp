@@ -5,19 +5,11 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <common/models/AbstractAlarmModel.hpp>
-#include <common/models/BatteryModel.hpp>
 
 #include <memory>
 
 namespace app::popup
 {
-    enum class Layout
-    {
-        Undefined,
-        LowBatteryInfo,
-        AlarmInfo
-    };
-
     class AlarmActivatedContract
     {
       public:
@@ -46,24 +38,18 @@ namespace app::popup
             virtual ~Presenter() noexcept                                  = default;
             virtual time_t getAlarmTime() const noexcept                   = 0;
             virtual bool isAlarmActive() const noexcept                    = 0;
-            virtual Layout getLayout()                                     = 0;
-            virtual void lowBatteryInfoHandled()                           = 0;
         };
     };
 
     class AlarmActivatedPresenter : public AlarmActivatedContract::Presenter
     {
       public:
-        AlarmActivatedPresenter(AbstractAlarmModel &alarmModel, AbstractBatteryModel &batteryModel);
+        AlarmActivatedPresenter(AbstractAlarmModel &alarmModel);
 
         time_t getAlarmTime() const noexcept;
         bool isAlarmActive() const noexcept;
-        Layout getLayout();
-        void lowBatteryInfoHandled();
 
       private:
         AbstractAlarmModel &alarmModel;
-        AbstractBatteryModel &batteryModel;
-        Layout layout{Layout::Undefined};
     };
 } // namespace app::popup

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellPowerNap.hpp"
@@ -6,6 +6,7 @@
 #include "windows/PowerNapMainWindow.hpp"
 #include "windows/PowerNapProgressWindow.hpp"
 #include "windows/PowerNapSessionEndedWindow.hpp"
+#include "windows/PowerNapWarningWindow.hpp"
 #include <common/models/TimeModel.hpp>
 #include <Paths.hpp>
 #include <common/windows/SessionPausedWindow.hpp>
@@ -36,6 +37,7 @@ namespace app
             return ret;
         }
 
+        lowBatteryInfoModel          = std::make_unique<app::LowBatteryInfoModel>();
         cpuSentinel                  = std::make_shared<sys::CpuSentinel>(applicationBellPowerNapName, this);
         auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
         bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
@@ -48,11 +50,12 @@ namespace app
 
     void ApplicationBellPowerNap::createUserInterface()
     {
-        windowsFactory.attach(
-            gui::name::window::main_window, [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
-                auto presenter = std::make_unique<powernap::PowerNapMainWindowPresenter>(app, settings.get());
-                return std::make_unique<gui::PowerNapMainWindow>(app, std::move(presenter));
-            });
+        windowsFactory.attach(gui::name::window::main_window,
+                              [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                                  auto presenter = std::make_unique<powernap::PowerNapMainWindowPresenter>(
+                                      app, settings.get(), *batteryModel, *lowBatteryInfoModel);
+                                  return std::make_unique<gui::PowerNapMainWindow>(app, std::move(presenter));
+                              });
         windowsFactory.attach(
             gui::window::name::powerNapProgress,
             [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
@@ -77,6 +80,11 @@ namespace app
                               [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
                                   auto presenter = std::make_unique<powernap::PowerNapSessionEndPresenter>(app);
                                   return std::make_unique<gui::PowerNapSessionEndedWindow>(app, std::move(presenter));
+                              });
+        windowsFactory.attach(gui::window::name::powerNapWarning,
+                              [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                                  auto presenter = std::make_unique<powernap::PowerNapWarningPresenter>(app);
+                                  return std::make_unique<gui::PowerNapWarningWindow>(app, std::move(presenter));
                               });
 
         attachPopups({gui::popup::ID::AlarmActivated,
