@@ -12,8 +12,8 @@
 #include <log/log.hpp>
 #include <Logger.hpp>
 #include <Utils.hpp>
-#include <FreeRTOS.h>
 #include <ticks.hpp>
+#include <critical.hpp>
 
 namespace sys
 {
@@ -243,18 +243,37 @@ namespace sys
             return;
         }
 
+        /* Disable SysTick to prevent pending SysTick interrupt */
+        lowPowerControl->DisableSysTick();
+
+        /* Disable IRQs globally using PRIMASK and try to enter WFI mode.
+         * Do not use FreeRTOS critical section, as it will mask the interrupts
+         * required to wake the CPU up.*/
+        const auto savedPrimask   = lowPowerControl->DisableInterrupts();
         const auto timeSpentInWFI = lowPowerControl->EnterWfiModeIfAllowed();
+
+        /* Re-enable SysTick and catch up ticks if needed */
+        lowPowerControl->EnableSysTick();
         if (timeSpentInWFI > 0) {
-            /* We increase the frequency immediately after exiting WFI so that the xTaskCatchUpTicks procedure has
-             * time to execute and does not block the button press detection mechanism. */
-            SetCpuFrequency(bsp::CpuFrequencyMHz::Level_4);
-            portENTER_CRITICAL();
-            lowPowerControl->DisableSysTick();
-            xTaskCatchUpTicks(cpp_freertos::Ticks::MsToTicks(timeSpentInWFI));
-            lowPowerControl->EnableSysTick();
-            portEXIT_CRITICAL();
-            UpdateCpuFrequencyMonitor(WfiName, timeSpentInWFI);
+            /* Increase the frequency immediately after exiting WFI so that the xTaskCatchUpTicks
+             * procedure has time to execute and does not block the button press detection
+             * mechanism. A critical section is required so that any exit from any critical section
+             * inside any of the functions called here does not re-enable interrupts - unfortunately
+             * FreeRTOS critical section implementation for RT1051 completely ignores initial PRIMASK
+             * state and will re-enable interrupts even if they were disabled initially. We don't
+             * want to do that until the tick counter has been updated. */
+            cpp_freertos::CriticalSection::Enter();
+            {
+                SetCpuFrequency(bsp::CpuFrequencyMHz::Level_3);
+                xTaskCatchUpTicks(cpp_freertos::Ticks::MsToTicks(timeSpentInWFI));
+                UpdateCpuFrequencyMonitor(WfiName, timeSpentInWFI);
+            }
+            cpp_freertos::CriticalSection::Exit(); // Interrupts are re-enabled here
         }
+
+        /* If WFI was successfully entered, interrupts were re-enabled anyway.
+         * Just restore original PRIMASK. */
+        lowPowerControl->EnableInterrupts(savedPrimask);
     }
 
     void PowerManager::LogPowerManagerStatistics()

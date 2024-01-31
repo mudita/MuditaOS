@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "board/irq_gpio.hpp"
@@ -62,6 +62,7 @@ namespace bsp
 
         NVIC_ClearPendingIRQ(GPIO5_Combined_0_15_IRQn);
         EnableIRQ(GPIO5_Combined_0_15_IRQn);
+        NVIC_SetPriority(GPIO5_Combined_0_15_IRQn, configLIBRARY_LOWEST_INTERRUPT_PRIORITY);
         GPC_EnableIRQ(GPC, GPIO5_Combined_0_15_IRQn);
 
         EnableIRQ(TMR3_IRQn);

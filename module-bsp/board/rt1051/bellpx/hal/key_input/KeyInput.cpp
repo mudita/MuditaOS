@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "KeyInput.hpp"
@@ -31,7 +31,7 @@ namespace hal::key_input
     std::vector<bsp::KeyEvent> KeyInput::getKeyEvents(KeyNotificationSource notification)
     {
         auto keyNotification = static_cast<bsp::NotificationSource>(notification);
-        if (keyNotification == bsp::NotificationSource::rotaryEncoder) {
+        if (keyNotification == bsp::NotificationSource::RotaryEncoder) {
             return bsp::rotary_encoder::getKeyEvents();
         }
         else {

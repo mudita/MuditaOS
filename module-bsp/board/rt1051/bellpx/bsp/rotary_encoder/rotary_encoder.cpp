@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "rotary_encoder.hpp"
@@ -91,7 +91,7 @@ namespace bsp::rotary_encoder
     {
         BaseType_t xHigherPriorityTaskWoken = pdFALSE;
         if (gHandleIrq != nullptr) {
-            std::uint8_t val = static_cast<std::uint8_t>(NotificationSource::rotaryEncoder);
+            std::uint8_t val = static_cast<std::uint8_t>(NotificationSource::RotaryEncoder);
             xQueueSendFromISR(gHandleIrq, &val, &xHigherPriorityTaskWoken);
         }
         return xHigherPriorityTaskWoken;

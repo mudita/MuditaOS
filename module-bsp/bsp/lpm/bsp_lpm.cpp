@@ -12,7 +12,8 @@
 #error "Unsupported target"
 #endif
 
-namespace bsp{
+namespace bsp
+{
 
     std::optional<std::unique_ptr<LowPowerMode>> LowPowerMode::Create() {
 

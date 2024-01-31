@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051LPM.hpp"
@@ -43,6 +43,7 @@ namespace bsp
         gpio_2->WritePin(static_cast<std::uint32_t>(BoardDefinitions::DCDC_INVERTER_MODE_PIN), 1);
     }
 
+    /* WFI mode is not supported by Pure, so all of these methods below are just dummy implementations. */
     void RT1051LPM::AllowEnteringWfiMode()
     {}
 
@@ -59,4 +60,17 @@ namespace bsp
         return 0;
     }
 
+    void RT1051LPM::DisableSysTick()
+    {}
+
+    void RT1051LPM::EnableSysTick()
+    {}
+
+    std::uint32_t RT1051LPM::DisableInterrupts()
+    {
+        return 0;
+    }
+
+    void RT1051LPM::EnableInterrupts([[maybe_unused]] std::uint32_t primask)
+    {}
 } // namespace bsp

@@ -58,6 +58,10 @@ namespace bsp
 
         virtual void DisableSysTick() = 0;
         virtual void EnableSysTick() = 0;
+
+        virtual std::uint32_t DisableInterrupts() = 0;
+        virtual void EnableInterrupts(std::uint32_t primask) = 0;
+
       protected:
         CpuFrequencyMHz currentFrequency = CpuFrequencyMHz::Level_6;
     };
