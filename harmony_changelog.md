@@ -5,6 +5,7 @@
 ### Fixed
 * Fixed source clock frequency computation for PWM module
 * Fixed initial watchdog configuration
+* Fixed alarm rings when deactivated during snooze
 
 ### Added
 * Added setting onboarding year to build date year
