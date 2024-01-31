@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/AlarmModel.hpp"
@@ -80,11 +80,14 @@ namespace app
             return;
         }
         alarmEventPtr->enabled = value;
-        if (isSnoozeActive()) {
+        updateAlarm(*alarmEventPtr);
+        if (value) {
+            alarmStatus = alarms::AlarmStatus::Activated;
+        }
+        else {
+            alarmStatus = alarms::AlarmStatus::Deactivated;
             disableSnooze(*alarmEventPtr);
         }
-        updateAlarm(*alarmEventPtr);
-        alarmStatus = value ? alarms::AlarmStatus::Activated : alarms::AlarmStatus::Deactivated;
     }
     void AlarmModel::updateAlarm(AlarmEventRecord &alarm)
     {
