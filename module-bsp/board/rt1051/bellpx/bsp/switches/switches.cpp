@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Utils.hpp> // for byte conversion functions. it is included first because of magic enum define
@@ -12,6 +12,7 @@
 #include <board/BoardDefinitions.hpp>
 #include <fsl_common.h>
 #include <switches/LatchState.hpp>
+#include <fsl_runtimestat_gpt.h>
 
 #include <chrono>
 #include <map>
@@ -29,6 +30,7 @@ namespace bsp::bell_switches
 
     constexpr std::chrono::milliseconds contactOscillationTimeout{30ms};
     constexpr std::chrono::milliseconds centerKeyPressValidationTimeout{500ms};
+    constexpr std::chrono::milliseconds minCenterKeyPressValidationTimeout{300ms};
 
     enum class KeyId : unsigned int
     {
@@ -47,6 +49,7 @@ namespace bsp::bell_switches
         const std::shared_ptr<drivers::DriverGPIO> gpio;
         const BoardDefinitions pin{-1};
         volatile KeyEvents lastState{KeyEvents::Pressed};
+        volatile std::uint32_t gptCounter{0};
         TimerHandle_t timer{nullptr};
 
         void createTimer(TimerCallback callback, const std::chrono::milliseconds timeout)
@@ -192,6 +195,16 @@ namespace bsp::bell_switches
         auto timerState = static_cast<DebounceTimerState *>(pvTimerGetTimerID(timerHandle));
         xTimerStop(timerState->timer, 0);
 
+        // double checking whether the set timer time has elapsed with the reference GPT timer
+        // because updating the sys tick after exiting WFI disturbs debounce timer
+        const auto currentGptTick = ulHighFrequencyTimerTicks();
+        const auto debounceTime =
+            ulHighFrequencyTimerTicksToMs(utils::computeIncrease(currentGptTick, timerState->gptCounter));
+        if (debounceTime < minCenterKeyPressValidationTimeout.count()) {
+            xTimerReset(timerState->timer, 10);
+            return;
+        }
+
         if (qHandleIrq != nullptr) {
             if (latchEventFlag.wasMarkedChanged()) {
                 latchEventFlag.clearChangedMark();
@@ -318,6 +331,7 @@ namespace bsp::bell_switches
         debounceTimerState.lastState = debounceTimerState.gpio->ReadPin(static_cast<uint32_t>(debounceTimerState.pin))
                                            ? KeyEvents::Released
                                            : KeyEvents::Pressed;
+        debounceTimerState.gptCounter = ulHighFrequencyTimerTicks();
         if (debounceTimerState.timer != nullptr) {
             xTimerResetFromISR(debounceTimerState.timer, &xHigherPriorityTaskWoken);
         }

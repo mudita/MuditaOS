@@ -7,6 +7,7 @@
 * Fixed initial watchdog configuration
 * Fixed alarm rings when deactivated during snooze
 * Fixed popup about file deletion showing in Relaxation app even if no file was deleted
+* Fixed displaying the menu after deep press on main screen
 
 ### Added
 * Added setting onboarding year to build date year
