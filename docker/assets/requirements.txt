@@ -8,10 +8,9 @@ iniconfig==1.1.1
 inotify==0.2.10
 packaging==20.4
 pluggy==0.13.1
-py<=1.11.0
 pyparsing==2.4.7
 pyserial==3.5
-pytest==6.1.2
+pytest>=7.2.0
 six==1.15.0
 toml==0.10.2
 tqdm==4.62.2
