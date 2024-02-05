@@ -38,6 +38,7 @@ namespace gui
         switch (state) {
         case app::home_screen::ViewState::Deactivated:
             alarmActivatedDeactivatedScreen->image->set("big_no-alarm_W_G", {});
+            alarmActivatedDeactivatedScreen->image->setMaximumWidth(alarmActivatedDeactivatedScreen->image->getWidth());
             alarmMainIcon->setVisible(false);
             alarmMainTime->setVisible(false);
             alarmTopIcon->setStatus(AlarmIcon::Status::DEACTIVATED);
@@ -59,6 +60,7 @@ namespace gui
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
             alarmTopIcon->setStatus(AlarmIcon::Status::DEACTIVATED);
             alarmActivatedDeactivatedScreen->image->set("bell_status_battery_lvl0", gui::ImageTypeSpecifier::W_G);
+            alarmActivatedDeactivatedScreen->image->setMaximumWidth(alarmActivatedDeactivatedScreen->image->getWidth());
             break;
         case app::home_screen::ViewState::ActivatedWait:
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
@@ -68,6 +70,7 @@ namespace gui
             break;
         case app::home_screen::ViewState::Activated:
             alarmActivatedDeactivatedScreen->image->set("big_alarm_W_G", {});
+            alarmActivatedDeactivatedScreen->image->setMaximumWidth(alarmActivatedDeactivatedScreen->image->getWidth());
             alarmMainIcon->setVisible(true);
             alarmMainIcon->setStatus(AlarmIcon::Status::ACTIVATED);
             if (isAlarmTimeVisibilityAllowed()) {
@@ -89,11 +92,13 @@ namespace gui
         case app::home_screen::ViewState::AlarmRingingDeactivatedWait:
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
             alarmActivatedDeactivatedScreen->image->set("big_no-alarm_W_G", {});
+            alarmActivatedDeactivatedScreen->image->setMaximumWidth(alarmActivatedDeactivatedScreen->image->getWidth());
             break;
         case app::home_screen::ViewState::AlarmSnoozedWait:
             alarmMainIcon->setStatus(AlarmIcon::Status::SNOOZE);
             alarmMainTime->setVisible(false);
             alarmActivatedDeactivatedScreen->image->set("big_alarm_snoozed_W_M", {});
+            alarmActivatedDeactivatedScreen->image->setMaximumWidth(alarmActivatedDeactivatedScreen->image->getWidth());
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
             break;
         case app::home_screen::ViewState::AlarmSnoozed:
