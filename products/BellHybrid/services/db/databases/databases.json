@@ -16,6 +16,10 @@
    {
     "name": "settings_bell",
     "version": "1"
+   },
+   {
+    "name": "quotes",
+    "version": "0"
    }
   ]
  }
