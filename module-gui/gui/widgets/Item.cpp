@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Item.hpp"
@@ -9,6 +9,7 @@
 #include <list>            // for list<>::iterator, list, operator!=, _List...
 #include <memory>
 #include <DrawCommand.hpp>
+
 namespace gui
 {
 
@@ -558,5 +559,4 @@ namespace gui
     {
         visitor.visit(*this);
     }
-
-} /* namespace gui */
+} // namespace gui
