@@ -17,6 +17,7 @@
 * Added switching SDRAM to self-refresh before entering WFI for further power consumption reduction
 * Added watchdog protection to WFI mode
 * Added low battery warning when the alarm is activated
+* Added new 32px and 170px fonts
 
 ### Changed / Improved
 
