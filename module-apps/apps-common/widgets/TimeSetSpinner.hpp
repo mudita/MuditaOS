@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -54,7 +54,7 @@ namespace gui
             {style::window::font::large, "alarm_large_colon_W_M"},
             {style::window::font::supersizeme, "alarm_colon_select_W_M"},
             {style::window::font::supersizemelight, "alarm_colon_select_W_M"},
-            {style::window::font::huge, "alarm_colon_clock_W_M"},
+            {style::window::font::huge, "alarm_colon_huge_W_M"},
             {style::window::font::gargantuan, "alarm_colon_clock_W_M"}};
 
         // clang-format off

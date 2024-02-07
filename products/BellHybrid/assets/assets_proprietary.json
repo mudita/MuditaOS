@@ -10,6 +10,10 @@
             "output": "assets/fonts/dejavu_sans_bold_27.mpf"
         },
         {
+            "name": "./fonts/pure/gt_pressura_bold_32.mpf",
+            "output":"assets/fonts/gt_pressura/gt_pressura_bold_32.mpf"
+        },
+        {
             "name": "./fonts/bell/gt_pressura_regular_38.mpf",
             "output": "assets/fonts/gt_pressura/gt_pressura_regular_38.mpf",
             "ref": "fd168040c5d1216d457e6cf223e8ea9bb76bf7b"
@@ -28,11 +32,6 @@
             "name": "./fonts/bell/gt_pressura_regular_90.mpf",
             "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
             "output": "assets/fonts/gt_pressura/gt_pressura_regular_90.mpf"
-        },
-        {
-            "name": "./fonts/bell/gt_pressura_regular_190.mpf",
-            "ref": "10c74fcb09c2022325767cad735c0183b6f5393a",
-            "output": "assets/fonts/gt_pressura/gt_pressura_regular_190.mpf"
         },
         {
             "name": "./fonts/bell/gt_pressura_light_200.mpf",
@@ -78,6 +77,16 @@
             "name": "./fonts/bell/gt_pressura_bold_38.mpf",
             "output": "assets/fonts/gt_pressura/gt_pressura_bold_38.mpf",
             "ref": "a5a432e1330f2728d7f943ccc9dbb678c3f9ebca"
+        },
+        {
+            "name": "./fonts/bell/gt_pressura_regular_170.mpf",
+            "output": "assets/fonts/gt_pressura/gt_pressura_regular_170.mpf",
+            "ref": "0cf242e02002bc0af4216a00ac7501a1fbe1ba1e"
+        },
+        {
+            "name": "./fonts/bell/gt_pressura_light_32.mpf",
+            "output": "assets/fonts/gt_pressura/gt_pressura_light_32.mpf",
+            "ref": "bb0da198fd4711072bf69e19136feae28db4e375"
         }
     ]
 }

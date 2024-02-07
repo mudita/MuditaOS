@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -58,27 +58,74 @@ namespace style
         inline constexpr auto default_rect_yaps            = 10U;
         namespace font
         {
+            /// numeric
+            /// 220 px (regular)
             inline constexpr auto gargantuan       = "gargantuan";
+            /// numeric
+            /// 200 px (light)
             inline constexpr auto colossal         = "colossal";
+            /// numeric
+            /// 170 px (regular)
             inline constexpr auto huge             = "huge";
+            /// alpha-numeric (with special characters)
+            /// 90 px (regular)
             inline constexpr auto supersizeme      = "supersizeme";
+            /// alpha-numeric (with special characters)
+            /// 90 px (light)
             inline constexpr auto supersizemelight = "supersizemelight";
+            /// alpha-numeric (with special characters)
+            /// 46 px (light)
             inline constexpr auto largelight       = "largelight";
+            /// alpha-numeric (with special characters)
+            /// 46 px (regular)
             inline constexpr auto large            = "large";
+            /// alpha-numeric (without special characters)
+            /// 40 px (light)
             inline constexpr auto veryverybiglight = "veryverybiglight";
+            /// alpha-numeric (with special characters)
+            /// 38 px (light)
             inline constexpr auto verybiglight     = "verybiglight";
+            /// alpha-numeric (with special characters)
+            /// 38 px (regular)
             inline constexpr auto verybig          = "verybig";
+            /// alpha-numeric (with special characters)
+            /// 38 px (bold)
             inline constexpr auto verybigbold      = "verybigbold";
+            /// alpha-numeric (with special characters)
+            /// 32 px (light)
+            inline constexpr auto mediumbiglight = "mediumbiglight";
+            /// alpha-numeric (with special characters)
+            /// 32 px (bold)
             inline constexpr auto mediumbigbold    = "mediumbigbold";
+            /// alpha-numeric (with special characters)
+            /// 30 px (bold)
             inline constexpr auto bigbold          = "bigbold";
+            /// alpha-numeric (with special characters)
+            /// 30 px (regular)
             inline constexpr auto big              = "big";
+            /// alpha-numeric (with special characters)
+            /// 30 px (light)
             inline constexpr auto biglight         = "biglight";
+            /// alpha-numeric (with special characters)
+            /// 27 px (bold)
             inline constexpr auto mediumbold       = "mediumbold";
+            /// alpha-numeric (with special characters)
+            /// 27 px (regular)
             inline constexpr auto medium           = "medium";
+            /// alpha-numeric (with special characters)
+            /// 27 px (light)
             inline constexpr auto mediumlight      = "mediumlight";
+            /// alpha-numeric (with special characters)
+            /// 24 px (bold)
             inline constexpr auto smallbold        = "smallbold";
+            /// alpha-numeric (with special characters)
+            /// 24 px (regular)
             inline constexpr auto small            = "small";
+            /// alpha-numeric (with special characters)
+            /// 20 px (bold)
             inline constexpr auto verysmallbold    = "verysmallbold";
+            /// alpha-numeric (with special characters)
+            /// 20 px (regular)
             inline constexpr auto verysmall        = "verysmall";
         }; // namespace font
 
