@@ -252,20 +252,24 @@ namespace gui
     {
         switch (mode) {
         case ScreenViewMode::Main:
-            lowBatteryWarning->setVisible(false);
-            firstBox->setVisible(true);
-            firstBox->informContentChanged();
-            lastBox->setVisible(true);
-            lastBox->informContentChanged();
-            centerBox->setVisible(true);
-            centerBox->informContentChanged();
+            if (lowBatteryWarning->visible) {
+                lowBatteryWarning->setVisible(false);
+                firstBox->setVisible(true);
+                firstBox->informContentChanged();
+                lastBox->setVisible(true);
+                lastBox->informContentChanged();
+                centerBox->setVisible(true);
+                centerBox->informContentChanged();
+            }
             break;
         case ScreenViewMode::Warning:
-            firstBox->setVisible(false);
-            lastBox->setVisible(false);
-            centerBox->setVisible(false);
-            lowBatteryWarning->setVisible(true);
-            lowBatteryWarning->informContentChanged();
+            if (!lowBatteryWarning->visible) {
+                firstBox->setVisible(false);
+                lastBox->setVisible(false);
+                centerBox->setVisible(false);
+                lowBatteryWarning->setVisible(true);
+                lowBatteryWarning->informContentChanged();
+            }
             break;
         }
     }
