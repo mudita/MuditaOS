@@ -3,6 +3,16 @@
 ## Unreleased
 
 ### Fixed
+
+### Added
+* Added new 32px and 170px fonts
+
+### Changed / Improved
+
+
+## [2.5.0 2024-02-09]
+
+### Fixed
 * Fixed source clock frequency computation for PWM module
 * Fixed initial watchdog configuration
 * Fixed alarm rings when deactivated during snooze
@@ -17,9 +27,7 @@
 * Added switching SDRAM to self-refresh before entering WFI for further power consumption reduction
 * Added watchdog protection to WFI mode
 * Added low battery warning when the alarm is activated
-* Added new 32px and 170px fonts
 
-### Changed / Improved
 
 ## [2.4.0 2024-01-11]
 
