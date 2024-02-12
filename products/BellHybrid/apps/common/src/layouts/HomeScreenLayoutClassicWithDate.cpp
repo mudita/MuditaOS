@@ -39,12 +39,12 @@ namespace gui
         infoBox->addWidget(date);
 
         // Assume format is 12h
-        time->setMargins({style::homescreen_classic::ampm_time_margin_w, 0, 0, 0});
+        time->setMargins({mainWindow::ampm::time_margin_w, 0, 0, 0});
 
         ampm = new TextFixedSize(timeHBox);
-        ampm->setMinimumSize(style::homescreen_classic::ampm_layout_w, style::bell_base_layout::center_layout_h);
-        ampm->setMaximumSize(style::homescreen_classic::ampm_layout_w, style::bell_base_layout::center_layout_h);
-        ampm->setMargins({style::homescreen_classic::ampm_margin_w, 0, 0, 0});
+        ampm->setMinimumSize(mainWindow::ampm::layout_w, style::bell_base_layout::center_layout_h);
+        ampm->setMaximumSize(mainWindow::ampm::layout_w, style::bell_base_layout::center_layout_h);
+        ampm->setMargins({mainWindow::ampm::margin_w, 0, 0, 0});
         ampm->setFont(mainWindow::time::font_small);
         ampm->setAlignment(Alignment(Alignment::Horizontal::Left, Alignment::Vertical::Top));
         ampm->setEdges(RectangleEdge::None);
@@ -73,7 +73,7 @@ namespace gui
     {
         HomeScreenLayoutClassic::setTimeFormat(fmt);
         if (fmt == utils::time::Locale::TimeFormat::FormatTime12H) {
-            time->setMargins({style::homescreen_classic::ampm_time_margin_w, 0, 0, 0});
+            time->setMargins({bellMainStyle::mainWindow::ampm::time_margin_w, 0, 0, 0});
             ampm->setVisible(true);
         }
         else {

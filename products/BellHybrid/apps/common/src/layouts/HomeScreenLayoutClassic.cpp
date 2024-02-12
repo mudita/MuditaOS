@@ -276,6 +276,9 @@ namespace gui
 
     void HomeScreenLayoutClassic::setTextDescription(const UTF8 &desc)
     {
+        if (onShowMessage != nullptr) {
+            onShowMessage();
+        }
         statusBox->setVisible(false);
         bottomText->setVisible(true);
         bottomText->setRichText(desc);
@@ -289,6 +292,9 @@ namespace gui
         bottomText->setVisible(false);
         statusBox->resizeItems();
         statusBox->informContentChanged();
+        if (onHideMessage != nullptr) {
+            onHideMessage();
+        }
     }
 
     bool HomeScreenLayoutClassic::isBatteryVisibilityAllowed(const Store::Battery &batteryContext)
@@ -299,7 +305,9 @@ namespace gui
     void HomeScreenLayoutClassic::setBatteryLevelState(const Store::Battery &batteryContext)
     {
         battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
-        connectionStatus->checkIfConnected(batteryContext.state);
+        if (connectionStatus->hideIfPossible(batteryContext.state) && onHideMessage != nullptr) {
+            onHideMessage();
+        }
 
         if (isBatteryVisibilityAllowed(batteryContext)) {
             battery->setVisible(true);
@@ -361,7 +369,10 @@ namespace gui
     }
     auto HomeScreenLayoutClassic::setUSBStatusConnected() -> void
     {
-        connectionStatus->setConnected();
+        if (onShowMessage != nullptr) {
+            onShowMessage();
+        }
+        connectionStatus->show();
         connectionStatus->informContentChanged();
     }
 

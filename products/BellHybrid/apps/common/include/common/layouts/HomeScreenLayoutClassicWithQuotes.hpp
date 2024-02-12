@@ -7,20 +7,26 @@
 
 namespace gui
 {
-    class HomeScreenLayoutClassicWithDate : public HomeScreenLayoutClassic
+    class HomeScreenLayoutClassicWithQuotes : public HomeScreenLayoutClassic
     {
       public:
-        HomeScreenLayoutClassicWithDate(std::string name);
+        HomeScreenLayoutClassicWithQuotes(std::string name);
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
 
       protected:
         void buildInterface() override;
-        bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext) override;
 
-        Text *date          = nullptr;
-        TextFixedSize *ampm = nullptr;
-        bool showAMPM       = false;
+        VBox *textBox{nullptr};
+        TextFixedSize *quotes{nullptr};
+        TextFixedSize *author{nullptr};
+        TextFixedSize *ampm{nullptr};
+        VBox *imgBox{nullptr};
+        Image *quoteImg{nullptr};
+
+      private:
+        void showQuotes();
+        void hideQuotes();
     };
 }; // namespace gui

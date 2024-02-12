@@ -162,7 +162,7 @@ namespace gui
     void HomeScreenLayoutVertical::setBatteryLevelState(const Store::Battery &batteryContext)
     {
         battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
-        connectionStatus->checkIfConnected(batteryContext.state);
+        connectionStatus->hideIfPossible(batteryContext.state);
 
         if (isBatteryVisibilityAllowed(batteryContext)) {
             battery->setVisible(true);
@@ -212,7 +212,7 @@ namespace gui
     }
     auto HomeScreenLayoutVertical::setUSBStatusConnected() -> void
     {
-        connectionStatus->setConnected();
+        connectionStatus->show();
         connectionStatus->informContentChanged();
     }
 
