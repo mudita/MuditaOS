@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeSetSpinner.hpp"
@@ -158,7 +158,7 @@ namespace gui
 
         colon->setImage(getColonImage(noFocusFontName));
         colon->setMargins(getColonMargins(noFocusFontName));
-        colon->setMinimumSizeToFitImage();
+        colon->fitBoxToImage();
 
         setMinimumSize(hour->widgetMinimumArea.w + colon->widgetMinimumArea.w +
                            colon->getMargins().getSumInAxis(Axis::X) + minute->widgetMinimumArea.w,

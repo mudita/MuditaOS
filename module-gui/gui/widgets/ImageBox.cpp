@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ImageBox.hpp"
@@ -24,6 +24,12 @@ void ImageBox::showImage(bool show)
 void ImageBox::setImage(const UTF8 &name, ImageTypeSpecifier specifier)
 {
     image->set(name, specifier);
+}
+
+void ImageBox::fitBoxToImage()
+{
+    setMinimumSize(image->getWidth(), image->getHeight());
+    setMaximumSize(image->getWidth(), image->getHeight());
 }
 
 void ImageBox::setMinimumSizeToFitImage()
