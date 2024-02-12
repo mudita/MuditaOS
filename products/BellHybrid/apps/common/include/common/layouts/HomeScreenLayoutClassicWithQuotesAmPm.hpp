@@ -3,24 +3,21 @@
 
 #pragma once
 
-#include "HomeScreenLayoutClassic.hpp"
+#include "HomeScreenLayoutClassicWithQuotes.hpp"
 
 namespace gui
 {
-    class HomeScreenLayoutClassicWithDate : public HomeScreenLayoutClassic
+    class HomeScreenLayoutClassicWithQuotesAmPm : public HomeScreenLayoutClassicWithQuotes
     {
       public:
-        HomeScreenLayoutClassicWithDate(std::string name);
+        explicit HomeScreenLayoutClassicWithQuotesAmPm(std::string name);
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
 
       protected:
         void buildInterface() override;
-        bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext) override;
 
-        Text *date          = nullptr;
-        TextFixedSize *ampm = nullptr;
-        bool showAMPM       = false;
+        TextFixedSize *ampm{nullptr};
     };
 }; // namespace gui

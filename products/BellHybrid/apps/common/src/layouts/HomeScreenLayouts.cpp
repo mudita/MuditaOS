@@ -8,6 +8,8 @@
 #include <common/layouts/HomeScreenLayoutClassicWithAmPm.hpp>
 #include <common/layouts/HomeScreenLayoutClassicWithBattery.hpp>
 #include <common/layouts/HomeScreenLayoutClassicWithDate.hpp>
+#include <common/layouts/HomeScreenLayoutClassicWithQuotes.hpp>
+#include <common/layouts/HomeScreenLayoutClassicWithQuotesAmPm.hpp>
 #if CONFIG_ENABLE_TEMP == 1
 #include <common/layouts/HomeScreenLayoutClassicWithTemp.hpp>
 #endif
@@ -27,6 +29,8 @@ namespace gui::factory
                  []() { return new HomeScreenLayoutClassicWithBattery(gui::layout::ClassicWithBattery); }},
                 {gui::layout::ClassicWithDate,
                  []() { return new HomeScreenLayoutClassicWithDate(gui::layout::ClassicWithDate); }},
+                {gui::layout::ClassicWithQuotes,
+                 []() { return new HomeScreenLayoutClassicWithQuotes(gui::layout::ClassicWithQuotes); }},
                 {gui::layout::VerticalSimple,
                  []() { return new HomeScreenLayoutVerticalSimple(gui::layout::VerticalSimple); }},
             {
@@ -54,6 +58,10 @@ namespace gui::factory
                  []() { return new HomeScreenLayoutClassicWithBattery(gui::layout::ClassicWithBattery); }},
                 {gui::layout::ClassicWithDate,
                  []() { return new HomeScreenLayoutClassicWithDate(gui::layout::ClassicWithDate); }},
+                {gui::layout::ClassicWithQuotes,
+                 []() { return new HomeScreenLayoutClassicWithQuotes(gui::layout::ClassicWithQuotes); }},
+                {gui::layout::ClassicWithQuotesAmPm,
+                 []() { return new HomeScreenLayoutClassicWithQuotesAmPm(gui::layout::ClassicWithQuotesAmPm); }},
                 {gui::layout::VerticalSimple,
                  []() { return new HomeScreenLayoutVerticalSimple(gui::layout::VerticalSimple); }},
                 {gui::layout::VerticalWithAmPm,

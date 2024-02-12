@@ -6,6 +6,7 @@
 
 ### Added
 * Added new 32px and 170px fonts
+* Added new clock face with quotes
 
 ### Changed / Improved
 
