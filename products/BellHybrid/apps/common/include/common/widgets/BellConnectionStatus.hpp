@@ -15,6 +15,7 @@ namespace gui
         BellConnectionStatus(Item *parent);
         void setFont(const UTF8 &fontName);
         void show(bool visibility);
+        bool isVisible() const;
 
       private:
         Text *statusText = nullptr;

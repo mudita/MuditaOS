@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,9 @@ namespace gui
 
         void showImage(bool show);
         void setImage(const UTF8 &name, ImageTypeSpecifier specifier = ImageTypeSpecifier::None);
+        /// adjusts the box size perfectly to the image
+        void fitBoxToImage();
+        /// adjusts the box size to at least the same size as the image
         virtual void setMinimumSizeToFitImage();
 
       protected:

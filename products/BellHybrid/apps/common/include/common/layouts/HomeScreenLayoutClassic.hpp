@@ -94,5 +94,8 @@ namespace gui
         AlarmSetSpinner *alarm    = nullptr;
         SnoozeTimer *snoozeTimer  = nullptr;
         Icon *lowBatteryWarning                = nullptr;
+
+        std::function<void()> onShowMessage;
+        std::function<void()> onHideMessage;
     };
 }; // namespace gui

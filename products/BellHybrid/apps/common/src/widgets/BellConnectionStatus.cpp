@@ -38,4 +38,9 @@ namespace gui
     {
         statusText->setVisible(visibility);
     }
+
+    bool BellConnectionStatus::isVisible() const
+    {
+        return statusText->visible;
+    }
 } // namespace gui

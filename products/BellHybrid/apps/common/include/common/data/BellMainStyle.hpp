@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,5 +27,13 @@ namespace bellMainStyle
             inline constexpr auto font_small  = style::window::font::verybiglight;
 
         } // namespace bottomDescription
-    }     // namespace mainWindow
+
+        namespace ampm
+        {
+            inline constexpr auto layout_w      = 51U;
+            inline constexpr auto margin_w      = 5U;
+            inline constexpr auto time_margin_w = layout_w + margin_w;
+        } // namespace ampm
+
+    } // namespace mainWindow
 } // namespace bellMainStyle
