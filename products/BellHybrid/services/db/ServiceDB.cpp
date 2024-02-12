@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <db/ServiceDB.hpp>
@@ -36,6 +36,8 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
         return alarmEventRecordInterface.get();
     case db::Interface::Name::MultimediaFiles:
         return multimediaFilesRecordInterface.get();
+    case db::Interface::Name::Quotes:
+        return quotesRecordInterface.get();
     default:
         LOG_INFO("Not supported interface");
     }
@@ -51,6 +53,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
 
     // Create databases
     eventsDB          = std::make_unique<EventsDB>((purefs::dir::getDatabasesPath() / "events.db").c_str());
+    quotesDB          = std::make_unique<Database>((purefs::dir::getDatabasesPath() / "quotes.db").c_str());
     multimediaFilesDB = std::make_unique<db::multimedia_files::MultimediaFilesDB>(
         (purefs::dir::getDatabasesPath() / "multimedia.db").c_str());
 
@@ -67,7 +70,7 @@ sys::ReturnCodes ServiceDB::InitHandler()
         dbAgent->registerMessages();
     }
 
-    const auto settings = std::make_unique<settings::Settings>();
+    auto settings = std::make_unique<settings::Settings>();
     settings->init(service::ServiceProxy(shared_from_this()));
 
     /* Save metadata for crashdump generation purpose */
@@ -78,6 +81,8 @@ sys::ReturnCodes ServiceDB::InitHandler()
     Store::CrashdumpMetadata::getInstance().setCommitHash(GIT_REV);
     Store::CrashdumpMetadata::getInstance().setOsVersion(VERSION);
     Store::CrashdumpMetadata::getInstance().setProductName("BellHybrid");
+
+    quotesRecordInterface = std::make_unique<Quotes::QuotesAgent>(quotesDB.get(), std::move(settings));
 
     return sys::ReturnCodes::Success;
 }

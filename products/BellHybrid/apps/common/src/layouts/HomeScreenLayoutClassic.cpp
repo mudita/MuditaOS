@@ -398,4 +398,8 @@ namespace gui
             }
         }
     }
+
+    auto HomeScreenLayoutClassic::setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor) -> void
+    {}
+
 }; // namespace gui

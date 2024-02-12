@@ -53,6 +53,7 @@ namespace app
         std::unique_ptr<home_screen::AbstractTemperatureModel> temperatureModel;
         std::unique_ptr<AbstractUserSessionModel> userSessionModel;
         std::unique_ptr<AbstractBatteryLevelNotificationModel> batteryLevelNotificationModel;
+        std::unique_ptr<AbstractQuoteModel> quoteModel;
         std::shared_ptr<app::home_screen::HomeScreenPresenter> homeScreenPresenter;
     };
 

@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include <QuotesAgent.hpp>
 #include <service-db/DBServiceName.hpp>
 #include <service-db/ServiceDBCommon.hpp>
 #include <service-db/ServiceDBDependencies.hpp>
@@ -11,6 +12,7 @@ class AlarmEventRecordInterface;
 class EventsDB;
 
 class ThreadRecordInterface;
+
 namespace db::multimedia_files
 {
     class MultimediaFilesDB;
@@ -24,8 +26,10 @@ class ServiceDB : public ServiceDBCommon
 
   private:
     std::unique_ptr<EventsDB> eventsDB;
+    std::unique_ptr<Database> quotesDB;
     std::unique_ptr<db::multimedia_files::MultimediaFilesDB> multimediaFilesDB;
 
+    std::unique_ptr<Quotes::QuotesAgent> quotesRecordInterface;
     std::unique_ptr<AlarmEventRecordInterface> alarmEventRecordInterface;
     std::unique_ptr<db::multimedia_files::MultimediaFilesRecordInterface> multimediaFilesRecordInterface;
 

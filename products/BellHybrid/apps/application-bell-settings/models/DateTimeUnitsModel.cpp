@@ -11,8 +11,8 @@
 
 #include <gui/widgets/ListViewEngine.hpp>
 #include <gui/widgets/Style.hpp>
-#include <service-time/ServiceTimeName.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
+#include <service-time/ServiceTimeName.hpp>
 #include <service-time/service-time/TimeMessage.hpp>
 #include <widgets/DateSetSpinner.hpp>
 
@@ -140,22 +140,22 @@ namespace app::bell_settings
         const auto now        = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
         const auto timeFormat = stm::api::timeFormat();
         const auto dateFormat = stm::api::dateFormat();
+        dateLoaded            = date::year_month_day{date::floor<date::days>(std::chrono::system_clock::now())};
         timeSetListItem->timeSetSpinner->setTimeFormat(timeFormat);
         timeSetListItem->timeSetSpinner->setTime(now);
-        yearSetListItem->dateSetSpinner->setDate(
-            date::year_month_day{date::floor<date::days>(std::chrono::system_clock::now())});
+        yearSetListItem->dateSetSpinner->setDate(dateLoaded);
 
         timeFmtSetListItem->setTimeFmt(timeFormat);
         dateFmtSetListItem->setDateFmt(dateFormat);
     }
 
-    auto DateTimeUnitsModel::requestRecords(uint32_t offset, uint32_t limit) -> void
+    auto DateTimeUnitsModel::requestRecords(std::uint32_t offset, std::uint32_t limit) -> void
     {
         setupModel(offset, limit);
         list->onProviderDataUpdate();
     }
 
-    void DateTimeUnitsModel::sendRtcUpdateTimeMessage(time_t newTime)
+    void DateTimeUnitsModel::sendRtcUpdateTimeMessage(std::time_t newTime)
     {
         auto msg = std::make_shared<stm::message::TimeChangeRequestMessage>(newTime);
         application->bus.sendUnicast(std::move(msg), service::name::service_time);
@@ -171,6 +171,12 @@ namespace app::bell_settings
     {
         auto msg = std::make_shared<stm::message::SetDateFormatRequest>(newFmt);
         application->bus.sendUnicast(std::move(msg), service::name::service_time);
+    }
+
+    auto DateTimeUnitsModel::isDateChanged() -> bool
+    {
+        const auto date = daySetListItem->dateSetSpinner->getDate();
+        return dateLoaded != date;
     }
 
     auto DateTimeUnitsModel::getTemperatureUnit() const -> utils::temperature::Temperature::Unit
@@ -209,5 +215,10 @@ namespace app::bell_settings
         timeSetListItem->timeSetSpinner->setMinute(0);
         timeFmtSetListItem->setTimeFmt(factoryResetTimeFmt);
         dateFmtSetListItem->setDateFmt(factoryResetDateFmt);
+    }
+
+    auto DateTimeUnitsModelFactoryResetValues::isDateChanged() -> bool
+    {
+        return false;
     }
 } // namespace app::bell_settings

@@ -17,6 +17,7 @@
 #include <Timers/SystemTimer.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <service-db/DBNotificationMessage.hpp>
+#include <service-db/QuotesMessages.hpp>
 #include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <switches/LatchStatusRequest.hpp>
 
@@ -78,15 +79,17 @@ namespace app::home_screen
                                              AbstractTemperatureModel &temperatureModel,
                                              AbstractTimeModel &timeModel,
                                              AbstractUserSessionModel &userSessionModel,
-                                             AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel)
+                                             AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel,
+                                             AbstractQuoteModel &quoteModel)
         : app{app}, alarmModel{alarmModel}, batteryModel{batteryModel},
           temperatureModel{temperatureModel}, timeModel{timeModel}, userSessionModel{userSessionModel},
-          batteryLevelNotificationModel{batteryLevelNotificationModel}, rngEngine{std::make_unique<std::mt19937>(
-                                                                            bsp::trng::getRandomValue())}
+          batteryLevelNotificationModel{batteryLevelNotificationModel},
+          quoteModel{quoteModel}, rngEngine{std::make_unique<std::mt19937>(bsp::trng::getRandomValue())}
     {}
 
     gui::RefreshModes HomeScreenPresenter::handleUpdateTimeEvent()
     {
+        requestQuote();
         getView()->setTime(timeModel.getCurrentTime());
         stateController->handleTimeUpdateEvent();
         return handleCyclicDeepRefresh();
@@ -127,6 +130,7 @@ namespace app::home_screen
 
     void HomeScreenPresenter::onBeforeShow()
     {
+        requestQuote();
         stateController->resetStateMachine();
         getView()->setTimeFormat(timeModel.getTimeFormat());
         getView()->setTime(timeModel.getCurrentTime());
@@ -313,6 +317,13 @@ namespace app::home_screen
         const auto batteryStatus = batteryModel.getLevelState();
         return not batteryModel.isBatteryCharging(batteryStatus.state) &&
                (batteryStatus.level < constants::lowBatteryInfoThreshold);
+    }
+
+    void HomeScreenPresenter::requestQuote() const
+    {
+        quoteModel.setCallback(
+            [this](std::string quote, std::string author) { getView()->setQuoteText(quote, author); });
+        quoteModel.sendQuery();
     }
 
 } // namespace app::home_screen

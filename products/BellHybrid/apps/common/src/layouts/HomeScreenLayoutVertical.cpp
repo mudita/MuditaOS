@@ -143,6 +143,9 @@ namespace gui
         alarmActivatedDeactivatedScreen->text->informContentChanged();
     }
 
+    void HomeScreenLayoutVertical::setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor)
+    {}
+
     bool HomeScreenLayoutVertical::isBatteryVisibilityAllowed(const Store::Battery &batteryContext)
     {
         return (batteryContext.level < dischargingLevelShowTop) || isBatteryCharging(batteryContext.state);

@@ -7,6 +7,7 @@
 #include <common/models/AbstractAlarmModel.hpp>
 #include <common/models/UserSessionModel.hpp>
 #include <common/models/BatteryLevelNotificationModel.hpp>
+#include <common/models/QuoteModel.hpp>
 #include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <common/layouts/HomeScreenLayouts.hpp>
 #include <gui/Common.hpp>
@@ -68,6 +69,7 @@ namespace app::home_screen
         virtual void setTextDescription(const UTF8 &desc)                       = 0;
         virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
         virtual void setUSBStatusConnected()                                    = 0;
+        virtual void setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor) = 0;
 
         /// Various
         virtual void setLayout(gui::LayoutGenerator layoutGenerator) = 0;
@@ -109,6 +111,7 @@ namespace app::home_screen
         virtual void updateBatteryLevelInterval()                                                = 0;
         virtual void refreshUserSession()                                                        = 0;
         virtual bool isLowBatteryLevel() const                                                   = 0;
+        virtual void requestQuote() const                                                        = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -122,7 +125,8 @@ namespace app::home_screen
                             AbstractTemperatureModel &temperatureModel,
                             AbstractTimeModel &timeModel,
                             AbstractUserSessionModel &userSessionModel,
-                            AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel);
+                            AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel,
+                            AbstractQuoteModel &quoteModel);
         virtual ~HomeScreenPresenter();
         HomeScreenPresenter()        = delete;
         HomeScreenPresenter &operator=(const HomeScreenPresenter &oth) = delete;
@@ -163,6 +167,7 @@ namespace app::home_screen
         void updateBatteryLevelInterval() override;
         void refreshUserSession() override;
         bool isLowBatteryLevel() const override;
+        void requestQuote() const override;
 
         void setLayout(gui::LayoutGenerator layoutGenerator) override;
 
@@ -175,6 +180,7 @@ namespace app::home_screen
         AbstractTimeModel &timeModel;
         AbstractUserSessionModel &userSessionModel;
         AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel;
+        AbstractQuoteModel &quoteModel;
         std::unique_ptr<AbstractController> stateController;
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
         std::unique_ptr<std::mt19937> rngEngine;

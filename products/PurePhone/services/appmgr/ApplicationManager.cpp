@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <appmgr/ApplicationManager.hpp>
@@ -667,20 +667,5 @@ namespace app::manager
                     .get());
             break;
         }
-    }
-
-    auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
-    {
-        const auto &requestedLanguage = msg->getLanguage();
-
-        if (not utils::setDisplayLanguage(requestedLanguage)) {
-            LOG_WARN("The selected language is already set. Ignore.");
-            return false;
-        }
-        settings->setValue(
-            settings::SystemProperties::displayLanguage, requestedLanguage, settings::SettingsScope::Global);
-        rebuildActiveApplications();
-        DBServiceAPI::InformLanguageChanged(this);
-        return true;
     }
 } // namespace app::manager
