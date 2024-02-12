@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/data/StyleCommon.hpp>
@@ -6,8 +6,7 @@
 
 namespace gui
 {
-    SessionPausedWindow::SessionPausedWindow(app::ApplicationCommon *app)
-        : AppWindow(app, gui::window::session_paused::sessionPaused)
+    SessionPausedWindow::SessionPausedWindow(app::ApplicationCommon *app, std::string name) : AppWindow(app, name)
     {
         buildInterface();
     }

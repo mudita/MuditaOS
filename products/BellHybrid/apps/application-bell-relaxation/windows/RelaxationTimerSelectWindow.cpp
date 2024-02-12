@@ -5,6 +5,7 @@
 #include <data/RelaxationStyle.hpp>
 #include <ApplicationBellRelaxation.hpp>
 
+#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <common/data/BatteryStatusSwitchData.hpp>
 #include <common/LanguageUtils.hpp>
@@ -177,6 +178,11 @@ namespace gui
 
     bool RelaxationTimerSelectWindow::onInput(const gui::InputEvent &inputEvent)
     {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
         if (spinner->onInput(inputEvent)) {
             updateBottomDescription();
             return true;

@@ -8,6 +8,7 @@
 #include <common/models/LowBatteryInfoModel.hpp>
 #include <chrono>
 #include <vector>
+#include <common/models/AbstractAlarmModel.hpp>
 
 namespace gui
 {
@@ -38,15 +39,16 @@ namespace app::relaxation
         class Presenter : public BasePresenter<RelaxationTimerSelectContract::View>
         {
           public:
-            virtual ~Presenter()                                      = default;
-            virtual const Range &getTimerValuesRange() const noexcept = 0;
-            virtual std::chrono::minutes getCurrentTimerValue() const = 0;
-            virtual void setTimerValue(std::chrono::minutes)          = 0;
-            virtual Store::Battery getBatteryState()                     = 0;
+            virtual ~Presenter()                                               = default;
+            virtual const Range &getTimerValuesRange() const noexcept          = 0;
+            virtual std::chrono::minutes getCurrentTimerValue() const          = 0;
+            virtual void setTimerValue(std::chrono::minutes)                   = 0;
+            virtual Store::Battery getBatteryState()                           = 0;
             virtual bool isBatteryCharging(Store::Battery::State state) const  = 0;
             virtual bool isBatteryBelowLowLevelThreshold(units::SOC soc) const = 0;
-            [[nodiscard]] virtual bool isLowBatteryWindowHandled() const = 0;
-            virtual void handleLowBatteryWindow()                        = 0;
+            [[nodiscard]] virtual bool isLowBatteryWindowHandled() const       = 0;
+            virtual void handleLowBatteryWindow()                              = 0;
+            virtual bool handleIfPreWakeupIsToTurnOffFirst()                   = 0;
         };
     };
 
@@ -55,6 +57,7 @@ namespace app::relaxation
         settings::Settings *settings{nullptr};
         AbstractBatteryModel &batteryModel;
         AbstractLowBatteryInfoModel &lowBatteryInfoModel;
+        AbstractAlarmModel &alarmModel;
 
         const RelaxationTimerSelectContract::Range &getTimerValuesRange() const noexcept override;
         std::chrono::minutes getCurrentTimerValue() const override;
@@ -64,10 +67,12 @@ namespace app::relaxation
         bool isBatteryBelowLowLevelThreshold(units::SOC soc) const override;
         [[nodiscard]] bool isLowBatteryWindowHandled() const override;
         void handleLowBatteryWindow() override;
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
 
       public:
         RelaxationTimerSelectPresenter(settings::Settings *settings,
                                        AbstractBatteryModel &batteryModel,
-                                       AbstractLowBatteryInfoModel &lowBatteryInfoModel);
+                                       AbstractLowBatteryInfoModel &lowBatteryInfoModel,
+                                       AbstractAlarmModel &alarm);
     };
 } // namespace app::relaxation

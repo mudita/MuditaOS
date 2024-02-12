@@ -23,6 +23,7 @@ target_sources(application-bell-meditation-timer
         models/ChimeVolume.cpp
         models/StartDelay.cpp
         models/Statistics.cpp
+        presenter/MeditationBasicsPresenter.cpp
         presenter/MeditationCountdownPresenter.cpp
         presenter/MeditationProgressPresenter.cpp
         presenter/MeditationTimerPresenter.cpp
@@ -31,8 +32,10 @@ target_sources(application-bell-meditation-timer
         presenter/SettingsPresenter.cpp
         presenter/StatisticsPresenter.cpp
         windows/MeditationMainWindow.cpp
+        windows/MeditationFinishWindow.cpp
         windows/MeditationCountdownWindow.cpp
         windows/MeditationRunningWindow.cpp
+        windows/MeditationSessionPausedWindow.cpp
         windows/MeditationTimerWindow.cpp
         windows/SettingsWindow.cpp
         windows/StatisticsWindow.cpp

@@ -9,8 +9,6 @@
 
 #include <service-time/AlarmMessage.hpp>
 
-// add messages to handle pre wake up //TODO: clean
-
 namespace alarms
 {
 
@@ -193,7 +191,7 @@ namespace alarms
     {
         return handleWithCallback<TurnOffPreWakeUpRequestMessage, TurnOffPreWakeUpResponseMessage, bool>(
             request, [&](TurnOffPreWakeUpRequestMessage *request, IAlarmOperations::OnTurnOffPreWakeUp callback) {
-                alarmOperations->turnOffPreWakeUp(callback);
+                alarmOperations->turnOffPreWakeUp(callback, request->turnOffOnlyFrontLight);
             });
     }
     auto AlarmMessageHandler::handlePreWakeUpStatus() -> std::shared_ptr<GetPreWakeUpResponseMessage>

@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationErrorWindow.hpp"
+#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
 #include <data/RelaxationStyle.hpp>
 #include <ApplicationBellRelaxation.hpp>
 
@@ -84,6 +85,11 @@ namespace gui
 
     bool RelaxationErrorWindow::onInput(const InputEvent &inputEvent)
     {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             application->switchWindow(gui::name::window::main_window);
             return true;

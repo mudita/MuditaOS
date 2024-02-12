@@ -6,6 +6,7 @@
 #include "windows/PowerNapMainWindow.hpp"
 #include "windows/PowerNapProgressWindow.hpp"
 #include "windows/PowerNapSessionEndedWindow.hpp"
+#include "windows/PowerNapSessionPausedWindow.hpp"
 #include "windows/PowerNapWarningWindow.hpp"
 #include <common/models/TimeModel.hpp>
 #include <Paths.hpp>
@@ -53,7 +54,7 @@ namespace app
         windowsFactory.attach(gui::name::window::main_window,
                               [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
                                   auto presenter = std::make_unique<powernap::PowerNapMainWindowPresenter>(
-                                      app, settings.get(), *batteryModel, *lowBatteryInfoModel);
+                                      app, settings.get(), *batteryModel, *lowBatteryInfoModel, *alarmModel);
                                   return std::make_unique<gui::PowerNapMainWindow>(app, std::move(presenter));
                               });
         windowsFactory.attach(
@@ -69,21 +70,26 @@ namespace app
                                                                                        *audioModel,
                                                                                        std::move(timeModel),
                                                                                        std::move(frontlightModel),
-                                                                                       powerNapAlarmDuration);
+                                                                                       powerNapAlarmDuration,
+                                                                                       *alarmModel);
                 return std::make_unique<gui::PowerNapProgressWindow>(app, std::move(presenter));
             });
-        windowsFactory.attach(gui::window::session_paused::sessionPaused,
-                              [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
-                                  return std::make_unique<gui::SessionPausedWindow>(app);
+        windowsFactory.attach(gui::window::name::powerNapSessionPaused,
+                              [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                                  auto presenter =
+                                      std::make_unique<powernap::PowerNapSessionPausedPresenter>(app, *alarmModel);
+                                  return std::make_unique<gui::PowerNapSessionPausedWindow>(app, std::move(presenter));
                               });
         windowsFactory.attach(gui::window::name::powerNapSessionEnded,
-                              [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
-                                  auto presenter = std::make_unique<powernap::PowerNapSessionEndPresenter>(app);
+                              [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                                  auto presenter =
+                                      std::make_unique<powernap::PowerNapSessionEndPresenter>(app, *alarmModel);
                                   return std::make_unique<gui::PowerNapSessionEndedWindow>(app, std::move(presenter));
                               });
         windowsFactory.attach(gui::window::name::powerNapWarning,
-                              [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
-                                  auto presenter = std::make_unique<powernap::PowerNapWarningPresenter>(app);
+                              [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                                  auto presenter =
+                                      std::make_unique<powernap::PowerNapWarningPresenter>(app, *alarmModel);
                                   return std::make_unique<gui::PowerNapWarningWindow>(app, std::move(presenter));
                               });
 

@@ -36,6 +36,7 @@ namespace app
         virtual void activateAlarm(bool state)                 = 0;
         virtual bool isPreWakeUpActive()                       = 0;
         virtual bool turnOffPreWakeUp()                        = 0;
+        virtual bool turnOffPreWakeUpFrontLight()              = 0;
         /// Command model to update its internal data
         virtual void update(AlarmModelReadyHandler callback = AlarmModelReadyHandler()) = 0;
     };

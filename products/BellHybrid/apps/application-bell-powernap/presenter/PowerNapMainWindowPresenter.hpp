@@ -7,6 +7,7 @@
 #include <common/models/BatteryModel.hpp>
 #include <common/models/LowBatteryInfoModel.hpp>
 #include <memory>
+#include <common/models/AbstractAlarmModel.hpp>
 
 namespace gui
 {
@@ -40,8 +41,9 @@ namespace app::powernap
           public:
             virtual auto getNapTimeProvider() -> std::shared_ptr<gui::ListItemProvider> = 0;
 
-            virtual void loadNapTimeList() = 0;
-            virtual void activate()        = 0;
+            virtual void loadNapTimeList()                   = 0;
+            virtual void activate()                          = 0;
+            virtual bool handleIfPreWakeupIsToTurnOffFirst() = 0;
         };
     };
 
@@ -51,7 +53,8 @@ namespace app::powernap
         PowerNapMainWindowPresenter(app::ApplicationCommon *app,
                                     settings::Settings *settings,
                                     AbstractBatteryModel &batteryModel,
-                                    AbstractLowBatteryInfoModel &lowBatteryInfoModel);
+                                    AbstractLowBatteryInfoModel &lowBatteryInfoModel,
+                                    AbstractAlarmModel &alarm);
         auto getNapTimeProvider() -> std::shared_ptr<gui::ListItemProvider> override;
 
         void loadNapTimeList() override;
@@ -61,11 +64,13 @@ namespace app::powernap
         bool isBatteryCharging(Store::Battery::State state) const;
         bool isBatteryBelowLowLevelThreshold(units::SOC soc) const;
         void conditionalSwitchScreen();
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
 
         app::ApplicationCommon *app{nullptr};
         settings::Settings *settings{nullptr};
         std::shared_ptr<PowerNapModel> model;
         AbstractBatteryModel &batteryModel;
         AbstractLowBatteryInfoModel &lowBatteryInfoModel;
+        AbstractAlarmModel &alarmModel;
     };
 } // namespace app::powernap

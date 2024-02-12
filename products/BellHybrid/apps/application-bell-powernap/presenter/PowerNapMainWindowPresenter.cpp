@@ -11,9 +11,10 @@ namespace app::powernap
     PowerNapMainWindowPresenter::PowerNapMainWindowPresenter(app::ApplicationCommon *app,
                                                              settings::Settings *settings,
                                                              AbstractBatteryModel &batteryModel,
-                                                             AbstractLowBatteryInfoModel &lowBatteryInfoModel)
+                                                             AbstractLowBatteryInfoModel &lowBatteryInfoModel,
+                                                             AbstractAlarmModel &alarm)
         : app{app}, settings{settings}, model{std::make_shared<PowerNapModel>()}, batteryModel{batteryModel},
-          lowBatteryInfoModel{lowBatteryInfoModel}
+          lowBatteryInfoModel{lowBatteryInfoModel}, alarmModel{alarm}
     {}
 
     auto PowerNapMainWindowPresenter::getNapTimeProvider() -> std::shared_ptr<gui::ListItemProvider>
@@ -58,5 +59,14 @@ namespace app::powernap
     bool PowerNapMainWindowPresenter::isBatteryBelowLowLevelThreshold(units::SOC soc) const
     {
         return soc < constants::lowBatteryInfoThreshold;
+    }
+
+    bool PowerNapMainWindowPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 } // namespace app::powernap

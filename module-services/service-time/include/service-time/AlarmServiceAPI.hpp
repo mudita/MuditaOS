@@ -32,6 +32,7 @@ namespace alarms
         bool requestRegisterSnoozedAlarmsCountChangeCallback(sys::Service *serv);
         bool requestRegisterActiveAlarmsIndicatorHandler(sys::Service *serv);
         bool requestTurnOffPreWakeUp(sys::Service *serv);
+        bool requestTurnOffPreWakeUpFrontLightOnly(sys::Service *serv);
         bool requestGetPreWakeUpStatus(sys::Service *serv, bool &response);
     }; // namespace AlarmServiceAPI
 

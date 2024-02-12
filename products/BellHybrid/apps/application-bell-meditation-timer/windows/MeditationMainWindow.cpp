@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationMainWindow.hpp"
@@ -10,12 +10,14 @@
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <common/options/OptionBellMenu.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
+#include <keymap/KeyMap.hpp>
 
 namespace app::meditation
 {
     using namespace gui;
-    MeditationMainWindow::MeditationMainWindow(app::ApplicationCommon *app)
-        : BellOptionWindow(app, gui::name::window::main_window)
+    MeditationMainWindow::MeditationMainWindow(
+        app::ApplicationCommon *app, std::shared_ptr<app::meditation::MeditationBasicsContract::Presenter> presenter)
+        : BellOptionWindow(app, gui::name::window::main_window), presenter(std::move(presenter))
     {
         addOptions(settingsOptionsList());
         setListTitle(utils::translate("app_bell_meditation_timer"));
@@ -53,5 +55,15 @@ namespace app::meditation
         addWinSettings(utils::translate("app_bell_meditation_statistics"), StatisticsWindow::name, defaultCallback);
 
         return settingsOptionList;
+    }
+
+    bool MeditationMainWindow::onInput(const InputEvent &inputEvent)
+    {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
+        return AppWindow::onInput(inputEvent);
     }
 } // namespace app::meditation

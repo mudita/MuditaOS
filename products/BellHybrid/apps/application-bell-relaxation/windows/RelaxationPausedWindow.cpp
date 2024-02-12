@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationPausedWindow.hpp"
 #include <data/RelaxationStyle.hpp>
 #include <ApplicationBellRelaxation.hpp>
+#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
 
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <i18n/i18n.hpp>
@@ -57,7 +58,9 @@ namespace gui
 
     bool RelaxationPausedWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease() && presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
             return true;
         }
 

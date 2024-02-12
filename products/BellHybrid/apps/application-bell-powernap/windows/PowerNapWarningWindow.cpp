@@ -7,6 +7,7 @@
 #include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <common/data/StyleCommon.hpp>
+#include <keymap/KeyMap.hpp>
 
 namespace
 {
@@ -53,6 +54,11 @@ namespace gui
 
     bool PowerNapWarningWindow::onInput(const InputEvent &inputEvent)
     {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             detachTimerIfExists();
             presenter->activate();

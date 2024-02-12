@@ -107,7 +107,7 @@ namespace alarms
                         std::unique_ptr<AbstractBedtimeSettingsProvider> &&BedtimeModel);
 
         bool isPreWakeUpActive() override;
-        void turnOffPreWakeUp(OnTurnOffPreWakeUp callback) override;
+        void turnOffPreWakeUp(OnTurnOffPreWakeUp callback, bool disableOnlyFrontLight = false) override;
 
       private:
         void minuteUpdated(TimePoint now) override;
@@ -118,7 +118,7 @@ namespace alarms
 
         SingleEventRecord getNextPreWakeUpEvent();
         void handlePreWakeUp(const SingleEventRecord &event, PreWakeUp::Decision decision);
-        void disablePreWakeUp(const std::shared_ptr<AlarmEventRecord> &event);
+        void disablePreWakeUp(const std::shared_ptr<AlarmEventRecord> &event, bool disableOnlyFrontLight = false);
         void handleSnoozeChime(const SingleEventRecord &event, bool newStateOn);
         void processBedtime(TimePoint now);
         void turnOffRingingAlarm(std::uint32_t id, OnTurnOffRingingAlarm callback) override;

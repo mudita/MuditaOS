@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationMainWindow.hpp"
@@ -6,6 +6,7 @@
 #include <data/RelaxationErrorData.hpp>
 #include <ApplicationBellRelaxation.hpp>
 #include "common/options/BellOptionsNavigation.hpp"
+#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
 
 #include <common/options/OptionBellMenu.hpp>
 #include <i18n/i18n.hpp>
@@ -73,6 +74,16 @@ namespace gui
         presenter->updateRecordsCount();
         songList->reset();
         songList->rebuildList(gui::listview::RebuildType::Full);
+    }
+
+    bool RelaxationMainWindow::onInput(const InputEvent &inputEvent)
+    {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
+        return AppWindow::onInput(inputEvent);
     }
 
 } // namespace gui

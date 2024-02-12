@@ -146,10 +146,11 @@ namespace app::relaxation
     {
         return timerFinished;
     }
+
     bool RelaxationRunningProgressPresenter::handleIfPreWakeupIsToTurnOffFirst()
     {
         if (alarmModel.isPreWakeUpActive()) {
-            alarmModel.turnOffPreWakeUp();
+            alarmModel.turnOffPreWakeUpFrontLight();
             return true;
         }
         return false;

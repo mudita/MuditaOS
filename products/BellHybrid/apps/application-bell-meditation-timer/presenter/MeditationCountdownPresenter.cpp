@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationCommon.hpp"
@@ -10,8 +10,9 @@
 namespace app::meditation
 {
     MeditationCountdownPresenter::MeditationCountdownPresenter(app::ApplicationCommon *app,
-                                                               models::StartDelay &startDelay)
-        : app{app}, startDelayModel{startDelay}, duration{startDelayModel.getValue()}
+                                                               models::StartDelay &startDelay,
+                                                               AbstractAlarmModel &alarm)
+        : app{app}, startDelayModel{startDelay}, duration{startDelayModel.getValue()}, alarmModel{alarm}
     {}
 
     void MeditationCountdownPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
@@ -57,5 +58,14 @@ namespace app::meditation
         if (ready) {
             app->switchWindow(meditation::windows::meditationProgress);
         }
+    }
+
+    bool MeditationCountdownPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 } // namespace app::meditation

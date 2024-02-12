@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationMainWindow.hpp"
@@ -9,6 +9,7 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/SideListView.hpp>
+#include <keymap/KeyMap.hpp>
 
 namespace app::meditation
 {
@@ -52,6 +53,11 @@ namespace app::meditation
 
     bool SettingsWindow::onInput(const gui::InputEvent &inputEvent)
     {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
         if (sideListView->onInput(inputEvent)) {
             return true;
         }

@@ -11,9 +11,10 @@ namespace app::meditation
 {
     namespace windows
     {
-        inline constexpr auto meditationCountdown  = "MeditationCountdown";
-        inline constexpr auto meditationProgress   = "MeditationProgress";
-        inline constexpr auto meditationLowBattery = "MeditationLowBatteryWindow";
+        inline constexpr auto meditationCountdown     = "MeditationCountdown";
+        inline constexpr auto meditationProgress      = "MeditationProgress";
+        inline constexpr auto meditationSessionPaused = "MeditationSessionPaused";
+        inline constexpr auto meditationLowBattery    = "MeditationLowBatteryWindow";
     }; // namespace windows
 
     constexpr auto meditationDBRecordName = "MeditationTimer";

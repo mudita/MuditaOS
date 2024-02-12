@@ -38,6 +38,7 @@ namespace app
         void activateAlarm(bool state) override;
         bool isPreWakeUpActive() override;
         bool turnOffPreWakeUp() override;
+        bool turnOffPreWakeUpFrontLight() override;
 
         std::chrono::seconds getTimeToNextSnooze() override;
         TimePoint getTimeOfNextSnooze() override;

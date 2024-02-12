@@ -91,9 +91,15 @@ namespace alarms
             }
             return false;
         }
+
         bool requestTurnOffPreWakeUp(sys::Service *serv)
         {
             return sendRequest<TurnOffPreWakeUpRequestMessage>(serv);
+        }
+
+        bool requestTurnOffPreWakeUpFrontLightOnly(sys::Service *serv)
+        {
+            return sendRequest<TurnOffPreWakeUpRequestMessage>(serv, true);
         }
     }; // namespace AlarmServiceAPI
 

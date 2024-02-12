@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -61,6 +61,7 @@ namespace app::meditation
             virtual void abandon()                                                  = 0;
             virtual void finish()                                                   = 0;
             virtual void onBeforeShow()                                             = 0;
+            virtual bool handleIfPreWakeupIsToTurnOffFirst()                        = 0;
         };
     };
 
@@ -75,6 +76,7 @@ namespace app::meditation
         models::Statistics &statisticsModel;
         std::chrono::minutes duration;
         std::chrono::seconds interval;
+        AbstractAlarmModel &alarmModel;
 
         static constexpr auto endWindowTimeout = std::chrono::seconds{5};
 
@@ -88,7 +90,8 @@ namespace app::meditation
                                     settings::Settings *settings,
                                     std::unique_ptr<AbstractTimeModel> timeModel,
                                     models::ChimeInterval &chimeIntervalModel,
-                                    models::Statistics &statisticsModel);
+                                    models::Statistics &statisticsModel,
+                                    AbstractAlarmModel &alarm);
 
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         void handleUpdateTimeEvent() override;
@@ -100,5 +103,6 @@ namespace app::meditation
         void abandon() override;
         void finish() override;
         void onBeforeShow() override;
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
     };
 } // namespace app::meditation

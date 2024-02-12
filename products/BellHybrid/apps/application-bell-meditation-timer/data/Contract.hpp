@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -24,6 +24,7 @@ namespace app::meditation::contract
         virtual void eraseProviderData()                                                = 0;
         virtual void exitWithSave()                                                     = 0;
         virtual void exitWithoutSave()                                                  = 0;
+        virtual bool handleIfPreWakeupIsToTurnOffFirst()                                = 0;
     };
 
     class StatisticsPresenter : public BasePresenter<View>
@@ -33,5 +34,6 @@ namespace app::meditation::contract
         virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
         virtual void eraseProviderData()                                                = 0;
         virtual void handleExit()                                                       = 0;
+        virtual bool handleIfPreWakeupIsToTurnOffFirst()                                = 0;
     };
 } // namespace app::meditation::contract

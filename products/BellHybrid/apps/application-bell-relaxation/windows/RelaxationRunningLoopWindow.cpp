@@ -9,7 +9,7 @@
 #include <ApplicationBellRelaxation.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimer.hpp>
-#include <Units.hpp>
+#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
 
 namespace
 {
@@ -153,10 +153,12 @@ namespace gui
 
     bool RelaxationRunningLoopWindow::onInput(const InputEvent &inputEvent)
     {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
         if (inputEvent.isShortRelease()) {
-            if (presenter->handleIfPreWakeupIsToTurnOffFirst()) {
-                return true;
-            }
             if (inputEvent.is(KeyCode::KEY_RF)) {
                 presenter->stop();
                 application->returnToPreviousWindow();

@@ -6,7 +6,8 @@
 
 namespace app::powernap
 {
-    PowerNapWarningPresenter::PowerNapWarningPresenter(app::ApplicationCommon *app) : app{app}
+    PowerNapWarningPresenter::PowerNapWarningPresenter(app::ApplicationCommon *app, AbstractAlarmModel &alarm)
+        : app{app}, alarmModel{alarm}
     {}
 
     void PowerNapWarningPresenter::activate()
@@ -14,5 +15,13 @@ namespace app::powernap
         auto data                        = std::make_unique<gui::SwitchData>();
         data->ignoreCurrentWindowOnStack = true;
         app->switchWindow(gui::window::name::powerNapProgress, std::move(data));
+    }
+    bool PowerNapWarningPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 } // namespace app::powernap

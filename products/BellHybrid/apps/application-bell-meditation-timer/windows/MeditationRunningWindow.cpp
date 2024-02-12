@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -10,6 +10,7 @@
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 #include <purefs/filesystem_paths.hpp>
+#include <keymap/KeyMap.hpp>
 
 namespace
 {
@@ -48,8 +49,8 @@ namespace gui
         const auto progressArcWidth  = runningStyle::progress::penWidth;
         const auto arcStartAngle =
             -90 - runningStyle::progress::verticalDeviationDegrees; // -90 to start drawing the circle from top
-        const auto arcSweepAngle     = 360 - (2 * runningStyle::progress::verticalDeviationDegrees);
-        const auto arcProgressSteps  = 1000;
+        const auto arcSweepAngle    = 360 - (2 * runningStyle::progress::verticalDeviationDegrees);
+        const auto arcProgressSteps = 1000;
 
         Arc::ShapeParams arcParams;
         arcParams.setCenterPoint(Point(getWidth() / 2, getHeight() / 2))
@@ -102,6 +103,12 @@ namespace gui
 
     bool MeditationRunningWindow::onInput(const InputEvent &inputEvent)
     {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
+
         if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
             if (presenter->isTimerStopped()) {
                 presenter->resume();

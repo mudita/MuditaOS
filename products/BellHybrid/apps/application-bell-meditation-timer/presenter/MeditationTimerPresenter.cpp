@@ -23,8 +23,10 @@ namespace app::meditation
     MeditationTimerPresenter::MeditationTimerPresenter(app::ApplicationCommon *app,
                                                        settings::Settings *settings,
                                                        AbstractBatteryModel &batteryModel,
-                                                       AbstractLowBatteryInfoModel &lowBatteryInfoModel)
-        : app{app}, settings{settings}, batteryModel{batteryModel}, lowBatteryInfoModel{lowBatteryInfoModel}
+                                                       AbstractLowBatteryInfoModel &lowBatteryInfoModel,
+                                                       AbstractAlarmModel &alarm)
+        : app{app}, settings{settings}, batteryModel{batteryModel}, lowBatteryInfoModel{lowBatteryInfoModel},
+          alarmModel{alarm}
     {}
 
     std::uint8_t MeditationTimerPresenter::getMinValue()
@@ -75,5 +77,14 @@ namespace app::meditation
         else {
             switchToNextScreen();
         }
+    }
+
+    bool MeditationTimerPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 } // namespace app::meditation

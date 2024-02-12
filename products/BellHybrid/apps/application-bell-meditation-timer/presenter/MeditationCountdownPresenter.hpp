@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "models/StartDelay.hpp"
+#include <common/models/AbstractAlarmModel.hpp>
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
@@ -41,6 +42,7 @@ namespace app::meditation
             virtual bool isFinished()                                               = 0;
             virtual bool isReady()                                                  = 0;
             virtual void setReady(bool status)                                      = 0;
+            virtual bool handleIfPreWakeupIsToTurnOffFirst()                        = 0;
         };
     };
 
@@ -51,13 +53,16 @@ namespace app::meditation
         models::StartDelay &startDelayModel;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::chrono::seconds duration;
+        AbstractAlarmModel &alarmModel;
 
         void onCountdownFinished();
         bool finished{false};
         bool ready{true};
 
       public:
-        MeditationCountdownPresenter(app::ApplicationCommon *app, models::StartDelay &startDelay);
+        MeditationCountdownPresenter(app::ApplicationCommon *app,
+                                     models::StartDelay &startDelay,
+                                     AbstractAlarmModel &alarm);
 
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         bool isFinished() override;
@@ -65,5 +70,6 @@ namespace app::meditation
         void stop() override;
         bool isReady() override;
         void setReady(bool status) override;
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
     };
 } // namespace app::meditation

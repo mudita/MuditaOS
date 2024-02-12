@@ -9,14 +9,15 @@
 
 namespace gui::window::name
 {
-    inline constexpr auto powerNapProgress     = "PowerNapProgressWindow";
-    inline constexpr auto powerNapSessionEnded = "PowerNapSessionEndedWindow";
-    inline constexpr auto powerNapWarning      = "PowerNapWarningWindow";
+    inline constexpr auto powerNapProgress      = "PowerNapProgressWindow";
+    inline constexpr auto powerNapSessionEnded  = "PowerNapSessionEndedWindow";
+    inline constexpr auto powerNapSessionPaused = "PowerNapSessionPausedWindow";
+    inline constexpr auto powerNapWarning       = "PowerNapWarningWindow";
 } // namespace gui::window::name
 
 namespace app
 {
-    inline constexpr auto applicationBellPowerNapName = "ApplicationBellPowerNap";
+    inline constexpr auto applicationBellPowerNapName      = "ApplicationBellPowerNap";
     inline constexpr auto applicationBellPowerNapStackSize = 1024 * 8;
     inline constexpr std::chrono::minutes powerNapAlarmDuration{5};
 

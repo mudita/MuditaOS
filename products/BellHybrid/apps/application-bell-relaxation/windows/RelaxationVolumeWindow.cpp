@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationVolumeWindow.hpp"
@@ -8,6 +8,7 @@
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <popups/data/PopupData.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
+#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
 
 namespace gui
 {
@@ -77,8 +78,9 @@ namespace gui
 
     bool RelaxationVolumeWindow::onInput(const InputEvent &inputEvent)
     {
-        //TODO: rotation works fine here?
-        if (inputEvent.isShortRelease() && presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
             return true;
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {

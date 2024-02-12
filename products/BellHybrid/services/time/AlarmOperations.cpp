@@ -225,8 +225,8 @@ namespace alarms
     void AlarmOperations::processBedtime(TimePoint now)
     {
         if (bedtime.decide(now)) {
-            auto bedtimeEvent           = std::make_shared<AlarmEventRecord>();
-            bedtimeEvent->enabled       = true;
+            auto bedtimeEvent     = std::make_shared<AlarmEventRecord>();
+            bedtimeEvent->enabled = true;
             handleAlarmEvent(bedtimeEvent, alarms::AlarmType::BedtimeReminder, true);
         }
     }
@@ -275,10 +275,13 @@ namespace alarms
         }
     }
 
-    auto AlarmOperations::disablePreWakeUp(const std::shared_ptr<AlarmEventRecord> &event) -> void
+    auto AlarmOperations::disablePreWakeUp(const std::shared_ptr<AlarmEventRecord> &event, bool disableOnlyFrontLight)
+        -> void
     {
         if (preWakeUp.isActive()) {
-            AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
+            if (!disableOnlyFrontLight) {
+                AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpChime, false);
+            }
             AlarmOperationsCommon::handleAlarmEvent(event, alarms::AlarmType::PreWakeUpFrontlight, false);
             preWakeUp.setActive(false);
         }
@@ -348,12 +351,12 @@ namespace alarms
         AlarmOperationsCommon::handleAlarmEvent(event, alarmType, newStateOn);
     }
 
-    void AlarmOperations::turnOffPreWakeUp(IAlarmOperations::OnTurnOffPreWakeUp callback)
+    void AlarmOperations::turnOffPreWakeUp(IAlarmOperations::OnTurnOffPreWakeUp callback, bool disableOnlyFrontLight)
     {
         auto nextEvent = getNextPreWakeUpEvent();
         if (nextEvent.isValid()) {
             if (auto event = std::dynamic_pointer_cast<AlarmEventRecord>(nextEvent.parent); event) {
-                disablePreWakeUp(event);
+                disablePreWakeUp(event, disableOnlyFrontLight);
                 if (callback) {
                     callback(true);
                 }

@@ -248,8 +248,14 @@ namespace app
 
     bool AlarmModel::turnOffPreWakeUp()
     {
-        LOG_WARN("----AlarmModel::turnOffPreWakeup()"); // TODO: clean up this log
+        LOG_ERROR("----AlarmModel::turnOffPreWakeup()"); // TODO: clean up this log
         return alarms::AlarmServiceAPI::requestTurnOffPreWakeUp(app);
+    }
+
+    bool AlarmModel::turnOffPreWakeUpFrontLight()
+    {
+        LOG_ERROR("----AlarmModel::turnOffPreWakeUpFrontLight()"); // TODO: clean up this log
+        return alarms::AlarmServiceAPI::requestTurnOffPreWakeUpFrontLightOnly(app);
     }
 
     alarms::AlarmStatus AlarmModel::getAlarmStatus()

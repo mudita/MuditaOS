@@ -514,6 +514,7 @@ namespace alarms
     {
         return false;
     }
-    void AlarmOperationsCommon::turnOffPreWakeUp(OnTurnOffPreWakeUp callback)
+
+    void AlarmOperationsCommon::turnOffPreWakeUp(OnTurnOffPreWakeUp callback, bool disableOnlyFrontLight)
     {}
 } // namespace alarms

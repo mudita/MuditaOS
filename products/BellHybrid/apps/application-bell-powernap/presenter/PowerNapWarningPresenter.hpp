@@ -4,6 +4,7 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
+#include <common/models/AbstractAlarmModel.hpp>
 
 namespace app
 {
@@ -23,16 +24,19 @@ namespace app::powernap
         class Presenter : public BasePresenter<PowerNapWarningContract::View>
         {
           public:
-            virtual void activate() = 0;
+            virtual void activate()                          = 0;
+            virtual bool handleIfPreWakeupIsToTurnOffFirst() = 0;
         };
     };
 
     class PowerNapWarningPresenter : public PowerNapWarningContract::Presenter
     {
         app::ApplicationCommon *app{nullptr};
+        AbstractAlarmModel &alarmModel;
         void activate() override;
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
 
       public:
-        explicit PowerNapWarningPresenter(app::ApplicationCommon *app);
+        explicit PowerNapWarningPresenter(app::ApplicationCommon *app, AbstractAlarmModel &alarm);
     };
 } // namespace app::powernap

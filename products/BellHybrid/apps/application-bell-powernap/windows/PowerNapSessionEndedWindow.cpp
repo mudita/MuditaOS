@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapSessionEndedWindow.hpp"
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
 #include <gui/widgets/Icon.hpp>
+#include <keymap/KeyMap.hpp>
 
 namespace gui
 {
@@ -40,5 +41,14 @@ namespace gui
             presenter->activate();
             return true;
         };
+    }
+    bool PowerNapSessionEndedWindow::onInput(const InputEvent &inputEvent)
+    {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            presenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
+        return WindowWithTimer::onInput(inputEvent);
     }
 } // namespace gui

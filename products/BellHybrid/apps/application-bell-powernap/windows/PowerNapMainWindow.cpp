@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapMainWindow.hpp"
 #include <Style.hpp>
 #include <SideListView.hpp>
 #include <gui/input/InputEvent.hpp>
+#include <keymap/KeyMap.hpp>
 
 namespace gui
 {
@@ -31,6 +32,11 @@ namespace gui
 
     bool PowerNapMainWindow::onInput(const gui::InputEvent &inputEvent)
     {
+        const auto key = mapKey(inputEvent.getKeyCode());
+        if (inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            windowPresenter->handleIfPreWakeupIsToTurnOffFirst()) {
+            return true;
+        }
         if (sideListView->onInput(inputEvent)) {
             return true;
         }

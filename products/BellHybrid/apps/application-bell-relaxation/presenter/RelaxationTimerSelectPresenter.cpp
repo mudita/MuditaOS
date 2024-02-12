@@ -19,8 +19,9 @@ namespace app::relaxation
 {
     RelaxationTimerSelectPresenter::RelaxationTimerSelectPresenter(settings::Settings *settings,
                                                                    AbstractBatteryModel &batteryModel,
-                                                                   AbstractLowBatteryInfoModel &lowBatteryInfoModel)
-        : settings{settings}, batteryModel{batteryModel}, lowBatteryInfoModel{lowBatteryInfoModel}
+                                                                   AbstractLowBatteryInfoModel &lowBatteryInfoModel,
+                                                                   AbstractAlarmModel &alarm)
+        : settings{settings}, batteryModel{batteryModel}, lowBatteryInfoModel{lowBatteryInfoModel}, alarmModel{alarm}
     {}
 
     const RelaxationTimerSelectContract::Range &RelaxationTimerSelectPresenter::getTimerValuesRange() const noexcept
@@ -65,6 +66,15 @@ namespace app::relaxation
     void RelaxationTimerSelectPresenter::handleLowBatteryWindow()
     {
         lowBatteryInfoModel.handleInfo();
+    }
+
+    bool RelaxationTimerSelectPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 
 } // namespace app::relaxation

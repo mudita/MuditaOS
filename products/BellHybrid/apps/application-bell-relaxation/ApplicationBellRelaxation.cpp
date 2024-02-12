@@ -85,7 +85,7 @@ namespace app
 
     void ApplicationBellRelaxation::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
             const auto paths = std::map<relaxation::MusicType, std::string>{
                 {relaxation::MusicType::Relaxation, paths::audio::proprietary() / paths::audio::relaxation()},
                 {relaxation::MusicType::ColorsOfNoise, paths::audio::proprietary() / paths::audio::colorOfNoises()},
@@ -93,13 +93,14 @@ namespace app
 
             auto soundsRepository = std::make_unique<relaxation::RelaxationSongsRepository>(app, paths);
             auto songsModel = std::make_unique<relaxation::RelaxationSongsModel>(app, std::move(soundsRepository));
-            auto presenter  = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(songsModel));
+            auto presenter =
+                std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(songsModel), *alarmModel);
             return std::make_unique<gui::RelaxationMainWindow>(app, std::move(presenter));
         });
         windowsFactory.attach(gui::window::name::relaxationTimerSelect,
                               [this](ApplicationCommon *app, const std::string &name) {
                                   auto presenter = std::make_unique<relaxation::RelaxationTimerSelectPresenter>(
-                                      settings.get(), *batteryModel, *lowBatteryInfoModel);
+                                      settings.get(), *batteryModel, *lowBatteryInfoModel, *alarmModel);
                                   return std::make_unique<gui::RelaxationTimerSelectWindow>(app, std::move(presenter));
                               });
 
@@ -119,17 +120,19 @@ namespace app
                                   return std::make_unique<gui::RelaxationRunningLoopWindow>(app, std::move(presenter));
                               });
 
-        windowsFactory.attach(gui::window::name::relaxationPaused, [this](ApplicationCommon *app, const std::string &name) {
-            auto timeModel = std::make_unique<app::TimeModel>();
-            auto presenter = std::make_unique<relaxation::RelaxationPausedPresenter>(std::move(timeModel), *alarmModel);
-            return std::make_unique<gui::RelaxationPausedWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(
+            gui::window::name::relaxationPaused, [this](ApplicationCommon *app, const std::string &name) {
+                auto timeModel = std::make_unique<app::TimeModel>();
+                auto presenter =
+                    std::make_unique<relaxation::RelaxationPausedPresenter>(std::move(timeModel), *alarmModel);
+                return std::make_unique<gui::RelaxationPausedWindow>(app, std::move(presenter));
+            });
 
-        windowsFactory.attach(gui::popup::window::volume_window,
-                              [this](ApplicationCommon *app, const std::string &name) {
-                                  auto presenter = std::make_unique<relaxation::RelaxationVolumePresenter>(*audioModel, *alarmModel);
-                                  return std::make_unique<gui::RelaxationVolumeWindow>(app, std::move(presenter));
-                              });
+        windowsFactory.attach(
+            gui::popup::window::volume_window, [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<relaxation::RelaxationVolumePresenter>(*audioModel, *alarmModel);
+                return std::make_unique<gui::RelaxationVolumeWindow>(app, std::move(presenter));
+            });
 
         windowsFactory.attach(gui::window::name::relaxationEnded, [](ApplicationCommon *app, const std::string &name) {
             auto presenter = std::make_unique<relaxation::RelaxationEndedPresenter>(app);
@@ -141,10 +144,11 @@ namespace app
                                   return std::make_unique<gui::AppsBatteryStatusWindow>(app, name);
                               });
 
-        windowsFactory.attach(gui::window::name::relaxationError, [](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<relaxation::RelaxationErrorPresenter>(app);
-            return std::make_unique<gui::RelaxationErrorWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(
+            gui::window::name::relaxationError, [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<relaxation::RelaxationErrorPresenter>(app, *alarmModel);
+                return std::make_unique<gui::RelaxationErrorWindow>(app, std::move(presenter));
+            });
 
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,

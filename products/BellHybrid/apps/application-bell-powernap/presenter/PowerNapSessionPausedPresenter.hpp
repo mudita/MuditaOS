@@ -11,9 +11,9 @@ namespace app
     class ApplicationCommon;
 }
 
-namespace app::relaxation
+namespace app::powernap
 {
-    class RelaxationErrorContract
+    class PowerNapSessionPausedContract
     {
       public:
         class View
@@ -21,22 +21,20 @@ namespace app::relaxation
           public:
             virtual ~View() = default;
         };
-        class Presenter : public BasePresenter<RelaxationErrorContract::View>
+        class Presenter : public BasePresenter<PowerNapSessionPausedContract::View>
         {
           public:
-            virtual void activate() = 0;
             virtual bool handleIfPreWakeupIsToTurnOffFirst() = 0;
         };
     };
 
-    class RelaxationErrorPresenter : public RelaxationErrorContract::Presenter
+    class PowerNapSessionPausedPresenter : public PowerNapSessionPausedContract::Presenter
     {
         app::ApplicationCommon *app{};
         AbstractAlarmModel &alarmModel;
-        void activate() override;
         bool handleIfPreWakeupIsToTurnOffFirst() override;
 
       public:
-        explicit RelaxationErrorPresenter(app::ApplicationCommon *app, AbstractAlarmModel &alarm);
+        explicit PowerNapSessionPausedPresenter(app::ApplicationCommon *app, AbstractAlarmModel &alarm);
     };
-} // namespace app::relaxation
+} // namespace app::powernap

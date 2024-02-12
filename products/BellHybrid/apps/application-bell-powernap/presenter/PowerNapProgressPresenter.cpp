@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapProgressPresenter.hpp"
@@ -24,11 +24,13 @@ namespace app::powernap
                                                          AbstractAudioModel &audioModel,
                                                          std::unique_ptr<AbstractTimeModel> timeModel,
                                                          std::unique_ptr<PowerNapFrontlightModel> frontlightModel,
-                                                         const std::chrono::seconds &powerNapAlarmDuration)
+                                                         const std::chrono::seconds &powerNapAlarmDuration,
+                                                         AbstractAlarmModel &alarm)
         : app{app}, settings{settings}, soundsRepository{std::move(soundsRepository)},
           audioModel{audioModel}, timeModel{std::move(timeModel)}, frontlightModel{std::move(frontlightModel)},
           napAlarmTimer{sys::TimerFactory::createSingleShotTimer(
-              app, powerNapAlarmTimerName, powerNapAlarmDuration, [this](sys::Timer &) { onNapAlarmFinished(); })}
+              app, powerNapAlarmTimerName, powerNapAlarmDuration, [this](sys::Timer &) { onNapAlarmFinished(); })},
+          alarmModel{alarm}
 
     {}
 
@@ -124,5 +126,14 @@ namespace app::powernap
     bool PowerNapProgressPresenter::isTimerStopped()
     {
         return timer->isStopped();
+    }
+
+    bool PowerNapProgressPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 } // namespace app::powernap

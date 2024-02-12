@@ -73,7 +73,7 @@ namespace alarms
         virtual void addCheckIfPhoneCallIsOngoingCallback(CheckIfPhoneCallIsOngoing)                         = 0;
         virtual void addAlarmDuringPhoneCallCallback(OnAlarmDuringPhoneCall)                                 = 0;
         virtual bool isPreWakeUpActive()                                                                     = 0;
-        virtual void turnOffPreWakeUp(OnTurnOffPreWakeUp)                                                    = 0;
+        virtual void turnOffPreWakeUp(OnTurnOffPreWakeUp, bool disableOnlyFrontLight)                        = 0;
     };
 
     class IAlarmOperationsFactory
@@ -123,7 +123,7 @@ namespace alarms
         void addCheckIfPhoneCallIsOngoingCallback(CheckIfPhoneCallIsOngoing callback) override;
         void addAlarmDuringPhoneCallCallback(OnAlarmDuringPhoneCall callback) override;
         bool isPreWakeUpActive() override;
-        void turnOffPreWakeUp(OnTurnOffPreWakeUp callback) override;
+        void turnOffPreWakeUp(OnTurnOffPreWakeUp callback, bool disableOnlyFrontLight) override;
 
       protected:
         std::unique_ptr<AbstractAlarmEventsRepository> alarmEventsRepo;

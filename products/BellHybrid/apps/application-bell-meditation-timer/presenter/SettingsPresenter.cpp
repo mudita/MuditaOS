@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsPresenter.hpp"
@@ -60,9 +60,10 @@ namespace app::meditation
     SettingsPresenter::SettingsPresenter(models::ChimeInterval &chimeIntervalModel,
                                          models::ChimeVolume &chimeVolumeModel,
                                          models::StartDelay &startDelayModel,
-                                         AbstractAudioModel &audioModel)
+                                         AbstractAudioModel &audioModel,
+                                         AbstractAlarmModel &alarm)
         : chimeIntervalModel{chimeIntervalModel}, chimeVolumeModel{chimeVolumeModel}, startDelayModel{startDelayModel},
-          audioModel{audioModel}
+          audioModel{audioModel}, alarmModel{alarm}
     {
 
         auto chimeInterval =
@@ -141,6 +142,15 @@ namespace app::meditation
         this->stopSound();
         chimeVolumeModel.restoreDefault();
         eraseProviderData();
+    }
+
+    bool SettingsPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 
 } // namespace app::meditation

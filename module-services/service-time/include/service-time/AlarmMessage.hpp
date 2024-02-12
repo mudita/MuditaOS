@@ -289,7 +289,9 @@ namespace alarms
     class TurnOffPreWakeUpRequestMessage : public AlarmMessage
     {
       public:
-        TurnOffPreWakeUpRequestMessage(){};
+        TurnOffPreWakeUpRequestMessage(const bool turnOffOnlyFrontLight = false)
+            : turnOffOnlyFrontLight(turnOffOnlyFrontLight){};
+        const bool turnOffOnlyFrontLight{};
     };
 
     class TurnOffPreWakeUpResponseMessage : public AlarmResponse

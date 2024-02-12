@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,6 +10,7 @@
 #include <time/time_locale.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <memory>
+#include <common/models/AbstractAlarmModel.hpp>
 
 namespace app
 {
@@ -59,6 +60,7 @@ namespace app::powernap
             virtual void handleUpdateTimeEvent()                                    = 0;
             virtual bool isNapFinished()                                            = 0;
             virtual void onBeforeShow()                                             = 0;
+            virtual bool handleIfPreWakeupIsToTurnOffFirst()                        = 0;
         };
     };
 
@@ -72,6 +74,7 @@ namespace app::powernap
         std::unique_ptr<AbstractTimeModel> timeModel;
         std::unique_ptr<PowerNapFrontlightModel> frontlightModel;
         sys::TimerHandle napAlarmTimer;
+        AbstractAlarmModel &alarmModel;
         bool napFinished{false};
 
         static constexpr auto endWindowTimeout = std::chrono::seconds{5};
@@ -83,7 +86,8 @@ namespace app::powernap
                                   AbstractAudioModel &audioModel,
                                   std::unique_ptr<AbstractTimeModel> timeModel,
                                   std::unique_ptr<PowerNapFrontlightModel> frontlightModel,
-                                  const std::chrono::seconds &powerNapAlarmDuration);
+                                  const std::chrono::seconds &powerNapAlarmDuration,
+                                  AbstractAlarmModel &alarm);
 
         void activate() override;
         void endNap() override;
@@ -98,5 +102,6 @@ namespace app::powernap
         void onNapFinished();
         void onNapAlarmFinished();
         void onBeforeShow() override;
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
     };
 } // namespace app::powernap

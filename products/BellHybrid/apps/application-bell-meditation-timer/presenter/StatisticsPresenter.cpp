@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StatisticsPresenter.hpp"
@@ -23,8 +23,10 @@ namespace
 
 namespace app::meditation
 {
-    StatisticsPresenter::StatisticsPresenter(app::ApplicationCommon *app, const models::Statistics &statisticsModel)
-        : app{app}
+    StatisticsPresenter::StatisticsPresenter(app::ApplicationCommon *app,
+                                             const models::Statistics &statisticsModel,
+                                             AbstractAlarmModel &alarm)
+        : app{app}, alarmModel{alarm}
     {
         BellListItemProvider::Items listItems;
         for (const auto e : std::array<std::uint32_t, 3>{7, 30, 365}) {
@@ -51,5 +53,13 @@ namespace app::meditation
     void StatisticsPresenter::handleExit()
     {
         app->returnToPreviousWindow();
+    }
+    bool StatisticsPresenter::handleIfPreWakeupIsToTurnOffFirst()
+    {
+        if (alarmModel.isPreWakeUpActive()) {
+            alarmModel.turnOffPreWakeUp();
+            return true;
+        }
+        return false;
     }
 } // namespace app::meditation

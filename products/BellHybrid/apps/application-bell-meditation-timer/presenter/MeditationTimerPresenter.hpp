@@ -7,6 +7,7 @@
 #include <apps-common/BasePresenter.hpp>
 #include <common/models/BatteryModel.hpp>
 #include <common/models/LowBatteryInfoModel.hpp>
+#include <common/models/AbstractAlarmModel.hpp>
 
 namespace app
 {
@@ -39,6 +40,7 @@ namespace app::meditation
             virtual std::uint8_t getCurrentValue()                   = 0;
             virtual std::string getTimeUnitName(std::uint32_t value) = 0;
             virtual void activate(std::uint32_t value)               = 0;
+            virtual bool handleIfPreWakeupIsToTurnOffFirst()         = 0;
         };
     };
 
@@ -48,7 +50,8 @@ namespace app::meditation
         MeditationTimerPresenter(app::ApplicationCommon *app,
                                  settings::Settings *settings,
                                  AbstractBatteryModel &batteryModel,
-                                 AbstractLowBatteryInfoModel &lowBatteryInfoModel);
+                                 AbstractLowBatteryInfoModel &lowBatteryInfoModel,
+                                 AbstractAlarmModel &alarm);
 
         std::uint8_t getMinValue() override;
         std::uint8_t getMaxValue() override;
@@ -56,11 +59,13 @@ namespace app::meditation
         std::uint8_t getCurrentValue() override;
         std::string getTimeUnitName(std::uint32_t value) override;
         void activate(std::uint32_t value) override;
+        bool handleIfPreWakeupIsToTurnOffFirst() override;
 
       private:
         app::ApplicationCommon *app{nullptr};
         settings::Settings *settings{nullptr};
         AbstractBatteryModel &batteryModel;
         AbstractLowBatteryInfoModel &lowBatteryInfoModel;
+        AbstractAlarmModel &alarmModel;
     };
 } // namespace app::meditation

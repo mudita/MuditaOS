@@ -11,9 +11,9 @@ namespace app
     class ApplicationCommon;
 }
 
-namespace app::relaxation
+namespace app::meditation
 {
-    class RelaxationErrorContract
+    class MeditationBasicsContract
     {
       public:
         class View
@@ -21,22 +21,20 @@ namespace app::relaxation
           public:
             virtual ~View() = default;
         };
-        class Presenter : public BasePresenter<RelaxationErrorContract::View>
+        class Presenter : public BasePresenter<MeditationBasicsContract::View>
         {
           public:
-            virtual void activate() = 0;
             virtual bool handleIfPreWakeupIsToTurnOffFirst() = 0;
         };
     };
 
-    class RelaxationErrorPresenter : public RelaxationErrorContract::Presenter
+    class MeditationBasicsPresenter : public MeditationBasicsContract::Presenter
     {
         app::ApplicationCommon *app{};
         AbstractAlarmModel &alarmModel;
-        void activate() override;
         bool handleIfPreWakeupIsToTurnOffFirst() override;
 
       public:
-        explicit RelaxationErrorPresenter(app::ApplicationCommon *app, AbstractAlarmModel &alarm);
+        explicit MeditationBasicsPresenter(app::ApplicationCommon *app, AbstractAlarmModel &alarm);
     };
-} // namespace app::relaxation
+} // namespace app::meditation
