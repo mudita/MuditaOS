@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,6 +11,7 @@ namespace gui
         constexpr auto ClassicWithBattery   = "ClassicWithBattery";
         constexpr auto ClassicWithAmPm      = "ClassicWithAmPm";
         constexpr auto ClassicWithDate      = "ClassicWithDate";
+        constexpr auto ClassicWithQuotes    = "ClassicWithQuotes";
         constexpr auto VerticalSimple       = "VerticalSimple";
         constexpr auto VerticalWithDate     = "VerticalWithDate";
         constexpr auto VerticalWithAmPm     = "VerticalWithAmPm";
