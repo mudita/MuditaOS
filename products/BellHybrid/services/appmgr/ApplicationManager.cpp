@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <appmgr/ApplicationManager.hpp>
@@ -64,11 +64,6 @@ namespace app::manager
         }
     }
 
-    auto ApplicationManager::handleDisplayLanguageChange(app::manager::DisplayLanguageChangeRequest *msg) -> bool
-    {
-        return ApplicationManagerCommon::handleDisplayLanguageChange(msg);
-    }
-
     void ApplicationManager::registerMessageHandlers()
     {
         ApplicationManagerCommon::registerMessageHandlers();
@@ -110,6 +105,11 @@ namespace app::manager
                 break;
             }
 
+            return sys::msgHandled();
+        });
+
+        connect(typeid(InformDateChanged), [this]([[maybe_unused]] sys::Message *request) {
+            DBServiceAPI::InformDateChanged(this);
             return sys::msgHandled();
         });
 

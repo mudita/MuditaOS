@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellSettings.hpp"
@@ -99,8 +99,9 @@ namespace app
             gui::window::name::bellSettingsLayout, [this](ApplicationCommon *app, const std::string &name) {
                 auto layoutModel = std::make_unique<bell_settings::LayoutModel>(this);
                 auto timeModel   = std::make_unique<app::TimeModel>();
+                auto quoteModel  = std::make_unique<app::QuoteModel>(this);
                 auto presenter   = std::make_unique<bell_settings::LayoutWindowPresenter>(
-                    this, std::move(layoutModel), std::move(timeModel));
+                    this, std::move(layoutModel), std::move(timeModel), std::move(quoteModel));
                 return std::make_unique<gui::BellSettingsLayoutWindow>(app, std::move(presenter), name);
             });
 

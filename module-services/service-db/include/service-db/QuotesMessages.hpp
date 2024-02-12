@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,7 +15,7 @@ namespace Quotes
 {
     struct CategoryRecord
     {
-        unsigned int category_id;
+        std::int32_t category_id;
         std::string category_name;
         bool enabled;
 
@@ -39,7 +39,7 @@ namespace Quotes
 
     struct QuoteRecord
     {
-        unsigned int quote_id;
+        std::int32_t quote_id;
         std::string quote;
         std::string author;
         bool enabled;
@@ -54,6 +54,37 @@ namespace Quotes
             enabled  = (*query)[3].getBool();
         }
     };
+
+    struct IdQuoteAuthorRecord
+    {
+        std::int32_t quote_id;
+        std::string quote;
+        std::string author;
+
+        IdQuoteAuthorRecord() = default;
+
+        explicit IdQuoteAuthorRecord(QueryResult *query)
+        {
+            quote_id = (*query)[0].getInt32();
+            quote    = (*query)[1].getString();
+            author   = (*query)[2].getString();
+        }
+    };
+
+    struct IdRecord
+    {
+        std::int32_t quote_id;
+
+        IdRecord() = default;
+
+        explicit IdRecord(QueryResult *query)
+        {
+            quote_id = (*query)[0].getInt32();
+        }
+    };
+
+    struct IdsList : PagedData<IdRecord>
+    {};
 
     struct QuotesList : PagedData<QuoteRecord>
     {};
@@ -309,12 +340,24 @@ namespace Quotes
         class InformLanguageChangeRequest : public db::Query
         {
           public:
-            InformLanguageChangeRequest() : Query(Query::Type::Read)
+            explicit InformLanguageChangeRequest() : Query(Query::Type::Read)
             {}
 
             auto debugInfo() const -> std::string
             {
                 return "InformLanguageChangeRequest";
+            }
+        };
+
+        class InformDateChanged : public db::Query
+        {
+          public:
+            explicit InformDateChanged() : Query(Query::Type::Read)
+            {}
+
+            auto debugInfo() const -> std::string
+            {
+                return "InformDateChanged";
             }
         };
 

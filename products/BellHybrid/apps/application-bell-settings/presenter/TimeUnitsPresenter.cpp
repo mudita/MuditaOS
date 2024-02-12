@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/TemperatureUnitModel.hpp"
@@ -10,6 +10,7 @@
 
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
+#include <service-appmgr/messages/InformDateChanged.hpp>
 
 namespace
 {
@@ -65,6 +66,10 @@ namespace app::bell_settings
                 auto layoutChangeRequest = std::make_shared<ChangeHomescreenLayoutMessage>(fallbackLayout);
                 app->bus.sendUnicast(layoutChangeRequest, service::name::appmgr);
             }
+        }
+        if (pagesProvider->isDateChanged()) {
+            auto msg = std::make_shared<app::manager::InformDateChanged>();
+            app->bus.sendUnicast(std::move(msg), service::name::appmgr);
         }
     }
 

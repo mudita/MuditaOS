@@ -8,6 +8,10 @@ target_sources(databases
         ServiceDB.cpp
         BellFactorySettings.cpp
         agents/MeditationStatsAgent.cpp
+        agents/QuotesAgent.cpp
+        agents/ShuffleQuoteModel.cpp
+        agents/QuotesAgent.hpp
+        agents/ShuffleQuoteModel.hpp
     PUBLIC
         include/db/ServiceDB.hpp
         include/db/SystemSettings.hpp
@@ -17,6 +21,7 @@ target_sources(databases
 target_include_directories(databases
     PUBLIC
         include
+        agents
 )
 
 target_link_libraries(databases

@@ -1,9 +1,8 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LayoutWindowPresenter.hpp"
 #include <service-appmgr/Controller.hpp>
-#include <common/layouts/HomeScreenLayouts.hpp>
 #include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 
@@ -27,8 +26,10 @@ namespace app::bell_settings
 {
     LayoutWindowPresenter::LayoutWindowPresenter(app::ApplicationCommon *app,
                                                  std::unique_ptr<AbstractLayoutModel> &&layoutModel,
-                                                 std::unique_ptr<AbstractTimeModel> &&timeModel)
-        : app(app), layoutModel{std::move(layoutModel)}, timeModel{std::move(timeModel)}
+                                                 std::unique_ptr<AbstractTimeModel> &&timeModel,
+                                                 std::unique_ptr<AbstractQuoteModel> &&quoteModel)
+        : app(app), layoutModel{std::move(layoutModel)}, timeModel{std::move(timeModel)}, quoteModel{
+                                                                                              std::move(quoteModel)}
     {
         initLayoutOptions();
     }
@@ -37,8 +38,8 @@ namespace app::bell_settings
     {
         std::vector<gui::Item *> layouts;
 
-        for (auto const &option : layoutOptions) {
-            layouts.push_back(option.first);
+        for (auto const &[option, _] : layoutOptions) {
+            layouts.push_back(option->getLayout());
         }
 
         return layouts;
@@ -48,21 +49,21 @@ namespace app::bell_settings
     {
         const auto layoutSelected = layoutModel->getValue();
 
-        for (auto const &option : layoutOptions) {
-            if (option.second == layoutSelected) {
-                return option.first;
+        for (auto const &[option, name] : layoutOptions) {
+            if (name == layoutSelected) {
+                return option->getLayout();
             }
         }
 
-        return layoutOptions.at(0).first;
+        return layoutOptions.at(0).first->getLayout();
     }
 
     void LayoutWindowPresenter::setLayout(gui::Item *selectedLayout)
     {
-        for (auto const &option : layoutOptions) {
-            if (option.first == selectedLayout) {
-                layoutModel->setValue(option.second);
-                auto layoutChangeRequest = std::make_shared<ChangeHomescreenLayoutMessage>(option.second);
+        for (auto const &[option, name] : layoutOptions) {
+            if (option->getLayout() == selectedLayout) {
+                layoutModel->setValue(name);
+                auto layoutChangeRequest = std::make_shared<ChangeHomescreenLayoutMessage>(name);
                 app->bus.sendUnicast(layoutChangeRequest, service::name::appmgr);
                 break;
             }
@@ -71,6 +72,12 @@ namespace app::bell_settings
 
     void LayoutWindowPresenter::initLayoutOptions()
     {
+        quoteModel->setCallback([=](std::string quote, std::string author) {
+            for (auto &[layout, _] : layoutOptions) {
+                layout->setQuoteText(quote, author);
+            }
+        });
+        quoteModel->sendQuery();
         const auto timeFormat = timeModel->getTimeFormat();
         auto layoutsList      = timeFormat == utils::time::Locale::TimeFormat::FormatTime24H
                                     ? gui::factory::getLayoutsFormat24h()
@@ -85,7 +92,7 @@ namespace app::bell_settings
             layout->setAlarmTime(alarmTime);
             layout->setBatteryLevelState(batteryState);
             layout->setTemperature(temperature);
-            layoutOptions.push_back({layout->getLayout(), layoutEntry.first});
+            layoutOptions.push_back({layout, layoutEntry.first});
         }
     }
 } // namespace app::bell_settings

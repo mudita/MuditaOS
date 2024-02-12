@@ -62,5 +62,6 @@ namespace gui
         virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt){};
         virtual void setSnoozeFormat(utils::time::Locale::TimeFormat fmt){};
         virtual void setSnoozeTime(std::time_t newTime){};
+        virtual void setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor){};
     };
 }; // namespace gui

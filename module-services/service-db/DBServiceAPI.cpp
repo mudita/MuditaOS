@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-db/DBServiceAPI.hpp"
@@ -308,6 +308,12 @@ bool DBServiceAPI::AddSMS(sys::Service *serv, const SMSRecord &record, std::uniq
 void DBServiceAPI::InformLanguageChanged(sys::Service *serv)
 {
     auto query = std::make_unique<Quotes::Messages::InformLanguageChangeRequest>();
+    DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+}
+
+void DBServiceAPI::InformDateChanged(sys::Service *serv)
+{
+    auto query = std::make_unique<Quotes::Messages::InformDateChanged>();
     DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
 }
 
