@@ -21,6 +21,8 @@ namespace gui
         Text *quotes{nullptr};
         Text *author{nullptr};
         TextFixedSize *ampm{nullptr};
+        VBox *imgBox{nullptr};
+        Image *quoteImg{nullptr};
         bool showAMPM{false};
     };
 }; // namespace gui

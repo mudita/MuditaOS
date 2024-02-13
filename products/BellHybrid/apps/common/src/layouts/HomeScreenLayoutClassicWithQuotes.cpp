@@ -14,7 +14,9 @@
 
 namespace
 {
-    constexpr inline gui::Length maxTimeHeight{148U};
+    constexpr auto quoteImageName{"bell_quote"};
+    constexpr auto maxTimeBoxHeight{148U};
+    constexpr auto imgBoxHeight{52U};
 }; // namespace
 
 namespace gui
@@ -29,9 +31,10 @@ namespace gui
     {
         using namespace bellMainStyle;
 
+        timeHBox->setMaximumHeight(maxTimeBoxHeight);
         timeHBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
-        time->setMaximumHeight(maxTimeHeight);
+        time->setMaximumHeight(maxTimeBoxHeight);
         time->setFont(style::window::font::huge);
         time->setMargins({mainWindow::ampm::time_margin_w, 0, 0, 0});
 
@@ -44,6 +47,15 @@ namespace gui
         ampm->setEdges(RectangleEdge::None);
         ampm->activeItem = false;
         ampm->drawUnderline(false);
+
+        imgBox = new VBox(this->centerBox);
+        imgBox->setMinimumSize(style::homescreen_classic::status_box_layout_w, imgBoxHeight);
+        imgBox->setEdges(RectangleEdge::None);
+        imgBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        imgBox->setVisible(true);
+
+        quoteImg = new Image(imgBox, quoteImageName, gui::ImageTypeSpecifier::W_M);
+        quoteImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
         resizeItems();
     }
