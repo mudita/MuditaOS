@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+# Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 function validate_product_selection() {
@@ -28,10 +28,10 @@ if validate_product_selection; then
     cd "$parent_path"
 
     mkdir -p ${DESTINATION}
+    cp products/${PRODUCT}/scripts/*.lua ${DESTINATION}
     cp -r products/${PRODUCT}/assets ${DESTINATION}/assets/
     cp -r share ${DESTINATION}/share
     cp -r migration/migration.lua ${DESTINATION}/share
-    cp *.lua ${DESTINATION}
     rm ${DESTINATION}/update_udm.lua
     cd -
 fi

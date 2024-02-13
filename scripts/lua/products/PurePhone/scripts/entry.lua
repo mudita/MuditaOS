@@ -83,4 +83,3 @@ print_boot_reason()
 local boot_reason, boot_reason_str = handle_boot_reason()
 local status, message = invoke_script(boot_reason)
 handle_exit(boot_reason_str, status, message)
-

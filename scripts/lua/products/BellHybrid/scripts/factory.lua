@@ -7,6 +7,7 @@ factory.script_name = "factory.lua"
 factory.img_in_progress = "assets/gui_image_factory_reset_in_progress.bin"
 factory.img_success = "assets/gui_image_factory_reset_success.bin"
 factory.img_failure = "assets/gui_image_factory_reset_failed.bin"
+factory.img_in_progress_wait = true
 
 local function remove_old_databases()
     print(string.format("Removing old databases from '%s'", paths.db_dir))

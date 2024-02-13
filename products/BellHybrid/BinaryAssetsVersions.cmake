@@ -1,6 +1,6 @@
 # This file sets versions of downloaded binaries for release packaging purposes
 
-if( NOT DEFINED ECOBOOT_BIN_VERSION)
+if (NOT DEFINED ECOBOOT_BIN_VERSION)
     set(ECOBOOT_BIN_VERSION 2.0.8 CACHE STRING "bootloader binary version to download from bootloader release page")
 endif()
 
