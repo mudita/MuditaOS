@@ -13,13 +13,13 @@ namespace
     // 4kB is too small because internally drflac_open() uses cache which by default has 4kB.
     // Alternatively smaller DR_FLAC_BUFFER_SIZE could be defined.
     constexpr auto serviceAudioStackSize = 1024 * 8;
-    constexpr auto defaultVolume        = "11";
-    constexpr auto defaultSnoozeVolume  = "10";
-    constexpr auto defaultBedtimeVolume = "12";
-    constexpr auto maxVolumeToSet       = 15.f;
-    constexpr auto minVolumeToSet       = 0.f;
-    constexpr auto profileType          = audio::Profile::Type::PlaybackLoudspeaker;
-    constexpr auto volumeSetting        = audio::Setting::Volume;
+    constexpr auto defaultVolume         = "11";
+    constexpr auto defaultSnoozeVolume   = "10";
+    constexpr auto defaultBedtimeVolume  = "12";
+    constexpr auto maxVolumeToSet        = 15.f;
+    constexpr auto minVolumeToSet        = 0.f;
+    constexpr auto profileType           = audio::Profile::Type::PlaybackLoudspeaker;
+    constexpr auto volumeSetting         = audio::Setting::Volume;
 
     namespace initializer
     {
@@ -133,8 +133,7 @@ namespace service
     }
 
     Audio::~Audio()
-    {
-    }
+    {}
 
     sys::MessagePointer Audio::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msgl,
                                                    [[maybe_unused]] sys::ResponseMessage *resp)
@@ -197,18 +196,23 @@ namespace service
         return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
     }
 
-    auto Audio::handleStop([[maybe_unused]] const std::vector<audio::PlaybackType> &stopTypes,
-                           const audio::Token &token) -> std::unique_ptr<AudioResponseMessage>
+    auto Audio::handleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
+        -> std::unique_ptr<AudioResponseMessage>
     {
         std::vector<std::pair<audio::Token, audio::RetCode>> retCodes;
 
+        // if stopType is not provided then stop all inputs otherwise stop specific ones from stopType
         for (auto &input : audioMux.GetAllInputs()) {
-            auto t = input.token;
-            if (token.IsValid() && t == token) {
-                retCodes.emplace_back(t, stopInput(&input));
-            }
-            if (token.IsUninitialized()) {
-                retCodes.emplace_back(t, stopInput(&input));
+            const auto &currentOperation = input.audio->GetCurrentOperation();
+            if (stopTypes.empty() ||
+                std::find(stopTypes.begin(), stopTypes.end(), currentOperation.GetPlaybackType()) != stopTypes.end()) {
+                auto t = input.token;
+                if (token.IsValid() && t == token) {
+                    retCodes.emplace_back(t, stopInput(&input));
+                }
+                if (token.IsUninitialized()) {
+                    retCodes.emplace_back(t, stopInput(&input));
+                }
             }
         }
 

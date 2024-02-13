@@ -117,6 +117,11 @@ namespace audio
         for (auto &audioInput : audioInputs) {
             auto currentPlaybackType = audioInput.audio->GetCurrentOperationPlaybackType();
             auto currentInputPrior   = GetPlaybackPriority(currentPlaybackType);
+            LOG_WARN("---AUDIO---- is it \"PreWakeUp\" type: %d",
+                     static_cast<int>(playbackType == audio::PlaybackType::PreWakeUp));
+            LOG_WARN("---AUDIO---- GetPlaybackPriority(playbackType): %d",
+                     static_cast<int>(GetPlaybackPriority(playbackType)));
+            LOG_WARN("---AUDIO----                 currentInputPrior: %d", static_cast<int>(currentInputPrior));
 
             // check busy input
             if (audioInput.audio->GetCurrentState() != Audio::State::Idle) {

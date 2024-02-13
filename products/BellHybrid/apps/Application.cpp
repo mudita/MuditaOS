@@ -17,6 +17,14 @@
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <common/popups/ChargingNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
+#include <service-evtmgr/KbdMessage.hpp>
+#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
+
+#if DEBUG_INPUT_EVENTS
+#define debug_input_events(...) LOG_DEBUG(__VA_ARGS__)
+#else
+#define debug_input_events(...)
+#endif
 
 namespace app
 {
@@ -134,7 +142,28 @@ namespace app
     sys::MessagePointer Application::handleKBDKeyEvent(sys::Message *msgl)
     {
         onKeyPressed();
-        return ApplicationCommon::handleKBDKeyEvent(msgl);
+        if (this->getState() != app::ApplicationCommon::State::ACTIVE_FORGROUND) {
+            LOG_FATAL("Terrible terrible damage! Application with no focus grabbed key!");
+        }
+        const auto msg        = static_cast<sevm::KbdMessage *>(msgl);
+        const auto inputEvent = keyTranslator->translate(msg->key);
+        const auto key        = mapKey(inputEvent.getKeyCode());
+        if (!inputEvent.is(gui::KeyCode::KEY_UNDEFINED) && inputEvent.isShortRelease() && key != KeyMap::Frontlight &&
+            key != KeyMap::DeepPressDown && key != KeyMap::DeepPressUp && alarmModel->isPreWakeUpActive()) {
+            alarmModel->turnOffPreWakeUp();
+            return sys::msgHandled();
+        }
+        if (!inputEvent.is(gui::KeyCode::KEY_UNDEFINED)) {
+            messageInputEventApplication(this, this->GetName(), inputEvent);
+        }
+
+        debug_input_events("AppInput -> K:|%s|, S:|%s|, App:|%s|, W:|%s|",
+                           magic_enum::enum_name(iev.getKeyCode()).data(),
+                           magic_enum::enum_name(iev.getState()).data(),
+                           GetName().c_str(),
+                           getCurrentWindow()->getName().c_str());
+
+        return sys::msgHandled();
     }
 
     sys::MessagePointer Application::handleApplicationSwitch(sys::Message *msgl)

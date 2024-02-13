@@ -92,10 +92,6 @@ namespace app::home_screen
             };
             auto switchToBatteryStatus = [](AbstractPresenter &presenter) { presenter.switchToBatteryStatus(); };
             auto isLowBatteryLevel     = [](AbstractPresenter &presenter) { return presenter.isLowBatteryLevel(); };
-            auto isPreWakeUpActive     = [](AbstractAlarmModel &alarmModel) -> bool {
-                return alarmModel.isPreWakeUpActive();
-            };
-            auto turnOffPreWakeUp = [](AbstractAlarmModel &alarmModel) { alarmModel.turnOffPreWakeUp(); };
 
         } // namespace Helpers
 
@@ -104,8 +100,6 @@ namespace app::home_screen
             struct BackPress
             {};
             struct LongBackPress
-            {};
-            struct FrontlightPress //TODO: delete?
             {};
             struct LightPress
             {};
@@ -132,8 +126,6 @@ namespace app::home_screen
             struct LowBatterySessionWarning
             {};
             struct LowBatteryAlarmWarning
-            {};
-            struct CancelPreWakeUp
             {};
         } // namespace Events
 
@@ -387,27 +379,16 @@ namespace app::home_screen
 
                                              "Activated"_s + sml::on_entry<_> / Activated::entry,
                                              "Activated"_s [not Helpers::isAlarmActive] = "Deactivated"_s,
-                                             //"Activated"_s + event<Events::LightPress> [not Helpers::isLowBatteryWarningToShow]/ Helpers::switchToMenu = "Activated"_s,
-                                             //"Activated"_s + event<Events::RotateLeftPress> [ not Helpers::isLowBatteryWarningToShow] = "ActivatedEdit"_s,
-                                             //"Activated"_s + event<Events::RotateLeftPress> [ Helpers::isLowBatteryWarningToShow && Helpers::isPreWakeUpActive] = "ActivatedEdit"_s,
-                                             //"Activated"_s + event<Events::RotateRightPress> [ not Helpers::isLowBatteryWarningToShow] = "ActivatedEdit"_s,
-                                             "Activated"_s + event<Events::RotateLeftPress> [ not Helpers::isLowBatteryWarningToShow ||  Helpers::isPreWakeUpActive] = "ActivatedEdit"_s,
-                                             "Activated"_s + event<Events::RotateRightPress> [ not Helpers::isLowBatteryWarningToShow ||  Helpers::isPreWakeUpActive] = "ActivatedEdit"_s,
-                                             "Activated"_s + event<Events::LightPress> [ not Helpers::isLowBatteryWarningToShow &&  not Helpers::isPreWakeUpActive ] / Helpers::switchToMenu = "Activated"_s,
-                                             //"Activated"_s + event<Events::LightPress> [ not Helpers::isLowBatteryWarningToShow &&  Helpers::isPreWakeUpActive ] / Helpers::turnOffPreWakeup,
-                                             "Activated"_s + event<Events::FrontlightPress> [ not Helpers::isLowBatteryWarningToShow && Helpers::isPreWakeUpActive ] / Helpers::turnOffPreWakeUp,
-                                             //"Activated"_s + event<Events::RotateLeftPress> = "ActivatedEdit"_s,
-                                             //"Activated"_s + event<Events::RotateRightPress> = "ActivatedEdit"_s,
+                                             "Activated"_s + event<Events::LightPress> [not Helpers::isLowBatteryWarningToShow]/ Helpers::switchToMenu = "Activated"_s,
+                                             "Activated"_s + event<Events::RotateLeftPress> [not Helpers::isLowBatteryWarningToShow] = "ActivatedEdit"_s,
+                                             "Activated"_s + event<Events::RotateRightPress> [not Helpers::isLowBatteryWarningToShow] = "ActivatedEdit"_s,
                                              "Activated"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
                                              "Activated"_s + event<Events::DeepDownPress>  = "DeactivatedWait"_s,
                                              "Activated"_s + event<Events::AlarmRinging>  = "AlarmRinging"_s,
                                              "Activated"_s + event<Events::BackPress>  / Helpers::endUserSessionWithDelay,
-                                             //"Activated"_s + event<Events::BackPress> [not Helpers::isLowBatteryWarningToShow && Helpers::isPreWakeUpActive ] / Helpers::turnOffPreWakeup,
                                              "Activated"_s + event<Events::LongBackPress> [not Helpers::isLowBatteryWarningToShow]  / Helpers::switchToBatteryStatus,
                                              "Activated"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
-                                             "Activated"_s + event<Events::LowBatterySessionWarning> [Helpers::isLowBatteryWarningToShow && not Helpers::isPreWakeUpActive] / Helpers::showLowBatteryWarning,
-                                             //"Activated"_s + event<Events::LowBatterySessionWarning> [Helpers::isLowBatteryWarningToShow && Helpers::isPreWakeUpActive] / Helpers::turnOffPreWakeup,
-                                             "Activated"_s + event<Events::CancelPreWakeUp> [Helpers::isPreWakeUpActive] / Helpers::turnOffPreWakeUp,
+                                             "Activated"_s + event<Events::LowBatterySessionWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning,
 
                                              "ActivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "ActivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
@@ -415,9 +396,7 @@ namespace app::home_screen
                                              "ActivatedEdit"_s + event<Events::Timer> / AlarmEdit::revertChanges = "Activated"_s,
                                              "ActivatedEdit"_s + event<Events::RotateLeftPress> / AlarmEdit::processRotateLeft,
                                              "ActivatedEdit"_s + event<Events::RotateRightPress> / AlarmEdit::processRotateRight,
-                                             //"ActivatedEdit"_s + event<Events::LightPress> [ Helpers::isPreWakeUpActive ] / Helpers::turnOffPreWakeup,
                                              "ActivatedEdit"_s + event<Events::LightPress> / Helpers::setNewAlarmTime = "ActivatedWait"_s,
-                                             //"ActivatedEdit"_s + event<Events::LightPress> [ Helpers::isLowBatteryWarningToShow ] / Helpers::showLowBatteryWarning,
                                              "ActivatedEdit"_s + event<Events::BackPress> / AlarmEdit::revertChanges = "Activated"_s,
                                              "ActivatedEdit"_s + event<Events::DeepDownPress> / AlarmEdit::revertChanges = "DeactivatedWait"_s,
                                              "ActivatedEdit"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
@@ -562,9 +541,6 @@ namespace app::home_screen
                 pimpl->sm->process_event(Events::BackPress{});
             }
             break;
-        case KeyMap::Frontlight: //TODO: delete
-            pimpl->sm->process_event(Events::FrontlightPress{});
-            break;
         case KeyMap::LightPress:
             pimpl->sm->process_event(Events::LightPress{});
             break;
@@ -589,13 +565,6 @@ namespace app::home_screen
 
         if (key != KeyMap::DeepPressUp && key != KeyMap::DeepPressDown && presenter.isLowBatteryWarningNeeded()) {
             pimpl->sm->process_event(Events::LowBatterySessionWarning{});
-            //pimpl->sm->process_event(Events::LowBatteryWarning{});
-        }
-
-        // DeepPress already switching off the Pre-wake upp
-        if (key != KeyMap::RotateLeft && key != KeyMap::RotateRight && key != KeyMap::DeepPressUp &&
-            key != KeyMap::DeepPressDown && presenter.isPreWakeUpActive()) {
-            pimpl->sm->process_event(Events::CancelPreWakeUp{});
         }
 
         return true;

@@ -241,14 +241,11 @@ namespace app
                      "Pre-wake up status not considered active");
             return false;
         }
-        LOG_WARN("----AlarmModel::isPreWakeUpActive():%d",
-                 static_cast<int>(isPreWakeUpActive)); // TODO: clean up this log
         return isPreWakeUpActive;
     }
 
     bool AlarmModel::turnOffPreWakeUp()
     {
-        LOG_WARN("----AlarmModel::turnOffPreWakeup()"); // TODO: clean up this log
         return alarms::AlarmServiceAPI::requestTurnOffPreWakeUp(app);
     }
 
