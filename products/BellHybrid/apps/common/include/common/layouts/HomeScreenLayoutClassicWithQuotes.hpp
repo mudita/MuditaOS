@@ -18,8 +18,9 @@ namespace gui
       protected:
         void buildInterface() override;
 
-        Text *quotes{nullptr};
-        Text *author{nullptr};
+        VBox *textBox{nullptr};
+        TextFixedSize *quotes{nullptr};
+        TextFixedSize *author{nullptr};
         TextFixedSize *ampm{nullptr};
         VBox *imgBox{nullptr};
         Image *quoteImg{nullptr};

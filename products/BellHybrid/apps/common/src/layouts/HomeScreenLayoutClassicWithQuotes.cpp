@@ -17,6 +17,11 @@ namespace
     constexpr auto quoteImageName{"bell_quote"};
     constexpr auto maxTimeBoxHeight{148U};
     constexpr auto imgBoxHeight{52U};
+    constexpr auto quoteFont{style::window::font::mediumbiglight};
+    constexpr auto authorFont{style::window::font::mediumbigbold};
+    constexpr auto textBoxHeight{120U};
+    constexpr auto quoteHeight{78U};
+    constexpr auto authorHeight{42U};
 }; // namespace
 
 namespace gui
@@ -56,6 +61,40 @@ namespace gui
 
         quoteImg = new Image(imgBox, quoteImageName, gui::ImageTypeSpecifier::W_M);
         quoteImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+
+        textBox = new VBox(nullptr);
+        textBox->setMinimumSize(style::bell_base_layout::last_layout_w, textBoxHeight);
+        textBox->setEdges(RectangleEdge::None);
+        textBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        textBox->setVisible(true);
+
+        quotes = new TextFixedSize(nullptr);
+        quotes->setMaximumSize(style::bell_base_layout::last_layout_w, quoteHeight);
+        quotes->setMargins({0, 0, 0, 0});
+        quotes->setFont(quoteFont);
+        quotes->setText("Wherever you are, and whatever you do, be in love.");
+        quotes->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        quotes->setEdges(RectangleEdge::None);
+        quotes->activeItem = false;
+        quotes->drawUnderline(false);
+        quotes->setVisible(true);
+
+        author = new TextFixedSize(nullptr);
+        author->setMaximumSize(style::bell_base_layout::last_layout_w, authorHeight);
+        author->setMargins({0, 0, 0, 0});
+        author->setFont(authorFont);
+        author->setText("-Rumi");
+        author->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        author->setEdges(RectangleEdge::None);
+        author->activeItem = false;
+        author->drawUnderline(false);
+        author->setVisible(true);
+
+        textBox->addWidget(quotes);
+        textBox->addWidget(author);
+
+        statusBox->setVisible(false);
+        this->lastBox->addWidget(textBox);
 
         resizeItems();
     }
