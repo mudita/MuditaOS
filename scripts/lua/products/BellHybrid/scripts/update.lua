@@ -11,9 +11,32 @@ update.script_name = "update.lua"
 update.img_in_progress = "assets/gui_image_update_in_progress.bin"
 update.img_success = "assets/gui_image_update_success.bin"
 update.img_failure = "assets/gui_image_update_failed.bin"
+update.img_in_progress_wait = false -- To display progress bar immediately after the script has started
 
 -- Match only files with '.db' extensions and omit such files inside subdirectories
 local match_db_files = '^[^%/]*%.db$'
+
+-- Percent values to be shown on progress bar taking each step's processing time into account
+local update_stages = {
+    init = 0,
+    stage1 = 4,
+    stage2 = 8,
+    stage3 = 72,
+    stage4 = 75,
+    stage5 = 77,
+    stage6 = 80,
+    stage7 = 82,
+    stage8 = 85,
+    done = 100
+}
+
+local function update_progress(percent)
+    local x, y = 90, 354
+    local height_empty, height_full = 4, 8
+    local width = 420
+    recovery.gui.draw_progress_bar(x, y, width, height_empty, height_full, percent)
+    recovery.gui.refresh_fast()
+end
 
 local function build_db_set(file)
     local contents = helpers.read_whole_file(file)
@@ -74,7 +97,6 @@ local function copy_var_directory()
     local to = paths.target.var_dir
     print(string.format("Copying '%s' to '%s'", from, to))
     helpers.copy_dir(from, to)
-
 end
 
 local function enter()
@@ -99,15 +121,25 @@ local function exit()
 end
 
 function update.execute()
+    update_progress(update_stages.init)
     enter()
+    update_progress(update_stages.stage1)
     purge_target_slot()
+    update_progress(update_stages.stage2)
     copy_update_package()
+    update_progress(update_stages.stage3)
     copy_databases()
+    update_progress(update_stages.stage4)
     create_directories()
+    update_progress(update_stages.stage5)
     migrate_db()
+    update_progress(update_stages.stage6)
     copy_var_directory()
+    update_progress(update_stages.stage7)
     remove_cache()
+    update_progress(update_stages.stage8)
     exit()
+    update_progress(update_stages.done)
 end
 
 return update
