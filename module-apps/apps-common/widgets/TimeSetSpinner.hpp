@@ -19,6 +19,7 @@ namespace style::time_set_spinner
     inline constexpr auto very_small_margin       = 3U;
     inline constexpr auto small_margin = 6U;
     inline constexpr auto big_margin   = 6U;
+    inline constexpr auto huge_margin             = 6U;
     inline constexpr auto gargantuan_margin_left  = 14U;
     inline constexpr auto gargantuan_margin_right = 7U;
     inline constexpr auto bottom_align_margin     = -12;
@@ -65,7 +66,7 @@ namespace gui
             {style::window::font::large, {style::time_set_spinner::small_margin, 0, style::time_set_spinner::small_margin, style::time_set_spinner::bottom_align_margin}},
             {style::window::font::supersizeme, {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
             {style::window::font::supersizemelight, {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
-            {style::window::font::huge, {style::time_set_spinner::big_margin, 0, style::time_set_spinner::big_margin, 0}},
+            {style::window::font::huge, {style::time_set_spinner::huge_margin, 0, style::time_set_spinner::huge_margin, 0}},
             {style::window::font::gargantuan, {style::time_set_spinner::gargantuan_margin_left, 0, style::time_set_spinner::gargantuan_margin_right, 0}}};
         // clang-format on
 

@@ -12,8 +12,8 @@ namespace gui
       public:
         HomeScreenLayoutClassicWithQuotes(std::string name);
 
-        // void setTime(std::time_t newTime) override;
-        // void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
+        void setTime(std::time_t newTime) override;
+        void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
 
       protected:
         void buildInterface() override;

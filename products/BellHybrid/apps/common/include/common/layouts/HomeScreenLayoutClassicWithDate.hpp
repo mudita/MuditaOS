@@ -1,16 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "HomeScreenLayoutClassic.hpp"
 
-namespace style::homescreen_classic
-{
-    constexpr inline auto ampm_layout_w      = 51U;
-    constexpr inline auto ampm_margin_w      = 5U;
-    constexpr inline auto ampm_time_margin_w = ampm_layout_w + ampm_margin_w;
-} // namespace style::homescreen_classic
 namespace gui
 {
     class HomeScreenLayoutClassicWithDate : public HomeScreenLayoutClassic
