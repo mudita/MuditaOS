@@ -33,6 +33,7 @@ namespace gui
         onShowMessage = [this]() {
             if (textBox->visible) {
                 textBox->setVisible(false);
+                imgBox->setVisible(false);
             }
         };
         onHideMessage = [this]() {
@@ -40,6 +41,8 @@ namespace gui
                 statusBox->setVisible(false);
                 textBox->setVisible(true);
                 textBox->informContentChanged();
+                imgBox->setVisible(true);
+                imgBox->informContentChanged();
             }
         };
     }
@@ -47,6 +50,8 @@ namespace gui
     void HomeScreenLayoutClassicWithQuotes::buildInterface()
     {
         using namespace bellMainStyle;
+
+        this->centerBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
         timeHBox->setMaximumHeight(maxTimeBoxHeight);
         timeHBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
