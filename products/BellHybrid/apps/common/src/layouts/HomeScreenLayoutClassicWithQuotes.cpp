@@ -3,25 +3,24 @@
 
 #include "layouts/HomeScreenLayoutClassicWithQuotes.hpp"
 #include "data/BellMainStyle.hpp"
-// #include "widgets/BellBattery.hpp"
-// #include "widgets/DuoHBox.hpp"
 
-// #include <date/date.h>
-// #include <gui/widgets/text/TextFixedSize.hpp>
+#include <widgets/text/TextFixedSize.hpp>
 #include <widgets/TimeSetFmtSpinner.hpp>
-
-// #include <service-time/api/TimeSettingsApi.hpp>
+#include <widgets/BellConnectionStatus.hpp>
 
 namespace
 {
+    constexpr auto usbStatusText{"app_bellmain_usb_status_connected"};
     constexpr auto quoteImageName{"bell_quote"};
-    constexpr auto maxTimeBoxHeight{148U};
-    constexpr auto imgBoxHeight{52U};
     constexpr auto quoteFont{style::window::font::mediumbiglight};
     constexpr auto authorFont{style::window::font::mediumbigbold};
+    constexpr auto usbStatusFont{style::window::font::verybiglight};
+    constexpr auto maxTimeBoxHeight{148U};
+    constexpr auto imgBoxHeight{52U};
     constexpr auto textBoxHeight{120U};
     constexpr auto quoteHeight{78U};
     constexpr auto authorHeight{42U};
+    constexpr auto usbStatusHeight{78U};
 }; // namespace
 
 namespace gui
@@ -107,8 +106,20 @@ namespace gui
         author->drawUnderline(false);
         author->setVisible(true);
 
+        usbStatus = new TextFixedSize(nullptr);
+        usbStatus->setMaximumSize(style::bell_base_layout::last_layout_w, usbStatusHeight);
+        usbStatus->setMargins({0, 0, 0, 0});
+        usbStatus->setFont(usbStatusFont);
+        usbStatus->setText(utils::translate(usbStatusText));
+        usbStatus->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        usbStatus->setEdges(RectangleEdge::None);
+        usbStatus->activeItem = false;
+        usbStatus->drawUnderline(false);
+        usbStatus->setVisible(false);
+
         textBox->addWidget(quotes);
         textBox->addWidget(author);
+        textBox->addWidget(usbStatus);
 
         statusBox->setVisible(false);
         this->lastBox->addWidget(textBox);
@@ -139,6 +150,28 @@ namespace gui
             time->setMargins({0, 0, 0, 0});
             ampm->setVisible(false);
         }
+    }
+
+    void HomeScreenLayoutClassicWithQuotes::setBatteryLevelState(const Store::Battery &batteryContext)
+    {
+        if (batteryContext.state != Store::Battery::State::PluggedNotCharging) {
+            usbStatus->setVisible(false);
+            quotes->setVisible(true);
+            quotes->informContentChanged();
+            author->setVisible(true);
+            author->informContentChanged();
+            imgBox->setVisible(true);
+            imgBox->informContentChanged();
+        }
+    }
+
+    void HomeScreenLayoutClassicWithQuotes::setUSBStatusConnected()
+    {
+        quotes->setVisible(false);
+        author->setVisible(false);
+        imgBox->setVisible(false);
+        usbStatus->setVisible(true);
+        usbStatus->informContentChanged();
     }
 
 }; // namespace gui

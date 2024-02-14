@@ -14,6 +14,8 @@ namespace gui
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
+        void setBatteryLevelState(const Store::Battery &batteryContext) override;
+        void setUSBStatusConnected() override;
 
       protected:
         void buildInterface() override;
@@ -22,6 +24,7 @@ namespace gui
         TextFixedSize *quotes{nullptr};
         TextFixedSize *author{nullptr};
         TextFixedSize *ampm{nullptr};
+        TextFixedSize *usbStatus{nullptr};
         VBox *imgBox{nullptr};
         Image *quoteImg{nullptr};
         bool showAMPM{false};
