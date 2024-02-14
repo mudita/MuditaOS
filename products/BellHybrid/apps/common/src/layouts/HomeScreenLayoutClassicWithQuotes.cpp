@@ -20,7 +20,6 @@ namespace
     constexpr auto textBoxHeight{120U};
     constexpr auto quoteHeight{78U};
     constexpr auto authorHeight{42U};
-    constexpr auto usbStatusHeight{78U};
 }; // namespace
 
 namespace gui
@@ -40,8 +39,10 @@ namespace gui
                 statusBox->setVisible(false);
                 textBox->setVisible(true);
                 textBox->informContentChanged();
-                imgBox->setVisible(true);
-                imgBox->informContentChanged();
+                if (quotes->visible) {
+                    imgBox->setVisible(true);
+                    imgBox->informContentChanged();
+                }
             }
         };
     }
@@ -107,11 +108,11 @@ namespace gui
         author->setVisible(true);
 
         usbStatus = new TextFixedSize(nullptr);
-        usbStatus->setMaximumSize(style::bell_base_layout::last_layout_w, usbStatusHeight);
+        usbStatus->setMaximumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
         usbStatus->setMargins({0, 0, 0, 0});
         usbStatus->setFont(usbStatusFont);
         usbStatus->setText(utils::translate(usbStatusText));
-        usbStatus->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        usbStatus->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         usbStatus->setEdges(RectangleEdge::None);
         usbStatus->activeItem = false;
         usbStatus->drawUnderline(false);
