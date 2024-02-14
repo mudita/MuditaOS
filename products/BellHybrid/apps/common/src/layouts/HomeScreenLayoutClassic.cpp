@@ -276,6 +276,9 @@ namespace gui
 
     void HomeScreenLayoutClassic::setTextDescription(const UTF8 &desc)
     {
+        if (onShowMessage != nullptr) {
+            onShowMessage();
+        }
         statusBox->setVisible(false);
         bottomText->setVisible(true);
         bottomText->setRichText(desc);
@@ -289,6 +292,9 @@ namespace gui
         bottomText->setVisible(false);
         statusBox->resizeItems();
         statusBox->informContentChanged();
+        if (onHideMessage != nullptr) {
+            onHideMessage();
+        }
     }
 
     bool HomeScreenLayoutClassic::isBatteryVisibilityAllowed(const Store::Battery &batteryContext)

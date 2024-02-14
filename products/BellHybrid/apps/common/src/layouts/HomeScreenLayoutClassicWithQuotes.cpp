@@ -30,6 +30,18 @@ namespace gui
         : HomeScreenLayoutClassic(std::move(name))
     {
         buildInterface();
+        onShowMessage = [this]() {
+            if (textBox->visible) {
+                textBox->setVisible(false);
+            }
+        };
+        onHideMessage = [this]() {
+            if (!textBox->visible) {
+                statusBox->setVisible(false);
+                textBox->setVisible(true);
+                textBox->informContentChanged();
+            }
+        };
     }
 
     void HomeScreenLayoutClassicWithQuotes::buildInterface()
