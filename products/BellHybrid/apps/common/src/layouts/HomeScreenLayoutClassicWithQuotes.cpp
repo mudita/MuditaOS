@@ -10,15 +10,15 @@
 
 namespace
 {
-    constexpr auto usbStatusText{"app_bellmain_usb_status_connected"};
+    constexpr auto maxTimeBoxHeight{148U};
+    constexpr auto textBoxHeight{120U};
+    constexpr auto imgBoxHeight{52U};
+
     constexpr auto quoteImageName{"bell_quote"};
     constexpr auto quoteFont{style::window::font::mediumbiglight};
-    constexpr auto authorFont{style::window::font::mediumbigbold};
-    constexpr auto usbStatusFont{style::window::font::verybiglight};
-    constexpr auto maxTimeBoxHeight{148U};
-    constexpr auto imgBoxHeight{52U};
-    constexpr auto textBoxHeight{120U};
     constexpr auto quoteHeight{78U};
+
+    constexpr auto authorFont{style::window::font::mediumbigbold};
     constexpr auto authorHeight{42U};
 }; // namespace
 
@@ -28,21 +28,10 @@ namespace gui
         : HomeScreenLayoutClassic(std::move(name))
     {
         buildInterface();
-        onShowMessage = [this]() {
-            if (textBox->visible) {
-                textBox->setVisible(false);
-                imgBox->setVisible(false);
-            }
-        };
+        onShowMessage = [this]() { hideQuotes(); };
         onHideMessage = [this]() {
-            if (!textBox->visible) {
-                statusBox->setVisible(false);
-                textBox->setVisible(true);
-                textBox->informContentChanged();
-                if (quotes->visible) {
-                    imgBox->setVisible(true);
-                    imgBox->informContentChanged();
-                }
+            if (!connectionStatus->isVisible()) {
+                showQuotes();
             }
         };
     }
@@ -79,6 +68,11 @@ namespace gui
         quoteImg = new Image(imgBox, quoteImageName, gui::ImageTypeSpecifier::W_M);
         quoteImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
+        // We do not display information about the battery status at any time
+        // only about the status of the USB connection
+        widgetBox->removeWidget(infoBox);
+        widgetBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+
         textBox = new VBox(nullptr);
         textBox->setMinimumSize(style::bell_base_layout::last_layout_w, textBoxHeight);
         textBox->setEdges(RectangleEdge::None);
@@ -107,25 +101,34 @@ namespace gui
         author->drawUnderline(false);
         author->setVisible(true);
 
-        usbStatus = new TextFixedSize(nullptr);
-        usbStatus->setMaximumSize(style::bell_base_layout::outer_layouts_w, style::bell_base_layout::outer_layouts_h);
-        usbStatus->setMargins({0, 0, 0, 0});
-        usbStatus->setFont(usbStatusFont);
-        usbStatus->setText(utils::translate(usbStatusText));
-        usbStatus->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        usbStatus->setEdges(RectangleEdge::None);
-        usbStatus->activeItem = false;
-        usbStatus->drawUnderline(false);
-        usbStatus->setVisible(false);
-
         textBox->addWidget(quotes);
         textBox->addWidget(author);
-        textBox->addWidget(usbStatus);
 
         statusBox->setVisible(false);
         this->lastBox->addWidget(textBox);
 
         resizeItems();
+    }
+
+    void HomeScreenLayoutClassicWithQuotes::showQuotes()
+    {
+        if (!textBox->visible) {
+            statusBox->setVisible(false);
+            textBox->setVisible(true);
+            textBox->informContentChanged();
+            imgBox->setVisible(true);
+            imgBox->informContentChanged();
+        }
+    }
+
+    void HomeScreenLayoutClassicWithQuotes::hideQuotes()
+    {
+        if (textBox->visible) {
+            textBox->setVisible(false);
+            imgBox->setVisible(false);
+            statusBox->setVisible(true);
+            statusBox->informContentChanged();
+        }
     }
 
     void HomeScreenLayoutClassicWithQuotes::setTime(std::time_t newTime)
@@ -151,28 +154,6 @@ namespace gui
             time->setMargins({0, 0, 0, 0});
             ampm->setVisible(false);
         }
-    }
-
-    void HomeScreenLayoutClassicWithQuotes::setBatteryLevelState(const Store::Battery &batteryContext)
-    {
-        if (batteryContext.state != Store::Battery::State::PluggedNotCharging) {
-            usbStatus->setVisible(false);
-            quotes->setVisible(true);
-            quotes->informContentChanged();
-            author->setVisible(true);
-            author->informContentChanged();
-            imgBox->setVisible(true);
-            imgBox->informContentChanged();
-        }
-    }
-
-    void HomeScreenLayoutClassicWithQuotes::setUSBStatusConnected()
-    {
-        quotes->setVisible(false);
-        author->setVisible(false);
-        imgBox->setVisible(false);
-        usbStatus->setVisible(true);
-        usbStatus->informContentChanged();
     }
 
 }; // namespace gui

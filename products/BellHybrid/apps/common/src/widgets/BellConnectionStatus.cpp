@@ -34,15 +34,22 @@ namespace gui
         statusText->setFont(fontName);
     }
 
-    void BellConnectionStatus::checkIfConnected(const Store::Battery::State &state)
+    bool BellConnectionStatus::hideIfPossible(const Store::Battery::State &state)
     {
         if (state != Store::Battery::State::PluggedNotCharging) {
             statusText->setVisible(false);
+            return true;
         }
+        return false;
     }
 
-    void BellConnectionStatus::setConnected()
+    void BellConnectionStatus::show()
     {
         statusText->setVisible(true);
+    }
+
+    bool BellConnectionStatus::isVisible() const
+    {
+        return statusText->visible;
     }
 } // namespace gui

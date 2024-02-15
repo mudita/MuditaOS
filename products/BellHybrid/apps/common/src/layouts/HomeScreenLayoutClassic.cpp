@@ -305,7 +305,9 @@ namespace gui
     void HomeScreenLayoutClassic::setBatteryLevelState(const Store::Battery &batteryContext)
     {
         battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
-        connectionStatus->checkIfConnected(batteryContext.state);
+        if (connectionStatus->hideIfPossible(batteryContext.state) && onHideMessage != nullptr) {
+            onHideMessage();
+        }
 
         if (isBatteryVisibilityAllowed(batteryContext)) {
             battery->setVisible(true);
@@ -367,7 +369,10 @@ namespace gui
     }
     auto HomeScreenLayoutClassic::setUSBStatusConnected() -> void
     {
-        connectionStatus->setConnected();
+        if (onShowMessage != nullptr) {
+            onShowMessage();
+        }
+        connectionStatus->show();
         connectionStatus->informContentChanged();
     }
 
