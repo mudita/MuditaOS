@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp.hpp"
@@ -36,11 +36,9 @@ namespace bsp
         switch (state) {
         case RebootState::None:
             break;
-        case RebootState::Poweroff:
-            board_shutdown();
-            break;
         case RebootState::Reboot:
-            board_reset();
+        case RebootState::Poweroff:
+            board_reset(); // Reset will result in powering off the CPU if USB is disconnected due to hardware design
             break;
         }
 
