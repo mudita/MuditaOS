@@ -16,10 +16,10 @@ namespace
 
     constexpr auto quoteImageName{"bell_quote"};
     constexpr auto quoteFont{style::window::font::mediumbiglight};
-    constexpr auto quoteHeight{78U};
+    constexpr auto quoteHeight{72U};
 
     constexpr auto authorFont{style::window::font::mediumbigbold};
-    constexpr auto authorHeight{42U};
+    constexpr auto authorHeight{36U};
 }; // namespace
 
 namespace gui
