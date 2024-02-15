@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp.hpp"
@@ -15,7 +15,7 @@ namespace
         using namespace drivers;
         auto gpio_power = DriverGPIO::Create(static_cast<GPIOInstances>(BoardDefinitions::POWER_SWITCH_HOLD_GPIO),
                                              DriverGPIOParams{});
-        gpio_power->WritePin(static_cast<uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 0);
+        gpio_power->WritePin(static_cast<std::uint32_t>(BoardDefinitions::POWER_SWITCH_HOLD_BUTTON), 0);
     }
 
     void board_reset()
@@ -31,11 +31,9 @@ namespace bsp
         switch (state) {
         case rebootState::none:
             break;
-        case rebootState::poweroff:
-            board_shutdown();
-            break;
         case rebootState::reboot:
-            board_reset();
+        case rebootState::poweroff:
+            board_reset(); // Reset will result in powering off the CPU if USB is disconnected due to hardware design
             break;
         }
 
