@@ -3,7 +3,8 @@
 ## Unreleased
 
 ### Fixed
-Fixed no response when editing a contact via Center to have the same number as another
+* Fixed no response when editing a contact via Center to have the same number as another.
+* Fixed occasional screen backlight flash when turning off the phone.
 
 ### Added
 
