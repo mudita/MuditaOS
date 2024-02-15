@@ -12,14 +12,16 @@ namespace
 {
     constexpr auto maxTimeBoxHeight{148U};
     constexpr auto textBoxHeight{120U};
+
     constexpr auto imgBoxHeight{52U};
+    constexpr auto imgTopMargin{10U};
 
     constexpr auto quoteImageName{"bell_quote"};
     constexpr auto quoteFont{style::window::font::mediumbiglight};
-    constexpr auto quoteHeight{72U};
+    constexpr auto quoteHeight{70U};
 
     constexpr auto authorFont{style::window::font::mediumbigbold};
-    constexpr auto authorHeight{36U};
+    constexpr auto authorHeight{42U};
 }; // namespace
 
 namespace gui
@@ -66,6 +68,7 @@ namespace gui
         imgBox->setVisible(true);
 
         quoteImg = new Image(imgBox, quoteImageName, gui::ImageTypeSpecifier::W_M);
+        quoteImg->setMargins({0, imgTopMargin, 0, 0});
         quoteImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
         // We do not display information about the battery status at any time
