@@ -10,10 +10,7 @@ namespace gui
     class HomeScreenLayoutClassicWithQuotes : public HomeScreenLayoutClassic
     {
       public:
-        HomeScreenLayoutClassicWithQuotes(std::string name);
-
-        void setTime(std::time_t newTime) override;
-        void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
+        explicit HomeScreenLayoutClassicWithQuotes(std::string name);
 
       protected:
         void buildInterface() override;
@@ -21,7 +18,6 @@ namespace gui
         VBox *textBox{nullptr};
         TextFixedSize *quotes{nullptr};
         TextFixedSize *author{nullptr};
-        TextFixedSize *ampm{nullptr};
         VBox *imgBox{nullptr};
         Image *quoteImg{nullptr};
 
