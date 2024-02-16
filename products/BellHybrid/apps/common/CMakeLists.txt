@@ -69,6 +69,7 @@ target_sources(application-bell-common
         src/layouts/HomeScreenLayoutClassicWithBattery.cpp
         src/layouts/HomeScreenLayoutClassicWithDate.cpp
         src/layouts/HomeScreenLayoutClassicWithQuotes.cpp
+        src/layouts/HomeScreenLayoutClassicWithQuotesAmPm.cpp
         src/layouts/HomeScreenLayoutClassicWithTemp.cpp
         src/layouts/HomeScreenLayoutVertical.cpp
         src/layouts/HomeScreenLayoutVerticalSimple.cpp
@@ -141,6 +142,7 @@ target_sources(application-bell-common
         include/common/layouts/HomeScreenLayoutClassicWithBattery.hpp
         include/common/layouts/HomeScreenLayoutClassicWithDate.hpp
         include/common/layouts/HomeScreenLayoutClassicWithQuotes.hpp
+        include/common/layouts/HomeScreenLayoutClassicWithQuotesAmPm.hpp
         include/common/layouts/HomeScreenLayoutClassicWithTemp.hpp
         include/common/layouts/HomeScreenLayoutVertical.hpp
         include/common/layouts/HomeScreenLayoutVerticalSimple.hpp
