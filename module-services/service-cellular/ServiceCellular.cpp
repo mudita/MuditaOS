@@ -131,6 +131,7 @@ ServiceCellular::ServiceCellular()
     bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
     bus.channels.push_back(sys::BusChannel::ServiceEvtmgrNotifications);
     bus.channels.push_back(sys::BusChannel::PhoneModeChanges);
+    bus.channels.push_back(sys::BusChannel::BatteryStatusNotification);
 
     callStateTimer = sys::TimerFactory::createPeriodicTimer(
         this, "call_state", std::chrono::milliseconds{1000}, [this](sys::Timer &) { CallStateTimerHandler(); });
@@ -190,8 +191,7 @@ ServiceCellular::ServiceCellular()
 }
 
 ServiceCellular::~ServiceCellular()
-{
-}
+{}
 
 void ServiceCellular::SleepTimerHandler()
 {
@@ -1371,7 +1371,7 @@ bool ServiceCellular::handle_URCReady()
     }
 
     bool ret = true;
-    ret = ret && channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC);
+    ret      = static_cast<bool>(channel->cmd(at::AT::ENABLE_NETWORK_REGISTRATION_URC));
 
     bus.sendMulticast<cellular::msg::notification::ModemStateChanged>(cellular::api::ModemState::Ready);
 
@@ -1812,7 +1812,7 @@ auto ServiceCellular::handleCellularCallRequestMessage(cellular::CallRequestMess
 
     if (!request->isHandled()) {
         const auto errorType = translate(result.code);
-        auto message = std::make_shared<cellular::CallRequestGeneralError>(errorType);
+        auto message         = std::make_shared<cellular::CallRequestGeneralError>(errorType);
         bus.sendUnicast(message, ::service::name::appmgr);
     }
 
@@ -1941,7 +1941,7 @@ auto ServiceCellular::handleCellularSelectAntennaMessage(sys::Message *msg) -> s
 }
 auto ServiceCellular::handleCellularSetScanModeMessage(sys::Message *msg) -> std::shared_ptr<sys::ResponseMessage>
 {
-    auto message = static_cast<cellular::SetScanModeMessage *>(msg);
+    auto message   = static_cast<cellular::SetScanModeMessage *>(msg);
     const auto ret = SetScanMode(message->data);
 
     return std::make_shared<cellular::ResponseMessage>(ret);

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-evtmgr/BatteryMessages.hpp"
@@ -59,6 +59,7 @@ EventManagerCommon::EventManagerCommon(LogDumpFunction logDumpFunction,
     alarmTimestamp = 0;
     alarmID        = 0;
     bus.channels.push_back(sys::BusChannel::ServiceDBNotifications);
+    bus.channels.push_back(sys::BusChannel::BatteryStatusNotification);
 }
 
 EventManagerCommon::~EventManagerCommon()
@@ -145,10 +146,6 @@ sys::ReturnCodes EventManagerCommon::InitHandler()
             if (!targetApplication.empty()) {
                 bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), targetApplication);
             }
-            bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::appmgr);
-            bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::service_desktop);
-            bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::bluetooth);
-            bus.sendUnicast(std::make_shared<sevm::BatteryStatusChangeMessage>(), service::name::cellular);
         }
         return sys::msgHandled();
     });

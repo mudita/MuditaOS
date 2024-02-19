@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryController.hpp"
@@ -132,7 +132,7 @@ BatteryController::BatteryController(sys::Service *service, xQueueHandle notific
                    params.battery}
 {
     updateSoc();
-    Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
+    Store::Battery::modify().state       = transformChargingState(charger->getChargingStatus());
     Store::Battery::modify().temperature = transformTemperatureState(charger->getTemperatureState());
     batteryState.check(transformChargingState(Store::Battery::get().state),
                        static_cast<float>(Store::Battery::get().level));
@@ -179,12 +179,12 @@ void sevm::battery::BatteryController::printCurrentState()
 
 void sevm::battery::BatteryController::update()
 {
-    const auto lastSoc   = Store::Battery::get().level;
-    const auto lastState = Store::Battery::get().state;
+    const auto lastSoc         = Store::Battery::get().level;
+    const auto lastState       = Store::Battery::get().state;
     const auto lastTemperature = Store::Battery::get().temperature;
 
     updateSoc();
-    Store::Battery::modify().state = transformChargingState(charger->getChargingStatus());
+    Store::Battery::modify().state       = transformChargingState(charger->getChargingStatus());
     Store::Battery::modify().temperature = transformTemperatureState(charger->getTemperatureState());
 
     const auto currentSoc         = Store::Battery::get().level;
@@ -194,7 +194,7 @@ void sevm::battery::BatteryController::update()
     /// Send BatteryStatusChangeMessage only when battery SOC, charger state or temperature has changed
     if ((lastSoc != currentSoc) || (lastState != currentState) || (lastTemperature != currentTemperature)) {
         auto message = std::make_shared<sevm::BatteryStatusChangeMessage>();
-        service->bus.sendUnicast(std::move(message), service::name::evt_manager);
+        service->bus.sendMulticast(std::move(message), sys::BusChannel::BatteryStatusNotification);
     }
 
     if (isFirstUpdateDone) {

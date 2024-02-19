@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ServiceCellularPriv.hpp"
@@ -62,7 +62,7 @@ namespace cellular::internal
         simCard->onSimReady = [this]() {
             state->set(State::ST::Ready);
 
-            auto channel     = owner->cmux->get(CellularMux::Channel::Commands);
+            auto channel = owner->cmux->get(CellularMux::Channel::Commands);
 
             const auto permitVolte = volteCapability->isVolteAllowed(*channel);
             const auto enableVolte =

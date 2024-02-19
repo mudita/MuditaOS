@@ -58,6 +58,7 @@ namespace app::manager
         constexpr auto updateAllowed = false;
         notificationProvider.handleBatteryTooHot(isBatteryTooHotWhilePlugged(), updateAllowed);
 
+        bus.channels.push_back(sys::BusChannel::BatteryStatusNotification);
         bus.channels.push_back(sys::BusChannel::BluetoothModeChanges);
         bus.channels.push_back(sys::BusChannel::BluetoothNotifications);
         bus.channels.push_back(sys::BusChannel::PhoneModeChanges);

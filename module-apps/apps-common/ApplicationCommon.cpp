@@ -844,9 +844,9 @@ namespace app
 
         // two lines below is to **not** loose data on copy on dynamic_cast, but to move the data
         (void)params.release();
-        auto data                    = std::unique_ptr<gui::PopupRequestParams>(rdata);
-        const auto id                = data->getPopupId();
-        auto blueprint               = popupBlueprint.getBlueprint(id);
+        auto data      = std::unique_ptr<gui::PopupRequestParams>(rdata);
+        const auto id  = data->getPopupId();
+        auto blueprint = popupBlueprint.getBlueprint(id);
 
         const auto topOfWindowsStackId = windowsStack().getWindowData(app::topWindow)->disposition.id;
         if (data->ignoreIfTheSamePopupIsOnTopOfTheStack && id == topOfWindowsStackId) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,6 +14,7 @@ namespace sys
         System,
         SystemManagerRequests,
         PowerManagerRequests,
+        BatteryStatusNotification,
         USBNotifications,
         ServiceCellularNotifications,
         Test2CustomBusChannel,
@@ -111,6 +112,8 @@ inline const char *c_str(sys::BusChannel channel)
         return "SystemManagerRequests";
     case sys::BusChannel::PowerManagerRequests:
         return "PowerManagerRequests";
+    case sys::BusChannel::BatteryStatusNotification:
+        return "BatteryStatusNotification";
     case sys::BusChannel::USBNotifications:
         return "USBNotifications";
     case sys::BusChannel::ServiceCellularNotifications:
