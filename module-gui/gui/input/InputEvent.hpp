@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -85,10 +85,10 @@ namespace gui
         enum class State
         {
             Undefined        = 0x00, /// No action defined or translation error
-            keyPressed       = 0x01, /// Key pressed event
-            keyReleasedShort = 0x02, /// Key released before timeout
-            keyReleasedLong  = 0x04, /// Key released after timeout
-            keyMoved         = 0x05, /// Monostable key event
+            KeyPressed       = 0x01, /// Key pressed event
+            KeyReleasedShort = 0x02, /// Key released before timeout
+            KeyReleasedLong  = 0x04, /// Key released after timeout
+            KeyMoved         = 0x05, /// Monostable key event
         };
 
         InputEvent(RawKey key, State state = State::Undefined, KeyCode keyCode = KeyCode::KEY_UNDEFINED);
@@ -120,7 +120,7 @@ namespace gui
 
         [[nodiscard]] auto isKeyPress() const -> bool
         {
-            return state == State::keyPressed;
+            return state == State::KeyPressed;
         }
 
         [[nodiscard]] auto isKeyPress(KeyCode code) const -> bool
@@ -130,7 +130,7 @@ namespace gui
 
         [[nodiscard]] auto isShortRelease() const -> bool
         {
-            return state == State::keyReleasedShort;
+            return state == State::KeyReleasedShort;
         }
 
         [[nodiscard]] auto isShortRelease(KeyCode code) const -> bool
@@ -140,7 +140,7 @@ namespace gui
 
         [[nodiscard]] auto isLongRelease() const -> bool
         {
-            return state == State::keyReleasedLong;
+            return state == State::KeyReleasedLong;
         }
 
         [[nodiscard]] auto isLongRelease(KeyCode code) const -> bool
@@ -174,7 +174,7 @@ namespace gui
 
       private:
         RawKey rawKey   = {};                     /// RawKey data
-        State state     = State::keyPressed;      /// initial translated key state
+        State state     = State::KeyPressed;      /// initial translated key state
         KeyCode keyCode = KeyCode::KEY_UNDEFINED; /// initial translated key code
     };
 
@@ -187,14 +187,14 @@ namespace gui
     switch (state) {
     case gui::InputEvent::State::Undefined:
         return "Undefined";
-    case gui::InputEvent::State::keyPressed:
-        return "keyPressed";
-    case gui::InputEvent::State::keyReleasedShort:
-        return "keyReleasedShort";
-    case gui::InputEvent::State::keyReleasedLong:
-        return "keyReleasedLong ";
-    case gui::InputEvent::State::keyMoved:
-        return "keyMoved";
+    case gui::InputEvent::State::KeyPressed:
+        return "KeyPressed";
+    case gui::InputEvent::State::KeyReleasedShort:
+        return "KeyReleasedShort";
+    case gui::InputEvent::State::KeyReleasedLong:
+        return "KeyReleasedLong ";
+    case gui::InputEvent::State::KeyMoved:
+        return "KeyMoved";
     }
     return "";
 }

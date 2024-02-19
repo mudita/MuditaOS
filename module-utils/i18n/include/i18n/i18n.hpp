@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -14,8 +14,8 @@ namespace utils
 {
     namespace files
     {
-        constexpr auto jsonExtension = ".json";
-        constexpr auto breakSign     = "_";
+        inline constexpr auto jsonExtension = ".json";
+        inline constexpr auto breakSign     = "_";
     } // namespace files
 
     const std::string &translate(const std::string &text);
