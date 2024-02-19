@@ -476,7 +476,7 @@ namespace app::home_screen
         const auto key = mapKey(inputEvent.getKeyCode());
         switch (key) {
         case KeyMap::Back:
-            if (inputEvent.getState() == gui::InputEvent::State::keyReleasedLong) {
+            if (inputEvent.getState() == gui::InputEvent::State::KeyReleasedLong) {
                 pimpl->sm->process_event(Events::LongBackPress{});
             }
             else {

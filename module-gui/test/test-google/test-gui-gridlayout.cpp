@@ -1,28 +1,28 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
-#include <log/log.hpp>
 #include <module-gui/gui/widgets/BoxLayout.hpp>
 #include <module-gui/gui/widgets/GridLayout.hpp>
 #include <gui/input/InputEvent.hpp>
 
 namespace testStyle
 {
-    const inline uint32_t box_x = 0;
-    const inline uint32_t box_y = 0;
-    const inline uint32_t box_w = 600;
-    const inline uint32_t box_h = 200;
+    constexpr std::uint32_t box_x = 0;
+    constexpr std::uint32_t box_y = 0;
+    constexpr std::uint32_t box_w = 600;
+    constexpr std::uint32_t box_h = 200;
 
-    const inline uint32_t grid_item_w = 50;
-    const inline uint32_t grid_item_h = 50;
+    constexpr std::uint32_t grid_item_w = 50;
+    constexpr std::uint32_t grid_item_h = 50;
 } // namespace testStyle
 
 class TestItem : public gui::Rect
 {
   public:
     unsigned int ID = 0;
-    TestItem(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect(parent, x, y, w, h){};
+    TestItem(Item *parent, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h)
+        : Rect(parent, x, y, w, h){};
 };
 
 class GridLayoutTesting : public ::testing::Test
@@ -47,14 +47,14 @@ class GridLayoutTesting : public ::testing::Test
     void moveNTimes(gui::BoxLayout *Box, unsigned int n, gui::KeyCode key)
     {
         for (unsigned int i = 0; i < n; i++) {
-            Box->onInput(gui::InputEvent({}, gui::InputEvent::State::keyReleasedShort, key));
+            Box->onInput(gui::InputEvent({}, gui::InputEvent::State::KeyReleasedShort, key));
         }
     }
 
     void addNItems(gui::BoxLayout *Box,
                    unsigned int n,
-                   uint32_t item_w,
-                   uint32_t item_h,
+                   std::uint32_t item_w,
+                   std::uint32_t item_h,
                    const gui::Margins &margins = gui::Margins())
     {
         for (unsigned int i = 1; i <= n; i++) {
@@ -142,20 +142,20 @@ TEST_F(GridLayoutTesting, Navigate_Test_ActiveItems_1)
     ///> | 25  A | 26 NA | 27  A | 28 NA | 29  A | 30 NA | 31 A  | 32 NA | 33  A | 34 NA | 35 A  | 36 NA |
     ///> | 37 NA | 38  A | 39 NA | 40  A | 41 NA | 42  A | 43 NA | 44  A | 45 NA | 46  A | 47 NA | 48  A |
     ///> | 49 NV | 50 NV | 51 NV | 52 NV |
-    for (uint32_t i = 1; i <= 12; i++) {
+    for (std::uint32_t i = 1; i <= 12; i++) {
         addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, (i % 2) ? true : false);
     }
-    for (uint32_t i = 13; i <= 24; i++) {
+    for (std::uint32_t i = 13; i <= 24; i++) {
         addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, ((i + 1) % 2) ? true : false);
     }
-    for (uint32_t i = 25; i <= 36; i++) {
+    for (std::uint32_t i = 25; i <= 36; i++) {
         addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, (i % 2) ? true : false);
     }
-    for (uint32_t i = 37; i <= 48; i++) {
+    for (std::uint32_t i = 37; i <= 48; i++) {
         addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, ((i + 1) % 2) ? true : false);
     }
     ///> Add some items to exceed grid layout area
-    for (uint32_t i = 49; i <= 52; i++) {
+    for (std::uint32_t i = 49; i <= 52; i++) {
         addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, true);
     }
     gridLayout->setFocus(true);
@@ -186,16 +186,16 @@ TEST_F(GridLayoutTesting, Navigate_Test_ActiveItems_2_BorderCallback)
     ///> | 13 NA | 14  A | 15 NA | 16  A | 17 NA | 18  A | 19 NA | 20  A | 21 NA | 22  A | 23 NA | 24  A |
     ///> | 25  A | 26 NA | 27  A | 28 NA | 29  A | 30 NA | 31 A  | 32 NA | 33  A | 34 NA | 35 A  | 36 NA |
     ///> | 37 NA | 38  A | 39 NA |
-    for (uint32_t i = 1; i <= 12; i++) {
+    for (std::uint32_t i = 1; i <= 12; i++) {
         addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, (i % 2) ? true : false);
     }
-    for (uint32_t i = 13; i <= 24; i++) {
+    for (std::uint32_t i = 13; i <= 24; i++) {
         addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, ((i + 1) % 2) ? true : false);
     }
-    for (uint32_t i = 25; i <= 36; i++) {
+    for (std::uint32_t i = 25; i <= 36; i++) {
         addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, (i % 2) ? true : false);
     }
-    for (uint32_t i = 37; i <= 39; i++) {
+    for (std::uint32_t i = 37; i <= 39; i++) {
         addItem(gridLayout, testStyle::grid_item_w, testStyle::grid_item_h, i, ((i + 1) % 2) ? true : false);
     }
 

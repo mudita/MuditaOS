@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -11,11 +11,11 @@ TEST_CASE("Regular key press and release")
 
     key.state  = RawKey::State::Pressed;
     auto event = translator.set(key);
-    REQUIRE(event.getState() == gui::InputEvent::State::keyPressed);
+    REQUIRE(event.getState() == gui::InputEvent::State::KeyPressed);
 
     key.state = RawKey::State::Released;
     event     = translator.set(key);
-    REQUIRE(event.getState() == gui::InputEvent::State::keyReleasedShort);
+    REQUIRE(event.getState() == gui::InputEvent::State::KeyReleasedShort);
 }
 
 TEST_CASE("Key release before first key press")
@@ -37,12 +37,12 @@ TEST_CASE("Key long release")
     key.state     = RawKey::State::Pressed;
     key.timePress = 0;
     auto event    = translator.set(key);
-    REQUIRE(event.getState() == gui::InputEvent::State::keyPressed);
+    REQUIRE(event.getState() == gui::InputEvent::State::KeyPressed);
 
     key.state       = RawKey::State::Released;
     key.timeRelease = timeToLongRelease;
     event           = translator.set(key);
-    REQUIRE(event.getState() == gui::InputEvent::State::keyReleasedLong);
+    REQUIRE(event.getState() == gui::InputEvent::State::KeyReleasedLong);
 }
 
 TEST_CASE("Key Moved")
@@ -52,7 +52,7 @@ TEST_CASE("Key Moved")
 
     key.state  = RawKey::State::Moved;
     auto event = translator.set(key);
-    REQUIRE(event.getState() == gui::InputEvent::State::keyMoved);
+    REQUIRE(event.getState() == gui::InputEvent::State::KeyMoved);
 }
 
 TEST_CASE("Key Undefined")

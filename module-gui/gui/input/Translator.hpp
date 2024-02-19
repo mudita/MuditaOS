@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,7 +20,7 @@ namespace gui
         /// RawKey to Input Event translation
         InputEvent set(RawKey key);
         /// Check if keyPress is timed out for particular timestamp
-        bool isKeyPressTimedOut(uint32_t actualTimeStamp);
+        bool isKeyPressTimedOut(std::uint32_t actualTimeStamp);
         /// Reset previous key press status
         void resetPreviousKeyPress();
         /// Set previous key press timeout status
@@ -41,7 +41,7 @@ namespace gui
         /// translate incomming key
         InputEvent translate(RawKey key);
         /// translate timeout - simulate key release
-        InputEvent translate(uint32_t timeout);
+        InputEvent translate(std::uint32_t timeout);
     };
 
     /// profiles cache - load once for all
@@ -51,7 +51,7 @@ namespace gui
         std::map<std::string, gui::Profile> profilesList = {};
 
         void loadProfile(const std::string &filepath);
-        std::vector<std::string> getProfilesNames();
+        std::vector<std::string> getProfilesFilenames();
         void init();
         Profile empty;
 
@@ -65,12 +65,11 @@ namespace gui
     /// translator using & switching KeyMaps for use per widget basis ,called for selected widget, per widget basis
     class KeyInputMappedTranslation : public KeyBaseTranslation
     {
-        uint32_t times = 0;
+        std::uint32_t times = 0;
         Profiles profiles;
 
       public:
-        uint32_t handle(RawKey key, const std::string &keymap, bool incrementTimes = true);
-        uint32_t getTimes() const noexcept;
+        std::uint32_t handle(RawKey key, const std::string &keymap, bool incrementTimes = true);
+        std::uint32_t getTimes() const noexcept;
     };
-
-} /* namespace gui */
+} // namespace gui
