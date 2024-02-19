@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,7 +27,7 @@ namespace gui
 
         gui::Status load(uint8_t *data);
 
-        static const std::uint32_t none_char_id = std::numeric_limits<const std::uint32_t>().max();
+        static constexpr auto none_char_id = std::numeric_limits<std::uint32_t>().max();
         // structure holding detailed information about font
         FontInfo info;
         // number of glyphs in the font
@@ -53,14 +53,14 @@ namespace gui
          * @param id2 Code of the second character - if none_char_id then return 0
          * @return Value of the kerning or 0 if pair was not found.
          */
-        int32_t getKerning(std::uint32_t id1, std::uint32_t id2) const;
+        std::int32_t getKerning(std::uint32_t id1, std::uint32_t id2) const;
         /**
          * @brief Method calculates how many chars will fit specified width using current font.
          * @param str UTF8 string that will be used to calculate how many chars can fit provided space.
-         * @param space Number of pixels in width availabale to calculate how many chars will fit.
+         * @param space Number of pixels in width available to calculate how many chars will fit.
          * @return number of chars that can fit provided space;
          */
-        std::uint32_t getCharCountInSpace(const UTF8 &str, const std::uint32_t space) const;
+        std::uint32_t getCharCountInSpace(const UTF8 &str, const std::uint32_t availableSpace) const;
         /**
          * @brief Calculates how many pixels will occupy selected part of the string.
          * @param str String used as a source of text.
@@ -85,11 +85,13 @@ namespace gui
          * @brief Returns number of pixels occupied by the character vertically.
          */
         std::uint32_t getCharPixelHeight(std::uint32_t charCode);
+
+        void setFallbackFont(RawFont *font);
+
         const std::string getName()
         {
             return info.face;
         }
-        void setFallbackFont(RawFont *font);
 
       private:
         std::map<std::uint32_t, std::unique_ptr<FontGlyph>> glyphs;
@@ -108,4 +110,4 @@ namespace gui
         /// if code is not found - nullptr is returned
         FontGlyph *findGlyphFallback(std::uint32_t id) const;
     };
-} /* namespace gui */
+} // namespace gui

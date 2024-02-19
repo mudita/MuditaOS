@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RawFont.hpp"
@@ -86,7 +86,7 @@ namespace gui
         return gui::Status::GUI_SUCCESS;
     }
 
-    int32_t RawFont::getKerning(std::uint32_t id1, std::uint32_t id2) const
+    std::int32_t RawFont::getKerning(std::uint32_t id1, std::uint32_t id2) const
     {
         if (id2 == none_char_id) {
             return 0;
@@ -111,28 +111,27 @@ namespace gui
         return kern->amount;
     }
 
-    std::uint32_t RawFont::getCharCountInSpace(const UTF8 &str, const std::uint32_t space) const
+    std::uint32_t RawFont::getCharCountInSpace(const UTF8 &str, const std::uint32_t availableSpace) const
     {
-        std::uint32_t availableSpace = space;
-        std::uint32_t textSpace      = 0;
         std::uint32_t count          = 0;
-        std::uint32_t current        = 0;
-        std::uint32_t previous       = none_char_id;
+        std::uint32_t usedSpace      = 0;
+        auto previousChar            = none_char_id;
 
-        for (std::uint32_t i = 0; i < str.length(); ++i, ++count) {
-            current = str[i];
-            textSpace += getCharPixelWidth(current, previous);
-            if (availableSpace < textSpace) {
-                return count - 1;
+        while (count < str.length()) {
+            const auto currentChar = str[count];
+            usedSpace += getCharPixelWidth(currentChar, previousChar);
+            if (availableSpace < usedSpace) {
+                return ((count > 0) ? (count - 1) : 0);
             }
-            previous = current;
+            previousChar = currentChar;
+            ++count;
         }
         return count;
     }
 
     FontGlyph *RawFont::getGlyph(std::uint32_t glyph_id) const
     {
-        auto glyph = this->findGlyph(glyph_id);
+        auto glyph = findGlyph(glyph_id);
         if (glyph != nullptr) {
             return glyph;
         }
@@ -286,4 +285,4 @@ namespace gui
             fallback_font = fallback;
         }
     }
-} /* namespace gui */
+} // namespace gui
