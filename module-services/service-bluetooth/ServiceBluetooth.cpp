@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-bluetooth/ServiceBluetooth.hpp"
@@ -52,11 +52,11 @@ namespace
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", BluetoothServiceStackDepth)
 {
     bus.channels.push_back(sys::BusChannel::ServiceCellularNotifications);
+    bus.channels.push_back(sys::BusChannel::BatteryStatusNotification);
 }
 
 ServiceBluetooth::~ServiceBluetooth()
-{
-}
+{}
 
 sys::ReturnCodes ServiceBluetooth::InitHandler()
 {
