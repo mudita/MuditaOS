@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MultiTextLine.hpp"
@@ -6,10 +6,10 @@
 namespace gui
 {
     /// Note - line breaking could be done here with different TextLines to return
-    /// or via different block types (i.e. numeric block tyle could be not "breakable"
+    /// or via different block types (i.e. numeric block type could be not "breakable")
     MultiTextLine::MultiTextLine(BlockCursor &localCursor, unsigned int maxWidth) : TextLine(maxWidth)
     {
-        do {
+        while (true) {
             if (!localCursor) { // cursor is faulty
                 lineEnd = true;
                 return;
@@ -29,7 +29,7 @@ namespace gui
                 continue;
             }
 
-            auto textFormat = localCursor->getFormat();
+            const auto textFormat = localCursor->getFormat();
             if (textFormat->getFont() == nullptr) {
                 lineEnd = true;
                 return;
@@ -41,7 +41,7 @@ namespace gui
                 return;
             }
 
-            auto signsCountToShow = calculateSignsToShow(localCursor, text, maxWidth - widthUsed);
+            const auto signsCountToShow = calculateSignsToShow(localCursor, text, maxWidth - widthUsed);
 
             // we can show nothing - this is the end of this line
             if (signsCountToShow == 0) {
@@ -57,7 +57,7 @@ namespace gui
             }
 
             // create item for show and update Line data
-            auto item = buildUITextPart(textToPrint(signsCountToShow, text), textFormat);
+            const auto item = buildUITextPart(textToPrint(signsCountToShow, text), textFormat);
             shownLetterCount += signsCountToShow;
             widthUsed += item->widgetArea.w;
             heightUsed = std::max(heightUsed, item->widgetArea.h);
@@ -82,8 +82,7 @@ namespace gui
                 end = TextBlock::End::None;
                 return;
             }
-
-        } while (true);
+        }
     }
 
     unsigned int MultiTextLine::calculateSignsToShow(BlockCursor &localCursor, UTF8 &text, unsigned int space)
@@ -91,7 +90,7 @@ namespace gui
         auto signsCountToShow = localCursor->getFormat()->getFont()->getCharCountInSpace(text, space);
 
         // additional one sign to detect potential space as last character in line
-        auto searchSubstring = text.substr(0, signsCountToShow + 1);
+        const auto searchSubstring = text.substr(0, signsCountToShow + 1);
 
         auto newlinePos = searchSubstring.findLast("\n", signsCountToShow);
         auto spacePos   = searchSubstring.findLast(" ", signsCountToShow);
@@ -117,7 +116,7 @@ namespace gui
 
             breakLineDashAddition = false;
         }
-        // if sings still left in text add dash sign
+        // if signs still left in text add dash sign
         else if (signsCountToShow != 0 && signsCountToShow < text.length()) {
             // decrease character shown count by one to fit dash
             signsCountToShow      = signsCountToShow - 1;
