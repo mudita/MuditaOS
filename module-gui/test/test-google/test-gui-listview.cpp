@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
@@ -42,7 +42,7 @@ class ListViewTesting : public ::testing::Test
             key = gui::KeyCode::KEY_DOWN;
 
         for (unsigned int i = 0; i < n; i++) {
-            testListView->onInput(gui::InputEvent({}, gui::InputEvent::State::keyReleasedShort, key));
+            testListView->onInput(gui::InputEvent({}, gui::InputEvent::State::KeyReleasedShort, key));
         }
     }
 
