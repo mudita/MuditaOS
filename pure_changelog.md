@@ -9,7 +9,8 @@
 ### Added
 
 ### Changed / Improved
-
+* Updated share capital in EULA.
+* Updated copy on final onboarding screen.
 
 ## [1.11.0 2023-12-15]
 

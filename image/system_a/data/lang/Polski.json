@@ -345,7 +345,7 @@
     "app_onboarding_title": "Wprowadzenie",
     "app_onboarding_title_configuration": "Konfiguracja",
     "app_onboarding_title_update_info": "Aktualizacja MuditaOS",
-    "app_onboarding_update_info": "<text>Aktualna wersja MuditaOS to<br></br><token>$VERSION</token>.<br></br>Aktualizacje z nowymi funkcjami i poprawkami pojawiaj\u0105 si\u0119 regularnie.<br></br>Aby zaktualizowa\u0107 telefon, odwied\u017a stron\u0119:<br></br></text><text weight='bold' size='27'>www.mudita.com/updateos</text><br></br><text>i post\u0119puj zgodnie ze wskaz\u00f3wkami.</text>",
+    "app_onboarding_update_info": "<text>Aktualna wersja MuditaOS to<br></br><token>$VERSION</token>.<br></br>Aby zaktualizowa\u0107 telefon, odwied\u017a stron\u0119:<br></br></text><text weight='bold' size='27'>www.mudita.com/updateos</text><br></br><text>i post\u0119puj zgodnie ze wskaz\u00f3wkami.</text>",
     "app_options_contact_add": "Dodaj do kontakt\u00f3w",
     "app_options_contact_details": "Szczeg\u00f3\u0142y kontaktu",
     "app_options_contact_edit": "Edytuj kontakt",

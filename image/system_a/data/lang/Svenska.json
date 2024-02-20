@@ -204,7 +204,7 @@
     "app_onboarding_skip_confirm": "<text> SIM-installation kr\u00e4vs f\u00f6r <br/> n\u00e4tverksanslutning. Hoppar du \u00e4nd\u00e5 \u00f6ver installationen? </text>",
     "app_onboarding_title_configuration": "Konfiguration",
     "app_onboarding_title_update_info": "MuditaOS-uppdatering",
-    "app_onboarding_update_info": "<text>Den nuvarande versionen av MuditaOS <br/> \u00e4r <token>$VERSION</token>. <br/> Uppdateringar med nya funktioner och korrigeringar visas ofta. <br/>F\u00f6r att uppdatera din telefon v\u00e4nligen bes\u00f6k: </text> <text weight='bold' size='27'>www.mudita.com/updateos</text> <text><br/>och f\u00f6lj instruktionerna.</text>",
+    "app_onboarding_update_info": "<text>Den nuvarande versionen av MuditaOS <br/> \u00e4r <token>$VERSION</token>.<br/>F\u00f6r att uppdatera din telefon v\u00e4nligen bes\u00f6k:<br></br></text> <text weight='bold' size='27'>www.mudita.com/updateos</text> <text><br/>och f\u00f6lj instruktionerna.</text>",
     "app_options_contact_add": "L\u00e4gg till i kontakter",
     "app_options_contact_details": "Kontaktuppgifter",
     "app_options_contact_edit": "Redigera kontakt",
