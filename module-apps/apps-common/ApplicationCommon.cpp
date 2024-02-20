@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationCommon.hpp"
@@ -113,9 +113,13 @@ namespace app
         connect(typeid(cellular::msg::notification::SimStateUpdate),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleSimStateUpdateMessage(msg); });
         connect(typeid(sdesktop::usb::USBConnected),
-                [&](sys::Message *msg) -> sys::MessagePointer { return handleUSBStatusChange(); });
-        connect(typeid(sdesktop::usb::USBDisconnected),
-                [&](sys::Message *msg) -> sys::MessagePointer { return handleUSBStatusChange(); });
+                [&](sys::Message *msg) -> sys::MessagePointer { return handleUsbStatusChange(); });
+        connect(typeid(sdesktop::usb::USBDisconnected), [&](sys::Message *msg) -> sys::MessagePointer {
+            if (onUsbDisconnected != nullptr) {
+                onUsbDisconnected();
+            }
+            return handleUsbStatusChange();
+        });
 
         addActionReceiver(app::manager::actions::PhoneModeChanged, [this](auto &&params) {
             if (params != nullptr) {
@@ -452,7 +456,7 @@ namespace app
         return sys::msgHandled();
     }
 
-    sys::MessagePointer ApplicationCommon::handleUSBStatusChange()
+    sys::MessagePointer ApplicationCommon::handleUsbStatusChange()
     {
         if ((state == State::ACTIVE_FORGROUND) && getCurrentWindow()->updateBatteryStatus()) {
             refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);

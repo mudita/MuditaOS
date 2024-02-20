@@ -66,7 +66,7 @@ namespace gui
         auto getAlarmTime() const -> std::time_t override;
         auto setAlarmTime(std::time_t newTime) -> void override;
         auto setSnoozeTime(std::time_t newTime) -> void override;
-        auto setUSBStatusConnected() -> void override;
+        auto updateUsbStatus(bool isConnected) -> void override;
 
         auto getSnoozeTimer() -> SnoozeTimer * override;
         auto getLayout() -> Item * override;

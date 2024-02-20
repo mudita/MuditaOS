@@ -50,7 +50,7 @@ namespace gui
         virtual void setViewState(app::home_screen::ViewState state)            = 0;
         virtual void setTextDescription(const UTF8 &desc)                       = 0;
         virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
-        virtual void setUSBStatusConnected()                                    = 0;
+        virtual void updateUsbStatus(bool isConnected)                          = 0;
         virtual void setTime(std::time_t newTime)                               = 0;
         virtual void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt)    = 0;
         virtual std::time_t getAlarmTime() const                                = 0;

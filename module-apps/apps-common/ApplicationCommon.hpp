@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -176,6 +176,8 @@ namespace app
         using OnActionReceived = std::function<ActionResult(manager::actions::ActionParamsPtr &&)>;
 
       protected:
+        std::function<void()> onUsbDisconnected;
+
         virtual sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl);
         virtual sys::MessagePointer handleApplicationSwitch(sys::Message *msgl);
         virtual sys::MessagePointer handleAppClose(sys::Message *msgl);
@@ -194,7 +196,7 @@ namespace app
         sys::MessagePointer handleNetworkAccessTechnologyUpdate(sys::Message *msgl);
         sys::MessagePointer handleInputEvent(sys::Message *msgl);
         sys::MessagePointer handleBatteryStatusChange();
-        sys::MessagePointer handleUSBStatusChange();
+        sys::MessagePointer handleUsbStatusChange();
         sys::MessagePointer handleSimStateUpdateMessage(sys::Message *msgl);
         sys::MessagePointer handleMinuteUpdated(sys::Message *msgl);
         sys::MessagePointer handleAction(sys::Message *msgl);

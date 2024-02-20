@@ -10,6 +10,7 @@ target_sources(application-bell-main
         windows/BellMainMenuWindow.cpp
 
         models/TemperatureModel.cpp
+        models/UsbStatusModel.cpp
 
         presenters/HomeScreenPresenter.cpp
         presenters/StateController.cpp
@@ -19,6 +20,7 @@ target_sources(application-bell-main
         windows/BellMainMenuWindow.hpp
 
         models/TemperatureModel.hpp
+        models/UsbStatusModel.hpp
 
         presenters/StateController.hpp
 
