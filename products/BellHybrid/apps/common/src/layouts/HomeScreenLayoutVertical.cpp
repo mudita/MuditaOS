@@ -162,16 +162,8 @@ namespace gui
     void HomeScreenLayoutVertical::setBatteryLevelState(const Store::Battery &batteryContext)
     {
         battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
-        connectionStatus->checkIfConnected(batteryContext.state);
-
-        if (isBatteryVisibilityAllowed(batteryContext)) {
-            battery->setVisible(true);
-        }
-        else {
-            battery->setVisible(false);
-        }
+        battery->setVisible(isBatteryVisibilityAllowed(batteryContext));
         battery->informContentChanged();
-        connectionStatus->informContentChanged();
     }
 
     void HomeScreenLayoutVertical::setTime(std::time_t newTime)
@@ -210,9 +202,9 @@ namespace gui
     {
         return this;
     }
-    auto HomeScreenLayoutVertical::setUSBStatusConnected() -> void
+    auto HomeScreenLayoutVertical::updateUsbStatus(bool isConnected) -> void
     {
-        connectionStatus->setConnected();
+        connectionStatus->show(isConnected);
         connectionStatus->informContentChanged();
     }
 

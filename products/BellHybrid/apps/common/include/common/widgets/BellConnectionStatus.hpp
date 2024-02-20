@@ -14,8 +14,7 @@ namespace gui
       public:
         BellConnectionStatus(Item *parent);
         void setFont(const UTF8 &fontName);
-        void checkIfConnected(const Store::Battery::State &state);
-        void setConnected();
+        void show(bool visibility);
 
       private:
         Text *statusText = nullptr;

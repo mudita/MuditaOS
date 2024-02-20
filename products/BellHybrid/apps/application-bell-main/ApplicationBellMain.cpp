@@ -3,6 +3,7 @@
 
 #include "include/application-bell-main/ApplicationBellMain.hpp"
 #include "models/TemperatureModel.hpp"
+#include "models/UsbStatusModel.hpp"
 
 #include "windows/BellBatteryShutdownWindow.hpp"
 #include "windows/BellHomeScreenWindow.hpp"
@@ -81,11 +82,13 @@ namespace app
         });
 
         connect(typeid(sdesktop::usb::USBConfigured), [&](sys::Message *msg) -> sys::MessagePointer {
+            usbStatusModel->setUsbStatus(app::AbstractUsbStatusModel::UsbStatus::Connected);
             if (getCurrentWindow()->getName() == gui::name::window::main_window) {
-                homeScreenPresenter->setUSBStatusConnected();
+                homeScreenPresenter->updateUsbStatus();
             }
             return sys::msgHandled();
         });
+
         connect(typeid(AlarmDeactivated), [this](sys::Message *request) -> sys::MessagePointer {
             alarmModel->turnOff();
             alarmModel->activateAlarm(false);
@@ -95,6 +98,10 @@ namespace app
             alarmModel->activateAlarm(true);
             return sys::msgHandled();
         });
+
+        onUsbDisconnected = [this]() {
+            usbStatusModel->setUsbStatus(app::AbstractUsbStatusModel::UsbStatus::Disconnected);
+        };
     }
 
     sys::ReturnCodes ApplicationBellMain::InitHandler()
@@ -109,13 +116,15 @@ namespace app
         temperatureModel              = std::make_unique<app::home_screen::TemperatureModel>(this);
         userSessionModel              = std::make_unique<app::UserSessionModel>(this);
         batteryLevelNotificationModel = std::make_unique<app::BatteryLevelNotificationModel>();
+        usbStatusModel                = std::make_unique<app::UsbStatusModel>();
         homeScreenPresenter           = std::make_shared<app::home_screen::HomeScreenPresenter>(this,
                                                                                       *alarmModel,
                                                                                       *batteryModel,
                                                                                       *temperatureModel,
                                                                                       *timeModel,
                                                                                       *userSessionModel,
-                                                                                      *batteryLevelNotificationModel);
+                                                                                      *batteryLevelNotificationModel,
+                                                                                      *usbStatusModel);
 
         createUserInterface();
 

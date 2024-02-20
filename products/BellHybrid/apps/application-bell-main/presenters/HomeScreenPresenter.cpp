@@ -4,6 +4,7 @@
 #include "application-bell-main/presenters/HomeScreenPresenter.hpp"
 #include "StateController.hpp"
 #include "models/TemperatureModel.hpp"
+#include "models/UsbStatusModel.hpp"
 
 #include <windows/BellHomeScreenWindow.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
@@ -78,11 +79,12 @@ namespace app::home_screen
                                              AbstractTemperatureModel &temperatureModel,
                                              AbstractTimeModel &timeModel,
                                              AbstractUserSessionModel &userSessionModel,
-                                             AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel)
+                                             AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel,
+                                             AbstractUsbStatusModel &usbStatusModel)
         : app{app}, alarmModel{alarmModel}, batteryModel{batteryModel},
           temperatureModel{temperatureModel}, timeModel{timeModel}, userSessionModel{userSessionModel},
-          batteryLevelNotificationModel{batteryLevelNotificationModel}, rngEngine{std::make_unique<std::mt19937>(
-                                                                            bsp::trng::getRandomValue())}
+          batteryLevelNotificationModel{batteryLevelNotificationModel},
+          usbStatusModel{usbStatusModel}, rngEngine{std::make_unique<std::mt19937>(bsp::trng::getRandomValue())}
     {}
 
     gui::RefreshModes HomeScreenPresenter::handleUpdateTimeEvent()
@@ -133,6 +135,7 @@ namespace app::home_screen
         getView()->setAlarmTimeFormat(timeModel.getTimeFormat());
         getView()->setSnoozeFormat(timeModel.getTimeFormat());
         getView()->setTemperature(temperatureModel.getTemperature());
+        updateUsbStatus();
     }
     void HomeScreenPresenter::createData()
     {
@@ -221,6 +224,7 @@ namespace app::home_screen
     void HomeScreenPresenter::handleBatteryStatus()
     {
         stateController->handleBatteryStatus();
+        updateUsbStatus();
     }
 
     void HomeScreenPresenter::setLayout(gui::LayoutGenerator layoutGenerator)
@@ -273,9 +277,11 @@ namespace app::home_screen
         return greetingCollection[dist(*rngEngine)];
     };
 
-    void HomeScreenPresenter::setUSBStatusConnected()
+    void HomeScreenPresenter::updateUsbStatus()
     {
-        getView()->setUSBStatusConnected();
+        const auto batteryState   = batteryModel.getLevelState().state;
+        const bool isUsbConnected = usbStatusModel.isUsbConnected(batteryState);
+        getView()->updateUsbStatus(isUsbConnected);
     }
 
     bool HomeScreenPresenter::isLowBatteryWarningNeeded()

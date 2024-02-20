@@ -26,7 +26,7 @@ namespace gui
         statusText->activeItem = false;
         statusText->drawUnderline(false);
         statusText->setText(utils::translate(usb_connected_status));
-        statusText->setVisible(true);
+        statusText->setVisible(false);
     }
 
     void BellConnectionStatus::setFont(const UTF8 &fontName)
@@ -34,15 +34,8 @@ namespace gui
         statusText->setFont(fontName);
     }
 
-    void BellConnectionStatus::checkIfConnected(const Store::Battery::State &state)
+    void BellConnectionStatus::show(bool visibility)
     {
-        if (state != Store::Battery::State::PluggedNotCharging) {
-            statusText->setVisible(false);
-        }
-    }
-
-    void BellConnectionStatus::setConnected()
-    {
-        statusText->setVisible(true);
+        statusText->setVisible(visibility);
     }
 } // namespace gui
