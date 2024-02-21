@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -142,7 +142,7 @@ TEST_CASE("Quotes")
         auto oldRandomizedSequence = quotesString;
 
         // Add a new quote
-        auto quoteId = tester->addQuote(quote, author, enabled);
+        auto quoteId = static_cast<std::int32_t>(tester->addQuote(quote, author, enabled));
         REQUIRE(oldRandomizedSequence != quotesString);
 
         // Check if quotes count has increased
