@@ -51,6 +51,7 @@ target_sources(service-appmgr
         include/service-appmgr/messages/GetCurrentDisplayLanguageRequest.hpp
         include/service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp
         include/service-appmgr/messages/LanguageChangeRequest.hpp
+        include/service-appmgr/messages/InformDateChanged.hpp
         include/service-appmgr/messages/Message.hpp
         include/service-appmgr/messages/PowerSaveModeInitRequest.hpp
         include/service-appmgr/messages/PreventBlockingRequest.hpp

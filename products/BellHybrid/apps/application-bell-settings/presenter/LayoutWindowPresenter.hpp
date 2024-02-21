@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,6 +7,8 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <common/models/LayoutModel.hpp>
 #include <common/models/TimeModel.hpp>
+#include <common/models/QuoteModel.hpp>
+#include <common/layouts/HomeScreenLayouts.hpp>
 #include <common/layouts/HomeScreenLayouts.hpp>
 
 #include <vector>
@@ -39,13 +41,15 @@ namespace app::bell_settings
         app::ApplicationCommon *app{};
         std::unique_ptr<AbstractLayoutModel> layoutModel;
         std::unique_ptr<AbstractTimeModel> timeModel;
-        std::vector<std::pair<gui::Item *, const std::string>> layoutOptions;
+        std::unique_ptr<AbstractQuoteModel> quoteModel;
+        std::vector<std::pair<gui::BaseHomeScreenLayoutProvider *, const std::string>> layoutOptions;
         void initLayoutOptions();
 
       public:
         explicit LayoutWindowPresenter(app::ApplicationCommon *app,
                                        std::unique_ptr<AbstractLayoutModel> &&layoutModel,
-                                       std::unique_ptr<AbstractTimeModel> &&timeModel);
+                                       std::unique_ptr<AbstractTimeModel> &&timeModel,
+                                       std::unique_ptr<AbstractQuoteModel> &&quoteModel);
 
         std::vector<gui::Item *> getLayouts() const override;
         gui::Item *getSelectedLayout() const override;

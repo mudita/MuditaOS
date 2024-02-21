@@ -112,6 +112,7 @@ namespace app
         userSessionModel              = std::make_unique<app::UserSessionModel>(this);
         batteryLevelNotificationModel = std::make_unique<app::BatteryLevelNotificationModel>();
         usbStatusModel                = std::make_unique<app::UsbStatusModel>();
+        quoteModel                    = std::make_unique<app::QuoteModel>(this);
         homeScreenPresenter           = std::make_shared<app::home_screen::HomeScreenPresenter>(this,
                                                                                       *alarmModel,
                                                                                       *batteryModel,
@@ -119,7 +120,8 @@ namespace app
                                                                                       *timeModel,
                                                                                       *userSessionModel,
                                                                                       *batteryLevelNotificationModel,
-                                                                                      *usbStatusModel);
+                                                                                      *usbStatusModel,
+                                                                                      *quoteModel);
 
         createUserInterface();
 
