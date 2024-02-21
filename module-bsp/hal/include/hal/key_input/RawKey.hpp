@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,11 +7,11 @@
 #include <hal/key_input/KeyEventDefinitions.hpp>
 
 /// default application timer trigger
-inline constexpr std::uint32_t keyTimerMs = 200;
+const inline uint32_t keyTimerMs = 200;
 /// default time key press will be counted as press again
-inline constexpr std::uint32_t keyTimeCycleMs = 1200;
+const inline uint32_t keyTimeCycleMs = 1200;
 /// default long press time
-inline constexpr std::uint32_t keyTimeLongpressMs = 1000;
+const inline uint32_t keyTimeLongpressMs = 1000;
 
 struct RawKey
 {

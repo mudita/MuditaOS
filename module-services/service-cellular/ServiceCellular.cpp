@@ -114,15 +114,15 @@ namespace constants
 {
     using namespace std::chrono_literals;
 
-    constexpr auto serviceCellularStackSize = 1024 * 8;
+    inline constexpr auto cellularStack = 1024 * 8;
 
-    constexpr std::chrono::milliseconds sleepTimerInterval{500ms};
-    constexpr std::chrono::milliseconds maxUrcHandleTime{5s};
-    constexpr std::chrono::milliseconds maxTimeWithoutCommunication{1s};
+    inline constexpr std::chrono::milliseconds sleepTimerInterval{500ms};
+    inline constexpr std::chrono::milliseconds maxUrcHandleTime{5s};
+    inline constexpr std::chrono::milliseconds maxTimeWithoutCommunication{1s};
 } // namespace constants
 
 ServiceCellular::ServiceCellular()
-    : sys::Service(::service::name::cellular, "", constants::serviceCellularStackSize, sys::ServicePriority::Idle),
+    : sys::Service(::service::name::cellular, "", constants::cellularStack, sys::ServicePriority::Idle),
       phoneModeObserver{std::make_unique<sys::phone_modes::Observer>()},
       priv{std::make_unique<internal::ServiceCellularPriv>(this)}
 {

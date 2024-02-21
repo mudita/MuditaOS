@@ -533,7 +533,7 @@ namespace app::home_screen
 
         switch (key) {
         case KeyMap::Back:
-            if (inputEvent.getState() == gui::InputEvent::State::KeyReleasedLong) {
+            if (inputEvent.getState() == gui::InputEvent::State::keyReleasedLong) {
                 pimpl->sm->process_event(Events::LongBackPress{});
             }
             else {

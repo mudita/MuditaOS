@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -101,14 +101,14 @@ TEST_CASE("gui::Window on input flow test")
 
         win.setFocusItem(l1);
         focus_acquired_l2 = false;
-        win.onInput(gui::InputEvent({}, gui::InputEvent::State::KeyReleasedShort, gui::KeyCode::KEY_DOWN));
+        win.onInput(gui::InputEvent({}, gui::InputEvent::State::keyReleasedShort, gui::KeyCode::KEY_DOWN));
         REQUIRE(focus_acquired_l2);
 
         focus_acquired_l1 = false;
-        win.onInput(gui::InputEvent({}, gui::InputEvent::State::KeyReleasedShort, gui::KeyCode::KEY_DOWN));
+        win.onInput(gui::InputEvent({}, gui::InputEvent::State::keyReleasedShort, gui::KeyCode::KEY_DOWN));
         REQUIRE(focus_acquired_l1);
 
-        win.onInput(gui::InputEvent({}, gui::InputEvent::State::KeyReleasedShort, gui::KeyCode::KEY_TORCH));
+        win.onInput(gui::InputEvent({}, gui::InputEvent::State::keyReleasedShort, gui::KeyCode::KEY_TORCH));
         REQUIRE(l1_input_handled);
     }
 }
