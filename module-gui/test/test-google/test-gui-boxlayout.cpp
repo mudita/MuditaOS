@@ -1,37 +1,37 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "gtest/gtest.h"
 
 #include "TestBoxLayout.hpp"
 
+#include <log/log.hpp>
 #include <module-gui/test/mock/TestListViewProvider.hpp>
 #include <gui/input/InputEvent.hpp>
 
 namespace testStyle
 {
-    constexpr std::uint32_t box_x = 0;
-    constexpr std::uint32_t box_y = 0;
-    constexpr std::uint32_t box_w = 200;
-    constexpr std::uint32_t box_h = 600;
+    const inline uint32_t box_x = 0;
+    const inline uint32_t box_y = 0;
+    const inline uint32_t box_w = 200;
+    const inline uint32_t box_h = 600;
 
-    constexpr std::uint32_t VBox_w = 200;
-    constexpr std::uint32_t VBox_h = 600;
-    constexpr std::uint32_t HBox_w = 200;
-    constexpr std::uint32_t HBox_h = 50;
+    const inline uint32_t VBox_w = 200;
+    const inline uint32_t VBox_h = 600;
+    const inline uint32_t HBox_w = 200;
+    const inline uint32_t HBox_h = 50;
 
-    constexpr std::uint32_t VBox_item_w = 200;
-    constexpr std::uint32_t VBox_item_h = 100;
-    constexpr std::uint32_t HBox_item_w = 50;
-    constexpr std::uint32_t HBox_item_h = 50;
+    const inline uint32_t VBox_item_w = 200;
+    const inline uint32_t VBox_item_h = 100;
+    const inline uint32_t HBox_item_w = 50;
+    const inline uint32_t HBox_item_h = 50;
 } // namespace testStyle
 
 class TestItem : public gui::Rect
 {
   public:
     unsigned int ID = 0;
-    TestItem(Item *parent, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h)
-        : Rect(parent, x, y, w, h){};
+    TestItem(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h) : Rect(parent, x, y, w, h){};
     ~TestItem() = default;
 };
 
@@ -64,14 +64,14 @@ class BoxLayoutTesting : public ::testing::Test
     void moveNTimes(gui::BoxLayout *Box, unsigned int n, gui::KeyCode key)
     {
         for (unsigned int i = 0; i < n; i++) {
-            Box->onInput(gui::InputEvent({}, gui::InputEvent::State::KeyReleasedShort, key));
+            Box->onInput(gui::InputEvent({}, gui::InputEvent::State::keyReleasedShort, key));
         }
     }
 
     void addNItems(gui::BoxLayout *Box,
                    unsigned int n,
-                   std::uint32_t item_w,
-                   std::uint32_t item_h,
+                   uint32_t item_w,
+                   uint32_t item_h,
                    const gui::Margins &margins = gui::Margins())
     {
         for (unsigned int i = 1; i <= n; i++) {
@@ -97,11 +97,11 @@ class BoxLayoutTesting : public ::testing::Test
     gui::VBox *testVBoxLayout    = nullptr;
     gui::HBox *testHBoxLayout    = nullptr;
 
-    static constexpr unsigned int fillVBoxPage     = testStyle::VBox_h / testStyle::VBox_item_h;
-    static constexpr unsigned int notFillVBoxPage  = fillVBoxPage - 2;
-    static constexpr unsigned int fillHBoxPage     = testStyle::HBox_w / testStyle::HBox_item_w;
-    static constexpr unsigned int notFillHVBoxPage = fillHBoxPage - 1;
-    static constexpr unsigned int overflowHBoxPage = fillHBoxPage + 2;
+    const unsigned int fillVBoxPage     = testStyle::VBox_h / testStyle::VBox_item_h;
+    const unsigned int notFillVBoxPage  = fillVBoxPage - 2;
+    const unsigned int fillHBoxPage     = testStyle::HBox_w / testStyle::HBox_item_w;
+    const unsigned int notFillHVBoxPage = fillHBoxPage - 1;
+    const unsigned int overflowHBoxPage = fillHBoxPage + 2;
 };
 
 TEST_F(BoxLayoutTesting, Constructor_Destructor_Test)

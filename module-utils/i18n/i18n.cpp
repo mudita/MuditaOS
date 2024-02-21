@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "i18nImpl.hpp"
@@ -52,12 +52,13 @@ namespace utils
         }
 
         i18nPrivateInterface localize;
+
     } // namespace
 
     void i18n::resetAssetsPath(const std::filesystem::path &assets)
     {
-        displayLanguageDirPath = assets / "lang";
-        inputLanguageDirPath   = assets / "profiles";
+        DisplayLanguageDirPath = assets / "lang";
+        InputLanguageDirPath   = assets / "profiles";
     }
 
     bool i18n::setInputLanguage(const Language &lang)
@@ -177,9 +178,10 @@ namespace utils
         if (result != metadata.end()) {
             return *result;
         }
-        return {};
+        else {
+            return {};
+        }
     }
-
     std::optional<LanguageMetadata> i18n::fetchMetadata(const std::filesystem::path &path) const
     {
         if (const auto jsonData = loader(path)) {
@@ -187,7 +189,6 @@ namespace utils
         }
         return {};
     }
-
     std::vector<Language> i18n::getAvailableDisplayLanguages() const
     {
         std::vector<Language> languages{metadata.size()};
@@ -196,6 +197,14 @@ namespace utils
 
         std::sort(languages.begin(), languages.end());
         return languages;
+    }
+    std::vector<Language> i18n::getAvailableInputLanguages() const
+    {
+        std::vector<Language> languageNames;
+        for (const auto &entry : std::filesystem::directory_iterator(getInputLanguagePath())) {
+            languageNames.push_back(std::filesystem::path(entry.path()).stem());
+        }
+        return languageNames;
     }
 
     void resetDisplayLanguages()
@@ -207,9 +216,9 @@ namespace utils
     {
         return localize.resetAssetsPath(p);
     }
-
     std::vector<Language> getAvailableDisplayLanguages()
     {
         return localize.getAvailableDisplayLanguages();
     }
+
 } // namespace utils

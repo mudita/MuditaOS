@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <data/CalculatorInputProcessorText.hpp>
@@ -30,13 +30,13 @@ SCENARIO("Input Processor tests")
 
         auto shortPressEvent = [](KeyCodes code) -> gui::InputEvent {
             return gui::InputEvent{RawKey{RawKey::State::Released, code, 0, 0},
-                                   gui::InputEvent::State::KeyReleasedShort,
+                                   gui::InputEvent::State::keyReleasedShort,
                                    static_cast<gui::KeyCode>(code)};
         };
 
         auto longPressEvent = [](KeyCodes code) -> gui::InputEvent {
             return gui::InputEvent{RawKey{RawKey::State::Released, code, 0, 0},
-                                   gui::InputEvent::State::KeyReleasedLong,
+                                   gui::InputEvent::State::keyReleasedLong,
                                    static_cast<gui::KeyCode>(code)};
         };
 

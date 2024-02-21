@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,8 +27,8 @@ namespace utils
         Language inputLanguage        = fallbackLanguageName;
         Language inputLanguageFilename;
         Language currentDisplayLanguage;
-        std::filesystem::path inputLanguageDirPath   = purefs::dir::getSystemDataDirPath() / "profiles";
-        std::filesystem::path displayLanguageDirPath = purefs::dir::getSystemDataDirPath() / "lang";
+        std::filesystem::path InputLanguageDirPath   = purefs::dir::getSystemDataDirPath() / "profiles";
+        std::filesystem::path DisplayLanguageDirPath = purefs::dir::getSystemDataDirPath() / "lang";
         cpp_freertos::MutexStandard mutex;
         std::vector<LanguageMetadata> metadata;
 
@@ -59,16 +59,18 @@ namespace utils
         bool setDisplayLanguage(const Language &lang);
         const std::filesystem::path getInputLanguagePath() const
         {
-            return inputLanguageDirPath;
+            return InputLanguageDirPath;
         }
         const std::filesystem::path getDisplayLanguagePath() const
         {
-            return displayLanguageDirPath;
+            return DisplayLanguageDirPath;
         }
 
         std::vector<Language> getAvailableDisplayLanguages() const;
+        std::vector<Language> getAvailableInputLanguages() const;
 
         void resetDisplayLanguages();
         void resetAssetsPath(const std::filesystem::path &);
     };
+
 } // namespace utils
