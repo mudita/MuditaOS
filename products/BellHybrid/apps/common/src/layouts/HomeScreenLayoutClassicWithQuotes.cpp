@@ -61,10 +61,14 @@ namespace gui
         quoteImg->setMargins({0, imgTopMargin, 0, 0});
         quoteImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
-        // We do not display information about the battery status at any time
-        // only about the status of the USB connection
+        /* We do not display information about the battery status at any time
+         * only about the status of the USB connection. */
         widgetBox->removeWidget(infoBox);
         widgetBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        infoBox->setVisible(false);
+        /* Add item to body even if it won't fit to avoid manual memory
+         * management for item. */
+        widgetBox->addWidget(infoBox);
 
         textBox = new VBox(nullptr);
         textBox->setMinimumSize(style::bell_base_layout::last_layout_w, textBoxHeight);
