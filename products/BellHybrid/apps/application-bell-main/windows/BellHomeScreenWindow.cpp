@@ -190,4 +190,11 @@ namespace gui
         }
     }
 
+    void BellHomeScreenWindow::setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor)
+    {
+        if (currentLayout) {
+            currentLayout->setQuoteText(quoteContent, quoteAuthor);
+        }
+    }
+
 } // namespace gui

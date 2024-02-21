@@ -11,6 +11,7 @@ namespace gui
     {
       public:
         explicit HomeScreenLayoutClassicWithQuotes(std::string name);
+        void setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor) override;
 
       protected:
         void buildInterface() override;

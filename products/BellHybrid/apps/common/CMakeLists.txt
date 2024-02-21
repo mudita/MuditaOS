@@ -20,6 +20,7 @@ target_sources(application-bell-common
         src/TimeModel.cpp
         src/UserSessionModel.cpp
         src/BatteryModel.cpp
+        src/QuoteModel.cpp
         src/BatteryLevelNotificationModel.cpp
         src/SoundsRepository.cpp
         src/BellListItemProvider.cpp
@@ -114,6 +115,7 @@ target_sources(application-bell-common
         include/common/models/AbstractAlarmSettingsModel.hpp
         include/common/models/LayoutModel.hpp
         include/common/models/LowBatteryInfoModel.hpp
+        include/common/models/QuoteModel.hpp
         include/common/popups/presenter/AlarmActivatedPresenter.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp

@@ -61,10 +61,14 @@ namespace gui
         quoteImg->setMargins({0, imgTopMargin, 0, 0});
         quoteImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
-        // We do not display information about the battery status at any time
-        // only about the status of the USB connection
+        /* We do not display information about the battery status at any time
+         * only about the status of the USB connection. */
         widgetBox->removeWidget(infoBox);
         widgetBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        infoBox->setVisible(false);
+        /* Add item to body even if it won't fit to avoid manual memory
+         * management for item. */
+        widgetBox->addWidget(infoBox);
 
         textBox = new VBox(nullptr);
         textBox->setMinimumSize(style::bell_base_layout::last_layout_w, textBoxHeight);
@@ -76,7 +80,7 @@ namespace gui
         quotes->setMaximumSize(style::bell_base_layout::last_layout_w, quoteHeight);
         quotes->setMargins({0, 0, 0, 0});
         quotes->setFont(quoteFont);
-        quotes->setText("Wherever you are, and whatever you do, be in love.");
+        quotes->setText("");
         quotes->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         quotes->setEdges(RectangleEdge::None);
         quotes->activeItem = false;
@@ -87,7 +91,7 @@ namespace gui
         author->setMaximumSize(style::bell_base_layout::last_layout_w, authorHeight);
         author->setMargins({0, 0, 0, 0});
         author->setFont(authorFont);
-        author->setText("-Rumi");
+        author->setText("");
         author->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         author->setEdges(RectangleEdge::None);
         author->activeItem = false;
@@ -122,6 +126,15 @@ namespace gui
             statusBox->setVisible(true);
             statusBox->informContentChanged();
         }
+    }
+
+    void HomeScreenLayoutClassicWithQuotes::setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor)
+    {
+        constexpr auto dash{'-'};
+        UTF8 authorWithDash = quoteAuthor;
+        authorWithDash.insert(&dash, 0);
+        author->setText(authorWithDash);
+        quotes->setText(quoteContent);
     }
 
 }; // namespace gui

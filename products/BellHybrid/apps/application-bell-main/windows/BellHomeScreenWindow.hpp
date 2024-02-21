@@ -41,6 +41,7 @@ namespace gui
         void setSnoozeFormat(utils::time::Locale::TimeFormat fmt) override;
         bool updateBatteryStatus() override;
         void updateUsbStatus(bool isConnected) override;
+        void setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor) override;
 
         std::shared_ptr<app::home_screen::AbstractPresenter> presenter;
 

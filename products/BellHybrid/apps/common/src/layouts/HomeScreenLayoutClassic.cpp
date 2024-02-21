@@ -361,8 +361,7 @@ namespace gui
         if (isConnected && (onShowMessage != nullptr)) {
             onShowMessage();
         }
-        else if (!isConnected && (onHideMessage != nullptr))
-        {
+        else if (!isConnected && (onHideMessage != nullptr)) {
             onHideMessage();
         }
         connectionStatus->show(isConnected);
@@ -392,4 +391,8 @@ namespace gui
             }
         }
     }
+
+    auto HomeScreenLayoutClassic::setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor) -> void
+    {}
+
 }; // namespace gui

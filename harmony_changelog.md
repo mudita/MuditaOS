@@ -7,6 +7,7 @@
 ### Added
 * Added new 32px and 170px fonts
 * Added new clock face with quotes
+* Added a backend for quotes on home screen
 
 ### Changed / Improved
 * Updated FSL drivers from NXP
