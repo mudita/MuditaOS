@@ -115,9 +115,6 @@ namespace app
         connect(typeid(sdesktop::usb::USBConnected),
                 [&](sys::Message *msg) -> sys::MessagePointer { return handleUsbStatusChange(); });
         connect(typeid(sdesktop::usb::USBDisconnected), [&](sys::Message *msg) -> sys::MessagePointer {
-            if (onUsbDisconnected != nullptr) {
-                onUsbDisconnected();
-            }
             return handleUsbStatusChange();
         });
 

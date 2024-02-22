@@ -10,25 +10,17 @@ namespace app
     class AbstractUsbStatusModel
     {
       public:
-        enum class UsbStatus : bool
-        {
-            Disconnected,
-            Connected
-        };
-
         virtual ~AbstractUsbStatusModel() noexcept = default;
 
         virtual bool isUsbConnected(const Store::Battery::State &state) const = 0;
-        virtual void setUsbStatus(UsbStatus status)                           = 0;
     };
 
     class UsbStatusModel : public AbstractUsbStatusModel
     {
       public:
         bool isUsbConnected(const Store::Battery::State &state) const override;
-        void setUsbStatus(UsbStatus status) override;
 
       private:
-        UsbStatus usbConnected{UsbStatus::Disconnected};
+        bool isUsbConfigured() const;
     };
 } // namespace app
