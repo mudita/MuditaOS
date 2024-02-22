@@ -42,7 +42,7 @@ namespace purefs::blkdev
 #endif
         mmcCard->busWidth                   = kMMC_DataBusWidth8bit;
         mmcCard->busTiming                  = kMMC_HighSpeed200Timing;
-        mmcCard->enablePreDefinedBlockCount = true;
+        mmcCard->enablePreDefinedBlockCount = false; // BIWIN eMMC doesn't work stable when this flag is true
         mmcCard->host->hostController.base  = USDHC2;
         mmcCard->host->hostController.sourceClock_Hz =
             CLOCK_GetFreq(kCLOCK_SysPllPfd2Clk) / (CLOCK_GetDiv(kCLOCK_Usdhc2Div) + 1U);
