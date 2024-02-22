@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EventStore.hpp"
@@ -36,6 +36,18 @@ namespace Store
             return true;
         }
         return false;
+    }
+
+    Usb usb;
+
+    const Usb &Usb::get()
+    {
+        return usb;
+    }
+
+    Usb &Usb::modify()
+    {
+        return usb;
     }
 
     cpp_freertos::MutexStandard GSM::mutex;

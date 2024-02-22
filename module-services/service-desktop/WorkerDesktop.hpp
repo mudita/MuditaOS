@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -45,6 +45,10 @@ class WorkerDesktop : public sys::Worker
     bool handleServiceQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
     bool handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
     bool handleSignallingQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue);
+
+    void handleUsbConnected();
+    void handleUsbDisconnected();
+    void handleUsbConfigured();
 
     std::atomic<bool> initialized = false;
     std::atomic<bool> configured  = false;

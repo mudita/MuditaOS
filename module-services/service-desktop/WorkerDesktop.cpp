@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-desktop/ServiceDesktop.hpp"
@@ -15,7 +15,8 @@
 
 #include <utility>
 #include <vector>
-#include "system/messages/SentinelRegistrationMessage.hpp"
+#include <system/messages/SentinelRegistrationMessage.hpp>
+#include <module-utils/EventStore/EventStore.hpp>
 
 WorkerDesktop::WorkerDesktop(sys::Service *ownerServicePtr,
                              std::function<void()> messageProcessedCallback,
@@ -216,23 +217,15 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
 
     switch (notification) {
     case bsp::USBDeviceStatus::Connected:
-        LOG_DEBUG("USB status: Connected");
-        ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(),
-                                        sys::BusChannel::USBNotifications);
+        handleUsbConnected();
         break;
 
     case bsp::USBDeviceStatus::Configured:
-        LOG_DEBUG("USB status: Configured");
-        ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConfigured>(),
-                                        sys::BusChannel::USBNotifications);
-        configured = true;
+        handleUsbConfigured();
         break;
 
     case bsp::USBDeviceStatus::Disconnected:
-        LOG_DEBUG("USB status: Disconnected");
-        ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBDisconnected>(),
-                                        sys::BusChannel::USBNotifications);
-        configured = false;
+        handleUsbDisconnected();
         break;
 
     case bsp::USBDeviceStatus::DataReceived:
@@ -252,6 +245,30 @@ bool WorkerDesktop::handleIrqQueueMessage(std::shared_ptr<sys::WorkerQueue> &que
     }
 
     return true;
+}
+
+void WorkerDesktop::handleUsbConnected()
+{
+    LOG_DEBUG("USB status: Connected");
+    ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConnected>(), sys::BusChannel::USBNotifications);
+}
+
+void WorkerDesktop::handleUsbDisconnected()
+{
+    LOG_DEBUG("USB status: Disconnected");
+    Store::Usb::modify().status = Store::Usb::Status::NotConfigured;
+    ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBDisconnected>(),
+                                    sys::BusChannel::USBNotifications);
+    configured = false;
+}
+
+void WorkerDesktop::handleUsbConfigured()
+{
+    LOG_DEBUG("USB status: Configured");
+    Store::Usb::modify().status = Store::Usb::Status::Configured;
+    ownerService->bus.sendMulticast(std::make_shared<sdesktop::usb::USBConfigured>(),
+                                    sys::BusChannel::USBNotifications);
+    configured = true;
 }
 
 bool WorkerDesktop::handleSignallingQueueMessage(std::shared_ptr<sys::WorkerQueue> &queue)
