@@ -82,7 +82,6 @@ namespace app
         });
 
         connect(typeid(sdesktop::usb::USBConfigured), [&](sys::Message *msg) -> sys::MessagePointer {
-            usbStatusModel->setUsbStatus(app::AbstractUsbStatusModel::UsbStatus::Connected);
             if (getCurrentWindow()->getName() == gui::name::window::main_window) {
                 homeScreenPresenter->updateUsbStatus();
             }
@@ -98,10 +97,6 @@ namespace app
             alarmModel->activateAlarm(true);
             return sys::msgHandled();
         });
-
-        onUsbDisconnected = [this]() {
-            usbStatusModel->setUsbStatus(app::AbstractUsbStatusModel::UsbStatus::Disconnected);
-        };
     }
 
     sys::ReturnCodes ApplicationBellMain::InitHandler()

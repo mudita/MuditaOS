@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -63,6 +63,24 @@ namespace Store
 
         static void setUpdated();
         static bool takeUpdated();
+    };
+
+    struct Usb
+    {
+      public:
+        enum class Status : bool
+        {
+            NotConfigured,
+            Configured
+        } status = Status::NotConfigured;
+
+        /// @brief Returns const reference to Usb instance, used to read Usb status
+        /// @return const Usb&
+        static const Usb &get();
+
+        /// @brief Returns reference to Usb instance, used to change Usb status
+        /// @return Usb&
+        static Usb &modify();
     };
 
     enum class RssiBar : size_t

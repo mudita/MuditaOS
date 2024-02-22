@@ -176,8 +176,6 @@ namespace app
         using OnActionReceived = std::function<ActionResult(manager::actions::ActionParamsPtr &&)>;
 
       protected:
-        std::function<void()> onUsbDisconnected;
-
         virtual sys::MessagePointer handleKBDKeyEvent(sys::Message *msgl);
         virtual sys::MessagePointer handleApplicationSwitch(sys::Message *msgl);
         virtual sys::MessagePointer handleAppClose(sys::Message *msgl);
