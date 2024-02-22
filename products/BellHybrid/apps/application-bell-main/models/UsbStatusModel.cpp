@@ -7,11 +7,11 @@ namespace app
 {
     bool UsbStatusModel::isUsbConnected(const Store::Battery::State &state) const
     {
-        return ((usbConnected == UsbStatus::Connected) && (state == Store::Battery::State::PluggedNotCharging));
+        return (isUsbConfigured() && (state == Store::Battery::State::PluggedNotCharging));
     }
 
-    void UsbStatusModel::setUsbStatus(UsbStatus status)
+    bool UsbStatusModel::isUsbConfigured() const
     {
-        usbConnected = status;
+        return Store::Usb::get().status == Store::Usb::Status::Configured;
     }
 } // namespace app
