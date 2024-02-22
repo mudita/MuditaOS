@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Fixed
+* Fixed BIWIN eMMC memory errors
 
 ### Added
 * Added new 32px and 170px fonts
