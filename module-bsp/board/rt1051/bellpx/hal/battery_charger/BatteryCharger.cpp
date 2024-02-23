@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BatteryChargerIRQ.hpp"
@@ -97,6 +97,7 @@ namespace hal::battery
         xTimerHandle reinit_timer;
         xQueueHandle notification_channel;
         inline static std::unique_ptr<BatteryWorkerQueue> worker_queue;
+        static constexpr auto workerStackSize = 1024 + 512;
 
         std::shared_ptr<drivers::DriverI2C> i2c;
         std::shared_ptr<drivers::DriverGPIO> charger_gpio_chgok;
@@ -132,7 +133,7 @@ namespace hal::battery
         });
 
         worker_queue = std::make_unique<BatteryWorkerQueue>(
-            "battery_charger", [this](const auto &msg) { handleIrqEvents(msg); }, 1024);
+            "battery_charger", [this](const auto &msg) { handleIrqEvents(msg); }, workerStackSize);
 
         pollFuelGauge();
 
