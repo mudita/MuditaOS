@@ -13,6 +13,7 @@
 
 ### Changed / Improved
 * Updated FSL drivers from NXP
+* Increased battery charger stack size
 
 ## [2.5.0 2024-02-09]
 
