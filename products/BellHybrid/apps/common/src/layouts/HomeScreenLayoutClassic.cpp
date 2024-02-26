@@ -304,9 +304,17 @@ namespace gui
 
     void HomeScreenLayoutClassic::setBatteryLevelState(const Store::Battery &batteryContext)
     {
+        const bool batteryVisibility = isBatteryVisibilityAllowed(batteryContext);
         battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
-        battery->setVisible(isBatteryVisibilityAllowed(batteryContext));
+        battery->setVisible(batteryVisibility);
         battery->informContentChanged();
+
+        if (batteryVisibility && (onShowMessage != nullptr)) {
+            onShowMessage();
+        }
+        else if (!batteryVisibility && (onHideMessage != nullptr)) {
+            onHideMessage();
+        }
     }
 
     void HomeScreenLayoutClassic::setTime(std::time_t newTime)
@@ -358,15 +366,16 @@ namespace gui
     }
     auto HomeScreenLayoutClassic::updateUsbStatus(bool isConnected) -> void
     {
+        connectionStatus->show(isConnected);
+        connectionStatus->informContentChanged();
+        adjustConnectionStatusPosition();
+
         if (isConnected && (onShowMessage != nullptr)) {
             onShowMessage();
         }
         else if (!isConnected && (onHideMessage != nullptr)) {
             onHideMessage();
         }
-        connectionStatus->show(isConnected);
-        connectionStatus->informContentChanged();
-        adjustConnectionStatusPosition();
     }
 
     auto HomeScreenLayoutClassic::adjustConnectionStatusPosition() -> void

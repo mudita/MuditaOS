@@ -7,11 +7,13 @@
 #include <widgets/text/TextFixedSize.hpp>
 #include <widgets/TimeSetFmtSpinner.hpp>
 #include <widgets/BellConnectionStatus.hpp>
+#include <widgets/BellBattery.hpp>
 
 namespace
 {
     constexpr auto maxTimeBoxHeight{148U};
     constexpr auto textBoxHeight{120U};
+    constexpr auto infoBoxHeight{54U};
 
     constexpr auto imgBoxHeight{52U};
     constexpr auto imgTopMargin{10U};
@@ -30,9 +32,12 @@ namespace gui
         : HomeScreenLayoutClassic(std::move(name))
     {
         buildInterface();
-        onShowMessage = [this]() { hideQuotes(); };
+        onShowMessage = [this]() {
+            hideQuotes();
+            adjustWidgetBox();
+        };
         onHideMessage = [this]() {
-            if (!connectionStatus->isVisible()) {
+            if (!connectionStatus->isVisible() && !battery->visible) {
                 showQuotes();
             }
         };
@@ -61,14 +66,14 @@ namespace gui
         quoteImg->setMargins({0, imgTopMargin, 0, 0});
         quoteImg->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
 
-        /* We do not display information about the battery status at any time
-         * only about the status of the USB connection. */
-        widgetBox->removeWidget(infoBox);
         widgetBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        infoBox->setVisible(false);
-        /* Add item to body even if it won't fit to avoid manual memory
-         * management for item. */
-        widgetBox->addWidget(infoBox);
+
+        infoBox->setMinimumHeight(infoBoxHeight);
+        infoBox->setMaximumHeight(infoBoxHeight);
+        infoBox->setMargins(Margins(0, 0, 0, 0));
+
+        connectionBox->setMargins(Margins(0, 0, 0, 0));
+        battery->setMargins(Margins(0, 0, 0, 0));
 
         textBox = new VBox(nullptr);
         textBox->setMinimumSize(style::bell_base_layout::last_layout_w, textBoxHeight);
@@ -135,6 +140,13 @@ namespace gui
         authorWithDash.insert(&dash, 0);
         author->setText(authorWithDash);
         quotes->setText(quoteContent);
+    }
+
+    void HomeScreenLayoutClassicWithQuotes::adjustWidgetBox()
+    {
+        infoBox->setVisible(battery->visible);
+        connectionBox->setVisible(connectionStatus->isVisible());
+        widgetBox->informContentChanged();
     }
 
 }; // namespace gui
