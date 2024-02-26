@@ -10,6 +10,7 @@
 * Added new clock face with quotes
 * Added a backend for quotes on home screen
 * Added progress bar to update process
+* Added low battery notification on home screen with quotes
 
 ### Changed / Improved
 * Updated FSL drivers from NXP
