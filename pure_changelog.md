@@ -12,6 +12,7 @@
 ### Changed / Improved
 * Updated share capital in EULA.
 * Updated copy on final onboarding screen.
+* Increased speed of update process.
 
 ## [1.11.0 2023-12-15]
 
