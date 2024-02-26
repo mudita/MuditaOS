@@ -25,5 +25,6 @@ namespace gui
       private:
         void showQuotes();
         void hideQuotes();
+        void adjustWidgetBox();
     };
 }; // namespace gui
