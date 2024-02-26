@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <memory>
@@ -394,7 +394,7 @@ namespace purefs::fs::drivers
             mnt,
             [](const char *path) {
                 if (ext4_inode_exist(path, EXT4_DE_DIR) == 0) {
-                    LOG_WARN("rmdir syscall instead of unlink is recommended for remove directory");
+                    LOG_WARN("rmdir syscall instead of unlink is recommended to remove directory");
                     return -ext4_dir_rm(path);
                 }
                 else {

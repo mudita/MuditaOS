@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -21,13 +21,16 @@ namespace tar
         bool is_file() const;
         bool is_directory() const;
 
-        void read(const std::byte *data, std::size_t size) const;
+        void read(std::uint8_t *data, std::size_t size) const;
 
       private:
         explicit entry(const std::filesystem::path &path);
         friend class iterator;
         mutable mtar_t handle{};
         mtar_header_t tar_header;
+
+        static constexpr auto streamBufferSize = 64 * 1024;
+        std::unique_ptr<char[]> streamBuffer;
     };
 
     class iterator

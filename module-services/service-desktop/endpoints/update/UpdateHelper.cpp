@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-desktop/Constants.hpp>
@@ -20,11 +20,6 @@
 
 namespace sdesktop::endpoints
 {
-    namespace
-    {
-        constexpr auto chunkSize = 1024 * 128;
-    }
-
     struct UpdatePackageEntries
     {
         explicit UpdatePackageEntries(const json11::Json &json)
@@ -80,11 +75,13 @@ namespace sdesktop::endpoints
             return false;
         }
 
+        constexpr auto chunkSize = 128 * 1024;
+        auto rawDataBuffer       = std::make_unique<char[]>(chunkSize);
+
         MD5 md5;
-        std::vector<std::byte> raw_data(chunkSize);
         std::size_t bytesRead;
-        while ((bytesRead = std::fread(raw_data.data(), 1, chunkSize, fd)) > 0) {
-            md5.add(raw_data.data(), bytesRead);
+        while ((bytesRead = std::fread(rawDataBuffer.get(), sizeof(*rawDataBuffer.get()), chunkSize, fd)) > 0) {
+            md5.add(rawDataBuffer.get(), bytesRead);
         }
 
         std::fclose(fd);
