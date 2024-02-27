@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -50,6 +50,13 @@ namespace gui
         Point end{0, 0};
         Color color{ColorFullBlack};
         uint8_t penWidth{1};
+
+        DrawLine(Point _start, Point _end, Color _color, uint8_t _penWidth)
+            : start{_start}, end{_end}, color{_color}, penWidth{_penWidth}
+        {}
+
+        DrawLine(Point _start, Point _end) : start{_start}, end{_end}
+        {}
 
         void draw(Context *ctx) const override;
     };

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LineRenderer.hpp"
@@ -56,6 +56,42 @@ namespace gui::renderer
             PixelRenderer::draw(ctx, Point(x, y), color);
             x += dx;
             y += dy;
+        }
+    }
+
+    void LineRenderer::draw(Context *ctx, Point start, Point end, const DrawableStyle &style)
+    {
+        if (style.color.alpha == Color::FullTransparent) {
+            return;
+        }
+        if (style.direction != LineExpansionDirection::Down && style.direction != LineExpansionDirection::Up) {
+            return;
+        }
+
+        const Length halfWidth = style.penWidth > 1 ? style.penWidth / 2 : 1;
+
+        const int distanceX = std::abs(end.x - start.x);
+        const int distanceY = std::abs(end.y - start.y);
+        const auto isX      = distanceX >= distanceY ? true : false;
+
+        const Length startx = start.x - halfWidth;
+        const Length starty = start.y - halfWidth;
+        const Length endx   = end.x - halfWidth;
+        const Length endy   = end.y - halfWidth;
+
+        for (Length i = 0; i < style.penWidth; ++i) {
+            int offsetX, offsetY;
+            if (isX) {
+                offsetX = 0;
+                offsetY = i;
+            }
+            else {
+                offsetX = i;
+                offsetY = 0;
+            }
+            const Point startP = Point(startx + offsetX, starty + offsetY);
+            const Point endP   = Point(endx + offsetX, endy + offsetY);
+            draw(ctx, startP, endP, style.color);
         }
     }
 

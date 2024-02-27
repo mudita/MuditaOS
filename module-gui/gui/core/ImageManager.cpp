@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ImageManager.hpp"
@@ -185,13 +185,8 @@ namespace gui
         rectangle.areaW  = squareWidth;
         rectangle.areaH  = squareWidth;
 
-        DrawLine line1;
-        line1.start = {0, 0};
-        line1.end   = {squareWidth, squareWidth};
-
-        DrawLine line2;
-        line2.start = {squareWidth - 1, 0};
-        line2.end   = {0, squareWidth - 1};
+        DrawLine line1({0, 0}, {squareWidth, squareWidth}, ColorFullBlack, 1);
+        DrawLine line2({squareWidth - 1, 0}, {0, squareWidth - 1}, ColorFullBlack, 1);
 
         Context renderContext(squareWidth, squareWidth);
         Renderer().render(renderContext, rectangle, line1, line2);

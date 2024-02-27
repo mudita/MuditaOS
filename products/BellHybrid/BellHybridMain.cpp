@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PlatformFactory.hpp"
@@ -13,6 +13,7 @@
 #include <application-bell-meditation-timer/MeditationTimer.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
+#include <application-bell-clock/ApplicationBellClock.hpp>
 
 // modules
 #include <module-db/databases/MultimediaFilesDB.hpp>
@@ -106,6 +107,7 @@ int main()
             applications.push_back(app::CreateLauncher<app::ApplicationBellAlarm>(app::applicationBellAlarmName));
             applications.push_back(app::CreateLauncher<app::ApplicationBellBedtime>(app::applicationBellBedtimeName));
             applications.push_back(app::CreateLauncher<app::ApplicationBellPowerNap>(app::applicationBellPowerNapName));
+            applications.push_back(app::CreateLauncher<app::ApplicationBellClock>(app::applicationBellClockName));
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellOnBoarding>(app::applicationBellOnBoardingName));
             applications.push_back(

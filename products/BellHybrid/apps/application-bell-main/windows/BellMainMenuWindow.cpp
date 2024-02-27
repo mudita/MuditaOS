@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellMainMenuWindow.hpp"
 
 #include <application-bell-alarm/ApplicationBellAlarm.hpp>
 #include <application-bell-relaxation/ApplicationBellRelaxation.hpp>
+#include <application-bell-clock/ApplicationBellClock.hpp>
 #include <application-bell-bedtime/ApplicationBellBedtime.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-meditation-timer/MeditationTimer.hpp>
@@ -47,6 +48,7 @@ namespace gui
         };
 
         addAppMenu(utils::translate("app_bellmain_alarm"), app::applicationBellAlarmName);
+        addAppMenu("Analog clock", app::applicationBellClockName);
         addAppMenu(utils::translate("app_bellmain_power_nap"), app::applicationBellPowerNapName);
         addAppMenu(utils::translate("app_bellmain_relaxation"), app::applicationBellRelaxationName);
         addAppMenu(utils::translate("app_bellmain_meditation_timer"), app::MeditationTimer::defaultName);

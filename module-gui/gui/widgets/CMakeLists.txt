@@ -48,6 +48,7 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/GridLayout.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/CheckBoxWithLabel.cpp"
         "${CMAKE_CURRENT_LIST_DIR}/visitor/DepthFirstItemTree.cpp"
+        "${CMAKE_CURRENT_LIST_DIR}/Clock.cpp"
     PUBLIC
         "${CMAKE_CURRENT_LIST_DIR}/Alignment.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/Arc.hpp"
@@ -84,4 +85,5 @@ target_sources( ${PROJECT_NAME}
         "${CMAKE_CURRENT_LIST_DIR}/visitor/ItemTree.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/visitor/DepthFirstItemTree.hpp"
         "${CMAKE_CURRENT_LIST_DIR}/screen.hpp"
+        "${CMAKE_CURRENT_LIST_DIR}/Clock.hpp"
 )

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -42,6 +42,8 @@ namespace gui::renderer
         };
 
         static void draw(Context *ctx, Point start, Point end, Color color);
+
+        static void draw(Context *ctx, Point start, Point end, const DrawableStyle &style);
 
         static void drawHorizontal(Context *ctx, Point start, Length width, const DrawableStyle &style);
 
