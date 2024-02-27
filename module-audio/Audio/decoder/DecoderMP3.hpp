@@ -23,7 +23,7 @@ namespace audio
 
         // Callback for when data needs to be read from the client.
         //
-        // pUserData   [in]  The user data that was passed to drflac_open() and family.
+        // pUserData   [in]  The user data that was passed to drmp3_init() and family.
         // pBufferOut  [out] The output buffer.
         // bytesToRead [in]  The number of bytes to read.
         //
@@ -35,15 +35,15 @@ namespace audio
 
         // Callback for when data needs to be seeked.
         //
-        // pUserData [in] The user data that was passed to drflac_open() and family.
+        // pUserData [in] The user data that was passed to drmp3_init() and family.
         // offset    [in] The number of bytes to move, relative to the origin. Will never be negative.
         // origin    [in] The origin of the seek - the current position or the start of the stream.
         //
         // Returns whether the seek was successful.
         //
         // The offset will never be negative. Whether it is relative to the beginning or current position is
-        // determined by the "origin" parameter which will be either drflac_seek_origin_start or
-        // drflac_seek_origin_current.
+        // determined by the "origin" parameter which will be either drmp3_seek_origin_start or
+        // drmp3_seek_origin_current.
         static drmp3_bool32 drmp3Seek(void *pUserData, int offset, drmp3_seek_origin origin);
     };
 } // namespace audio

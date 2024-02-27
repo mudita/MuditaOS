@@ -4,6 +4,7 @@
 
 ### Fixed
 * Fixed BIWIN eMMC memory errors
+* Fixed freeze after changing Relaxation volume intensively
 
 ### Added
 * Added new 32px and 170px fonts
