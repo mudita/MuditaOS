@@ -96,16 +96,18 @@ namespace audio
 
     std::int32_t DecoderMP3::decode(std::uint32_t samplesToRead, std::int16_t *pcmData)
     {
-        if (!fileExists(fd)) {
-            LOG_WARN("File '%s' was deleted during playback!", filePath.c_str());
-            return fileDeletedRetCode;
-        }
-
         const auto samplesRead = drmp3_read_pcm_frames_s16(
             mp3.get(), samplesToRead / channelCount, reinterpret_cast<drmp3_int16 *>(pcmData));
         if (samplesRead > 0) {
             /* Calculate frame duration in seconds */
             position += static_cast<float>(samplesRead) / static_cast<float>(sampleRate);
+        }
+        else if (!fileExists(fd)) {
+            /* Unfortunately this second check of file existence is needed
+             * to verify whether lack of new samples was caused by EOF or by
+             * deletion of the file. */
+            LOG_WARN("File '%s' was deleted during playback!", filePath.c_str());
+            return fileDeletedRetCode;
         }
         return samplesRead * channelCount;
     }
@@ -113,6 +115,13 @@ namespace audio
     std::size_t DecoderMP3::drmp3Read(void *pUserData, void *pBufferOut, std::size_t bytesToRead)
     {
         const auto decoderContext = reinterpret_cast<DecoderMP3 *>(pUserData);
+
+        /* Check if the file exists - std::fread happily returns bytesToRead if
+         * requested to read from deleted file, what causes decoding library
+         * to enter infinite loop of reading. */
+        if (!fileExists(decoderContext->fd)) {
+            return 0;
+        }
         return std::fread(pBufferOut, 1, bytesToRead, decoderContext->fd);
     }
 
