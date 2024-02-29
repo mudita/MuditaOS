@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ContactsTable.hpp"
@@ -8,24 +8,24 @@
 
 namespace ColumnName
 {
-    const uint8_t id         = 0;
-    const uint8_t name_id    = 1;
-    const uint8_t numbers_id = 2;
-    const uint8_t ring_id    = 3;
-    const uint8_t address_id = 4;
-    const uint8_t speeddial  = 5;
+    constexpr std::uint8_t id         = 0;
+    constexpr std::uint8_t name_id    = 1;
+    constexpr std::uint8_t numbers_id = 2;
+    constexpr std::uint8_t ring_id    = 3;
+    constexpr std::uint8_t address_id = 4;
+    constexpr std::uint8_t speeddial  = 5;
 }; // namespace ColumnName
 
 namespace statements
 {
-    const auto selectWithoutTemp = "SELECT * FROM contacts WHERE _id=" u32_ " AND "
-                                   " contacts._id NOT IN ( "
-                                   "   SELECT cmg.contact_id "
-                                   "   FROM contact_match_groups cmg, contact_groups cg "
-                                   "   WHERE cmg.group_id = cg._id "
-                                   "       AND cg.name = 'Temporary' "
-                                   "   ) ";
-    const auto selectWithTemp = "SELECT * FROM contacts WHERE _id=" u32_ ";";
+    constexpr auto selectWithoutTemp = "SELECT * FROM contacts WHERE _id=" u32_ " AND "
+                                       " contacts._id NOT IN ( "
+                                       "   SELECT cmg.contact_id "
+                                       "   FROM contact_match_groups cmg, contact_groups cg "
+                                       "   WHERE cmg.group_id = cg._id "
+                                       "       AND cg.name = 'Temporary' "
+                                       "   ) ";
+    constexpr auto selectWithTemp = "SELECT * FROM contacts WHERE _id=" u32_ ";";
 } // namespace statements
 
 ContactsTable::ContactsTable(Database *db) : Table(db)
@@ -50,12 +50,12 @@ bool ContactsTable::add(ContactsTableRow entry)
                        entry.speedDial.c_str());
 }
 
-bool ContactsTable::removeById(uint32_t id)
+bool ContactsTable::removeById(std::uint32_t id)
 {
     return db->execute("DELETE FROM contacts where _id=" u32_ ";", id);
 }
 
-bool ContactsTable::BlockByID(uint32_t id, bool shouldBeBlocked)
+bool ContactsTable::BlockByID(std::uint32_t id, bool shouldBeBlocked)
 {
     return db->execute("UPDATE contacts SET blacklist=" u32_ " WHERE _id=" u32_ ";", shouldBeBlocked ? 1 : 0, id);
 }
@@ -72,13 +72,13 @@ bool ContactsTable::update(ContactsTableRow entry)
                        entry.ID);
 }
 
-ContactsTableRow ContactsTable::getById(uint32_t id)
+ContactsTableRow ContactsTable::getById(std::uint32_t id)
 {
     auto retQuery = db->query(statements::selectWithoutTemp, id);
     return getByIdCommon(std::move(retQuery));
 }
 
-ContactsTableRow ContactsTable::getByIdWithTemporary(uint32_t id)
+ContactsTableRow ContactsTable::getByIdWithTemporary(std::uint32_t id)
 {
     debug_db_data("%s", __FUNCTION__);
     auto retQuery = db->query(statements::selectWithTemp, id);
@@ -218,7 +218,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByName(std::uint32_t limit
         } while (queryRet->nextRow());
 
     if (limit > 0) {
-        for (uint32_t a = 0; a < limit; a++) {
+        for (std::uint32_t a = 0; a < limit; a++) {
             ids_limit.push_back(ids[a + offset]);
         }
         return ids_limit;
@@ -354,7 +354,7 @@ std::vector<std::uint32_t> ContactsTable::GetIDsSortedByField(
     return ids;
 }
 
-std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uint32_t limit)
+std::vector<ContactsTableRow> ContactsTable::getLimitOffset(std::uint32_t offset, std::uint32_t limit)
 {
     auto retQuery = db->query("SELECT * from contacts WHERE contacts._id NOT IN "
                               " ( SELECT cmg.contact_id "
@@ -386,8 +386,8 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffset(uint32_t offset, uin
     return ret;
 }
 
-std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offset,
-                                                                   uint32_t limit,
+std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(std::uint32_t offset,
+                                                                   std::uint32_t limit,
                                                                    ContactTableFields field,
                                                                    const char *str)
 {
@@ -428,7 +428,7 @@ std::vector<ContactsTableRow> ContactsTable::getLimitOffsetByField(uint32_t offs
     return ret;
 }
 
-uint32_t ContactsTable::count()
+std::uint32_t ContactsTable::count()
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM contacts "
                               " WHERE contacts._id not in ( "
@@ -442,10 +442,10 @@ uint32_t ContactsTable::count()
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].getUInt32()};
+    return (*queryRet)[0].getUInt32();
 }
 
-uint32_t ContactsTable::countByFieldId(const char *field, uint32_t id)
+std::uint32_t ContactsTable::countByFieldId(const char *field, std::uint32_t id)
 {
     auto queryRet = db->query("SELECT COUNT(*) FROM contacts WHERE %q=" u32_ ";", field, id);
 
@@ -453,5 +453,5 @@ uint32_t ContactsTable::countByFieldId(const char *field, uint32_t id)
         return 0;
     }
 
-    return uint32_t{(*queryRet)[0].getUInt32()};
+    return (*queryRet)[0].getUInt32();
 }

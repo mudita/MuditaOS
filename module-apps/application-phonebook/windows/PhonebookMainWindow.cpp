@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PhonebookMainWindow.hpp"
@@ -166,7 +166,14 @@ namespace gui
         if ((msgNotification != nullptr) && (msgNotification->interface == db::Interface::Name::Contact) &&
             msgNotification->dataModified()) {
             phonebookModel->letterMap = phonebookModel->requestLetterMap();
-            rebuild();
+            if (msgNotification->type == db::Query::Type::Delete) {
+                /* Perform full rebuild to prevent crash in case current
+                 * list index > number of remaining elements. */
+                contactsList->rebuildList(gui::listview::RebuildType::Full);
+            }
+            else {
+                contactsList->rebuildList(gui::listview::RebuildType::InPlace);
+            }
             return true;
         }
         return false;
