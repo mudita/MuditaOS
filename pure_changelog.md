@@ -6,6 +6,7 @@
 * Fixed no response when editing a contact via Center to have the same number as another.
 * Fixed occasional screen backlight flash when turning off the phone.
 * Fixed device freeze after finishing onboarding in Spanish.
+* Fixed crash when deleting all contacts from MC with Phonebook app opened.
 
 ### Added
 
