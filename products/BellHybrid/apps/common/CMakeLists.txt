@@ -39,6 +39,7 @@ target_sources(application-bell-common
         src/models/SettingsModel.cpp
         src/models/BedtimeModel.cpp
         src/models/LowBatteryInfoModel.cpp
+        src/models/PreWakeUpModel.cpp
         src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmActivatedWindow.cpp
         src/popups/BedtimeNotificationWindow.cpp
@@ -116,6 +117,7 @@ target_sources(application-bell-common
         include/common/models/LayoutModel.hpp
         include/common/models/LowBatteryInfoModel.hpp
         include/common/models/QuoteModel.hpp
+        include/common/models/PreWakeUpModel.hpp
         include/common/popups/presenter/AlarmActivatedPresenter.hpp
         include/common/popups/AlarmActivatedWindow.hpp
         include/common/popups/AlarmDeactivatedWindow.hpp

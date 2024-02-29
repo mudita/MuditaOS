@@ -17,6 +17,7 @@
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <common/popups/ChargingNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
+#include <service-time/AlarmMessage.hpp>
 
 namespace app
 {
@@ -37,6 +38,11 @@ namespace app
             }
             return val ? gui::popup::FilterType::Ignore : gui::popup::FilterType::Show;
         });
+
+        preWakeUpModel = std::make_unique<PreWakeUpModel>();
+        bus.channels.push_back(sys::BusChannel::AlarmNotifications);
+        connect(typeid(alarms::PreWakeUpChangeState),
+                [&](sys::Message *msg) { return handlePreWakeUpChangeState(msg); });
     }
 
     sys::ReturnCodes Application::InitHandler()
@@ -153,6 +159,16 @@ namespace app
     {
         onStop();
         return ApplicationCommon::handleAppFocusLost(msgl);
+    }
+
+    sys::MessagePointer Application::handlePreWakeUpChangeState(sys::Message *msg)
+    {
+        auto *message = dynamic_cast<alarms::PreWakeUpChangeState *>(msg);
+        if (message == nullptr) {
+            return sys::msgNotHandled();
+        }
+        preWakeUpModel->setActive(message->isActive());
+        return sys::msgHandled();
     }
 
     void Application::onKeyPressed()
