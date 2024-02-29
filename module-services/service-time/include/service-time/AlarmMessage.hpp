@@ -287,4 +287,10 @@ namespace alarms
       private:
         bool activity;
     };
+
+    class TurnOffPreWakeUpRequestMessage : public AlarmMessage
+    {
+      public:
+        TurnOffPreWakeUpRequestMessage(){};
+    };
 } // namespace alarms

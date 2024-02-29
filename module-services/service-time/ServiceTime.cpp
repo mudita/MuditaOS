@@ -215,6 +215,12 @@ namespace stm
             alarmMessageHandler->handleBatteryStateChange(message);
             return std::make_shared<sys::ResponseMessage>();
         });
+        connect(typeid(alarms::TurnOffPreWakeUpRequestMessage), [&](sys::Message *request) -> sys::MessagePointer {
+            // return alarmMessageHandler->handleTurnOffPreWakeUp(
+            //     static_cast<alarms::TurnOffPreWakeUpRequestMessage *>(request));
+            LOG_ERROR("*** TurnOffPreWakeUpRequestMessage ***");
+            return std::make_shared<sys::ResponseMessage>();
+        });
     }
 
     auto ServiceTime::handleSetAutomaticDateAndTimeRequest(sys::Message *request)

@@ -18,6 +18,8 @@
 #include <common/popups/ChargingNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
 #include <service-time/AlarmMessage.hpp>
+#include <service-evtmgr/KbdMessage.hpp>
+#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
 
 namespace app
 {
@@ -39,7 +41,7 @@ namespace app
             return val ? gui::popup::FilterType::Ignore : gui::popup::FilterType::Show;
         });
 
-        preWakeUpModel = std::make_unique<PreWakeUpModel>();
+        preWakeUpModel = std::make_unique<PreWakeUpModel>(this);
         bus.channels.push_back(sys::BusChannel::AlarmNotifications);
         connect(typeid(alarms::PreWakeUpChangeState),
                 [&](sys::Message *msg) { return handlePreWakeUpChangeState(msg); });
@@ -140,6 +142,20 @@ namespace app
     sys::MessagePointer Application::handleKBDKeyEvent(sys::Message *msgl)
     {
         onKeyPressed();
+        if (preWakeUpModel->isActive()) {
+            if (this->getState() != app::ApplicationCommon::State::ACTIVE_FORGROUND) {
+                LOG_FATAL("Terrible terrible damage! Application with no focus grabbed key!");
+                return sys::msgNotHandled();
+            }
+            const auto msg        = static_cast<sevm::KbdMessage *>(msgl);
+            const auto inputEvent = keyTranslator->translate(msg->key);
+            const auto key        = mapKey(inputEvent.getKeyCode());
+            if (!inputEvent.is(gui::KeyCode::KEY_UNDEFINED) && inputEvent.isShortRelease() &&
+                key != KeyMap::Frontlight && key != KeyMap::DeepPressDown && key != KeyMap::DeepPressUp) {
+                preWakeUpModel->turnOffPreWakeUp();
+                return sys::msgHandled();
+            }
+        }
         return ApplicationCommon::handleKBDKeyEvent(msgl);
     }
 
