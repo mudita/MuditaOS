@@ -68,7 +68,7 @@ namespace gui::renderer
             return;
         }
 
-        const Length halfWidth = style.penWidth > 1 ? style.penWidth / 2 : 1;
+        const Length halfWidth = style.penWidth > 1 ? style.penWidth / 2 : 0;
 
         const int distanceX = std::abs(end.x - start.x);
         const int distanceY = std::abs(end.y - start.y);

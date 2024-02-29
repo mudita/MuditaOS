@@ -17,6 +17,8 @@ namespace gui
     class Text;
     class VBox;
     class BellBattery;
+    class AlarmSetSpinner;
+
     class BellClockWindow : public AppWindow, public app::bell_clock::View
     {
       public:
@@ -34,8 +36,10 @@ namespace gui
         gui::ArcProgressBar *progress{nullptr};
         gui::Clock *clock{nullptr};
         BellBattery *battery{nullptr};
+        AlarmSetSpinner *alarm{nullptr};
 
-        VBox *body{};
+        VBox *bottom{};
+        VBox *top{};
         Text *text{};
     };
 } /* namespace gui */
