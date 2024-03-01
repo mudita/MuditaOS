@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -104,11 +104,15 @@ namespace db::multimedia_files::query
     class GetLimitedByPaths : public Query
     {
       public:
-        GetLimitedByPaths(const std::vector<std::string> &paths, uint32_t offset, uint32_t limit);
+        GetLimitedByPaths(const std::vector<std::string> &paths,
+                          std::uint32_t offset,
+                          std::uint32_t limit,
+                          SortingBy sorting = SortingBy::TitleAscending);
         [[nodiscard]] auto debugInfo() const -> std::string override;
 
         const std::vector<std::string> paths;
         const uint32_t offset = 0;
         const uint32_t limit  = 0;
+        const SortingBy sorting = SortingBy::TitleAscending;
     };
 } // namespace db::multimedia_files::query

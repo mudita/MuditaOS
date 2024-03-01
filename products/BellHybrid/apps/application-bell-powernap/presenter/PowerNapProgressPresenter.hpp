@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -66,7 +66,7 @@ namespace app::powernap
     {
         app::ApplicationCommon *app{};
         settings::Settings *settings{};
-        std::unique_ptr<AbstractSoundsRepository> soundsRepository;
+        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository;
         AbstractAudioModel &audioModel;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
@@ -79,7 +79,7 @@ namespace app::powernap
       public:
         PowerNapProgressPresenter(app::ApplicationCommon *app,
                                   settings::Settings *settings,
-                                  std::unique_ptr<AbstractSoundsRepository> soundsRepository,
+                                  std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository,
                                   AbstractAudioModel &audioModel,
                                   std::unique_ptr<AbstractTimeModel> timeModel,
                                   std::unique_ptr<PowerNapFrontlightModel> frontlightModel,

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmSettingsPresenter.hpp"
@@ -9,7 +9,7 @@ namespace app::bell_settings
     AlarmSettingsPresenter::AlarmSettingsPresenter(std::unique_ptr<AlarmSettingsListItemProvider> &&provider,
                                                    std::unique_ptr<AbstractAlarmSettingsModel> &&settingsModel,
                                                    AbstractAudioModel &audioModel,
-                                                   std::unique_ptr<AbstractSoundsRepository> &&soundsRepository,
+                                                   std::unique_ptr<AbstractSimpleSoundsRepository> &&soundsRepository,
                                                    std::unique_ptr<AbstractFrontlightModel> &&frontlight)
         : provider{std::move(provider)}, settingsModel{std::move(settingsModel)}, audioModel{audioModel},
           soundsRepository{std::move(soundsRepository)}, frontlight{std::move(frontlight)}

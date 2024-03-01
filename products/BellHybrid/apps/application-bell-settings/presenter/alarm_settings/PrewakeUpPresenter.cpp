@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PrewakeUpPresenter.hpp"
@@ -6,11 +6,12 @@
 
 namespace app::bell_settings
 {
-    PrewakeUpWindowPresenter::PrewakeUpWindowPresenter(std::unique_ptr<PrewakeUpListItemProvider> &&provider,
-                                                       std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
-                                                       AbstractAudioModel &audioModel,
-                                                       std::unique_ptr<AbstractSoundsRepository> &&soundsRepository,
-                                                       std::unique_ptr<AbstractFrontlightModel> &&frontlight)
+    PrewakeUpWindowPresenter::PrewakeUpWindowPresenter(
+        std::unique_ptr<PrewakeUpListItemProvider> &&provider,
+        std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
+        AbstractAudioModel &audioModel,
+        std::unique_ptr<AbstractSimpleSoundsRepository> &&soundsRepository,
+        std::unique_ptr<AbstractFrontlightModel> &&frontlight)
         : provider{std::move(provider)}, model{std::move(model)}, audioModel{audioModel},
           soundsRepository{std::move(soundsRepository)}, frontlight{std::move(frontlight)}
     {
