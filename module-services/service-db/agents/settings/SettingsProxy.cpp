@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-db/EntryPath.hpp>
@@ -12,7 +12,6 @@
 
 namespace settings
 {
-
     SettingsProxy::SettingsProxy(const service::ServiceProxy &interface) : service::ServiceProxy(interface)
     {}
 
@@ -58,25 +57,21 @@ namespace settings
         }
     }
 
-    template <typename T, typename... Args>
-    auto message(sys::BusProxy &bus, Args... args)
-    {
-        bus.sendUnicast(std::make_shared<T>(args...), service::name::db);
-    }
-
     void SettingsProxy::registerValueChange(EntryPath path)
     {
-        message<settings::Messages::RegisterOnVariableChange>(getService()->bus, std::move(path));
+        auto msg = std::make_shared<Messages::RegisterOnVariableChange>(std::move(path));
+        getService()->bus.sendUnicast(std::move(msg), service::name::db);
     }
 
     void SettingsProxy::unregisterValueChange(EntryPath path)
     {
-        message<settings::Messages::UnregisterOnVariableChange>(getService()->bus, std::move(path));
+        auto msg = std::make_shared<Messages::UnregisterOnVariableChange>(std::move(path));
+        getService()->bus.sendUnicast(std::move(msg), service::name::db);
     }
 
     void SettingsProxy::setValue(const EntryPath &path, const std::string &value)
     {
-        message<settings::Messages::SetVariable>(getService()->bus, path, value);
+        auto msg = std::make_shared<Messages::SetVariable>(path, value);
+        getService()->bus.sendUnicast(std::move(msg), service::name::db);
     }
-
 } // namespace settings

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Logger.hpp"
@@ -11,11 +11,11 @@
 
 namespace
 {
-    inline constexpr int statusSuccess         = 1;
-    inline constexpr auto streamBufferSize     = 64 * 1024;
-    inline constexpr auto logFileNamePrefix    = "MuditaOS";
-    inline constexpr auto logFileNameExtension = ".log";
-    inline constexpr auto logFileNameSeparator = "_";
+    constexpr int statusSuccess         = 1;
+    constexpr auto streamBufferSize     = 64 * 1024;
+    constexpr auto logFileNamePrefix    = "MuditaOS";
+    constexpr auto logFileNameExtension = ".log";
+    constexpr auto logFileNameSeparator = "_";
 } // namespace
 
 namespace Log

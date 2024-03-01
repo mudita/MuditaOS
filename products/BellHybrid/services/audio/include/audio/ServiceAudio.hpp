@@ -49,8 +49,9 @@ namespace service
         auto handleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
             -> std::unique_ptr<AudioResponseMessage>;
 
-        auto handleSetVolume(const audio::PlaybackType &playbackType, const std::string &value)
-            -> std::unique_ptr<AudioResponseMessage>;
+        auto handleSetVolume(const audio::PlaybackType &playbackType,
+                             const audio::VolumeUpdateType &updateType,
+                             const std::string &value) -> std::unique_ptr<AudioResponseMessage>;
         auto handleGetVolume(const audio::PlaybackType &playbackType) -> std::unique_ptr<AudioResponseMessage>;
         auto getVolume(const audio::PlaybackType &playbackType) -> audio::Volume;
 
@@ -76,7 +77,6 @@ namespace service
         std::unique_ptr<settings::Settings> settingsProvider;
         std::unique_ptr<audio::VolumeFadeIn> volumeFadeIn;
     };
-
 } // namespace service
 
 namespace sys

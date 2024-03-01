@@ -39,7 +39,10 @@ namespace app
         using OnPlaybackFinishedCallback = std::function<void(PlaybackFinishStatus)>;
 
         virtual ~AbstractAudioModel() noexcept                                                              = default;
-        virtual void setVolume(Volume volume, PlaybackType playbackType, OnStateChangeCallback &&callback)  = 0;
+        virtual void setVolume(Volume volume,
+                               PlaybackType playbackType,
+                               audio::VolumeUpdateType updateType = audio::VolumeUpdateType::UpdateDB,
+                               OnStateChangeCallback &&callback   = {})                                       = 0;
         virtual std::optional<Volume> getVolume(PlaybackType playbackType)                                  = 0;
         virtual void getVolume(PlaybackType playbackType, OnGetValueCallback &&callback)                    = 0;
         virtual void play(const std::string &filePath,

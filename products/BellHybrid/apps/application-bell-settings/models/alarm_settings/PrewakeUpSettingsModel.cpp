@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <models/alarm_settings/PrewakeUpSettingsModel.hpp>
@@ -35,7 +35,7 @@ namespace app::bell_settings
 
     void PrewakeUpChimeVolumeModel::setValue(std::uint8_t value)
     {
-        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::PreWakeup, {});
+        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::PreWakeup);
     }
 
     std::uint8_t PrewakeUpChimeVolumeModel::getValue() const

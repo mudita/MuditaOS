@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationVolumeWindow.hpp"
@@ -56,7 +56,7 @@ namespace gui
         progress->setMaximum(arcProgressSteps);
         progress->setValue(presenter->getVolume());
 
-        auto data = presenter->getVolumeData();
+        const auto data = presenter->getVolumeData();
         spinner   = new U8IntegerSpinner({static_cast<U8IntegerSpinner::value_type>(data.min),
                                         static_cast<U8IntegerSpinner::value_type>(data.max),
                                         static_cast<U8IntegerSpinner::value_type>(data.step)},
@@ -78,15 +78,23 @@ namespace gui
     bool RelaxationVolumeWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER) || inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            presenter->saveVolume(spinner->value());
             application->returnToPreviousWindow();
             return true;
         }
+
         resetTimer();
-        auto data              = presenter->getVolumeData();
+        const auto data          = presenter->getVolumeData();
         const auto ret         = body->onInput(inputEvent);
-        const auto selectedVal = spinner->value();
-        progress->setValue(presenter->getVolume());
-        body->setMinMaxArrowsVisibility(selectedVal == data.min, selectedVal == data.max);
+        const auto selectedValue = spinner->value();
+        progress->setValue(selectedValue);
+        body->setMinMaxArrowsVisibility(selectedValue == data.min, selectedValue == data.max);
         return ret;
+    }
+
+    void RelaxationVolumeWindow::onClose(CloseReason reason)
+    {
+        presenter->saveVolume(spinner->value());
+        WindowWithTimer::onClose(reason);
     }
 } // namespace gui

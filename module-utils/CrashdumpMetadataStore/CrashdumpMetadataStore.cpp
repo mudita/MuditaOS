@@ -1,16 +1,16 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CrashdumpMetadataStore.hpp"
 
 namespace
 {
-    inline constexpr auto separator                 = "_";
-    inline constexpr auto defaultSerialNumberLength = 13;
-    inline constexpr auto defaultCommitHashLength   = 8;
-    inline constexpr auto defaultProductName        = "unknown";
-    inline constexpr auto defaultOsVersion          = "0.0.0";
-    inline constexpr auto defaultFillValue          = '0';
+    constexpr auto separator                 = "_";
+    constexpr auto defaultSerialNumberLength = 13;
+    constexpr auto defaultCommitHashLength   = 8;
+    constexpr auto defaultProductName        = "unknown";
+    constexpr auto defaultOsVersion          = "0.0.0";
+    constexpr auto defaultFillValue          = '0';
 } // namespace
 
 namespace Store

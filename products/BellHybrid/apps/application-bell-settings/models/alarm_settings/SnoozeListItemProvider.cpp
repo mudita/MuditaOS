@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SnoozeListItemProvider.hpp"
@@ -45,9 +45,7 @@ namespace app::bell_settings
         if (chimeInterval >= range.back()) {
             return range.back();
         }
-        else {
-            return chimeInterval;
-        }
+        return chimeInterval;
     }
 
     SnoozeListItemProvider::SnoozeListItemProvider(AbstractSnoozeSettingsModel &model,
@@ -146,7 +144,7 @@ namespace app::bell_settings
         constexpr auto volumeStep = 1U;
         constexpr auto volumeMin  = AbstractAudioModel::minVolume;
         constexpr auto volumeMax  = AbstractAudioModel::maxVolume;
-        auto snoozeChimeVolume    = new list_items::NumericWithBar(
+        snoozeChimeVolume         = new list_items::NumericWithBar(
             list_items::NumericWithBar::spinner_type::range{volumeMin, volumeMax, volumeStep},
             model.getSnoozeChimeVolume(),
             volumeMax,
@@ -163,7 +161,7 @@ namespace app::bell_settings
             }
         };
 
-        snoozeChimeVolume->onExit = [this, snoozeChimeVolume]() {
+        snoozeChimeVolume->onExit = [this]() {
             if (onVolumeExit) {
                 onVolumeExit(snoozeChimeVolume->value());
             }
@@ -176,4 +174,8 @@ namespace app::bell_settings
         }
     }
 
+    auto SnoozeListItemProvider::getCurrentVolume() -> std::uint8_t
+    {
+        return snoozeChimeVolume->value();
+    }
 } // namespace app::bell_settings

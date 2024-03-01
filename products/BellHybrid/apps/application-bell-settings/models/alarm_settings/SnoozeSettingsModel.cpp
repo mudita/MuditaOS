@@ -1,8 +1,7 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <models/alarm_settings/SnoozeSettingsModel.hpp>
-
 #include <db/SystemSettings.hpp>
 
 namespace
@@ -73,17 +72,19 @@ namespace app::bell_settings
 
     void SnoozeChimeVolumeModel::setValue(std::uint8_t value)
     {
-        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Snooze, {});
+        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Snooze);
     }
 
     std::uint8_t SnoozeChimeVolumeModel::getValue() const
     {
         return defaultValue;
     }
+
     SnoozeChimeVolumeModel::SnoozeChimeVolumeModel(AbstractAudioModel &audioModel) : audioModel{audioModel}
     {
         defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::Snooze).value_or(0);
     }
+
     void SnoozeChimeVolumeModel::restoreDefault()
     {
         setValue(defaultValue);

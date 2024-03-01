@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsStyle.hpp"
@@ -53,7 +53,7 @@ namespace app::bell_settings
         constexpr auto volumeStep = 1U;
         constexpr auto volumeMin  = AbstractAudioModel::minVolume;
         constexpr auto volumeMax  = AbstractAudioModel::maxVolume;
-        auto alarmVolume          = new list_items::NumericWithBar(
+        alarmVolume               = new list_items::NumericWithBar(
             list_items::NumericWithBar::spinner_type::range{volumeMin, volumeMax, volumeStep},
             settingsModel.getAlarmVolume(),
             volumeMax,
@@ -68,7 +68,7 @@ namespace app::bell_settings
                 onVolumeEnter(alarmTone->value());
             }
         };
-        alarmVolume->onExit = [this, alarmVolume]() {
+        alarmVolume->onExit = [this]() {
             if (onVolumeExit) {
                 onVolumeExit(alarmVolume->value());
             }
@@ -122,5 +122,10 @@ namespace app::bell_settings
         for (auto item : internalData) {
             item->deleteByList = false;
         }
+    }
+
+    auto AlarmSettingsListItemProvider::getCurrentVolume() -> std::uint8_t
+    {
+        return alarmVolume->value();
     }
 } // namespace app::bell_settings

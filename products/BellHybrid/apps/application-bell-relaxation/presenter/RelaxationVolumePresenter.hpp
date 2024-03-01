@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,6 +9,7 @@ namespace app
 {
     class ApplicationCommon;
 }
+
 namespace app::relaxation
 {
     using VolumeData = struct VolumeData
@@ -24,12 +25,13 @@ namespace app::relaxation
         virtual ~AbstractRelaxationVolumePresenter()              = default;
         virtual VolumeData getVolumeData()                        = 0;
         virtual void setVolume(AbstractAudioModel::Volume volume) = 0;
+        virtual void saveVolume(AbstractAudioModel::Volume volume) = 0;
         virtual AbstractAudioModel::Volume getVolume()            = 0;
     };
 
     class RelaxationVolumePresenter : public AbstractRelaxationVolumePresenter
     {
-        constexpr static struct VolumeData volumeData
+        static constexpr struct VolumeData volumeData
         {
             AbstractAudioModel::minVolume, AbstractAudioModel::maxVolume, 1
         };
@@ -39,6 +41,7 @@ namespace app::relaxation
 
         VolumeData getVolumeData() override;
         void setVolume(AbstractAudioModel::Volume volume) override;
+        void saveVolume(AbstractAudioModel::Volume volume) override;
         AbstractAudioModel::Volume getVolume() override;
 
       public:

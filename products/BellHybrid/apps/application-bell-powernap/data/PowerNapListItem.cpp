@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapListItem.hpp"
@@ -6,12 +6,14 @@
 #include "data/PowerNapStyle.hpp"
 
 #include <common/LanguageUtils.hpp>
+
 namespace
 {
-    inline constexpr auto spinnerMax  = 180U;
-    inline constexpr auto spinnerMin  = 1U;
-    inline constexpr auto spinnerStep = 1U;
+    constexpr auto spinnerMax  = 180U;
+    constexpr auto spinnerMin  = 1U;
+    constexpr auto spinnerStep = 1U;
 } // namespace
+
 namespace gui
 {
     PowerNapListItem::PowerNapListItem()
@@ -92,5 +94,4 @@ namespace gui
         body->setArrowVisible(BellBaseLayout::Arrow::Left, not isMin);
         body->setArrowVisible(BellBaseLayout::Arrow::Right, not isMax);
     }
-
 } // namespace gui

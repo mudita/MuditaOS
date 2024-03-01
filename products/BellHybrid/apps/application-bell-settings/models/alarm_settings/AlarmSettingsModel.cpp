@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/models/AlarmSettingsModel.hpp>
@@ -30,7 +30,7 @@ namespace app::bell_settings
 
     void AlarmVolumeModel::setValue(std::uint8_t value)
     {
-        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Alarm, {});
+        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Alarm);
     }
 
     std::uint8_t AlarmVolumeModel::getValue() const

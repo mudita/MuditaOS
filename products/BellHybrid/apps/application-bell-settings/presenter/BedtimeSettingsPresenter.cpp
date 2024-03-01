@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BedtimeSettingsPresenter.hpp"
@@ -14,6 +14,7 @@ namespace app::bell_settings
     {
         auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
+            this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::Bedtime);
             this->audioModel.play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
                                   AbstractAudioModel::PlaybackType::Bedtime,
                                   {});
@@ -27,7 +28,8 @@ namespace app::bell_settings
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { this->stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
-            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Bedtime, {});
+            this->audioModel.setVolume(
+                val, AbstractAudioModel::PlaybackType::Bedtime, audio::VolumeUpdateType::SkipUpdateDB);
             if (this->audioModel.hasPlaybackFinished()) {
                 playSound(currentSoundPath);
             }

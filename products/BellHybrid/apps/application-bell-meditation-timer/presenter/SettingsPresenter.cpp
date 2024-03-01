@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsPresenter.hpp"
@@ -51,7 +51,6 @@ namespace app::list_items
             bottomText->setRichText(utils::language::getCorrectSecondsNumeralForm(value));
         }
     };
-
 } // namespace app::list_items
 
 namespace app::meditation
@@ -86,16 +85,17 @@ namespace app::meditation
         listItemsProvider =
             std::make_shared<BellListItemProvider>(BellListItemProvider::Items{startDelay, chimeInterval, chimeVolume});
 
-        auto playSound = [this]() {
+        auto playSound = [this, chimeVolume]() {
+            this->audioModel.setVolume(chimeVolume->value(), AbstractAudioModel::PlaybackType::Meditation);
             this->audioModel.play(getMeditationAudioPath(), AbstractAudioModel::PlaybackType::Meditation, {});
         };
 
         chimeVolume->onEnter = playSound;
-
         chimeVolume->onExit = [this]() { stopSound(); };
 
         chimeVolume->set_on_value_change_cb([this, playSound](const auto &val) {
-            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Meditation, {});
+            this->audioModel.setVolume(
+                val, AbstractAudioModel::PlaybackType::Meditation, audio::VolumeUpdateType::SkipUpdateDB);
             if (this->audioModel.hasPlaybackFinished()) {
                 playSound();
             }
@@ -105,26 +105,31 @@ namespace app::meditation
             item->setValue();
         }
     }
+
     void SettingsPresenter::loadData()
     {
         for (auto &item : listItemsProvider->getListItems()) {
             item->setValue();
         }
     }
+
     void SettingsPresenter::saveData()
     {
         for (auto &item : listItemsProvider->getListItems()) {
             item->getValue();
         }
     }
+
     auto SettingsPresenter::getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider>
     {
         return listItemsProvider;
     }
+
     void SettingsPresenter::eraseProviderData()
     {
         listItemsProvider->clearData();
     }
+
     void SettingsPresenter::exitWithSave()
     {
         saveData();
@@ -142,5 +147,4 @@ namespace app::meditation
         chimeVolumeModel.restoreDefault();
         eraseProviderData();
     }
-
 } // namespace app::meditation

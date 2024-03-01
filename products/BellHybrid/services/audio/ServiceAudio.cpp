@@ -117,7 +117,7 @@ namespace service
 
         connect(typeid(AudioSetVolume), [this](sys::Message *msg) -> sys::MessagePointer {
             auto *msgl = static_cast<AudioSetVolume *>(msg);
-            return handleSetVolume(msgl->playbackType, msgl->val);
+            return handleSetVolume(msgl->playbackType, msgl->updateType, msgl->value);
         });
 
         connect(typeid(AudioGetVolume), [this](sys::Message *msg) -> sys::MessagePointer {
@@ -152,6 +152,7 @@ namespace service
 
     sys::ReturnCodes Audio::DeinitHandler()
     {
+        settingsProvider->deinit();
         LOG_INFO("Deinitialized");
         return sys::ReturnCodes::Success;
     }
@@ -315,20 +316,21 @@ namespace service
         return ret;
     }
 
-    auto Audio::handleSetVolume(const audio::PlaybackType &playbackType, const std::string &value)
-        -> std::unique_ptr<AudioResponseMessage>
+    auto Audio::handleSetVolume(const audio::PlaybackType &playbackType,
+                                const audio::VolumeUpdateType &updateType,
+                                const std::string &value) -> std::unique_ptr<AudioResponseMessage>
     {
-        constexpr auto setting  = audio::Setting::Volume;
-        auto retCode            = audio::RetCode::Success;
         const auto clampedValue = std::clamp(utils::getNumericValue<float>(value), minVolumeToSet, maxVolumeToSet);
+        auto retCode            = audio::RetCode::Success;
 
-        if (const auto activeInput = audioMux.GetActiveInput(); activeInput) {
-            if (activeInput.value()) {
+        if (const auto activeInput = audioMux.GetActiveInput(); activeInput.has_value()) {
+            if (activeInput.value() != nullptr) {
                 retCode = activeInput.value()->audio->SetOutputVolume(clampedValue);
             }
         }
 
-        if (retCode == audio::RetCode::Success) {
+        if ((updateType == audio::VolumeUpdateType::UpdateDB) && (retCode == audio::RetCode::Success)) {
+            constexpr auto setting = audio::Setting::Volume;
             settingsProvider->setValue(dbPath(setting, playbackType, profileType), std::to_string(clampedValue));
         }
         return std::make_unique<AudioResponseMessage>(retCode);

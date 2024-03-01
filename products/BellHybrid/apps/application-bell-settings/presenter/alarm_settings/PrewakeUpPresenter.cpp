@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PrewakeUpPresenter.hpp"
@@ -16,6 +16,7 @@ namespace app::bell_settings
     {
         auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
+            this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::PreWakeup);
             this->audioModel.play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
                                   AbstractAudioModel::PlaybackType::PreWakeup,
                                   {});
@@ -30,7 +31,8 @@ namespace app::bell_settings
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { this->stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
-            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::PreWakeup, {});
+            this->audioModel.setVolume(
+                val, AbstractAudioModel::PlaybackType::PreWakeup, audio::VolumeUpdateType::SkipUpdateDB);
             if (this->audioModel.hasPlaybackFinished()) {
                 playSound(currentSoundPath);
             }
