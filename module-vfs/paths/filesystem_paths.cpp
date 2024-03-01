@@ -1,21 +1,21 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/filesystem_paths.hpp>
 
 namespace
 {
-    constexpr inline auto PATH_SYSTEM      = "/system";
-    constexpr inline auto PATH_USER        = "/user";
-    constexpr inline auto PATH_CONF        = "/mfgconf";
-    constexpr inline auto PATH_DB          = "db";
-    constexpr inline auto PATH_LOGS        = "log";
-    constexpr inline auto PATH_CRASH_DUMPS = "crash_dumps";
-    constexpr inline auto PATH_USER_MEDIA  = "media";
-    constexpr inline auto PATH_TMP         = "temp";
-    constexpr inline auto PATH_ASSETS      = "assets";
-    constexpr inline auto PATH_DATA        = "data";
-    constexpr inline auto PATH_VAR         = "var";
+    constexpr auto PATH_SYSTEM      = "/system";
+    constexpr auto PATH_USER        = "/user";
+    constexpr auto PATH_CONF        = "/mfgconf";
+    constexpr auto PATH_DB          = "db";
+    constexpr auto PATH_LOGS        = "log";
+    constexpr auto PATH_CRASH_DUMPS = "crash_dumps";
+    constexpr auto PATH_USER_MEDIA  = "media";
+    constexpr auto PATH_TMP         = "temp";
+    constexpr auto PATH_ASSETS      = "assets";
+    constexpr auto PATH_DATA        = "data";
+    constexpr auto PATH_VAR         = "var";
 } // namespace
 
 namespace purefs
@@ -76,10 +76,10 @@ namespace purefs
         {
             return getSystemDiskPath() / PATH_DATA;
         }
+
         std::filesystem::path getSystemVarDirPath() noexcept
         {
             return getSystemDiskPath() / PATH_VAR;
         }
-
     } // namespace dir
 } // namespace purefs

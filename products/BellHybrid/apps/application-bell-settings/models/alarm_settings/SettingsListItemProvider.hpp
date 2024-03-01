@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,14 +9,13 @@
 
 namespace app::bell_settings
 {
-
     class SettingsListItemProvider : public app::InternalModel<gui::BellSideListItemWithCallbacks *>,
                                      public gui::ListItemProvider
     {
       public:
         /// Val contains currently chosen tone
         using ToneCallback = std::function<void(const UTF8 &val)>;
-        /// Val contains currently chosen volume(1-10 range)
+        /// Val contains currently chosen volume (1-10 range)
         using VolumeCallback      = std::function<void(const uint32_t &val)>;
         using VolumeEnterCallback = ToneCallback;
         using FrontlightCallback      = std::function<void(const frontlight_utils::Brightness &val)>;
@@ -25,7 +24,7 @@ namespace app::bell_settings
 
         std::vector<gui::BellSideListItemWithCallbacks *> getListItems();
 
-        auto requestRecords(uint32_t offset, uint32_t limit) -> void override;
+        auto requestRecords(std::uint32_t offset, std::uint32_t limit) -> void override;
 
         [[nodiscard]] auto getItem(gui::Order order) -> gui::ListItem * override;
 
@@ -49,5 +48,4 @@ namespace app::bell_settings
         FrontlightExitCallback onFrontlightExit;
         FrontlightCallback onFrontlightChange;
     };
-
 } // namespace app::bell_settings

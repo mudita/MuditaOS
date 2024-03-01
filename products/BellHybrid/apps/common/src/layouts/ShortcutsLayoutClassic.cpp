@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "layouts/ShortcutsLayoutClassic.hpp"
@@ -12,25 +12,25 @@ namespace
 {
     namespace container
     {
-        constexpr inline auto width      = 544U;
-        constexpr inline auto height     = 220U;
-        constexpr inline auto top_margin = 74U;
+        constexpr auto width      = 544U;
+        constexpr auto height     = 220U;
+        constexpr auto top_margin = 74U;
 
         namespace separator
         {
-            constexpr inline auto height = 22U;
+            constexpr auto height = 22U;
         } // namespace separator
 
         namespace image
         {
-            constexpr inline auto height = container::height - separator::height;
-            constexpr inline auto width  = 448U;
+            constexpr auto height = container::height - separator::height;
+            constexpr auto width  = 448U;
         } // namespace image
 
         namespace text
         {
-            constexpr inline auto height = 146U;
-            constexpr inline auto width  = 448U;
+            constexpr auto height = 146U;
+            constexpr auto width  = 448U;
         } // namespace text
 
     } // namespace container

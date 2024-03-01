@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AlarmSettingsPresenter.hpp"
@@ -16,6 +16,7 @@ namespace app::bell_settings
     {
 
         auto playSound = [this](const UTF8 &val) {
+            this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::Alarm);
             this->audioModel.play(
                 this->soundsRepository->titleToPath(val).value_or(""), AbstractAudioModel::PlaybackType::Alarm, {});
         };
@@ -28,7 +29,8 @@ namespace app::bell_settings
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
         this->provider->onVolumeChange = [this](const auto &val) {
-            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Alarm, {});
+            this->audioModel.setVolume(
+                val, AbstractAudioModel::PlaybackType::Alarm, audio::VolumeUpdateType::SkipUpdateDB);
         };
 
         auto setBrightness = [this](const auto &brightness) {

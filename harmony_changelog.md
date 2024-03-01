@@ -4,7 +4,8 @@
 
 ### Fixed
 * Fixed BIWIN eMMC memory errors
-* Fixed freeze after changing Relaxation volume intensively
+* Fixed device freeze after changing Relaxation volume intensively
+* Fixed UI freeze after changing any volume intensively
 
 ### Added
 * Added new 32px and 170px fonts

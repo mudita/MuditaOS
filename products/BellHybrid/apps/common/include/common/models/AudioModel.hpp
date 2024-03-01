@@ -14,7 +14,10 @@ namespace app
         explicit AudioModel(ApplicationCommon *app);
         virtual ~AudioModel();
 
-        void setVolume(Volume volume, PlaybackType playbackType, OnStateChangeCallback &&callback) override;
+        void setVolume(Volume volume,
+                       PlaybackType playbackType,
+                       audio::VolumeUpdateType updateType,
+                       OnStateChangeCallback &&callback) override;
         std::optional<Volume> getVolume(PlaybackType playbackType) override;
         void getVolume(PlaybackType playbackType, OnGetValueCallback &&callback) override;
         void play(const std::string &filePath,

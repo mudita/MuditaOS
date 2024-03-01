@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "models/BedtimeModel.hpp"
@@ -17,12 +17,7 @@ namespace app::bell_bedtime
     auto BedtimeOnOffModel::getValue() const -> bool
     {
         const auto str = settings.getValue(bell::settings::Bedtime::active, settings::SettingsScope::Global);
-        try {
-            return std::stoi(str);
-        }
-        catch (const std::invalid_argument &) {
-            return 0;
-        }
+        return utils::toNumeric(str);
     }
 
     auto BedtimeTimeModel::writeString(std::string str) -> void
@@ -77,20 +72,21 @@ namespace app::bell_bedtime
 
     void BedtimeVolumeModel::setValue(std::uint8_t value)
     {
-        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Bedtime, {});
+        audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Bedtime);
     }
 
     auto BedtimeVolumeModel::getValue() const -> std::uint8_t
     {
         return defaultValue;
     }
+
     BedtimeVolumeModel::BedtimeVolumeModel(AbstractAudioModel &audioModel) : audioModel{audioModel}
     {
         defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::Bedtime).value_or(0);
     }
+
     void BedtimeVolumeModel::restoreDefault()
     {
         setValue(defaultValue);
     }
-
 } // namespace app::bell_bedtime

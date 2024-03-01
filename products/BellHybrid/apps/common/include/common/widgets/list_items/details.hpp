@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -33,7 +33,7 @@ namespace app::list_items
             void set_value(const value_type &value)
             {
                 spinner->set_value(value);
-                controlVisibility();
+                control_visibility();
             }
 
             void set_range(const typename spinner_type::range &range)
@@ -53,7 +53,8 @@ namespace app::list_items
             }
 
             /// Might be overridden if the specific handling of the bottom text is needed
-            virtual void control_bottom_description(const value_type &value){};
+            virtual void control_bottom_description(const value_type &value)
+            {}
 
             explicit ListItemBase(typename SpinnerType::range &&range,
                                   gui::AbstractSettingsModel<value_type> &model,
@@ -74,7 +75,7 @@ namespace app::list_items
                 }
 
                 spinner->onValueChanged = [this](const auto &val) {
-                    controlVisibility();
+                    control_visibility();
                     if (onValueChangeCb) {
                         onValueChangeCb(val);
                     }
@@ -83,21 +84,21 @@ namespace app::list_items
                 getValue = [this]() { this->model.setValue(this->spinner->value()); };
                 setValue = [this]() {
                     this->spinner->set_value(this->model.getValue());
-                    controlVisibility();
+                    control_visibility();
                 };
 
-                inputCallback = [this, &bottomDescription](Item &, const gui::InputEvent &event) {
+                inputCallback = [this]([[maybe_unused]] Item &item, const gui::InputEvent &event) {
                     return OnInputCallback(event);
                 };
 
-                focusChangedCallback = [this, &bottomDescription](Item &) {
+                focusChangedCallback = [this]([[maybe_unused]] Item &item) {
                     OnFocusChangedCallback();
-                    controlVisibility();
+                    control_visibility();
                     return true;
                 };
             }
 
-            virtual void controlVisibility()
+            virtual void control_visibility()
             {
                 body->setMinMaxArrowsVisibility(spinner->is_min(), spinner->is_max());
                 if (not this->bottomDescription.empty()) {
@@ -105,6 +106,7 @@ namespace app::list_items
                     body->resize();
                 }
             }
+
             SpinnerType *spinner{};
             gui::AbstractSettingsModel<value_type> &model;
             std::string bottomDescription;
@@ -147,14 +149,13 @@ namespace app::list_items
             }
 
             gui::ArcProgressBar *progress = nullptr;
-            void controlVisibility() override
+            void control_visibility() override
             {
-                ListItemBase<SpinnerType>::controlVisibility();
+                ListItemBase<SpinnerType>::control_visibility();
                 if (progress && this->spinner) {
                     progress->setValue(static_cast<unsigned int>(this->spinner->value()));
                 }
             }
         };
     } // namespace details
-
 } // namespace app::list_items

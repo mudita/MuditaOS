@@ -18,8 +18,8 @@
 
 namespace
 {
-    inline constexpr auto snoozeTimerName = "SnoozeTimer";
-    inline constexpr std::chrono::seconds timerTick{1};
+    constexpr auto snoozeTimerName = "SnoozeTimer";
+    constexpr std::chrono::seconds timerTick{1};
 } // namespace
 
 namespace gui
@@ -196,5 +196,4 @@ namespace gui
             currentLayout->setQuoteText(quoteContent, quoteAuthor);
         }
     }
-
 } // namespace gui

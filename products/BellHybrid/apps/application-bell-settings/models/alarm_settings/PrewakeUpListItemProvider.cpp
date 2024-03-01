@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PrewakeUpListItemProvider.hpp"
@@ -74,29 +74,29 @@ namespace app::bell_settings
         constexpr auto volumeStep = 1U;
         constexpr auto volumeMin  = AbstractAudioModel::minVolume;
         constexpr auto volumeMax  = AbstractAudioModel::maxVolume;
-        auto volume               = new list_items::NumericWithBar(
+        prewakeUpVolume           = new list_items::NumericWithBar(
             list_items::NumericWithBar::spinner_type::range{volumeMin, volumeMax, volumeStep},
             settingsModel.getChimeVolume(),
             volumeMax,
             utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_volume"));
-        volume->set_on_value_change_cb([this](const auto &val) {
+        prewakeUpVolume->set_on_value_change_cb([this](const auto &val) {
             if (onVolumeChange) {
                 onVolumeChange(val);
             }
         });
 
-        volume->onEnter = [this, chimeTone]() {
+        prewakeUpVolume->onEnter = [this, chimeTone]() {
             if (onVolumeEnter) {
                 onVolumeEnter(chimeTone->value());
             }
         };
 
-        volume->onExit = [this, volume]() {
+        prewakeUpVolume->onExit = [this]() {
             if (onVolumeExit) {
-                onVolumeExit(volume->value());
+                onVolumeExit(prewakeUpVolume->value());
             }
         };
-        internalData.emplace_back(volume);
+        internalData.emplace_back(prewakeUpVolume);
 
         auto lightDuration = new list_items::NumberWithSuffix(
             list_items::NumberWithSuffix::spinner_type::range{0, 5, 10, 15},
@@ -150,5 +150,10 @@ namespace app::bell_settings
         for (auto item : internalData) {
             item->deleteByList = false;
         }
+    }
+
+    auto PrewakeUpListItemProvider::getCurrentVolume() -> std::uint8_t
+    {
+        return prewakeUpVolume->value();
     }
 } // namespace app::bell_settings

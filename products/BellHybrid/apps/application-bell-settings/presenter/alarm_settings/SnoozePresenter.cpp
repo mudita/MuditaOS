@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SnoozePresenter.hpp"
@@ -6,7 +6,6 @@
 
 namespace app::bell_settings
 {
-
     SnoozePresenter::SnoozePresenter(std::shared_ptr<SnoozeListItemProvider> provider,
                                      std::unique_ptr<AbstractSnoozeSettingsModel> snoozeSettingsModel,
                                      AbstractAudioModel &audioModel,
@@ -16,6 +15,7 @@ namespace app::bell_settings
     {
         auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
+            this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::Snooze);
             this->audioModel.play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
                                   AbstractAudioModel::PlaybackType::Snooze,
                                   {});
@@ -30,7 +30,8 @@ namespace app::bell_settings
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
-            this->audioModel.setVolume(val, AbstractAudioModel::PlaybackType::Snooze, {});
+            this->audioModel.setVolume(
+                val, AbstractAudioModel::PlaybackType::Snooze, audio::VolumeUpdateType::SkipUpdateDB);
             if (this->audioModel.hasPlaybackFinished()) {
                 playSound(currentSoundPath);
             }
@@ -56,14 +57,17 @@ namespace app::bell_settings
     {
         return provider;
     }
+
     void SnoozePresenter::stopSound()
     {
         audioModel.stopPlayedByThis({});
     }
+
     void SnoozePresenter::eraseProviderData()
     {
         provider->clearData();
     }
+
     void SnoozePresenter::exitWithoutSave()
     {
         snoozeSettingsModel->getSnoozeChimeVolume().restoreDefault();

@@ -82,6 +82,12 @@ namespace audio
         Enable
     };
 
+    enum class VolumeUpdateType
+    {
+        UpdateDB,
+        SkipUpdateDB
+    };
+
     /// Used to describe audio operations
     using Context = std::pair<Profile::Type, PlaybackType>;
 

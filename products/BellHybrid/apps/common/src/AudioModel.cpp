@@ -137,9 +137,11 @@ namespace app
 
     void AudioModel::setVolume(AbstractAudioModel::Volume volume,
                                PlaybackType playbackType,
+                               audio::VolumeUpdateType updateType,
                                OnStateChangeCallback &&callback)
     {
-        auto msg = std::make_unique<service::AudioSetVolume>(convertPlaybackType(playbackType), std::to_string(volume));
+        auto msg = std::make_unique<service::AudioSetVolume>(
+            convertPlaybackType(playbackType), updateType, std::to_string(volume));
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
         auto cb   = [_callback = callback](auto response) {
             auto result = dynamic_cast<service::AudioResponseMessage *>(response);

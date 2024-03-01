@@ -1,18 +1,17 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/widgets/ProgressTimerWithSnoozeTimer.hpp>
 #include <common/widgets/SnoozeTimer.hpp>
-#include <Text.hpp>
-#include <ProgressBar.hpp>
 #include <ApplicationCommon.hpp>
 #include <apps-common/GuiTimer.hpp>
 #include <gsl/assert>
 
 namespace
 {
-    inline constexpr auto increasingModePrefix = "-";
+    constexpr auto increasingModePrefix = "-";
 }
+
 namespace app
 {
     void ProgressTimerWithSnoozeTimer::update()

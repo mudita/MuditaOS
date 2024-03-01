@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BedtimeSettingsListItemProvider.hpp"
@@ -15,7 +15,7 @@ namespace app::bell_settings
 
     BedtimeSettingsListItemProvider::BedtimeSettingsListItemProvider(std::shared_ptr<AbstractBedtimeModel> model,
                                                                      std::vector<UTF8> chimeToneRange)
-        : model{model}
+        : model{std::move(model)}
     {
         buildListItems(std::move(chimeToneRange));
     }
@@ -47,32 +47,36 @@ namespace app::bell_settings
         constexpr auto volumeStep = 1U;
         constexpr auto volumeMin  = AbstractAudioModel::minVolume;
         constexpr auto volumeMax  = AbstractAudioModel::maxVolume;
-        auto volume               = new list_items::NumericWithBar(
+        bedtimeVolume             = new list_items::NumericWithBar(
             list_items::NumericWithBar::spinner_type::range{volumeMin, volumeMax, volumeStep},
             model->getBedtimeVolume(),
             volumeMax,
             utils::translate("app_bell_settings_bedtime_settings_volume"));
-        volume->set_on_value_change_cb([this](const auto &val) {
+        bedtimeVolume->set_on_value_change_cb([this](const auto &val) {
             if (onVolumeChange) {
                 onVolumeChange(val);
             }
         });
 
-        volume->onEnter = [this, chimeTone]() {
+        bedtimeVolume->onEnter = [this, chimeTone]() {
             if (onVolumeEnter) {
                 onVolumeEnter(chimeTone->value());
             }
         };
 
-        volume->onExit = [this, volume]() {
+        bedtimeVolume->onExit = [this]() {
             if (onVolumeExit) {
-                onVolumeExit(volume->value());
+                onVolumeExit(bedtimeVolume->value());
             }
         };
-        internalData.emplace_back(volume);
+        internalData.emplace_back(bedtimeVolume);
         for (auto item : internalData) {
             item->deleteByList = false;
         }
     }
 
+    auto BedtimeSettingsListItemProvider::getCurrentVolume() -> std::uint8_t
+    {
+        return bedtimeVolume->value();
+    }
 } // namespace app::bell_settings
