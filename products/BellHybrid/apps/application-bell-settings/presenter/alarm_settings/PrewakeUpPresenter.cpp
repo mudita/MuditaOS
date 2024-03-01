@@ -6,11 +6,12 @@
 
 namespace app::bell_settings
 {
-    PrewakeUpWindowPresenter::PrewakeUpWindowPresenter(std::unique_ptr<PrewakeUpListItemProvider> &&provider,
-                                                       std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
-                                                       AbstractAudioModel &audioModel,
-                                                       std::unique_ptr<AbstractSoundsRepository> &&soundsRepository,
-                                                       std::unique_ptr<AbstractFrontlightModel> &&frontlight)
+    PrewakeUpWindowPresenter::PrewakeUpWindowPresenter(
+        std::unique_ptr<PrewakeUpListItemProvider> &&provider,
+        std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
+        AbstractAudioModel &audioModel,
+        std::unique_ptr<AbstractSimpleSoundsRepository> &&soundsRepository,
+        std::unique_ptr<AbstractFrontlightModel> &&frontlight)
         : provider{std::move(provider)}, model{std::move(model)}, audioModel{audioModel},
           soundsRepository{std::move(soundsRepository)}, frontlight{std::move(frontlight)}
     {

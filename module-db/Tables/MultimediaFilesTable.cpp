@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MultimediaFilesTable.hpp"
@@ -7,6 +7,20 @@
 #include <Utils.hpp>
 #include <magic_enum.hpp>
 #include <inttypes.h>
+
+namespace
+{
+    std::string getSorting(db::multimedia_files::SortingBy sorting)
+    {
+        switch (sorting) {
+        case db::multimedia_files::SortingBy::IdAscending:
+            return "_id ASC";
+        case db::multimedia_files::SortingBy::TitleAscending:
+        default:
+            return "title ASC";
+        }
+    }
+} // namespace
 
 namespace db::multimedia_files
 {
@@ -350,11 +364,12 @@ namespace db::multimedia_files
     }
 
     auto MultimediaFilesTable::getLimitOffsetByPaths(const std::vector<std::string> &paths,
-                                                     uint32_t offset,
-                                                     uint32_t limit) -> std::vector<TableRow>
+                                                     std::uint32_t offset,
+                                                     std::uint32_t limit,
+                                                     SortingBy sorting) -> std::vector<TableRow>
     {
-        const std::string query = "SELECT * FROM files WHERE " + constructMatchPattern(paths) +
-                                  " ORDER BY title ASC LIMIT " + std::to_string(limit) + " OFFSET " +
+        const std::string query = "SELECT * FROM files WHERE " + constructMatchPattern(paths) + " ORDER BY " +
+                                  getSorting(sorting) + " LIMIT " + std::to_string(limit) + " OFFSET " +
                                   std::to_string(offset) + ";";
         std::unique_ptr<QueryResult> retQuery = db->query(query.c_str());
         return retQueryUnpack(std::move(retQuery));
