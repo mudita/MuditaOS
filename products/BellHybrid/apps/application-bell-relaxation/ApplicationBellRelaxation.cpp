@@ -22,6 +22,7 @@
 #include <Paths.hpp>
 #include <apps-common/messages/AppMessage.hpp>
 #include <apps-common/models/SongsRepository.hpp>
+#include <common/SoundsRepository.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/models/BatteryModel.hpp>
 #include <common/models/AudioModel.hpp>
@@ -85,13 +86,19 @@ namespace app
     void ApplicationBellRelaxation::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
-            const auto paths = std::map<relaxation::MusicType, std::string>{
+            const auto pathsTypeMap = std::map<relaxation::MusicType, std::string>{
                 {relaxation::MusicType::Relaxation, paths::audio::proprietary() / paths::audio::relaxation()},
                 {relaxation::MusicType::ColorsOfNoise, paths::audio::proprietary() / paths::audio::colorOfNoises()},
                 {relaxation::MusicType::User, paths::audio::userApp() / paths::audio::relaxation()}};
+            const auto pathsSortingVector = std::vector<SoundsRepository::PathSorting>{
+                {paths::audio::proprietary() / paths::audio::relaxation(), SoundsRepository::SortingBy::TitleAscending},
+                {paths::audio::proprietary() / paths::audio::colorOfNoises(),
+                 SoundsRepository::SortingBy::TitleAscending},
+                {paths::audio::userApp() / paths::audio::relaxation(), SoundsRepository::SortingBy::TitleAscending}};
 
-            auto soundsRepository = std::make_unique<relaxation::RelaxationSongsRepository>(app, paths);
-            auto songsModel = std::make_unique<relaxation::RelaxationSongsModel>(app, std::move(soundsRepository));
+            auto soundsRepository = std::make_unique<SoundsRepository>(app, pathsSortingVector);
+            auto songsModel =
+                std::make_unique<relaxation::RelaxationSongsModel>(app, std::move(soundsRepository), pathsTypeMap);
             auto presenter  = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(songsModel));
             return std::make_unique<gui::RelaxationMainWindow>(app, std::move(presenter));
         });

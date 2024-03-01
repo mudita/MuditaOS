@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MultimediaFilesRecord.hpp"
@@ -257,7 +257,8 @@ namespace db::multimedia_files
     std::unique_ptr<db::multimedia_files::query::GetLimitedResult> MultimediaFilesRecordInterface::
         runQueryImplGetLimited(const std::shared_ptr<db::multimedia_files::query::GetLimitedByPaths> &query)
     {
-        const auto records = database->files.getLimitOffsetByPaths(query->paths, query->offset, query->limit);
+        const auto records =
+            database->files.getLimitOffsetByPaths(query->paths, query->offset, query->limit, query->sorting);
         auto response      = std::make_unique<query::GetLimitedResult>(records, database->files.count(query->paths));
         response->setRequestQuery(query);
 

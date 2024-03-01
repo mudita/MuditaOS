@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BedtimeSettingsPresenter.hpp"
@@ -8,7 +8,7 @@ namespace app::bell_settings
     SettingsPresenter::SettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
                                          std::shared_ptr<AbstractBedtimeModel> model,
                                          AbstractAudioModel &audioModel,
-                                         std::unique_ptr<AbstractSoundsRepository> soundsRepository)
+                                         std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository)
         : provider(std::move(provider)),
           model(std::move(model)), audioModel{audioModel}, soundsRepository{std::move(soundsRepository)}
     {

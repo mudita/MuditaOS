@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SnoozePresenter.hpp"
@@ -10,7 +10,7 @@ namespace app::bell_settings
     SnoozePresenter::SnoozePresenter(std::shared_ptr<SnoozeListItemProvider> provider,
                                      std::unique_ptr<AbstractSnoozeSettingsModel> snoozeSettingsModel,
                                      AbstractAudioModel &audioModel,
-                                     std::unique_ptr<AbstractSoundsRepository> soundsRepository)
+                                     std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository)
         : provider{provider}, snoozeSettingsModel{std::move(snoozeSettingsModel)}, audioModel{audioModel},
           soundsRepository{std::move(soundsRepository)}
     {
