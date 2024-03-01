@@ -62,8 +62,6 @@ target_sources(application-bell-relaxation
         windows/RelaxationErrorWindow.hpp
         model/RelaxationSongsModel.hpp
         model/RelaxationSongsModel.cpp
-        model/RelaxationSongsRepository.hpp
-        model/RelaxationSongsRepository.cpp
 
         PUBLIC
         include/application-bell-relaxation/ApplicationBellRelaxation.hpp

@@ -1,31 +1,20 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationSongsModel.hpp"
 #include "common/options/OptionBellMenu.hpp"
 #include "widgets/RelaxationOption.hpp"
 
-namespace
-{
-    app::relaxation::MusicType getTypeFromPath(const std::string &path,
-                                               const std::map<app::relaxation::MusicType, std::string> &pathPrefixes)
-    {
-        for (const auto &[type, pathPrefix] : pathPrefixes) {
-            if (path.find(pathPrefix) != std::string::npos) {
-                return type;
-            }
-        }
-        return app::relaxation::MusicType::Relaxation;
-    }
-} // namespace
 namespace app::relaxation
 {
     RelaxationSongsProvider::RelaxationSongsProvider(ApplicationCommon *app) : DatabaseModel(app)
     {}
 
-    RelaxationSongsModel::RelaxationSongsModel(
-        ApplicationCommon *application, std::unique_ptr<app::relaxation::RelaxationSongsRepository> soundsRepository)
-        : RelaxationSongsProvider(application), application(application), songsRepository{std::move(soundsRepository)}
+    RelaxationSongsModel::RelaxationSongsModel(ApplicationCommon *application,
+                                               std::unique_ptr<AbstractSoundsRepository> soundsRepository,
+                                               const std::map<MusicType, std::string> &pathPrefixes)
+        : RelaxationSongsProvider(application),
+          application(application), songsRepository{std::move(soundsRepository)}, pathPrefixes{pathPrefixes}
     {}
 
     void RelaxationSongsModel::createData(OnActivateCallback callback)
@@ -42,7 +31,7 @@ namespace app::relaxation
 
     unsigned int RelaxationSongsModel::requestRecordsCount()
     {
-        return songsRepository->getRecordsCount();
+        return songsRepository->getFilesCount();
     }
     unsigned int RelaxationSongsModel::getMinimalItemSpaceRequired() const
     {
@@ -64,15 +53,14 @@ namespace app::relaxation
         if (!sound) {
             return nullptr;
         }
-        auto item =
-            gui::option::RelaxationOption{getTypeFromPath(sound->fileInfo.path, songsRepository->getPathPrefixes()),
-                                          sound->tags.title,
-                                          [=]([[maybe_unused]] gui::Item &item) {
-                                              activateCallback(*sound);
-                                              return true;
-                                          },
-                                          [=]([[maybe_unused]] gui::Item &item) { return true; },
-                                          nullptr};
+        auto item = gui::option::RelaxationOption{getTypeFromPath(sound->fileInfo.path),
+                                                  sound->tags.title,
+                                                  [=]([[maybe_unused]] gui::Item &item) {
+                                                      activateCallback(*sound);
+                                                      return true;
+                                                  },
+                                                  []([[maybe_unused]] gui::Item &item) { return true; },
+                                                  nullptr};
 
         return item.build();
     }
@@ -99,5 +87,14 @@ namespace app::relaxation
         DatabaseModel::updateRecords(std::move(records));
         list->onProviderDataUpdate();
         return true;
+    }
+    MusicType RelaxationSongsModel::getTypeFromPath(const std::string &path)
+    {
+        for (const auto &[type, pathPrefix] : pathPrefixes) {
+            if (path.find(pathPrefix) != std::string::npos) {
+                return type;
+            }
+        }
+        return MusicType::Relaxation;
     }
 } // namespace app::relaxation

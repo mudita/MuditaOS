@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -48,7 +48,7 @@ namespace app::bell_settings
         PrewakeUpWindowPresenter(std::unique_ptr<PrewakeUpListItemProvider> &&provider,
                                  std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
                                  AbstractAudioModel &audioModel,
-                                 std::unique_ptr<AbstractSoundsRepository> &&soundsRepository,
+                                 std::unique_ptr<AbstractSimpleSoundsRepository> &&soundsRepository,
                                  std::unique_ptr<AbstractFrontlightModel> &&frontlight);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
@@ -63,7 +63,7 @@ namespace app::bell_settings
         std::shared_ptr<PrewakeUpListItemProvider> provider;
         std::unique_ptr<AbstractPrewakeUpSettingsModel> model;
         AbstractAudioModel &audioModel;
-        std::unique_ptr<AbstractSoundsRepository> soundsRepository;
+        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository;
         std::unique_ptr<AbstractFrontlightModel> frontlight;
         UTF8 currentSoundPath;
     };
