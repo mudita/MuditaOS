@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "RelaxationSongsRepository.hpp"
+#include "data/RelaxationCommon.hpp"
+#include <common/SoundsRepository.hpp>
 #include <apps-common/models/SongsModelInterface.hpp>
 #include <gui/widgets/ListItemProvider.hpp>
 
@@ -25,18 +26,21 @@ namespace app::relaxation
     {
       private:
         ApplicationCommon *application;
-        std::unique_ptr<RelaxationSongsRepository> songsRepository;
+        std::unique_ptr<AbstractSoundsRepository> songsRepository;
+        std::map<MusicType, std::string> pathPrefixes;
         OnActivateCallback activateCallback{nullptr};
 
         bool onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
                                   unsigned int repoRecordsCount);
         [[nodiscard]] bool updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records) override;
+        MusicType getTypeFromPath(const std::string &path);
 
       public:
         virtual ~RelaxationSongsModel() = default;
 
-        explicit RelaxationSongsModel(ApplicationCommon *application,
-                                      std::unique_ptr<RelaxationSongsRepository> soundsRepository);
+        RelaxationSongsModel(ApplicationCommon *application,
+                             std::unique_ptr<AbstractSoundsRepository> soundsRepository,
+                             const std::map<MusicType, std::string> &pathPrefixes);
 
         unsigned int requestRecordsCount() override;
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -45,7 +45,7 @@ namespace app::bell_settings
         SettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
                           std::shared_ptr<AbstractBedtimeModel> model,
                           AbstractAudioModel &audioModel,
-                          std::unique_ptr<AbstractSoundsRepository> soundsRepository);
+                          std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto saveData() -> void override;
@@ -59,7 +59,7 @@ namespace app::bell_settings
         std::shared_ptr<BedtimeSettingsListItemProvider> provider;
         std::shared_ptr<AbstractBedtimeModel> model;
         AbstractAudioModel &audioModel;
-        std::unique_ptr<AbstractSoundsRepository> soundsRepository;
+        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository;
         UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings

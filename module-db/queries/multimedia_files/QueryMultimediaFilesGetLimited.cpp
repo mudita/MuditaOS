@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "QueryMultimediaFilesGetLimited.hpp"
@@ -106,8 +106,11 @@ namespace db::multimedia_files::query
         return std::string{"GetAlbumsLimitedResult"};
     }
 
-    GetLimitedByPaths::GetLimitedByPaths(const std::vector<std::string> &paths, uint32_t offset, uint32_t limit)
-        : Query(Query::Type::Read), paths{paths}, offset(offset), limit(limit)
+    GetLimitedByPaths::GetLimitedByPaths(const std::vector<std::string> &paths,
+                                         std::uint32_t offset,
+                                         std::uint32_t limit,
+                                         SortingBy sorting)
+        : Query(Query::Type::Read), paths{paths}, offset{offset}, limit{limit}, sorting{sorting}
     {}
 
     auto GetLimitedByPaths::debugInfo() const -> std::string

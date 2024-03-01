@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -70,6 +70,12 @@ namespace db::multimedia_files
         channels
     };
 
+    enum class SortingBy
+    {
+        TitleAscending,
+        IdAscending
+    };
+
     class MultimediaFilesTable : public Table<TableRow, TableFields>
     {
       public:
@@ -101,8 +107,10 @@ namespace db::multimedia_files
         auto getLimitOffset(const Album &album, uint32_t offset, uint32_t limit) -> std::vector<TableRow>;
         auto count(const Album &album) -> uint32_t;
 
-        auto getLimitOffsetByPaths(const std::vector<std::string> &paths, uint32_t offset, uint32_t limit)
-            -> std::vector<TableRow>;
+        auto getLimitOffsetByPaths(const std::vector<std::string> &paths,
+                                   std::uint32_t offset,
+                                   std::uint32_t limit,
+                                   SortingBy sorting = SortingBy::TitleAscending) -> std::vector<TableRow>;
         auto count(const std::vector<std::string> &paths) -> uint32_t;
         TableRow getByPath(std::string path);
 
