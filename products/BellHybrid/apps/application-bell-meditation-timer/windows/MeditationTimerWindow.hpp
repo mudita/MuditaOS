@@ -4,12 +4,8 @@
 #pragma once
 
 #include "MeditationTimerPresenter.hpp"
-
-#include <Application.hpp>
 #include <AppWindow.hpp>
-#include <InputEvent.hpp>
-
-#include <apps-common/widgets/spinners/Spinners.hpp>
+#include <widgets/spinners/Spinners.hpp>
 
 namespace gui
 {

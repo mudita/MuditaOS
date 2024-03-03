@@ -4,7 +4,6 @@
 #pragma once
 
 #include <common/data/BellFinishedWindowSwitchData.hpp>
-#include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <apps-common/popups/WindowWithTimer.hpp>
 
 namespace gui

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SimSwitchingWindow.hpp"
@@ -10,9 +10,9 @@
 namespace constants
 {
     constexpr auto timerName = "SimSwitchingTimer";
-    inline constexpr std::chrono::seconds timerStartInterval{3};
-    inline constexpr std::chrono::seconds timerRepeatInterval{1};
-    inline constexpr std::chrono::seconds maxDurationTime{10};
+    constexpr std::chrono::seconds timerStartInterval{3};
+    constexpr std::chrono::seconds timerRepeatInterval{1};
+    constexpr std::chrono::seconds maxDurationTime{10};
 } // namespace constants
 
 namespace gui

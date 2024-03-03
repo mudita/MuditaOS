@@ -4,8 +4,8 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
-#include <common/models/BatteryModel.hpp>
-#include <common/models/LowBatteryInfoModel.hpp>
+#include <EventStore.hpp>
+#include <Units.hpp>
 #include <chrono>
 #include <vector>
 
@@ -17,12 +17,15 @@ namespace gui
 namespace app
 {
     class ApplicationCommon;
+    class AbstractBatteryModel;
+    class AbstractLowBatteryInfoModel;
 }
 
 namespace settings
 {
     class Settings;
 }
+
 namespace app::relaxation
 {
     class RelaxationTimerSelectContract

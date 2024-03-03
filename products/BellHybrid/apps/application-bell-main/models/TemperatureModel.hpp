@@ -6,10 +6,6 @@
 #include <Temperature.hpp>
 #include <service-db/Settings.hpp>
 
-#include <cstdint>
-#include <functional>
-#include <string>
-
 namespace app
 {
     class ApplicationCommon;

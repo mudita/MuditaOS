@@ -32,13 +32,12 @@ namespace app::meditation
                                                              std::unique_ptr<AbstractTimeModel> timeModel,
                                                              models::ChimeInterval &chimeIntervalModel,
                                                              models::Statistics &statisticsModel)
-        : app{app}, settings{settings}, timeModel{std::move(timeModel)}, chimeIntervalModel{chimeIntervalModel},
-          statisticsModel{statisticsModel}
+        : app{app}, settings{settings}, timeModel{std::move(timeModel)}, statisticsModel{statisticsModel}
     {
         duration = std::chrono::minutes{
             utils::getNumericValue<int>(settings->getValue(meditationDBRecordName, settings::SettingsScope::AppLocal))};
 
-        interval = to_interval(this->chimeIntervalModel.getValue().to_double(), duration);
+        interval = to_interval(chimeIntervalModel.getValue().to_double(), duration);
     }
 
     void MeditationProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)

@@ -20,7 +20,6 @@ namespace gui
         PowerNapProgressWindow(app::ApplicationCommon *app,
                                std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> &&windowPresenter);
 
-        // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;

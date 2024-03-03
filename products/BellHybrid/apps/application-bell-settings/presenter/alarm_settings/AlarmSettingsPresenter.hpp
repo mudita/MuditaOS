@@ -5,7 +5,6 @@
 
 #include "models/AudioErrorModel.hpp"
 #include <apps-common/BasePresenter.hpp>
-#include <apps-common/AudioOperations.hpp>
 #include <common/models/AbstractAudioModel.hpp>
 #include <common/models/FrontlightModel.hpp>
 #include <common/SoundsRepository.hpp>

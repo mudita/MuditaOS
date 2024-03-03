@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <time/time_locale.hpp>
-#include <utf8/UTF8.hpp>
 #include <widgets/BellSideListItem.hpp>
 #include <widgets/spinners/Spinners.hpp>
 
@@ -32,5 +31,4 @@ namespace gui
         Label *bottomDescription{};
         StringSpinner *timeFormat;
     };
-
 } // namespace gui

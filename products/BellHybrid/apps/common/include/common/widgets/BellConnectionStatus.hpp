@@ -3,16 +3,15 @@
 
 #pragma once
 
-#include <Units.hpp>
 #include <gui/widgets/BoxLayout.hpp>
-#include <gui/widgets/Image.hpp>
+#include <utf8/UTF8.hpp>
 
 namespace gui
 {
     class BellConnectionStatus : public gui::HBox
     {
       public:
-        BellConnectionStatus(Item *parent);
+        explicit BellConnectionStatus(Item *parent);
         void setFont(const UTF8 &fontName);
         void show(bool visibility);
         bool isVisible() const;

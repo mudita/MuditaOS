@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,12 +6,16 @@
 #include <common/models/AbstractSettingsModel.hpp>
 
 #include <service-db/Settings.hpp>
-#include <Service/Service.hpp>
 
 namespace app
 {
     class ApplicationCommon;
-};
+}
+
+namespace sys
+{
+    class Service;
+}
 
 namespace gui
 {

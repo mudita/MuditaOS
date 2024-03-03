@@ -1,11 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-cellular/service-cellular/connection-manager/ConnectionManagerCellularCommands.hpp>
 
 #include <module-cellular/at/cmd/CFUN.hpp>
 #include <module-cellular/at/Cmd.hpp>
-#include <module-cellular/at/ATFactory.hpp>
 
 auto ConnectionManagerCellularCommands::disconnectFromNetwork() -> bool
 {

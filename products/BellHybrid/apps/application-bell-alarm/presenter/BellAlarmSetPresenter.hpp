@@ -6,7 +6,6 @@
 #include <apps-common/BasePresenter.hpp>
 #include <common/models/AbstractAlarmModel.hpp>
 #include <common/models/BatteryModel.hpp>
-#include <memory>
 
 namespace app
 {
@@ -34,7 +33,7 @@ namespace app::bell_alarm
         class Presenter : public BasePresenter<BellAlarmSetContract::View>
         {
           public:
-            virtual time_t getAlarmTime() const noexcept = 0;
+            virtual std::time_t getAlarmTime() const noexcept = 0;
             virtual bool isAlarmActive() const noexcept  = 0;
             virtual void activate()                      = 0;
             virtual Layout getLayout()                   = 0;
@@ -49,11 +48,11 @@ namespace app::bell_alarm
                               AbstractAlarmModel &alarmModel,
                               AbstractBatteryModel &batteryModel);
 
-        time_t getAlarmTime() const noexcept;
-        bool isAlarmActive() const noexcept;
+        std::time_t getAlarmTime() const noexcept override;
+        bool isAlarmActive() const noexcept override;
         void activate() override;
-        Layout getLayout();
-        void lowBatteryInfoHandled();
+        Layout getLayout() override;
+        void lowBatteryInfoHandled() override;
 
       private:
         app::ApplicationCommon *app{};

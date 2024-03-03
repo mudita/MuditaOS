@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CellularUrcHandler.hpp"
@@ -6,6 +6,7 @@
 
 #include "service-cellular/src/ServiceCellularPriv.hpp"
 #include "service-cellular/src/ussd/USSDHandler.hpp"
+#include "service-cellular/CellularServiceAPI.hpp"
 
 #include <service-antenna/AntennaServiceAPI.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
@@ -153,7 +154,7 @@ void CellularUrcHandler::Handle(Qind &urc)
         urc.setHandled(true);
     }
     else if (urc.isFota()) {
-        const auto httpSuccess = "0";
+        constexpr auto httpSuccess = "0";
         if (urc.getFotaStage() == Qind::FotaStage::HTTPEND && urc.getFotaParameter() == httpSuccess) {
             LOG_DEBUG("Fota UPDATE, switching to AT mode");
             cellularService.cmux->setMode(CellularMux::Mode::AT);

@@ -4,10 +4,8 @@
 #include "MeditationMainWindow.hpp"
 #include "SettingsWindow.hpp"
 
-#include <common/data/StyleCommon.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <apps-common/ApplicationCommon.hpp>
-#include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/SideListView.hpp>
 
 namespace app::meditation

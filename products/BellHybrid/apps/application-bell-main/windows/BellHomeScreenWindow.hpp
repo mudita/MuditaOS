@@ -6,10 +6,7 @@
 #include "application-bell-main/presenters/HomeScreenPresenter.hpp"
 #include "models/TemperatureModel.hpp"
 
-#include <apps-common/GuiTimer.hpp>
 #include <apps-common/windows/AppWindow.hpp>
-#include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
-#include <common/widgets/BellBattery.hpp>
 
 namespace gui
 {

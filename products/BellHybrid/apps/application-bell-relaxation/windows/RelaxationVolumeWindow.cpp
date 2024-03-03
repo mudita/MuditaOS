@@ -5,8 +5,8 @@
 #include <data/RelaxationStyle.hpp>
 #include <ApplicationBellRelaxation.hpp>
 
-#include <popups/data/PopupData.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
+#include <gui/widgets/ProgressBar.hpp>
 
 namespace gui
 {

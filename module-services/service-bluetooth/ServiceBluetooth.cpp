@@ -44,9 +44,8 @@
 namespace
 {
     constexpr auto BluetoothServiceStackDepth = 1024 * 3;
-    inline constexpr auto connectionTimeout   = std::chrono::minutes{10};
-    inline constexpr auto btRestartDelay      = std::chrono::milliseconds{500};
-
+    constexpr auto connectionTimeout          = std::chrono::minutes{10};
+    constexpr auto btRestartDelay             = std::chrono::milliseconds{500};
 } // namespace
 
 ServiceBluetooth::ServiceBluetooth() : sys::Service(service::name::bluetooth, "", BluetoothServiceStackDepth)

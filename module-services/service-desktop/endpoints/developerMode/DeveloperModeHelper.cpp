@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/developerMode/DeveloperModeHelper.hpp>
@@ -30,16 +30,15 @@
 #include <locks/data/PhoneLockMessages.hpp>
 
 #include <fstream>
+
 namespace
 {
-
     auto toTetheringState(const std::string &state) -> sys::phone_modes::Tethering
     {
         using namespace sdesktop::endpoints::json::developerMode;
 
         return state == tetheringOn ? sys::phone_modes::Tethering::On : sys::phone_modes::Tethering::Off;
     }
-
 } // namespace
 
 namespace sdesktop::endpoints

@@ -2,13 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationRunningProgressWindow.hpp"
+#include <ApplicationBellRelaxation.hpp>
 #include <data/RelaxationStyle.hpp>
 #include <data/RelaxationSwitchData.hpp>
 #include <common/BellCommonNames.hpp>
+#include <common/widgets/BellStatusClock.hpp>
+#include <gui/widgets/ProgressBar.hpp>
 #include <popups/data/AudioErrorParams.hpp>
-#include <ApplicationBellRelaxation.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
+#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
 
 namespace
 {

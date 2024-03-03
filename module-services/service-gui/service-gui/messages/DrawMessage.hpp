@@ -1,20 +1,15 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "GUIMessage.hpp"
-#include <core/DrawCommand.hpp>
 #include <gui/Common.hpp>
-#include <Service/Message.hpp>
 
 #include <list>
 #include <memory>
 
-#include "Service/Message.hpp"
 #include "core/DrawCommandForward.hpp"
-#include "GUIMessage.hpp"
-#include "gui/Common.hpp"
 
 namespace service::gui
 {

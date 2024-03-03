@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <cstdint>
 #include <module-gui/gui/Common.hpp>
 
 namespace gui

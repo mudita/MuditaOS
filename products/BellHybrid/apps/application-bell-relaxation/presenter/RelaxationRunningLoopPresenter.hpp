@@ -5,22 +5,16 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/widgets/TimerWithCallbacks.hpp>
-#include <common/models/BatteryModel.hpp>
 #include <module-utils/EventStore/EventStore.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
-#include <service-db/Settings.hpp>
 #include <time/time_locale.hpp>
 
 namespace app
 {
     class AbstractTimeModel;
     class AbstractBatteryModel;
-    class ApplicationCommon;
 } // namespace app
-namespace gui
-{
-    class Item;
-} // namespace gui
+
 namespace settings
 {
     class Settings;

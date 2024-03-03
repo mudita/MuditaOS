@@ -6,10 +6,11 @@
 #include "presenter/RelaxationPausedPresenter.hpp"
 
 #include <AppWindow.hpp>
-#include <common/widgets/BellStatusClock.hpp>
 
 namespace gui
 {
+    class BellStatusClock;
+
     class RelaxationPausedWindow : public AppWindow, public app::relaxation::RelaxationPausedContract::View
     {
       public:

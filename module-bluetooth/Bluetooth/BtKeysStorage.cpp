@@ -172,5 +172,4 @@ namespace bluetooth
         }
         return 0;
     }
-
 } // namespace bluetooth

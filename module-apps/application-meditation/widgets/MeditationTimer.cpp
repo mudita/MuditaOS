@@ -13,16 +13,12 @@
 
 namespace
 {
-    inline constexpr auto meditationTimerName = "MeditationTimer";
-    inline constexpr std::chrono::seconds initialInterval{1};
+    constexpr auto meditationTimerName = "MeditationTimer";
+    constexpr std::chrono::seconds initialInterval{1};
 } // namespace
+
 namespace gui
 {
-    namespace
-    {
-        constexpr auto TimerInterval = std::chrono::milliseconds{1000};
-    } // namespace
-
     MeditationTimer::MeditationTimer(std::uint32_t x,
                                      std::uint32_t y,
                                      std::uint32_t width,
@@ -79,11 +75,13 @@ namespace gui
         Expects(timer != nullptr);
         return *timer;
     }
+
     gui::Progress &MeditationTimer::getProgress() noexcept
     {
         Expects(progressBar != nullptr);
         return *progressBar;
     }
+
     void MeditationTimer::playSound()
     {
         AudioServiceAPI::PlaybackStart(application,

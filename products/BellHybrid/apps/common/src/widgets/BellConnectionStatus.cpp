@@ -4,11 +4,10 @@
 #include <EventStore.hpp>
 #include <common/widgets/BellConnectionStatus.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
-#include "i18n/i18n.hpp"
+#include <i18n/i18n.hpp>
 
 namespace
 {
-    constexpr auto usb_connected_status     = "app_bellmain_usb_status_connected";
     constexpr auto status_text_max_w        = 350U;
     constexpr auto status_text_max_h        = 102U;
 } // namespace
@@ -25,7 +24,7 @@ namespace gui
         statusText->setEditMode(EditMode::Browse);
         statusText->activeItem = false;
         statusText->drawUnderline(false);
-        statusText->setText(utils::translate(usb_connected_status));
+        statusText->setText(utils::translate("app_bellmain_usb_status_connected"));
         statusText->setVisible(false);
     }
 

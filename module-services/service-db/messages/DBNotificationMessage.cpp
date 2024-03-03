@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-db/DBNotificationMessage.hpp>
@@ -11,7 +11,7 @@ namespace db
 {
     NotificationMessage::NotificationMessage(db::Interface::Name interface,
                                              Query::Type type,
-                                             std::optional<uint32_t> recordId)
+                                             std::optional<std::uint32_t> recordId)
         : sys::DataMessage(MessageType::DBServiceNotification), interface(interface), type(type), recordId(recordId)
     {}
 

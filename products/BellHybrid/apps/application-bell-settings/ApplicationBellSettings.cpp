@@ -40,7 +40,6 @@
 #include "windows/BellSettingsBedsideWindow.hpp"
 
 #include <Paths.hpp>
-#include <apps-common/windows/Dialog.hpp>
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/models/BedtimeModel.hpp>
 #include <common/models/BedsideModel.hpp>

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/SystemManagerCommon.hpp>
@@ -60,16 +60,15 @@ namespace sys
             }
             return sState::Regular;
         }
-
     } // namespace
 
     namespace constants
     {
         using namespace std::chrono_literals;
-        inline constexpr std::chrono::milliseconds timerInitInterval{30s};
-        inline constexpr std::chrono::milliseconds timerPeriodInterval{100ms};
-        inline constexpr std::chrono::milliseconds powerManagerLogsTimerInterval{1h};
-        inline constexpr auto restoreTimeout{5000};
+        constexpr std::chrono::milliseconds timerInitInterval{30s};
+        constexpr std::chrono::milliseconds timerPeriodInterval{100ms};
+        constexpr std::chrono::milliseconds powerManagerLogsTimerInterval{1h};
+        constexpr auto restoreTimeout{5000};
     } // namespace constants
 
     namespace state

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <apps-common/popups/Popups.hpp>
@@ -17,8 +17,8 @@ namespace
     constexpr auto chargingText                = "app_bell_charging_notification";
     constexpr auto chargingDoneText            = "app_bell_charging_done_notification";
     constexpr auto chargingNotificationTimeout = std::chrono::seconds{5};
-
 } // namespace
+
 namespace gui
 {
     ChargingNotificationWindow::ChargingNotificationWindow(app::ApplicationCommon *app, const std::string &windowName)

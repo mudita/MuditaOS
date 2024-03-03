@@ -7,12 +7,11 @@
 
 #include <apps-common/popups/WindowWithTimer.hpp>
 #include <apps-common/widgets/spinners/Spinners.hpp>
-#include <apps-common/widgets/BarGraph.hpp>
-#include <common/models/AbstractAudioModel.hpp>
 
 namespace gui
 {
     class BellBaseLayout;
+    class ArcProgressBar;
 
     class RelaxationVolumeWindow : public WindowWithTimer
     {

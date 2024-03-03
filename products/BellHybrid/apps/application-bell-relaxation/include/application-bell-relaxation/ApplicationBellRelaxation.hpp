@@ -4,11 +4,6 @@
 #pragma once
 
 #include <Application.hpp>
-#include <common/models/AbstractAudioModel.hpp>
-#include <common/models/AbstractRelaxationFadeModel.hpp>
-#include <common/models/BatteryModel.hpp>
-#include <common/models/LowBatteryInfoModel.hpp>
-#include <purefs/filesystem_paths.hpp>
 
 namespace gui::window::name
 {
@@ -22,6 +17,10 @@ namespace gui::window::name
 
 namespace app
 {
+    class AbstractAudioModel;
+    class AbstractLowBatteryInfoModel;
+    class AbstractRelaxationFadeModel;
+
     namespace relaxation
     {
         class RelaxationPlayer;

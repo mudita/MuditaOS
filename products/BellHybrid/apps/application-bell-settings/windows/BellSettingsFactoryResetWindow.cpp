@@ -1,14 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsFactoryResetWindow.hpp"
 
 #include <application-bell-main/ApplicationBellMain.hpp>
-#include <apps-common/widgets/BellBaseLayout.hpp>
-#include <apps-common/ApplicationCommon.hpp>
-#include <common/data/StyleCommon.hpp>
 #include <common/windows/BellFactoryReset.hpp>
-#include <i18n/i18n.hpp>
 #include <common/options/OptionBellMenu.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>

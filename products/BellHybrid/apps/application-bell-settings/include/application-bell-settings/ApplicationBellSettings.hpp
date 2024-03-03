@@ -5,8 +5,6 @@
 
 #include <Application.hpp>
 #include <apps-common/windows/AppWindow.hpp>
-#include <common/models/AbstractAudioModel.hpp>
-#include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 
 namespace gui::window::name
 {
@@ -24,6 +22,8 @@ namespace gui::window::name
 namespace app
 {
     inline constexpr auto applicationBellSettingsName = "ApplicationBellSettings";
+
+    class AbstractAudioModel;
 
     class ApplicationBellSettings : public Application
     {

@@ -12,6 +12,10 @@
 #include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 
+#include <gui/widgets/Icon.hpp>
+#include <gui/widgets/ProgressBar.hpp>
+#include <common/widgets/BellStatusClock.hpp>
+
 namespace
 {
     constexpr auto meditationProgressTimerName{"MeditationProgressTimer"};

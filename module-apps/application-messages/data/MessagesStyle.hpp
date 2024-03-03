@@ -1,11 +1,9 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <gui/widgets/Style.hpp>
-
-#include <cstdint>
 
 namespace style
 {
@@ -13,53 +11,53 @@ namespace style
     {
         namespace threads
         {
-            inline constexpr uint32_t listPositionX = style::window::default_left_margin;
+            inline constexpr std::uint32_t listPositionX = style::window::default_left_margin;
             // Magic 1 -> discussed with Design for proper alignment.
-            inline constexpr uint32_t ListPositionY = style::window::default_vertical_pos - 1;
+            inline constexpr std::uint32_t ListPositionY = style::window::default_vertical_pos - 1;
             // Bottom margin need to be added to fit all elements.
-            inline constexpr uint32_t listHeight =
+            inline constexpr std::uint32_t listHeight =
                 style::window_height - ListPositionY - style::nav_bar::height + style::margins::small;
-            inline constexpr uint32_t listWidth = style::listview::body_width_with_scroll;
+            inline constexpr std::uint32_t listWidth = style::listview::body_width_with_scroll;
         } // namespace threads
 
         namespace threadItem
         {
-            inline constexpr uint32_t sms_thread_item_h = 100;
+            inline constexpr std::uint32_t sms_thread_item_h = 100;
 
-            inline constexpr uint32_t topMargin    = 16;
-            inline constexpr uint32_t bottomMargin = 13;
+            inline constexpr std::uint32_t topMargin    = 16;
+            inline constexpr std::uint32_t bottomMargin = 13;
 
-            inline constexpr uint32_t leftMargin  = 10;
-            inline constexpr uint32_t rightMargin = 10;
+            inline constexpr std::uint32_t leftMargin  = 10;
+            inline constexpr std::uint32_t rightMargin = 10;
 
-            inline constexpr uint32_t timestampWidth             = 132;
-            inline constexpr uint32_t numberImportanceWidth      = 80;
-            inline constexpr uint32_t numberImportanceLeftMargin = 10;
-            inline constexpr uint32_t snippetLeftMargin          = 5;
-            inline constexpr uint32_t cotactWidthOffset          = timestampWidth + leftMargin + rightMargin;
-            inline constexpr uint32_t notSentIconWidth           = 20;
+            inline constexpr std::uint32_t timestampWidth             = 132;
+            inline constexpr std::uint32_t numberImportanceWidth      = 80;
+            inline constexpr std::uint32_t numberImportanceLeftMargin = 10;
+            inline constexpr std::uint32_t snippetLeftMargin          = 5;
+            inline constexpr std::uint32_t cotactWidthOffset          = timestampWidth + leftMargin + rightMargin;
+            inline constexpr std::uint32_t notSentIconWidth           = 20;
 
-            inline constexpr uint32_t previewWidthOffset = leftMargin + rightMargin + 10;
+            inline constexpr std::uint32_t previewWidthOffset = leftMargin + rightMargin + 10;
         } // namespace threadItem
 
         namespace newMessage
         {
             namespace recipientLabel
             {
-                inline constexpr uint32_t h = 42;
+                inline constexpr std::uint32_t h = 42;
             }
             namespace recipientImg
             {
-                inline constexpr uint32_t w = 32, h = 32;
+                inline constexpr std::uint32_t w = 32, h = 32;
             }
             namespace text
             {
-                inline constexpr uint32_t h    = 43;
-                inline constexpr uint32_t maxH = 320;
+                inline constexpr std::uint32_t h    = 43;
+                inline constexpr std::uint32_t maxH = 320;
             } // namespace text
             namespace messageLabel
             {
-                inline constexpr uint32_t h = 44;
+                inline constexpr std::uint32_t h = 44;
             }
         } // namespace newMessage
 
@@ -100,10 +98,10 @@ namespace style
 
         namespace smsList
         {
-            inline constexpr uint32_t x = style::window::default_left_margin;
-            inline constexpr uint32_t y = style::window::default_vertical_pos;
-            inline constexpr uint32_t h = style::window::default_body_height;
-            inline constexpr uint32_t w = style::listview::body_width_with_scroll;
+            inline constexpr std::uint32_t x = style::window::default_left_margin;
+            inline constexpr std::uint32_t y = style::window::default_vertical_pos;
+            inline constexpr std::uint32_t h = style::window::default_body_height;
+            inline constexpr std::uint32_t w = style::listview::body_width_with_scroll;
         } // namespace smsList
 
         namespace oldSmsLabel
@@ -118,11 +116,10 @@ namespace style
         {
             namespace list
             {
-                inline constexpr uint32_t x = style::window::default_left_margin;
-                inline constexpr uint32_t y = style::window::default_vertical_pos;
-                inline constexpr uint32_t h = style::window_height - y - style::nav_bar::height;
-                inline constexpr uint32_t w = style::listview::body_width_with_scroll;
-
+                inline constexpr std::uint32_t x = style::window::default_left_margin;
+                inline constexpr std::uint32_t y = style::window::default_vertical_pos;
+                inline constexpr std::uint32_t h = style::window_height - y - style::nav_bar::height;
+                inline constexpr std::uint32_t w = style::listview::body_width_with_scroll;
             } // namespace list
         }     // namespace templates
     }         // namespace messages

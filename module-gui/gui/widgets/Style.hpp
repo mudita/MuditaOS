@@ -4,9 +4,7 @@
 #pragma once
 
 #include "screen.hpp"
-#include <limits>
 #include <gui/core/Color.hpp>
-#include <gui/Common.hpp>
 #include <Alignment.hpp>
 #include <Margins.hpp>
 

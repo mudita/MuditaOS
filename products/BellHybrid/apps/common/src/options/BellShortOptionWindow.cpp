@@ -82,5 +82,4 @@ namespace gui
 
         optionsList->rebuildList(listview::RebuildType::InPlace);
     }
-
 } /* namespace gui */

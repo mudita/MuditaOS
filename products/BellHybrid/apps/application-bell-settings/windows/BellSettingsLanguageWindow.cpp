@@ -3,6 +3,7 @@
 
 #include "BellSettingsLanguageWindow.hpp"
 #include <common/options/OptionBellMenu.hpp>
+#include <widgets/BellBaseLayout.hpp>
 
 namespace gui
 {
@@ -67,5 +68,4 @@ namespace gui
         }
         return AppWindow::onInput(inputEvent);
     }
-
 } // namespace gui

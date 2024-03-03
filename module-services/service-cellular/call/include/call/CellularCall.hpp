@@ -1,8 +1,9 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
+#include "CallEvents.hpp"
 #include "api/CallAudio.hpp"
 #include "api/CallGUI.hpp"
 #include "api/CallDB.hpp"
@@ -12,19 +13,7 @@
 #include <service-cellular/CellularMessage.hpp>
 #include <Interface/CalllogRecord.hpp>
 #include <SystemManager/CpuSentinel.hpp>
-#include <PhoneNumber.hpp>
-#include <Tables/CalllogTable.hpp>
-#include <time/time_conversion.hpp>
-#include <utf8/UTF8.hpp>
-#include <Utils.hpp>
-
-#include <cstdint>
 #include <memory>
-#include <functional>
-#include <iosfwd>
-#include <string>
-#include <sys/types.h>
-#include "CallEvents.hpp"
 
 class ServiceCellular;
 

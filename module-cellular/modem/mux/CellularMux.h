@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -202,14 +202,11 @@ repeated until a response is obtained or action is taken by a higher layer.
 #include "modem/ATParser.hpp"
 #include "Service/Service.hpp"
 
-#include <message_buffer.h>
-
 #if defined(__cplusplus)
 extern "C"
 {
 #endif
 #include "FreeRTOS.h"
-#include "task.h" /* RTOS task related API prototypes. */
 #if defined(__cplusplus)
 }
 #endif

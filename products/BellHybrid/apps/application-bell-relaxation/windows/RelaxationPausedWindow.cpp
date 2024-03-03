@@ -5,6 +5,7 @@
 #include <data/RelaxationStyle.hpp>
 #include <ApplicationBellRelaxation.hpp>
 
+#include <common/widgets/BellStatusClock.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <i18n/i18n.hpp>
 

@@ -27,7 +27,7 @@ namespace app
             return;
         }
         const auto secondsRemaining = duration - elapsed;
-        const Duration remainingDuration{std::time_t{secondsRemaining.count()}};
+        const Duration remainingDuration{secondsRemaining.count()};
 
         timer->setTime(remainingDuration.getMinutes(), remainingDuration.getSeconds());
     }

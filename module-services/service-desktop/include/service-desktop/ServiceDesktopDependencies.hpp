@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,7 +12,6 @@ class ServiceDesktop;
 
 namespace sys::dependencies
 {
-
     template <>
     inline std::vector<std::string> getDependenciesFor<ServiceDesktop>()
     {
@@ -26,5 +25,4 @@ namespace sys::dependencies
         dependencies.push_back(service::name::service_desktop);
         return dependencies;
     }
-
 } // namespace sys::dependencies

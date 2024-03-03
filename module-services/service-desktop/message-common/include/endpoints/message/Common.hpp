@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,7 +9,6 @@
 
 namespace sdesktop::endpoints::message
 {
-
     inline constexpr auto size_length = 9U;
     inline constexpr auto size_header = size_length + 1;
 
@@ -63,5 +62,4 @@ namespace sdesktop::endpoints::message
 
         return std::make_unique<std::string>(message::endpointChar + responsePayloadSizeStr + jsonStr);
     }
-
 } // namespace sdesktop::endpoints::message

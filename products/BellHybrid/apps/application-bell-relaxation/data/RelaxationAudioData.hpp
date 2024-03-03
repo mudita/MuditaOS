@@ -1,14 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <SwitchData.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
-#include <tags_fetcher/TagsFetcher.hpp>
-
-#include <chrono>
-#include <memory>
-#include <string>
 
 namespace gui
 {

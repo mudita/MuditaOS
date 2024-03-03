@@ -1,11 +1,10 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-desktop/USBSecurityModel.hpp"
 
 #include "Service/Service.hpp"
 #include "service-desktop/DesktopMessages.hpp"
-#include "service-desktop/WorkerDesktop.hpp"
 #include <EventStore.hpp>
 
 #include <service-db/Settings.hpp>

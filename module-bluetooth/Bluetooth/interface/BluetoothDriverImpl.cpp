@@ -11,7 +11,6 @@ extern "C"
 #include <btstack_memory.h>
 #include <btstack_run_loop.h>
 #include <hci.h>
-#include <hci_dump.h>
 
 #include <btstack_chipset_cc256x.h>
 #include <btstack_link_key_db_memory.h>

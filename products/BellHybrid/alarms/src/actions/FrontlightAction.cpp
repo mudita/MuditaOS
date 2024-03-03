@@ -10,6 +10,7 @@
 #include <service-db/Settings.hpp>
 #include <db/SystemSettings.hpp>
 #include <module-utils/utility/Utils.hpp>
+#include <Service/Service.hpp>
 
 namespace alarms
 {

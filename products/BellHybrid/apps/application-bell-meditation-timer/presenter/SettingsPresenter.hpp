@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,7 +6,6 @@
 #include "data/Contract.hpp"
 #include <common/BellListItemProvider.hpp>
 #include <common/models/AbstractAudioModel.hpp>
-#include <common/SoundsRepository.hpp>
 #include <memory>
 
 namespace app
@@ -39,9 +38,8 @@ namespace app::meditation
 
       private:
         void stopSound();
-        models::ChimeInterval &chimeIntervalModel;
+
         models::ChimeVolume &chimeVolumeModel;
-        models::StartDelay &startDelayModel;
         AbstractAudioModel &audioModel;
         std::shared_ptr<BellListItemProvider> listItemsProvider;
     };

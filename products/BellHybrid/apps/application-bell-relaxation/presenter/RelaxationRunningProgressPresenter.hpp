@@ -3,24 +3,16 @@
 
 #pragma once
 
-#include <service-db/Settings.hpp>
 #include <apps-common/BasePresenter.hpp>
-#include <apps-common/widgets/TimerWithCallbacks.hpp>
+
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
-#include <tags_fetcher/TagsFetcher.hpp>
 #include <time/time_locale.hpp>
 
 namespace app
 {
     class AbstractTimeModel;
-    class AbstractBatteryModel;
-    class ApplicationCommon;
+    class TimerWithCallbacks;
 } // namespace app
-
-namespace gui
-{
-    class Item;
-} // namespace gui
 
 namespace settings
 {

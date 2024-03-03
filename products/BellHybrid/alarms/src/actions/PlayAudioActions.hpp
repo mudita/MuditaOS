@@ -7,10 +7,14 @@
 #include <audio/AudioMessage.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerHandle.hpp>
-#include <Service/Service.hpp>
 
 #include <chrono>
 #include <filesystem>
+
+namespace sys
+{
+    class Service;
+}
 
 namespace alarms
 {

@@ -7,6 +7,7 @@
 #include <audio/AudioMessage.hpp>
 #include <db/SystemSettings.hpp>
 #include <Timers/TimerFactory.hpp>
+#include <Service/Service.hpp>
 
 namespace alarms
 {

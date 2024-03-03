@@ -1,11 +1,9 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <widgets/spinners/Spinners.hpp>
-#include <gui/widgets/Style.hpp>
-#include <gui/widgets/text/TextConstants.hpp>
 #include <time/time_locale.hpp>
 
 #include <string>
@@ -32,10 +30,10 @@ namespace gui
     {
       public:
         ClockVertical(Item *parent                               = nullptr,
-                      uint32_t x                                 = 0U,
-                      uint32_t y                                 = 0U,
-                      uint32_t w                                 = 0U,
-                      uint32_t h                                 = 0U,
+                      std::uint32_t x                            = 0U,
+                      std::uint32_t y                            = 0U,
+                      std::uint32_t w                            = 0U,
+                      std::uint32_t h                            = 0U,
                       utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H);
 
         /// Switches currently displayed time format

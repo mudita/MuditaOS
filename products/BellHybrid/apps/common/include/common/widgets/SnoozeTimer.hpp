@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,8 +6,6 @@
 #include <apps-common/widgets/TimeSetFmtSpinner.hpp>
 #include <gui/widgets/BoxLayout.hpp>
 #include <gui/widgets/Style.hpp>
-#include <gui/widgets/text/TextFixedSize.hpp>
-#include <gui/widgets/text/TextConstants.hpp>
 #include <time/time_locale.hpp>
 #include <string>
 

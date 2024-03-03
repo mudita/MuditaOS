@@ -1,9 +1,8 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <Service/ServiceProxy.hpp>

@@ -13,7 +13,6 @@
 
 #include <crc32.h>
 
-#include <filesystem>
 #include <atomic>
 
 class WorkerDesktop : public sys::Worker

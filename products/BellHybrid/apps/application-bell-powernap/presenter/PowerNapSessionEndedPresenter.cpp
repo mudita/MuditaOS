@@ -1,8 +1,7 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapSessionEndedPresenter.hpp"
-#include <Timers/TimerFactory.hpp>
 #include <Application.hpp>
 #include <service-appmgr/Controller.hpp>
 #include "application-bell-main/ApplicationBellMain.hpp"

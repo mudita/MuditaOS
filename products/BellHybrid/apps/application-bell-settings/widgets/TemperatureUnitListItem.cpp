@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsStyle.hpp"
@@ -46,6 +46,7 @@ namespace gui
     {
         return temperatureUnit->value();
     }
+
     auto TemperatureUnitListItem::setUnit(const utils::temperature::Temperature::Unit unit) -> void
     {
         using namespace utils::temperature;

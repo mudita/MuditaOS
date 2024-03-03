@@ -1,14 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include <functional>
 #include <stdexcept>
-#include "thread.hpp"
-#include "condition_variable.hpp"
 #include "mutex.hpp"
-#include "Service/Mailbox.hpp"
 #include "Service/Service.hpp"
 #include "Service/ServiceCreator.hpp"
 #include "Timers/TimerHandle.hpp"
@@ -18,9 +14,7 @@
 #include "CpuStatistics.hpp"
 #include "TaskStatistics.hpp"
 #include "DeviceManager.hpp"
-#include <chrono>
 #include <vector>
-#include <algorithm>
 
 namespace app
 {

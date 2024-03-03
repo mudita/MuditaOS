@@ -16,9 +16,9 @@ namespace gui
     class BellAlarmWindow : public AppWindow, public app::bell_alarm::BellAlarmWindowContract::View
     {
       public:
-        explicit BellAlarmWindow(app::ApplicationCommon *app,
-                                 std::shared_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> windowPresenter,
-                                 std::string name = window::name::bellAlarm);
+        BellAlarmWindow(app::ApplicationCommon *app,
+                        std::shared_ptr<app::bell_alarm::BellAlarmWindowContract::Presenter> windowPresenter,
+                        std::string name = window::name::bellAlarm);
 
         void buildInterface() override;
         bool onInput(const InputEvent &inputEvent) override;

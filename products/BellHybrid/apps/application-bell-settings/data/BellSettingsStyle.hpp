@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include <gui/Common.hpp>
 #include <Style.hpp>
 
 namespace gui

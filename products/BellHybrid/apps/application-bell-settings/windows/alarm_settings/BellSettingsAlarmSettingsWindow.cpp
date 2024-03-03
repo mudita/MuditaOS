@@ -1,13 +1,11 @@
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "application-bell-settings/ApplicationBellSettings.hpp"
 #include "BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "BellSettingsAlarmSettingsWindow.hpp"
 #include "BellSettingsStyle.hpp"
 
 #include <common/windows/BellFinishedWindow.hpp>
-#include <popups/data/AudioErrorParams.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <apps-common/options/OptionStyle.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
@@ -98,4 +96,4 @@ namespace gui
         auto switchData = std::make_unique<AudioErrorParams>(AudioErrorType::FileDeleted);
         app::manager::Controller::sendAction(application, app::manager::actions::ShowPopup, std::move(switchData));
     }
-} /* namespace gui */
+} // namespace gui

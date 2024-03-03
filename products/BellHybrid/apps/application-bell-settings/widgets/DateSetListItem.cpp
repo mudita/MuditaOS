@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DateSetListItem.hpp"
@@ -54,5 +54,4 @@ namespace gui
     MonthSetListItem::MonthSetListItem(const UTF8 &topDesc) : DateSetListItem(topDesc, DateSetSpinner::Type::month){};
 
     DaySetListItem::DaySetListItem(const UTF8 &topDesc) : DateSetListItem(topDesc, DateSetSpinner::Type::day){};
-
-} /* namespace gui */
+} // namespace gui

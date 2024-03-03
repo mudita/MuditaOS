@@ -5,7 +5,6 @@
 
 #include "AsyncTask.hpp"
 #include "Audio/AudioCommon.hpp"      // for Volume, Play...
-#include "Audio/Profiles/Profile.hpp" // for Profile, Pro...
 #include "CallbackStorage.hpp"
 
 #include "system/Common.hpp"   // for ReturnCodes
@@ -16,12 +15,10 @@
 #include <SystemManager/SystemManagerCommon.hpp>
 #include <hal/key_input/KeyEventDefinitions.hpp>
 #include "gui/Common.hpp" // for ShowMode
-#include "projdefs.h"     // for pdMS_TO_TICKS
 #include <PhoneModes/Observer.hpp>
 
 #include <service-appmgr/ApplicationManifest.hpp>
 #include <list>     // for list
-#include <map>      // for allocator, map
 #include <memory>   // for make_shared
 #include <string>   // for string
 #include <utility>  // for move, pair

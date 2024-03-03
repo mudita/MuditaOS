@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,9 +12,6 @@ namespace app
 }
 namespace gui
 {
-    namespace charging_notification
-    {} // namespace charging_notification
-
     class Icon;
 
     class ChargingNotificationWindow : public WindowWithTimer, public app::AsyncCallbackReceiver
@@ -40,6 +37,7 @@ namespace gui
         explicit ChargingDoneNotificationWindow(app::ApplicationCommon *app);
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
     };
+
     class ChargingInProgressNotificationWindow : public ChargingNotificationWindow
     {
       protected:

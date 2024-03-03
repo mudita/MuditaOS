@@ -1,23 +1,18 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SongsRepository.hpp"
 
 #include <algorithm>
-#include <log/log.hpp>
-#include <service-audio/AudioServiceAPI.hpp>
-#include <service-audio/AudioServiceName.hpp>
 #include <time/ScopedTime.hpp>
-#include <service-audio/AudioMessage.hpp>
 #include <module-db/queries/multimedia_files/QueryMultimediaFilesGetLimited.hpp>
-#include <module-db/queries/multimedia_files/QueryMultimediaFilesGet.hpp>
 
 #include <filesystem>
 
 namespace constants
 {
-    inline constexpr auto cacheMaxSize{30};
-    inline constexpr auto cacheThreshold{10};
+    constexpr auto cacheMaxSize{30};
+    constexpr auto cacheThreshold{10};
 } // namespace constants
 
 namespace app::music

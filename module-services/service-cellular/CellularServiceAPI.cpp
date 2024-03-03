@@ -1,12 +1,10 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "service-cellular/CellularMessage.hpp"
 #include "service-cellular/CellularServiceAPI.hpp"
-#include "service-cellular/ServiceCellular.hpp"
 #include "application-call/include/application-call/ApplicationCall.hpp"
 
-#include <MessageType.hpp>
 #include <modem/mux/CellularMux.h>
 #include <PhoneNumber.hpp>
 #include <system/Common.hpp>

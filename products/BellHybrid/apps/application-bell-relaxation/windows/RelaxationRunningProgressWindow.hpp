@@ -7,13 +7,15 @@
 #include <data/RelaxationAudioData.hpp>
 
 #include <AppWindow.hpp>
-#include <apps-common/widgets/BarGraph.hpp>
-#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
-#include <common/widgets/BellStatusClock.hpp>
-#include <gui/widgets/Icon.hpp>
 
 namespace gui
 {
+    class Icon;
+    class ArcProgressBar;
+    class TimeFixedWidget;
+    class BellStatusClock;
+    class TimeMinuteSecondWidget;
+
     class RelaxationRunningProgressWindow : public AppWindow,
                                             public app::relaxation::RelaxationRunningProgressContract::View
     {

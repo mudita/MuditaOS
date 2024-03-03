@@ -10,6 +10,7 @@ namespace app::music
 {
     class AbstractSongsRepository;
 }
+
 namespace app::relaxation
 {
 
@@ -48,5 +49,4 @@ namespace app::relaxation
       public:
         explicit RelaxationMainWindowPresenter(std::unique_ptr<SongsModel> songsModel);
     };
-
 } // namespace app::relaxation

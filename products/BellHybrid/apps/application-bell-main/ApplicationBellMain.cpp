@@ -21,11 +21,7 @@
 #include <service-db/DBNotificationMessage.hpp>
 #include <windows/Dialog.hpp>
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
-#include <appmgr/messages/ChangeHomescreenLayoutParams.hpp>
-#include <system/messages/SystemManagerMessage.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
-#include <WindowsStack.hpp>
-#include <popups/Popups.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <appmgr/messages/AlarmMessage.hpp>
 

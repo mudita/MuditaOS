@@ -10,8 +10,6 @@
 #include <module-db/Interface/AlarmEventRecord.hpp>
 #include <service-db/Settings.hpp>
 
-#include <functional>
-
 namespace app
 {
     class ApplicationCommon;

@@ -3,8 +3,6 @@
 
 #pragma once
 
-#include <string>
-
 namespace sdesktop::paths
 {
     inline constexpr auto updateFilename         = "update.tar";

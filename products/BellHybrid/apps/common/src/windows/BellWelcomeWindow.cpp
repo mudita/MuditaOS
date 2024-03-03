@@ -81,5 +81,4 @@ namespace gui
                                 BellChargeWelcomeWindow::message,
                                 onAction)
     {}
-
 } /* namespace gui */

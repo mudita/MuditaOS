@@ -6,7 +6,10 @@
 #include "widgets/RelaxationPlayer.hpp"
 
 #include <common/models/TimeModel.hpp>
+#include <common/models/BatteryModel.hpp>
 #include <gsl/assert>
+
+#include <service-db/Settings.hpp>
 
 namespace app::relaxation
 {

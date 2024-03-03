@@ -5,12 +5,12 @@
 #include <data/RelaxationStyle.hpp>
 #include <data/RelaxationSwitchData.hpp>
 #include <popups/data/AudioErrorParams.hpp>
+#include <common/widgets/BellStatusClock.hpp>
+#include <common/widgets/BellBattery.hpp>
 #include <common/BellCommonNames.hpp>
-
-#include <ApplicationBellRelaxation.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimer.hpp>
-#include <Units.hpp>
+#include <ApplicationBellRelaxation.hpp>
 
 namespace
 {

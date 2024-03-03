@@ -3,7 +3,6 @@
 
 #pragma once
 
-#include "AlarmEventsDBRepository.hpp"
 #include "AlarmOperations.hpp"
 #include "AlarmMessageHandler.hpp"
 #include "service-time/TimeManager.hpp"
@@ -11,13 +10,9 @@
 #include <service-cellular/CellularServiceAPI.hpp>
 #include "service-time/ServiceTimeDependencies.hpp"
 
-#include <MessageType.hpp>
 #include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-
-#include <functional>
-#include <string> // for allocator, string
 
 namespace settings
 {

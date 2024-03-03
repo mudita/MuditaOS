@@ -16,7 +16,6 @@
 
 namespace gui
 {
-
     BellSettingsAlarmSettingsSnoozeWindow::BellSettingsAlarmSettingsSnoozeWindow(
         app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::SnoozePresenter> presenter)
         : AppWindow(app, name), presenter{std::move(presenter)}

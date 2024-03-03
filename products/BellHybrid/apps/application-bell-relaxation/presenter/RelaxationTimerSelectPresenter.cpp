@@ -4,7 +4,7 @@
 #include "RelaxationTimerSelectPresenter.hpp"
 #include <data/RelaxationCommon.hpp>
 #include <ApplicationBellRelaxation.hpp>
-
+#include <common/models/LowBatteryInfoModel.hpp>
 #include <service-db/Settings.hpp>
 
 namespace
@@ -66,5 +66,4 @@ namespace app::relaxation
     {
         lowBatteryInfoModel.handleInfo();
     }
-
 } // namespace app::relaxation

@@ -1,17 +1,14 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <hal/key_input/RawKey.hpp>
 
-#include <sstream>
-#include <cstdint>
 #include <type_traits>
 
 namespace gui
 {
-
     enum class KeyCode
     {
         KEY_UNDEFINED = 0,
@@ -48,7 +45,7 @@ namespace gui
         HEADSET_VOLDN = static_cast<int>(bsp::KeyCodes::HeadsetVolDown),
     };
 
-    static const int InvalidNumericKeyCode = -1;
+    inline constexpr int InvalidNumericKeyCode = -1;
 
     /// if numeric - returns numeric value, else return: InvalidNumericKeyCode ( -1 )
     [[nodiscard]] inline auto toNumeric(KeyCode key) -> int

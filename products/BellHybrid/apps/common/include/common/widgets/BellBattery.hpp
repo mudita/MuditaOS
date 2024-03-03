@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,7 +9,6 @@
 
 namespace gui
 {
-
     namespace battery
     {
         constexpr auto font_small         = style::window::font::largelight;
@@ -18,7 +17,6 @@ namespace gui
         constexpr auto percent_w          = 106U;
         constexpr auto battery_widget_h   = 64U;
         constexpr auto battery_widget_w   = 184U;
-
     } // namespace battery
 
     enum class BatteryPercentMode

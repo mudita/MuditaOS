@@ -7,12 +7,12 @@
 #include <data/RelaxationAudioData.hpp>
 
 #include <AppWindow.hpp>
-#include <common/widgets/BellStatusClock.hpp>
-#include <common/widgets/BellBattery.hpp>
 
 namespace gui
 {
     class TextFixedSize;
+    class BellStatusClock;
+    class BellBattery;
 
     class RelaxationRunningLoopWindow : public AppWindow, public app::relaxation::RelaxationRunningLoopContract::View
     {

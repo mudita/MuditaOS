@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MessagesStyle.hpp"
@@ -12,9 +12,6 @@
 #include <log/log.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGet.hpp>
 #include <module-db/queries/messages/threads/QueryThreadsGetForList.hpp>
-#include <OptionsWindow.hpp>
-#include <OptionWindow.hpp>
-#include <service-db/DBServiceAPI.hpp>
 
 ThreadsModel::ThreadsModel(app::ApplicationCommon *app) : BaseThreadsRecordModel(app), app::AsyncCallbackReceiver{app}
 {}

@@ -4,6 +4,7 @@
 #include <models/SettingsModel.hpp>
 #include <utf8/UTF8.hpp>
 #include <widgets/list_items/Fraction.hpp>
+#include <Service/Service.hpp>
 
 namespace gui
 {

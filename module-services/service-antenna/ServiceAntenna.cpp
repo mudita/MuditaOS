@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <AntennaMessage.hpp>
@@ -21,6 +21,11 @@
 #include <memory>
 #include <string>
 #include <vector>
+
+namespace
+{
+    constexpr auto antennaServiceStackSize = 1024 * 2;
+}
 
 namespace antenna
 {
@@ -50,7 +55,6 @@ namespace antenna
     }
 } // namespace antenna
 
-inline constexpr auto antennaServiceStackSize = 1024 * 2;
 
 ServiceAntenna::ServiceAntenna()
     : sys::Service(service::name::antenna, "", antennaServiceStackSize, sys::ServicePriority::Idle),
@@ -294,6 +298,7 @@ bool ServiceAntenna::signalCheckStateHandler(void)
     state->set(antenna::State::idle);
     return true;
 }
+
 bool ServiceAntenna::bandCheckStateHandler(void)
 {
     std::string cellularResponse;
@@ -358,6 +363,7 @@ bool ServiceAntenna::lockedStateHandler(void)
     state->disableTimeout();
     return true;
 }
+
 void ServiceAntenna::registerMessageHandlers()
 {
     connect(typeid(antenna::message::InvalidCsqNotification), [&](sys::Message *request) -> sys::MessagePointer {

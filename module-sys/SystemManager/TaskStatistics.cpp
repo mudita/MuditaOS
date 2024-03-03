@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/TaskStatistics.hpp>
@@ -10,8 +10,8 @@
 
 namespace constants
 {
-    inline constexpr std::uint32_t cpuUsageThreshold{10};
-    inline const std::string ignoredTaskName{"IDLE"};
+    constexpr std::uint32_t cpuUsageThreshold{10};
+    const std::string ignoredTaskName{"IDLE"};
 } // namespace constants
 
 namespace sys

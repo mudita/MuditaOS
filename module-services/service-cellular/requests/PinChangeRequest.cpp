@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <string>
@@ -8,7 +8,6 @@
 #include <at/ATFactory.hpp>
 
 #include "service-cellular/requests/PinChangeRequest.hpp"
-#include <at/ATFactory.hpp>
 #include <map>
 
 namespace
@@ -19,8 +18,6 @@ namespace
         {"042", cellular::PinChangeRequest::PassChangeType::ChangePin2},
         {"05", cellular::PinChangeRequest::PassChangeType::ChangePinByPuk},
     }};
-
-    constexpr inline std::string_view changeNetworkPasswordServiceCode = "03";
 } // namespace
 
 namespace cellular

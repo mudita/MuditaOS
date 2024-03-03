@@ -12,7 +12,6 @@ namespace sdesktop
 
     namespace developerMode
     {
-
         AppFocusChangeEvent::AppFocusChangeEvent(std::string appName)
         {
             context.setResponseStatus(http::Code::OK);

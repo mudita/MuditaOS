@@ -59,8 +59,7 @@ namespace app::meditation
                                          models::ChimeVolume &chimeVolumeModel,
                                          models::StartDelay &startDelayModel,
                                          AbstractAudioModel &audioModel)
-        : chimeIntervalModel{chimeIntervalModel}, chimeVolumeModel{chimeVolumeModel}, startDelayModel{startDelayModel},
-          audioModel{audioModel}
+        : chimeVolumeModel{chimeVolumeModel}, audioModel{audioModel}
     {
 
         auto chimeInterval =

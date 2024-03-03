@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,13 +9,12 @@
 #include <modem/mux/CellularMux.h>
 #include <PhoneNumber.hpp>
 #include <module-bsp/bsp/cellular/bsp_cellular.hpp>
-#include <utf8/UTF8.hpp>
 
-#include <cstdint>
 #include <string>
 #include <module-services/service-cellular/DTMFCode.hpp>
 
 class Service;
+
 namespace sys
 {
     class Service;
@@ -150,5 +149,4 @@ namespace CellularServiceAPI
     bool CallAudioLoudspeakerOnEvent(sys::Service *serv);
 
     bool CallAudioLoudspeakerOffEvent(sys::Service *serv);
-
 }; // namespace CellularServiceAPI

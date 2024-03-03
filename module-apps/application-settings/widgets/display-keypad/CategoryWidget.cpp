@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CategoryWidget.hpp"
@@ -9,27 +9,24 @@ namespace style::quotes
 {
     namespace widget
     {
-        inline constexpr uint32_t w = style::window::default_body_width;
-        inline constexpr uint32_t h = 50;
+        constexpr std::uint32_t w = style::window::default_body_width;
+        constexpr std::uint32_t h = 50;
 
-        inline constexpr uint32_t input_box_w           = 55;
-        inline constexpr uint32_t input_box_h           = h;
-        inline constexpr int32_t input_box_right_margin = 20;
+        constexpr std::uint32_t input_box_w           = 55;
+        constexpr std::uint32_t input_box_h           = h;
+        constexpr std::int32_t input_box_right_margin = 20;
 
-        inline constexpr uint32_t description_label_w           = 280;
-        inline constexpr uint32_t description_label_h           = 33;
-        inline constexpr int32_t description_label_right_margin = 40;
+        constexpr std::uint32_t description_label_w           = 280;
+        constexpr std::uint32_t description_label_h           = 33;
+        constexpr std::int32_t description_label_right_margin = 40;
 
-        inline constexpr int32_t tick_image_left_margin  = -64;
-        inline constexpr int32_t tick_image_right_margin = 32;
-
+        constexpr std::int32_t tick_image_left_margin  = -64;
+        constexpr std::int32_t tick_image_right_margin = 32;
     } // namespace widget
-
 } // namespace style::quotes
 
 namespace gui
 {
-
     CategoryWidget::CategoryWidget(const Quotes::CategoryRecord &categoryRecord,
                                    std::function<void(bool)> enableCategoryCallback,
                                    std::function<void(const UTF8 &)> navBarTemporaryMode,

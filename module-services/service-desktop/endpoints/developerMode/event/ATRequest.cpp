@@ -1,9 +1,8 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <endpoints/developerMode/event/ATRequest.hpp>
 #include <endpoints/developerMode/DeveloperModeHelper.hpp>
-#include <endpoints/JsonKeyNames.hpp>
 
 namespace sdesktop::developerMode
 {
@@ -19,5 +18,4 @@ namespace sdesktop::developerMode
         context.setResponseBody(json11::Json::object{{endpoints::json::developerMode::ATResponse, response}});
         context.setResponseStatus(endpoints::http::Code::OK);
     }
-
 } // namespace sdesktop::developerMode

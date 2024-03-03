@@ -16,9 +16,12 @@ namespace
 
 namespace gui
 {
-
-    ClockVertical::ClockVertical(
-        Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, utils::time::Locale::TimeFormat timeFormat)
+    ClockVertical::ClockVertical(Item *parent,
+                                 std::uint32_t x,
+                                 std::uint32_t y,
+                                 std::uint32_t w,
+                                 std::uint32_t h,
+                                 utils::time::Locale::TimeFormat timeFormat)
         : VBox{parent, x, y, w, h}
     {
         using namespace utils;

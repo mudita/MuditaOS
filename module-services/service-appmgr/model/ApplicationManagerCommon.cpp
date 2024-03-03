@@ -20,7 +20,7 @@
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <Utils.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
-#include <service-desktop/ServiceDesktopName.hpp>
+#include <service-gui/ServiceGUIName.hpp>
 #include <service-eink/ServiceEink.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <AppWindowConstants.hpp>
@@ -887,5 +887,4 @@ namespace app::manager
         }
         return nullptr;
     }
-
 } // namespace app::manager

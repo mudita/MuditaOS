@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ProfileConfigUtils.hpp"
@@ -6,24 +6,25 @@
 #include <log/log.hpp>
 #include <json11.hpp>
 #include <magic_enum.hpp>
+
 namespace audio
 {
     namespace strings
     {
-        constexpr inline auto samplerate        = "samplerate";
-        constexpr inline auto bitWidth          = "bitWidth";
-        constexpr inline auto flags             = "flags";
-        constexpr inline auto outputVolume      = "outputVolume";
-        constexpr inline auto outputPath        = "outputPath";
-        constexpr inline auto inputGain         = "inputGain";
-        constexpr inline auto inputPath         = "inputPath";
-        constexpr inline auto filterParams      = "filterParams";
-        constexpr inline auto filterType        = "filterType";
-        constexpr inline auto frequency         = "frequency";
-        constexpr inline auto Q                 = "Q";
-        constexpr inline auto gain              = "gain";
-        constexpr inline auto playbackPathGain  = "playbackPathGain";
-        constexpr inline auto playbackPathAtten = "playbackPathAtten";
+        constexpr auto samplerate        = "samplerate";
+        constexpr auto bitWidth          = "bitWidth";
+        constexpr auto flags             = "flags";
+        constexpr auto outputVolume      = "outputVolume";
+        constexpr auto outputPath        = "outputPath";
+        constexpr auto inputGain         = "inputGain";
+        constexpr auto inputPath         = "inputPath";
+        constexpr auto filterParams      = "filterParams";
+        constexpr auto filterType        = "filterType";
+        constexpr auto frequency         = "frequency";
+        constexpr auto Q                 = "Q";
+        constexpr auto gain              = "gain";
+        constexpr auto playbackPathGain  = "playbackPathGain";
+        constexpr auto playbackPathAtten = "playbackPathAtten";
     } // namespace strings
 
     namespace utils
@@ -129,5 +130,4 @@ namespace audio
         config.filterCoefficients = filterParams;
         return config;
     }
-
 } // namespace audio

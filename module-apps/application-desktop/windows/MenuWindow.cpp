@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DBNotificationsHandler.hpp"
@@ -18,19 +18,19 @@ namespace style::design
 {
     // all these might not be final - as designs for these didn't look like that
 
-    inline const auto tile_w       = 130;
-    inline const auto tile_h       = 130;
-    inline const auto tile_margin  = 24 - (64 - 50) / 2; // this is waiting for proper adjust-to-design anyway
-    inline const auto tile_text_y  = 50;
-    inline const auto notify_dot_x = 80;
-    inline const auto notify_dot_y = (64 - 50) / 2;
-    inline const auto grid_offset  = 20;
+    constexpr auto tile_w       = 130;
+    constexpr auto tile_h       = 130;
+    constexpr auto tile_margin  = 24 - (64 - 50) / 2; // this is waiting for proper adjust-to-design anyway
+    constexpr auto tile_text_y  = 50;
+    constexpr auto notify_dot_x = 80;
+    constexpr auto notify_dot_y = (64 - 50) / 2;
+    constexpr auto grid_offset  = 20;
 } // namespace style::design
 
 namespace
 {
-    static constexpr auto deepRefreshDot = "dot_12px_hard_alpha_W_G";
-    static constexpr auto fastRefreshDot = "dot_12px_hard_alpha_W_M";
+    constexpr auto deepRefreshDot = "dot_12px_hard_alpha_W_G";
+    constexpr auto fastRefreshDot = "dot_12px_hard_alpha_W_M";
 
     gui::Image *buildThumbnail(gui::RefreshModes mode)
     {

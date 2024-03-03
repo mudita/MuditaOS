@@ -5,7 +5,6 @@
 
 #include <Paths.hpp>
 #include <filesystem>
-#include <string>
 
 namespace app::meditation
 {

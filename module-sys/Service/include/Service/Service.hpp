@@ -1,32 +1,27 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "ServiceForward.hpp"
 #include "BusProxy.hpp"
-#include "Mailbox.hpp" // for Mailbox
-#include "Message.hpp" // for MessagePointer
+#include "Mailbox.hpp"
+#include "Message.hpp"
 #include "ServiceManifest.hpp"
-#include "thread.hpp" // for Thread
+#include "thread.hpp"
 #include <SystemWatchdog/Watchdog.hpp>
-#include <SystemWatchdog/SystemWatchdog.hpp> // for SystemWatchdog
-#include <algorithm>                         // for find, max
-#include <cstdint>                           // for uint32_t, uint64_t
-#include <functional>                        // for function
-#include <iterator>                          // for end
-#include <map>                               // for map
-#include <memory>                            // for allocator, shared_ptr, enable_shared_from_this
-#include <string>                            // for string
-#include <typeindex>                         // for type_index
-#include <utility>                           // for pair
-#include <vector>                            // for vector<>::iterator, vector
-#include <typeinfo>                          // for connect by type
+#include <SystemWatchdog/SystemWatchdog.hpp>
+#include <map>
+#include <memory>
+#include <string>
+#include <typeindex>
+#include <utility>
+#include <vector>
+#include <typeinfo>
 #include <stdexcept>
 
 namespace sys
 {
-
     class async_fail : public std::runtime_error
     {
       public:

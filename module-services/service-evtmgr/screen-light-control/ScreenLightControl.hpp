@@ -4,7 +4,6 @@
 #pragma once
 
 #include "ScreenLightControlParameters.hpp"
-#include <memory>
 #include <Timers/TimerHandle.hpp>
 
 namespace settings

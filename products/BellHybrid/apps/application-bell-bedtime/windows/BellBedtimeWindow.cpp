@@ -1,17 +1,10 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellBedtimeWindow.hpp"
 
-#include <apps-common/widgets/BellBaseLayout.hpp>
-#include <apps-common/widgets/TimeSetFmtSpinner.hpp>
-
-#include <data/BellBedtimeStyle.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
-
-#include <module-gui/gui/widgets/text/TextFixedSize.hpp>
 #include <module-gui/gui/widgets/ThreeBox.hpp>
-#include <module-gui/gui/widgets/Image.hpp>
 
 #include <widgets/SideListView.hpp>
 #include <common/windows/BellFinishedWindow.hpp>

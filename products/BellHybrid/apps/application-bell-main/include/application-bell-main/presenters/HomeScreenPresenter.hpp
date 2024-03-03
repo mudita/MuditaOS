@@ -19,7 +19,6 @@
 #include <utf8/UTF8.hpp>
 
 #include <chrono>
-#include <functional>
 
 namespace app
 {

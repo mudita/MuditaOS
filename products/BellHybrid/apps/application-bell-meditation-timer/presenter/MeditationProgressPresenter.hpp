@@ -94,7 +94,6 @@ namespace app::meditation
         settings::Settings *settings{nullptr};
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
-        models::ChimeInterval &chimeIntervalModel;
         models::Statistics &statisticsModel;
         std::chrono::minutes duration;
         std::chrono::seconds interval;

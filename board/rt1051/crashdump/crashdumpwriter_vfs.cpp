@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "crashdumpwriter_vfs.hpp"
@@ -20,10 +20,10 @@
 
 namespace
 {
-    inline constexpr auto prefix     = "crashdump";
-    inline constexpr auto extension  = ".hex";
-    inline constexpr auto file_index = ".1";
-    inline constexpr auto separator  = "_";
+    constexpr auto prefix     = "crashdump";
+    constexpr auto extension  = ".hex";
+    constexpr auto file_index = ".1";
+    constexpr auto separator  = "_";
 
     inline std::string generateCrashdumpFilename()
     {

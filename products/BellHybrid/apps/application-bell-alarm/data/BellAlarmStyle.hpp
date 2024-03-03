@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -22,8 +22,8 @@ namespace gui
 
         namespace icon
         {
-            constexpr inline auto imageTopMargin    = 112;
-            constexpr inline auto imageBottomMargin = 30;
+            inline constexpr auto imageTopMargin    = 112;
+            inline constexpr auto imageBottomMargin = 30;
         } // namespace icon
     }     // namespace bell_alarm_style
 } // namespace gui

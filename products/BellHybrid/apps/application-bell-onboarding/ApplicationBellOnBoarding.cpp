@@ -10,7 +10,6 @@
 #include <windows/OnBoardingFinalizeWindow.hpp>
 #include <windows/OnBoardingOnOffWindow.hpp>
 #include <windows/OnBoardingSettingsWindow.hpp>
-#include <windows/OnBoardingWelcomeWindow.hpp>
 #include <windows/OnBoardingInstructionPromptWindow.hpp>
 #include <windows/OnBoardingShortcutsOptionWindow.hpp>
 

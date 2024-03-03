@@ -8,6 +8,9 @@
 #include <common/models/TimeModel.hpp>
 #include <gsl/assert>
 
+#include <apps-common/widgets/TimerWithCallbacks.hpp>
+#include <service-db/Settings.hpp>
+
 namespace
 {
     bool isSongLengthEqualToPeriod(std::chrono::seconds songLength, std::chrono::minutes period)

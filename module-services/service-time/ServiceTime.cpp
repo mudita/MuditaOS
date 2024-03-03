@@ -8,6 +8,7 @@
 #include <service-time/TimeMessage.hpp>
 #include <service-time/TimeSettings.hpp>
 #include <service-time/TimezoneHandler.hpp>
+#include <service-time/AlarmEventsDBRepository.hpp>
 #include <service-audio/AudioServiceName.hpp>
 #include <service-audio/AudioMessage.hpp>
 

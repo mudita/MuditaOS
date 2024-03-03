@@ -1,11 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <widgets/BellSideListItem.hpp>
 #include <widgets/DateSetSpinner.hpp>
-#include <utf8/UTF8.hpp>
 
 namespace gui
 {
@@ -38,5 +37,4 @@ namespace gui
       public:
         DaySetListItem(const UTF8 &topDesc = "");
     };
-
-} /* namespace gui */
+} // namespace gui

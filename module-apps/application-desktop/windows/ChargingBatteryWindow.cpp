@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ChargingBatteryWindow.hpp"
@@ -15,8 +15,8 @@ namespace gui
 {
     namespace
     {
-        constexpr inline auto imgPositionX = 176;
-        constexpr inline auto imgPositionY = 250;
+        constexpr auto imgPositionX = 176;
+        constexpr auto imgPositionY = 250;
 
         std::string getInfoText()
         {

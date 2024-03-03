@@ -26,6 +26,7 @@
 #include <common/models/AudioModel.hpp>
 #include <common/models/SongsModel.hpp>
 #include <common/models/RelaxationFadeModel.hpp>
+#include <common/models/LowBatteryInfoModel.hpp>
 #include <common/windows/AppsBatteryStatusWindow.hpp>
 #include <common/AudioErrorPresenter.hpp>
 #include <common/windows/AudioErrorWindow.hpp>

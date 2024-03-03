@@ -128,8 +128,6 @@ target_sources(application-bell-settings
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp
         windows/alarm_settings/BellSettingsPrewakeUpWindow.hpp
 
-        data/FinishedWindowMessageData.hpp
-
     PUBLIC
         include/application-bell-settings/models/DateTimeUnitsModel.hpp
         include/application-bell-settings/models/AudioErrorModel.hpp

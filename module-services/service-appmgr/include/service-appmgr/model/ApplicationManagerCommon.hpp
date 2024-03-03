@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,29 +7,22 @@
 #include "ApplicationsRegistry.hpp"
 #include "ActionsRegistry.hpp"
 #include "ApplicationStack.hpp"
+
 #include <service-appmgr/messages/Message.hpp>
+#include <service-db/Settings.hpp>
 
 #include <apps-common/ApplicationLauncher.hpp>
 
 #include <system/Common.hpp>
 #include <Service/Message.hpp>
 #include <Service/Service.hpp>
-#include <Timers/TimerHandle.hpp>
 
-#include <deque>
 #include <memory>
 #include <string>
-#include <string_view>
 #include <vector>
-
-#include <service-db/DBServiceName.hpp>
-#include <service-db/Settings.hpp>
-#include <service-gui/ServiceGUIName.hpp>
-#include <service-eink/ServiceEinkName.hpp>
 
 #include <notifications/NotificationProvider.hpp>
 #include <apps-common/notifications/NotificationsHandler.hpp>
-#include <apps-common/notifications/NotificationsConfiguration.hpp>
 
 namespace app
 {

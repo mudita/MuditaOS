@@ -8,6 +8,7 @@
 #include "CurrentMeasurementScope.hpp"
 #endif
 
+#include <Service/Service.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>

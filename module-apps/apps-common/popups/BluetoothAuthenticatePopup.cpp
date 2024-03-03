@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothAuthenticatePopup.hpp"
@@ -10,23 +10,22 @@ namespace gui
 {
     namespace bluetooth::authenticate
     {
-        inline constexpr auto option_box_top_margin = 40U;
+        constexpr auto option_box_top_margin = 40U;
 
-        inline constexpr auto max_passkey_signs_count = 16U;
-        inline constexpr auto min_passkey_signs_count = 4U;
-        inline constexpr auto passkey_input_w         = 300U;
-        inline constexpr auto passkey_input_h         = 60U;
+        constexpr auto max_passkey_signs_count = 16U;
+        constexpr auto min_passkey_signs_count = 4U;
+        constexpr auto passkey_input_w         = 300U;
+        constexpr auto passkey_input_h         = 60U;
 
-        inline constexpr auto buttons_input_w = 150U;
-        inline constexpr auto buttons_input_h = 75U;
-        inline constexpr auto buttons_margin  = 30U;
+        constexpr auto buttons_input_w = 150U;
+        constexpr auto buttons_input_h = 75U;
+        constexpr auto buttons_margin  = 30U;
 
         enum ButtonsOptions
         {
             Pair,
             Cancel,
         };
-
     } // namespace bluetooth::authenticate
 
     BluetoothAuthenticatePopup::BluetoothAuthenticatePopup(app::ApplicationCommon *app, const std::string &name)

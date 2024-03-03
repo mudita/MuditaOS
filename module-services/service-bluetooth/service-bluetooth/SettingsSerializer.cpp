@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "SettingsSerializer.hpp"
@@ -7,9 +7,9 @@
 
 namespace strings
 {
-    constexpr inline auto addr    = "addr";
-    constexpr inline auto name    = "name";
-    constexpr inline auto devices = "devices";
+    constexpr auto addr    = "addr";
+    constexpr auto name    = "name";
+    constexpr auto devices = "devices";
 } // namespace strings
 
 auto SettingsSerializer::toString(const std::vector<Devicei> &devices) -> std::string

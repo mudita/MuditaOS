@@ -15,11 +15,6 @@
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <WindowsStack.hpp>
 
-namespace
-{
-    constexpr unsigned int y_position = 22U;
-} // namespace
-
 namespace gui
 {
     AlarmActivatedWindow::AlarmActivatedWindow(app::ApplicationCommon *app,

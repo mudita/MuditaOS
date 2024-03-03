@@ -6,7 +6,11 @@
 #include "SettingsListItemProvider.hpp"
 #include "AbstractAlarmSettingsModel.hpp"
 #include <common/models/AbstractSettingsModel.hpp>
-#include <common/models/SongsModel.hpp>
+
+namespace app
+{
+    class SongsModel;
+}
 
 namespace app::list_items
 {

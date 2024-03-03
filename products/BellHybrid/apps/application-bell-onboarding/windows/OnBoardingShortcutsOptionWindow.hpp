@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,9 +8,9 @@
 
 namespace style::bell_shortcuts_layout
 {
-    constexpr inline auto top_layout_h    = 153U;
-    constexpr inline auto center_layout_h = 180U;
-    constexpr inline auto bottom_layout_h = 51U;
+    inline constexpr auto top_layout_h    = 153U;
+    inline constexpr auto center_layout_h = 180U;
+    inline constexpr auto bottom_layout_h = 51U;
 } // namespace style::bell_shortcuts_layout
 
 namespace gui

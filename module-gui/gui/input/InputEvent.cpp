@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "InputEvent.hpp"
 #include <gsl/assert>
+#include <sstream>
 
 namespace gui
 {
-
     InputEvent::InputEvent(RawKey key, State state, KeyCode keyCode) : rawKey(key), state(state), keyCode(keyCode)
     {}
 
@@ -24,5 +24,4 @@ namespace gui
         Expects(isDigit());
         return toNumeric(keyCode);
     }
-
 }; // namespace gui

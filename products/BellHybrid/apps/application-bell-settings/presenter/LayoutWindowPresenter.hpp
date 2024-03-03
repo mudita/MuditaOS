@@ -9,7 +9,6 @@
 #include <common/models/TimeModel.hpp>
 #include <common/models/QuoteModel.hpp>
 #include <common/layouts/HomeScreenLayouts.hpp>
-#include <common/layouts/HomeScreenLayouts.hpp>
 
 #include <vector>
 #include <string>

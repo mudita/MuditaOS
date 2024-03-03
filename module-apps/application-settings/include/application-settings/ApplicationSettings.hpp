@@ -1,13 +1,11 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Application.hpp>
 
-#include <application-settings/windows/WindowNames.hpp>
 #include <apps-common/audio/SoundsPlayer.hpp>
-#include <bsp/common.hpp>
 #include <bsp/keypad_backlight/keypad_backlight.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <EventStore.hpp>
@@ -15,7 +13,7 @@
 #include <application-settings/data/WallpaperOption.hpp>
 #include <module-services/service-cellular/service-cellular/VolteState.hpp>
 
-class AudioStopNotification; // Forward declaration
+class AudioStopNotification;
 
 namespace app
 {
