@@ -2,17 +2,17 @@
 # Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-import collections
-import shutil
-from pathlib import Path
 import argparse
+import collections
 import json
+import logging
+import shutil
 import subprocess
 import sys
-import logging
 import textwrap
+from pathlib import Path
 
-logging.basicConfig(level=logging.DEBUG, format='%(levelname)s: %(message)s')
+logging.basicConfig(level=logging.DEBUG, format="%(levelname)s: %(message)s")
 logger = logging.getLogger(__name__)
 handler = logging.StreamHandler(sys.stdout)
 logger.addHandler(handler)
@@ -40,8 +40,8 @@ def write_all_keys_to_file(json_path: Path, output_path: Path):
         json_data = json.load(json_file)
         keys = json_data.keys()
 
-    with output_path.open(mode='w') as output_file:
-        output_file.write('\n'.join(keys))
+    with output_path.open(mode="w") as output_file:
+        output_file.write("\n".join(keys))
 
 
 def validate_data(list_of_pairs: list):
@@ -50,7 +50,7 @@ def validate_data(list_of_pairs: list):
 
 
 def perform_on_files_from_path(json_path: Path, operation):
-    json_files = json_path.glob('*.json')
+    json_files = json_path.glob("*.json")
     ret = 0
 
     for file_path in json_files:
@@ -62,10 +62,15 @@ def perform_on_files_from_path(json_path: Path, operation):
 
 def check_duplicates(file_path: Path, json_file):
     try:
-        _ = json.load(json_file, object_pairs_hook=validate_data)
-    except ValueError as e:
-        duplicate_keys = [key.strip() for key in str(e).split(',') if key.strip()]
-        logger.debug(f"[{file_path.name}]: duplicate {len(duplicate_keys)}: {', '.join(duplicate_keys)}")
+        json.load(json_file, object_pairs_hook=validate_data)
+    except ValueError as err:
+        duplicate_keys = [key.strip() for key in str(err).split(",") if key.strip()]
+        logger.debug(
+            "[%s]: duplicate %s: %s",
+            file_path.name,
+            len(duplicate_keys),
+            ", ".join(duplicate_keys),
+        )
         return 1
     return 0
 
@@ -74,7 +79,12 @@ def check_empty_entries(file_path: Path, json_file):
     json_data = json.load(json_file)
     empty_entries = [entry for entry, value in json_data.items() if not value]
     if empty_entries:
-        logger.debug(f"[{file_path.name}]: empty entries {len(empty_entries)}: {empty_entries}")
+        logger.debug(
+            "[%s]: empty entries %s: %s",
+            file_path.name,
+            len(empty_entries),
+            empty_entries,
+        )
         return 1
     return 0
 
@@ -82,7 +92,7 @@ def check_empty_entries(file_path: Path, json_file):
 def get_all_keys_from_path(json_path: Path) -> set[str]:
     json_keys = set()
 
-    for file_path in json_path.glob('*.json'):
+    for file_path in json_path.glob("*.json"):
         with file_path.open() as json_file:
             json_data = json.load(json_file)
             json_keys |= set(json_data.keys())
@@ -94,25 +104,22 @@ def check_missing_entries_from_path(json_path: Path) -> int:
     all_keys = get_all_keys_from_path(json_path)
     ret = 0
 
-    for file_path in json_path.glob('*.json'):
+    for file_path in json_path.glob("*.json"):
         with file_path.open() as json_file:
             json_data = json.load(json_file)
             missing_keys_in_file = all_keys - set(json_data.keys())
 
             if missing_keys_in_file:
-                with (file_path.with_suffix('.pattern')).open('w') as pattern_file:
-                    pattern_file.write('\n'.join(missing_keys_in_file))
+                with (file_path.with_suffix(".pattern")).open("w") as pattern_file:
+                    pattern_file.write("\n".join(missing_keys_in_file))
                 ret = 1
 
     return ret
 
 
 def fix_json(dst_path: Path):
-    with open(dst_path) as dst_file:
-        json_data = json.load(dst_file)
-
-    with open(dst_path, 'w') as dst_file:
-        json.dump(json_data, dst_file, indent=4, sort_keys=True)
+    json_data = json.loads(dst_path.read_text())
+    dst_path.write_text(json.dumps(json_data, indent=4, sort_keys=True))
 
 
 def fix_jsons(json_dst_path: Path):
@@ -120,16 +127,14 @@ def fix_jsons(json_dst_path: Path):
         json_dst_path.mkdir(parents=True)
 
     for file_path in json_dst_path.glob("*.json"):
-        dst_file_path = file_path
-
-        fix_json(dst_file_path)
+        fix_json(file_path)
 
     logger.debug("Translation files fixed")
 
 
 def verify_keys_code_usage(pattern_src_path: Path, pattern_file=None):
-    unused_keys = []
-    used_keys = []
+    unused_keys = set()
+    used_keys = set()
 
     if pattern_file is None:
         file_list = list(pattern_src_path.glob("*.pattern"))
@@ -143,19 +148,28 @@ def verify_keys_code_usage(pattern_src_path: Path, pattern_file=None):
         with pattern_path.open("r") as file:
             lines = [line.strip() for line in file if line.strip()]
             rg_result = subprocess.run(
-                ["rg", "-f", str(pattern_path), "-g", f"!{pattern_src_path}", "-T", "json", ".."],
+                [
+                    "rg",
+                    "-f",
+                    str(pattern_path),
+                    "-g",
+                    f"!{pattern_src_path}",
+                    "-T",
+                    "json",
+                    "..",
+                ],
                 stdout=subprocess.PIPE,
             ).stdout.decode("UTF-8")
 
             for line in lines:
                 if line in rg_result:
-                    used_keys.append(line)
+                    used_keys.add(line)
                 else:
-                    unused_keys.append(line)
+                    unused_keys.add(line)
 
         pattern_path.unlink()
 
-    return set(unused_keys), set(used_keys)
+    return unused_keys, used_keys
 
 
 def remove_unused_keys(json_dst_path: Path, unused_keys: set):
@@ -163,14 +177,13 @@ def remove_unused_keys(json_dst_path: Path, unused_keys: set):
         json_dst_path.mkdir(parents=True)
 
     for file in json_dst_path.glob("*.json"):
-        with file.open() as json_file:
-            json_data = json.load(json_file)
+        json_data = json.loads(file.read_text())
         for key in unused_keys:
             json_data.pop(key, None)
 
         temp_path = file.with_suffix(".tmp")
-        with temp_path.open(mode='w') as outfile:
-            json.dump(json_data, outfile, indent=4, sort_keys=True)
+        temp_path.write_text(json.dumps(json_data, indent=4, sort_keys=True))
+
         shutil.move(str(temp_path), str(file))
 
     logger.debug("Translation files cleaned up from unused keys")
@@ -189,17 +202,21 @@ def get_missing_and_used_keys_for_files(json_path: Path, used_keys: set):
 
             if missing_keys_in_file:
                 logger.debug(
-                    f"[{file}]: missing and used {len(missing_keys_in_file)}: {sorted(missing_keys_in_file)}")
+                    "[%s]: missing and used %s: %s",
+                    file,
+                    len(missing_keys_in_file),
+                    sorted(missing_keys_in_file),
+                )
                 ret |= 1
     return ret
 
 
-def main(args):
+def main(cli_args):
     ret = 0
-    src_path = Path(args.src)
-    dst_path = Path(args.dst) if args.dst else None
+    src_path = Path(cli_args.src)
+    dst_path = Path(cli_args.dst) if cli_args.dst else None
 
-    if args.fix:
+    if cli_args.fix:
         copy_folder_contents(src_path, dst_path)
         fix_jsons(dst_path)
 
@@ -207,7 +224,9 @@ def main(args):
         write_all_keys_to_file(dst_path / "English.json", dst_path / "English.keys")
         not_used_keys, _ = verify_keys_code_usage(dst_path, "English.keys")
         if not_used_keys:
-            logger.critical(f"unused english keys:  {len(not_used_keys)}: {not_used_keys}")
+            logger.critical(
+                "unused english keys: %s: %s", len(not_used_keys), not_used_keys
+            )
 
         remove_unused_keys(dst_path, not_used_keys)
         missing_not_used_keys, missing_used_keys = verify_keys_code_usage(src_path)
@@ -226,30 +245,45 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        prog='verify_translations',
-        description='Script for checking the inconsistency of lang jsons',
-        formatter_class=argparse.RawTextHelpFormatter
+        prog="verify_translations",
+        description="Script for checking the inconsistency of lang jsons",
+        formatter_class=argparse.RawTextHelpFormatter,
     )
 
-    parser.add_argument('-s', '--src', metavar='path', type=Path, help="source path to the json files", required=True)
-    parser.add_argument('--fix', action='store_true', help=textwrap.dedent('''\
+    parser.add_argument(
+        "-s",
+        "--src",
+        metavar="path",
+        type=Path,
+        help="source path to the json files",
+        required=True,
+    )
+    parser.add_argument(
+        "--fix",
+        action="store_true",
+        help=textwrap.dedent(
+            """\
         fix the translation files: remove duplicates, remove unused keys and sort
         WARNING! this will overwrite your destination files!
-    
-        Use with caution!'''))
-    parser.add_argument('-d', '--dst', metavar='path', type=Path, help="destination path for the fixed json files")
-    parser.add_argument('-v', '--verbose', action='store_true')
+
+        Use with caution!"""
+        ),
+    )
+    parser.add_argument(
+        "-d",
+        "--dst",
+        metavar="path",
+        type=Path,
+        help="destination path for the fixed json files",
+    )
+    parser.add_argument("-v", "--verbose", action="store_true")
 
     args = parser.parse_args()
 
     if args.fix and not args.dst:
         parser.error("The destination path must be specified")
-        sys.exit(1)
 
-    if args.verbose:
-        logger.setLevel(logging.DEBUG)
-    else:
-        logger.setLevel(logging.CRITICAL)
+    logger.setLevel(logging.DEBUG if args.verbose else logging.CRITICAL)
 
     error_code = main(args)
     if error_code:
