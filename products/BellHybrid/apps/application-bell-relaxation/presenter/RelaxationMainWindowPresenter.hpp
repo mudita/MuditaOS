@@ -1,12 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "model/RelaxationSongsModel.hpp"
 #include <apps-common/BasePresenter.hpp>
-#include <module-db/Interface/MultimediaFilesRecord.hpp>
-#include <vector>
+#include <common/models/SongsModel.hpp>
 
 namespace app::music
 {
@@ -31,24 +29,24 @@ namespace app::relaxation
         {
 
           public:
-            virtual void createData(RelaxationSongsModel::OnActivateCallback activateCallback) = 0;
+            virtual void createData(SongsModel::OnActivateCallback activateCallback)           = 0;
             virtual void updateViewState()                                                     = 0;
             virtual void updateRecordsCount()                                                  = 0;
-            virtual std::shared_ptr<RelaxationSongsModel> getSongsModel()                      = 0;
+            virtual std::shared_ptr<SongsModel> getSongsModel()                                = 0;
         };
     };
 
     class RelaxationMainWindowPresenter : public RelaxationMainWindowContract::Presenter
     {
       private:
-        std::shared_ptr<RelaxationSongsModel> songsModel;
-        void createData(RelaxationSongsModel::OnActivateCallback activateCallback) override;
+        std::shared_ptr<SongsModel> songsModel;
+        void createData(SongsModel::OnActivateCallback activateCallback) override;
         void updateViewState() override;
         void updateRecordsCount() override;
-        std::shared_ptr<RelaxationSongsModel> getSongsModel() override;
+        std::shared_ptr<SongsModel> getSongsModel() override;
 
       public:
-        explicit RelaxationMainWindowPresenter(std::unique_ptr<RelaxationSongsModel> songsModel);
+        explicit RelaxationMainWindowPresenter(std::unique_ptr<SongsModel> songsModel);
     };
 
 } // namespace app::relaxation
