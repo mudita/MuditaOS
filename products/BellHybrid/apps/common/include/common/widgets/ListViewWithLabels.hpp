@@ -1,22 +1,24 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <ListViewWithArrows.hpp>
-#include "data/RelaxationCommon.hpp"
+
+#include <optional>
 
 namespace gui
 {
     class ListItemProvider;
+    class LabelMarkerItem;
 
-    class RelaxationListView : public ListViewWithArrows
+    using ListLabel = std::optional<std::string>;
+
+    class ListViewWithLabels : public ListViewWithArrows
     {
-        using MusicType = app::relaxation::MusicType;
-
       public:
-        RelaxationListView(Item *parent,
+        ListViewWithLabels(Item *parent,
                            unsigned int x,
                            unsigned int y,
                            unsigned int w,
@@ -26,14 +28,15 @@ namespace gui
         void reset() override;
 
       private:
+        std::size_t getSlotsLeft();
         void addItemsOnPage() override;
         void addLabelMarker(ListItem *item);
-        std::size_t getSlotsLeft();
-        void updateState(MusicType newMarker);
+        void updateState(ListLabel newMarker);
+        LabelMarkerItem *createMarkerItem(ListLabel label);
 
-        MusicType currentType{MusicType::Undefined};
-        MusicType previousType{MusicType::Undefined};
-        MusicType currentMarker{MusicType::Undefined};
+        ListLabel current{std::nullopt};
+        ListLabel previous{std::nullopt};
+        ListLabel currentMarker{std::nullopt};
         std::uint32_t itemsOnPage{0};
         bool labelAdded{false};
     };

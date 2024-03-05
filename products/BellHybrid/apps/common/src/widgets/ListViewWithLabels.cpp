@@ -1,33 +1,18 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "RelaxationListView.hpp"
-#include "widgets/RelaxationOption.hpp"
-#include "model/RelaxationSongsModel.hpp"
-#include "RelaxationItem.hpp"
-#include <TextFixedSize.hpp>
+#include <common/widgets/ListViewWithLabels.hpp>
+#include <common/widgets/LabelListItem.hpp>
+#include <common/models/SongsModel.hpp>
 
 namespace
 {
-
     constexpr auto maxItemDisplayed{4U};
-
-    const std::map<app::relaxation::MusicType, std::string> typeToLabel{
-        {app::relaxation::MusicType::Relaxation, "app_bell_relaxation_sounds"},
-        {app::relaxation::MusicType::ColorsOfNoise, "app_bell_relaxation_noises"},
-        {app::relaxation::MusicType::User, "app_bell_relaxation_uploaded_sounds"}};
-
-    gui::RelaxationMarkerItem *createMarkerItem(app::relaxation::MusicType musicType)
-    {
-        const auto label = UTF8(utils::translate(typeToLabel.at(musicType)));
-        return new gui::RelaxationMarkerItem(label);
-    }
-
 } // namespace
 
 namespace gui
 {
-    RelaxationListView::RelaxationListView(Item *parent,
+    ListViewWithLabels::ListViewWithLabels(Item *parent,
                                            unsigned int x,
                                            unsigned int y,
                                            unsigned int w,
@@ -38,7 +23,7 @@ namespace gui
         body->dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool { return true; };
     }
 
-    void RelaxationListView::addItemsOnPage()
+    void ListViewWithLabels::addItemsOnPage()
     {
         currentPageSize = 0;
         itemsOnPage     = 0;
@@ -57,7 +42,7 @@ namespace gui
                 itemsOnPage++;
             }
             else {
-                // Add invisible item to list to avoid memory leak
+                /* Add invisible item to list to avoid memory leak */
                 item->setVisible(false);
                 body->addWidget(item);
                 break;
@@ -72,39 +57,48 @@ namespace gui
         recalculateStartIndex();
 
         if (!labelAdded) {
-            currentMarker = MusicType::Undefined;
+            currentMarker.reset();
         }
     }
 
-    void RelaxationListView::addLabelMarker(ListItem *item)
+    LabelMarkerItem *ListViewWithLabels::createMarkerItem(ListLabel label)
     {
-        const auto relaxationItem = dynamic_cast<gui::RelaxationItem *>(item);
-        if (relaxationItem == nullptr) {
+        if (label.has_value()) {
+            const auto labelString = UTF8(utils::translate(label.value()));
+            return new LabelMarkerItem(labelString);
+        }
+        return new LabelMarkerItem(UTF8(""));
+    }
+
+    void ListViewWithLabels::addLabelMarker(ListItem *item)
+    {
+        const auto labelListItem = dynamic_cast<gui::LabelListItem *>(item);
+        if (labelListItem == nullptr) {
             return;
         };
-        previousType = currentType;
-        currentType  = relaxationItem->getMusicType();
+        previous = current;
+        current  = labelListItem->getLabel();
 
         switch (direction) {
         case listview::Direction::Bottom:
-            if (currentType != previousType && currentType != currentMarker) {
-                body->addWidget(createMarkerItem(currentType));
-                updateState(currentType);
+            if (current != previous && current != currentMarker) {
+                body->addWidget(createMarkerItem(*current));
+                updateState(current);
             }
             break;
 
         case listview::Direction::Top:
-            if (currentType != previousType && previousType != currentMarker) {
+            if (current != previous && previous != currentMarker) {
                 const auto initialSlotsLeft = getSlotsLeft();
 
-                body->removeWidget(relaxationItem);
-                body->addWidget(createMarkerItem(previousType));
-                updateState(previousType);
+                body->removeWidget(labelListItem);
+                body->addWidget(createMarkerItem(*previous));
+                updateState(previous);
 
                 /* Add item to body even if it won't fit to avoid manual memory
                  * management for item, but apply correction to currentPageSize
                  * if it is not visible. */
-                body->addWidget(relaxationItem);
+                body->addWidget(labelListItem);
 
                 if (initialSlotsLeft == 0) {
                     currentPageSize--;
@@ -112,21 +106,21 @@ namespace gui
                 }
             }
             else {
-                const auto relaxationProvider = dynamic_cast<app::relaxation::RelaxationSongsModel *>(provider.get());
-                if (relaxationProvider == nullptr) {
+                const auto songsProvider = dynamic_cast<app::SongsModel *>(provider.get());
+                if (songsProvider == nullptr) {
                     break;
                 }
-                const auto nextItemExist = relaxationProvider->nextRecordExist(getOrderFromDirection());
+                const auto nextItemExist = songsProvider->nextRecordExist(getOrderFromDirection());
                 if (!nextItemExist && getSlotsLeft() == 1) {
-                    body->addWidget(createMarkerItem(currentType));
-                    updateState(currentType);
+                    body->addWidget(createMarkerItem(current));
+                    updateState(current);
                 }
             }
             break;
         }
     }
 
-    std::size_t RelaxationListView::getSlotsLeft()
+    std::size_t ListViewWithLabels::getSlotsLeft()
     {
         if (itemsOnPage > maxItemDisplayed) {
             return 0;
@@ -134,17 +128,17 @@ namespace gui
         return maxItemDisplayed - itemsOnPage;
     }
 
-    void RelaxationListView::reset()
+    void ListViewWithLabels::reset()
     {
-        currentMarker = MusicType::Undefined;
-        previousType  = MusicType::Undefined;
-        currentType   = MusicType::Undefined;
+        currentMarker.reset();
+        previous.reset();
+        current.reset();
         ListViewEngine::reset();
     }
 
-    void RelaxationListView::updateState(RelaxationListView::MusicType newMarker)
+    void ListViewWithLabels::updateState(ListLabel marker)
     {
-        currentMarker = newMarker;
+        currentMarker = marker;
         itemsOnPage++;
         labelAdded = true;
     }
