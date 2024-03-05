@@ -1,7 +1,7 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "RelaxationItem.hpp"
+#include <common/widgets/LabelListItem.hpp>
 #include "common/options/OptionBellMenu.hpp"
 
 namespace
@@ -11,15 +11,15 @@ namespace
 
 namespace gui
 {
-    RelaxationItem::RelaxationItem(app::relaxation::MusicType musicType) : musicType(musicType)
+    LabelListItem::LabelListItem(ListLabel label) : label{label}
     {}
 
-    app::relaxation::MusicType RelaxationItem::getMusicType()
+    ListLabel LabelListItem::getLabel()
     {
-        return musicType;
+        return label;
     }
 
-    RelaxationMarkerItem::RelaxationMarkerItem(const UTF8 &labelText)
+    LabelMarkerItem::LabelMarkerItem(const UTF8 &labelText)
     {
         setMinimumSize(style::bell_options::default_text_width, style::bell_options::h);
         setMargins(gui::Margins(0, style::bell_options::option_margin, 0, style::bell_options::option_margin));

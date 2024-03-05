@@ -1,15 +1,15 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationMainWindow.hpp"
-#include <data/RelaxationAudioData.hpp>
-#include <data/RelaxationErrorData.hpp>
-#include <ApplicationBellRelaxation.hpp>
-#include "common/options/BellOptionsNavigation.hpp"
 
+#include "data/RelaxationAudioData.hpp"
+#include "data/RelaxationErrorData.hpp"
+
+#include <ApplicationBellRelaxation.hpp>
+#include <common/options/BellOptionsNavigation.hpp>
 #include <common/options/OptionBellMenu.hpp>
 #include <i18n/i18n.hpp>
-
 
 namespace gui
 {
@@ -30,7 +30,7 @@ namespace gui
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        songList = new gui::RelaxationListView(
+        songList = new gui::ListViewWithLabels(
             this, 0, 0, style::window_width, style::window_height, presenter->getSongsModel());
         songList->applySizeRestrictions(style::bell_options_list::w,
                                         style::bell_options_list::h,

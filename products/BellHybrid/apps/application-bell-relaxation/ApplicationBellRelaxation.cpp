@@ -26,6 +26,7 @@
 #include <common/models/TimeModel.hpp>
 #include <common/models/BatteryModel.hpp>
 #include <common/models/AudioModel.hpp>
+#include <common/models/SongsModel.hpp>
 #include <common/windows/AppsBatteryStatusWindow.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
@@ -86,10 +87,10 @@ namespace app
     void ApplicationBellRelaxation::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
-            const auto pathsTypeMap = std::map<relaxation::MusicType, std::string>{
-                {relaxation::MusicType::Relaxation, paths::audio::proprietary() / paths::audio::relaxation()},
-                {relaxation::MusicType::ColorsOfNoise, paths::audio::proprietary() / paths::audio::colorOfNoises()},
-                {relaxation::MusicType::User, paths::audio::userApp() / paths::audio::relaxation()}};
+            const app::LabelsWithPaths labelsWithPaths{
+                {"app_bell_relaxation_sounds", paths::audio::proprietary() / paths::audio::relaxation()},
+                {"app_bell_relaxation_noises", paths::audio::proprietary() / paths::audio::colorOfNoises()},
+                {"app_bell_relaxation_uploaded_sounds", paths::audio::userApp() / paths::audio::relaxation()}};
             const auto pathsSortingVector = std::vector<SoundsRepository::PathSorting>{
                 {paths::audio::proprietary() / paths::audio::relaxation(), SoundsRepository::SortingBy::TitleAscending},
                 {paths::audio::proprietary() / paths::audio::colorOfNoises(),
@@ -97,8 +98,7 @@ namespace app
                 {paths::audio::userApp() / paths::audio::relaxation(), SoundsRepository::SortingBy::TitleAscending}};
 
             auto soundsRepository = std::make_unique<SoundsRepository>(app, pathsSortingVector);
-            auto songsModel =
-                std::make_unique<relaxation::RelaxationSongsModel>(app, std::move(soundsRepository), pathsTypeMap);
+            auto songsModel = std::make_unique<app::SongsModel>(app, std::move(soundsRepository), labelsWithPaths);
             auto presenter  = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(songsModel));
             return std::make_unique<gui::RelaxationMainWindow>(app, std::move(presenter));
         });
