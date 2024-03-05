@@ -6,36 +6,50 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <ListViewWithArrows.hpp>
 #include <common/data/RelaxationCommon.hpp>
+#include <common/widgets/LabelListItem.hpp>
+
+#include <optional>
+#include <map>
 
 namespace gui
 {
     class ListItemProvider;
+    class LabelMarkerItem;
 
-    class RelaxationListView : public ListViewWithArrows
+    enum class EmptyEnum
     {
-        using MusicType = app::relaxation::MusicType;
+    };
 
+    // template <typename T = EmptyEnum>
+    class ListViewWithLabels : public ListViewWithArrows
+    {
       public:
-        RelaxationListView(Item *parent,
+        using ItemsType     = std::optional<int>;
+        using TypeLabelsMap = std::map<int, std::string>;
+
+        ListViewWithLabels(Item *parent,
                            unsigned int x,
                            unsigned int y,
                            unsigned int w,
                            unsigned int h,
-                           std::shared_ptr<ListItemProvider> prov);
+                           std::shared_ptr<ListItemProvider> prov,
+                           const TypeLabelsMap labelsPerType = TypeLabelsMap{});
 
         void reset() override;
 
       private:
+        std::size_t getSlotsLeft();
         void addItemsOnPage() override;
         void addLabelMarker(ListItem *item);
-        std::size_t getSlotsLeft();
-        void updateState(MusicType newMarker);
+        void updateState(ItemsType newMarker);
+        LabelMarkerItem *createMarkerItem(ItemsType type);
 
-        MusicType currentType{MusicType::Undefined};
-        MusicType previousType{MusicType::Undefined};
-        MusicType currentMarker{MusicType::Undefined};
+        ItemsType currentType{std::nullopt};
+        ItemsType previousType{std::nullopt};
+        ItemsType currentMarker{std::nullopt};
         std::uint32_t itemsOnPage{0};
         bool labelAdded{false};
+        const TypeLabelsMap typeToLabel;
     };
 
 } // namespace gui

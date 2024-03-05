@@ -11,15 +11,10 @@ namespace
 
 namespace gui
 {
-    RelaxationItem::RelaxationItem(app::relaxation::MusicType musicType) : musicType(musicType)
+    LabelListItem::LabelListItem()
     {}
 
-    app::relaxation::MusicType RelaxationItem::getMusicType()
-    {
-        return musicType;
-    }
-
-    RelaxationMarkerItem::RelaxationMarkerItem(const UTF8 &labelText)
+    LabelMarkerItem::LabelMarkerItem(const UTF8 &labelText)
     {
         setMinimumSize(style::bell_options::default_text_width, style::bell_options::h);
         setMargins(gui::Margins(0, style::bell_options::option_margin, 0, style::bell_options::option_margin));
