@@ -39,6 +39,7 @@ target_sources(application-bell-common
         src/models/SettingsModel.cpp
         src/models/BedtimeModel.cpp
         src/models/LowBatteryInfoModel.cpp
+        src/models/SongsModel.cpp
         src/models/PreWakeUpModel.cpp
         src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmActivatedWindow.cpp
@@ -58,6 +59,9 @@ target_sources(application-bell-common
         src/widgets/SnoozeTimer.cpp
         src/widgets/LayoutVertical.cpp
         src/widgets/ClockVertical.cpp
+        src/widgets/ListViewWithLabels.cpp
+        src/widgets/LabelListItem.cpp
+        src/widgets/LabelOption.cpp
 
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
@@ -117,6 +121,7 @@ target_sources(application-bell-common
         include/common/models/LayoutModel.hpp
         include/common/models/LowBatteryInfoModel.hpp
         include/common/models/QuoteModel.hpp
+        include/common/models/SongsModel.hpp
         include/common/models/PreWakeUpModel.hpp
         include/common/popups/presenter/AlarmActivatedPresenter.hpp
         include/common/popups/AlarmActivatedWindow.hpp
@@ -136,6 +141,9 @@ target_sources(application-bell-common
         include/common/widgets/ListItems.hpp
         include/common/widgets/LayoutVertical.hpp
         include/common/widgets/ClockVertical.hpp
+        include/common/widgets/ListViewWithLabels.hpp
+        include/common/widgets/LabelListItem.hpp
+        include/common/widgets/LabelOption.hpp
         include/common/options/BellOptionWindow.hpp
         include/common/options/BellShortOptionWindow.hpp
         include/common/options/OptionBellMenu.hpp
