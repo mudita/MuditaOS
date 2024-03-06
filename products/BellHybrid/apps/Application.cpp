@@ -17,9 +17,7 @@
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <common/popups/ChargingNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
-#include <service-time/AlarmMessage.hpp>
 #include <service-evtmgr/KbdMessage.hpp>
-#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
 
 namespace app
 {
@@ -27,15 +25,16 @@ namespace app
                              std::string parent,
                              StatusIndicators statusIndicators,
                              StartInBackground startInBackground,
-                             uint32_t stackDepth,
+                             std::uint32_t stackDepth,
                              sys::ServicePriority priority)
-        : ApplicationCommon(name, parent, statusIndicators, startInBackground, stackDepth, priority)
+        : ApplicationCommon(
+              std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth, priority)
     {
         getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &popupParams) {
-            bool val = ((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||
-                        (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
-                        (isCurrentWindow(gui::BellTurnOffWindow::name)));
-            if (val == true) {
+            const bool val = ((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||
+                              (isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::PowerOff))) ||
+                              (isCurrentWindow(gui::BellTurnOffWindow::name)));
+            if (val) {
                 LOG_ERROR("Block popup - as current window is in higher order popup");
             }
             return val ? gui::popup::FilterType::Ignore : gui::popup::FilterType::Show;

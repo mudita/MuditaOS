@@ -21,6 +21,7 @@ namespace
         }
         return offset;
     }
+
     constexpr std::pair<std::uint32_t, std::uint32_t> calculateNewOffsetAndLimit(std::uint32_t offset,
                                                                                  std::uint32_t limit,
                                                                                  std::uint32_t loadedFiles)
@@ -29,7 +30,8 @@ namespace
         const auto newOffset = offset + loadedFiles;
         return {newOffset, newLimit};
     }
-    db::multimedia_files::SortingBy transformSorting(SoundsRepository::SortingBy sorting)
+
+    constexpr db::multimedia_files::SortingBy transformSorting(SoundsRepository::SortingBy sorting)
     {
         switch (sorting) {
         case SoundsRepository::SortingBy::IdAscending:
@@ -43,13 +45,14 @@ namespace
 
 SimpleSoundsRepository::SimpleSoundsRepository(std::filesystem::path dirToScan)
 {
-    for (auto const &entry : std::filesystem::directory_iterator(dirToScan)) {
+    for (const auto &entry : std::filesystem::directory_iterator(dirToScan)) {
         processEntry(entry);
     }
 
     /// Sort entries by track ID
     std::sort(samples.begin(), samples.end(), [](const auto &a, const auto &b) { return a.track < b.track; });
 }
+
 std::optional<std::filesystem::path> SimpleSoundsRepository::titleToPath(const UTF8 &title) const
 {
     const auto res =
@@ -59,6 +62,7 @@ std::optional<std::filesystem::path> SimpleSoundsRepository::titleToPath(const U
     }
     return {};
 }
+
 std::optional<UTF8> SimpleSoundsRepository::pathToTitle(std::filesystem::path path) const
 {
     const auto res =

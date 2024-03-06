@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,39 +7,48 @@ namespace bell::settings
 {
     namespace Temperature
     {
-        constexpr inline auto unit = "temperature_unit";
+        inline constexpr auto unit = "temperature_unit";
     } // namespace Temperature
+
     namespace Snooze
     {
-        constexpr inline auto active   = "snooze_active";
-        constexpr inline auto length   = "snooze_length";
-        constexpr inline auto interval = "snooze_interval";
-        constexpr inline auto tone     = "snooze_tone";
+        inline constexpr auto tonePath         = "snooze_tone_path";
+        inline constexpr auto toneFallbackPath = "snooze_tone_path_default";
+        inline constexpr auto active   = "snooze_active";
+        inline constexpr auto length   = "snooze_length";
+        inline constexpr auto interval = "snooze_interval";
     } // namespace Snooze
+
     namespace PrewakeUp
     {
-        constexpr inline auto duration      = "prewake_up_duration";
-        constexpr inline auto tone          = "prewake_up_tone";
-        constexpr inline auto lightDuration = "prewake_up_light_duration";
-        constexpr inline auto brightness    = "prewake_up_brightness";
+        inline constexpr auto tonePath         = "prewake_up_tone_path";
+        inline constexpr auto toneFallbackPath = "prewake_up_tone_path_default";
+        inline constexpr auto duration      = "prewake_up_duration";
+        inline constexpr auto lightDuration = "prewake_up_light_duration";
+        inline constexpr auto brightness    = "prewake_up_brightness";
     } // namespace PrewakeUp
+
     namespace Alarm
     {
-        constexpr inline auto tone        = "alarm_tone";
-        constexpr inline auto fadeActive  = "alarm_fade_active";
-        constexpr inline auto lightActive = "alarm_light_active";
-        constexpr inline auto duration    = "alarm_duration";
-        constexpr inline auto brightness  = "alarm_brightness";
+        inline constexpr auto tonePath    = "alarm_tone_path";
+        inline constexpr auto toneFallbackPath = "alarm_tone_path_default";
+        inline constexpr auto fadeActive  = "alarm_fade_active";
+        inline constexpr auto lightActive = "alarm_light_active";
+        inline constexpr auto duration    = "alarm_duration";
+        inline constexpr auto brightness  = "alarm_brightness";
     } // namespace Alarm
+
     namespace Bedtime
     {
-        constexpr inline auto active   = "bedtime_active";
-        constexpr inline auto time     = "bedtime_time";
-        constexpr inline auto tone     = "bedtime_tone";
-        constexpr inline auto duration = "bedtime_duration";
+        inline constexpr auto tonePath         = "bedtime_tone_path";
+        inline constexpr auto toneFallbackPath = "bedtime_tone_path_default";
+        inline constexpr auto active   = "bedtime_active";
+        inline constexpr auto time     = "bedtime_time";
+        inline constexpr auto duration = "bedtime_duration";
     } // namespace Bedtime
+
     namespace Layout
     {
-        constexpr inline auto layout = "layout";
+        inline constexpr auto layout = "layout";
     } // namespace Layout
-};    // namespace bell::settings
+} // namespace bell::settings

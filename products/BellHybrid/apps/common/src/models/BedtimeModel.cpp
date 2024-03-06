@@ -6,9 +6,14 @@
 #include <db/SystemSettings.hpp>
 #include <ctime>
 
+namespace
+{
+    constexpr auto defaultBedtimeTime = "21:00";
+}
+
 namespace app::bell_bedtime
 {
-    void BedtimeOnOffModel::setValue(bool value)
+    auto BedtimeOnOffModel::setValue(bool value) -> void
     {
         const auto valStr = std::to_string(value);
         settings.setValue(bell::settings::Bedtime::active, valStr, settings::SettingsScope::Global);
@@ -20,7 +25,7 @@ namespace app::bell_bedtime
         return utils::toNumeric(str);
     }
 
-    auto BedtimeTimeModel::writeString(std::string str) -> void
+    auto BedtimeTimeModel::writeString(const std::string &str) -> void
     {
         settings.setValue(bell::settings::Bedtime::time, str, settings::SettingsScope::Global);
     }
@@ -37,7 +42,7 @@ namespace app::bell_bedtime
         return bool(stringStream);
     }
 
-    void BedtimeTimeModel::setValue(time_t value)
+    auto BedtimeTimeModel::setValue(std::time_t value) -> void
     {
         auto tm = std::localtime(&value);
         std::stringstream stringStream;
@@ -45,32 +50,34 @@ namespace app::bell_bedtime
         writeString(stringStream.str());
     }
 
-    auto BedtimeTimeModel::getValue() const -> time_t
+    auto BedtimeTimeModel::getValue() const -> std::time_t
     {
-        const auto str = readString();
-        std::tm tm     = {};
+        const auto &str = readString();
+        std::tm tm{};
         if (!getTmFromString(str, tm)) {
             // incorrect time string
-            getTmFromString(DEFAULT_BEDTIME_TIME, tm);
+            getTmFromString(defaultBedtimeTime, tm);
         }
         return std::mktime(&tm);
     }
 
-    void AlarmToneModel::setValue(UTF8 value)
+    BedtimeToneModel::BedtimeToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository)
+        : gui::SettingsModel<UTF8>{app}, soundsRepository{soundsRepository}
+    {}
+
+    auto BedtimeToneModel::setValue(UTF8 value) -> void
     {
-        settings.setValue(bell::settings::Bedtime::tone, value, settings::SettingsScope::Global);
+        const auto &path = soundsRepository.titleToPath(value).value_or("");
+        settings.setValue(bell::settings::Bedtime::tonePath, path, settings::SettingsScope::Global);
     }
 
-    auto AlarmToneModel::getValue() const -> UTF8
+    auto BedtimeToneModel::getValue() const -> UTF8
     {
-        const auto str = settings.getValue(bell::settings::Bedtime::tone, settings::SettingsScope::Global);
-        if (str.empty()) {
-            return DEFAULT_BEDTIME_TONE;
-        }
-        return str;
+        const auto &path = settings.getValue(bell::settings::Bedtime::tonePath, settings::SettingsScope::Global);
+        return soundsRepository.pathToTitle(path).value_or("");
     }
 
-    void BedtimeVolumeModel::setValue(std::uint8_t value)
+    auto BedtimeVolumeModel::setValue(std::uint8_t value) -> void
     {
         audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Bedtime);
     }
@@ -85,7 +92,7 @@ namespace app::bell_bedtime
         defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::Bedtime).value_or(0);
     }
 
-    void BedtimeVolumeModel::restoreDefault()
+    auto BedtimeVolumeModel::restoreDefault() -> void
     {
         setValue(defaultValue);
     }

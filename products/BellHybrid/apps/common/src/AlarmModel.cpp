@@ -50,6 +50,7 @@ namespace app
                                                        service::name::service_time);
         request->execute(app, this, responseCallback);
     }
+
     void AlarmModel::setAlarmTime(std::time_t time)
     {
         auto alarmEventPtr = getAlarmPtr();
@@ -73,6 +74,7 @@ namespace app
     {
         return Clock::to_time_t(cachedRecord.startDate);
     }
+
     void AlarmModel::activate(bool value)
     {
         auto alarmEventPtr = getAlarmPtr();
@@ -89,6 +91,7 @@ namespace app
             disableSnooze(*alarmEventPtr);
         }
     }
+
     void AlarmModel::updateAlarm(AlarmEventRecord &alarm)
     {
         auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::AlarmUpdateRequestMessage>(alarm),
@@ -100,6 +103,7 @@ namespace app
 
         cachedRecord = alarm.getNextSingleEvent(TimePointNow());
     }
+
     void AlarmModel::disableSnooze(AlarmEventRecord &alarm)
     {
         auto request = AsyncRequest::createFromMessage(std::make_unique<alarms::TurnOffSnoozeRequestMessage>(alarm.ID),
@@ -110,6 +114,7 @@ namespace app
         });
         nextSnoozeTime = TIME_POINT_INVALID;
     }
+
     bool AlarmModel::isActive() const
     {
         if (!cachedRecord.parent) {

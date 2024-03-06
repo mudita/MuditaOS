@@ -6,7 +6,9 @@
 #include <service-time/AlarmMessage.hpp>
 #include <time/AlarmOperations.hpp>
 #include <time/dateCommon.hpp>
+#include <db/SystemSettings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
+#include <common/models/BedtimeModel.hpp>
 
 #include <string>
 
@@ -104,12 +106,8 @@ namespace alarms
             const auto intervalStr =
                 settings.getValue(bell::settings::Snooze::interval, settings::SettingsScope::Global);
             const auto interval = utils::getNumericValue<std::uint32_t>(intervalStr);
-            if (interval == 0) {
-                return {false, std::chrono::minutes{0}};
-            }
-            else {
-                return {true, std::chrono::minutes{interval}};
-            }
+            const auto enabled  = (interval != 0);
+            return {enabled, std::chrono::minutes{interval}};
         }
 
         class OnboardingSettingsProviderImpl : public OnboardingSettingsProvider
@@ -184,7 +182,7 @@ namespace alarms
 
     void AlarmOperations::minuteUpdated(TimePoint now)
     {
-        // Prevent activating alarms when the onboard is not done yet
+        // Prevent activating alarms when the onboarding is not done yet
         if (!isOnboardingDone()) {
             return;
         }

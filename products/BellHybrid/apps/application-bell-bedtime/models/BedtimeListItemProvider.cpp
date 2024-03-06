@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BedtimeListItemProvider.hpp"
@@ -44,7 +44,7 @@ namespace app::bell_bedtime
         }
     }
 
-    auto BedtimeListItemProvider::requestRecords(uint32_t offset, uint32_t limit) -> void
+    auto BedtimeListItemProvider::requestRecords(std::uint32_t offset, std::uint32_t limit) -> void
     {
         setupModel(offset, limit);
         list->onProviderDataUpdate();
@@ -69,5 +69,4 @@ namespace app::bell_bedtime
     {
         return internalData;
     }
-
 } // namespace app::bell_bedtime
