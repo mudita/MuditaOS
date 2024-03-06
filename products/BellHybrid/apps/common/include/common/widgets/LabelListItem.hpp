@@ -4,8 +4,8 @@
 #pragma once
 
 #include "ListItem.hpp"
-#include <common/widgets/ListViewWithLabels.hpp>
 #include "widgets/TextWithIconsWidget.hpp"
+#include <common/widgets/ListViewWithLabels.hpp>
 
 namespace gui
 {

@@ -20,7 +20,6 @@ namespace gui
       private:
         std::unique_ptr<app::relaxation::RelaxationMainWindowContract::Presenter> presenter;
 
-        // gui::RelaxationListView *songList = nullptr;
         gui::ListViewWithLabels *songList{nullptr};
 
         void buildInterface() override;

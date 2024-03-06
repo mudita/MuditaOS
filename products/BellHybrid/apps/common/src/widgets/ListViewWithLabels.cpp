@@ -2,10 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/widgets/ListViewWithLabels.hpp>
-//#include "widgets/RelaxationOption.hpp"
-#include "../../application-bell-relaxation/model/RelaxationSongsModel.hpp"
 #include <common/widgets/LabelListItem.hpp>
-#include <TextFixedSize.hpp>
+#include "../../application-bell-relaxation/model/RelaxationSongsModel.hpp" // TODO: remove
 
 namespace
 {
