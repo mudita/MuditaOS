@@ -40,7 +40,7 @@
 namespace app
 {
     class WindowsStack;
-    using UiNotificationFilter = std::function<bool(sys::Message *, const std::string &name)>;
+    using UiNotificationFilter = std::function<bool(sys::Message *msg, const std::string &name)>;
 } // namespace app
 
 namespace db

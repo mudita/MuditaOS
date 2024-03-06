@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,16 +7,20 @@
 #include <common/models/SettingsModel.hpp>
 #include <common/models/AudioModel.hpp>
 #include <common/data/FrontlightUtils.hpp>
+#include <common/SoundsRepository.hpp>
 
 namespace app::bell_settings
 {
     class AlarmToneModel : public gui::SettingsModel<UTF8>
     {
       public:
-        using SettingsModel::SettingsModel;
+        AlarmToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository);
 
         void setValue(UTF8 value) override;
         UTF8 getValue() const override;
+
+      private:
+        SimpleSoundsRepository &soundsRepository;
     };
 
     class AlarmVolumeModel : public gui::AbstractSettingsModel<std::uint8_t>

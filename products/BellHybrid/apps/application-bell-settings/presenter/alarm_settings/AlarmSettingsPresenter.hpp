@@ -54,7 +54,7 @@ namespace app::bell_settings
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto loadData() -> void override;
-        auto saveData() -> void;
+        auto saveData() -> void override;
         auto eraseProviderData() -> void override;
         auto exitWithSave() -> void override;
         auto exitWithRollback() -> void override;

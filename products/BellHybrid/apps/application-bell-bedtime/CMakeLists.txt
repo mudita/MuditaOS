@@ -27,7 +27,7 @@ target_include_directories(application-bell-bedtime
 target_link_libraries(application-bell-bedtime
     PRIVATE
         app
-        bell::app-common
+        bell::paths
         bell::db
         date::date
         service-appmgr

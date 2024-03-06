@@ -18,9 +18,9 @@ namespace gui
       public:
         virtual ~AbstractSettingsModel() = default;
 
-        virtual void setValue(ValueType value) = 0;
-        virtual ValueType getValue() const     = 0;
-        virtual void restoreDefault()
+        virtual auto setValue(ValueType value) -> void = 0;
+        virtual auto getValue() const -> ValueType     = 0;
+        virtual auto restoreDefault() -> void
         {}
     };
 } // namespace gui

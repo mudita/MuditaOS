@@ -61,11 +61,8 @@ namespace app
             [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
                 auto timeModel       = std::make_unique<app::TimeModel>();
                 auto frontlightModel = std::make_unique<powernap::PowerNapFrontlightModel>(this, powerNapAlarmDuration);
-                auto soundsRepository =
-                    std::make_unique<SimpleSoundsRepository>(paths::audio::proprietary() / paths::audio::alarm());
                 auto presenter = std::make_unique<powernap::PowerNapProgressPresenter>(app,
                                                                                        settings.get(),
-                                                                                       std::move(soundsRepository),
                                                                                        *audioModel,
                                                                                        std::move(timeModel),
                                                                                        std::move(frontlightModel),
