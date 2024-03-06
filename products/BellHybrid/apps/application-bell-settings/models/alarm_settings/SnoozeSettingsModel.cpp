@@ -4,78 +4,66 @@
 #include <models/alarm_settings/SnoozeSettingsModel.hpp>
 #include <db/SystemSettings.hpp>
 
-namespace
-{
-    template <typename T>
-    std::optional<T> get_helper(settings::Settings &settings, const std::string &str)
-    {
-        const auto retStr = settings.getValue(str, settings::SettingsScope::Global);
-        if (retStr.empty()) {
-            LOG_ERROR("%s does not exist", str.c_str());
-            return {};
-        }
-        else {
-            if constexpr (std::is_integral_v<T>) {
-                return utils::toNumeric(retStr);
-            }
-            else {
-                return retStr;
-            }
-        }
-    }
-} // namespace
-
 namespace app::bell_settings
 {
-    void SnoozeOnOffModel::setValue(bool value)
+    auto SnoozeOnOffModel::setValue(bool value) -> void
     {
         const auto valStr = std::to_string(value);
         settings.setValue(bell::settings::Snooze::active, valStr, settings::SettingsScope::Global);
     }
 
-    bool SnoozeOnOffModel::getValue() const
+    auto SnoozeOnOffModel::getValue() const -> bool
     {
-        return get_helper<bool>(settings, bell::settings::Snooze::active).value_or(false);
+        return utils::getNumericValue<bool>(
+            settings.getValue(bell::settings::Snooze::active, settings::SettingsScope::Global));
     }
 
-    void SnoozeLengthModel::setValue(std::uint8_t value)
+    auto SnoozeLengthModel::setValue(std::uint8_t value) -> void
     {
         const auto valStr = std::to_string(value);
         settings.setValue(bell::settings::Snooze::length, valStr, settings::SettingsScope::Global);
     }
 
-    std::uint8_t SnoozeLengthModel::getValue() const
+    auto SnoozeLengthModel::getValue() const -> std::uint8_t
     {
-        return get_helper<std::uint32_t>(settings, bell::settings::Snooze::length).value_or(0);
+        return utils::getNumericValue<std::uint8_t>(
+            settings.getValue(bell::settings::Snooze::length, settings::SettingsScope::Global));
     }
 
-    void SnoozeChimeIntervalModel::setValue(std::uint8_t value)
+    auto SnoozeChimeIntervalModel::setValue(std::uint8_t value) -> void
     {
         const auto valStr = std::to_string(value);
         settings.setValue(bell::settings::Snooze::interval, valStr, settings::SettingsScope::Global);
     }
 
-    std::uint8_t SnoozeChimeIntervalModel::getValue() const
+    auto SnoozeChimeIntervalModel::getValue() const -> std::uint8_t
     {
-        return get_helper<std::uint32_t>(settings, bell::settings::Snooze::interval).value_or(0);
+        return utils::getNumericValue<std::uint8_t>(
+            settings.getValue(bell::settings::Snooze::interval, settings::SettingsScope::Global));
     }
 
-    void SnoozeChimeToneModel::setValue(UTF8 value)
+    SnoozeChimeToneModel::SnoozeChimeToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository)
+        : gui::SettingsModel<UTF8>{app}, soundsRepository{soundsRepository}
+    {}
+
+    auto SnoozeChimeToneModel::setValue(UTF8 value) -> void
     {
-        settings.setValue(bell::settings::Snooze::tone, value, settings::SettingsScope::Global);
+        const auto &path = soundsRepository.titleToPath(value).value_or("");
+        settings.setValue(bell::settings::Snooze::tonePath, path, settings::SettingsScope::Global);
     }
 
-    UTF8 SnoozeChimeToneModel::getValue() const
+    auto SnoozeChimeToneModel::getValue() const -> UTF8
     {
-        return get_helper<UTF8>(settings, bell::settings::Snooze::tone).value_or("");
+        const auto &path = settings.getValue(bell::settings::Snooze::tonePath, settings::SettingsScope::Global);
+        return soundsRepository.pathToTitle(path).value_or("");
     }
 
-    void SnoozeChimeVolumeModel::setValue(std::uint8_t value)
+    auto SnoozeChimeVolumeModel::setValue(std::uint8_t value) -> void
     {
         audioModel.setVolume(value, AbstractAudioModel::PlaybackType::Snooze);
     }
 
-    std::uint8_t SnoozeChimeVolumeModel::getValue() const
+    auto SnoozeChimeVolumeModel::getValue() const -> std::uint8_t
     {
         return defaultValue;
     }
@@ -85,7 +73,7 @@ namespace app::bell_settings
         defaultValue = audioModel.getVolume(AbstractAudioModel::PlaybackType::Snooze).value_or(0);
     }
 
-    void SnoozeChimeVolumeModel::restoreDefault()
+    auto SnoozeChimeVolumeModel::restoreDefault() -> void
     {
         setValue(defaultValue);
     }

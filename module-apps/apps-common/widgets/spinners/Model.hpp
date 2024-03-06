@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -32,12 +32,12 @@ class Model
     Model(const range &r, Boundaries boundaries) : elements{r}, it{elements.begin()}, boundaries{boundaries}
     {}
 
-    ElementType get() const
+    auto get() const -> ElementType
     {
         return it == elements.end() ? ElementType{} : *it;
     }
 
-    void set(ElementType val)
+    auto set(ElementType val) -> void
     {
         const auto e = std::find_if(elements.begin(), elements.end(), [&val](const auto &i) { return i == val; });
         if (e != elements.end()) {
@@ -45,7 +45,7 @@ class Model
         }
     }
 
-    bool next()
+    auto next() -> bool
     {
         bool ret{true};
         if (std::next(it) == elements.end()) {
@@ -62,7 +62,7 @@ class Model
         return ret;
     }
 
-    bool previous()
+    auto previous() -> bool
     {
         bool ret{true};
         if (it == elements.begin()) {
@@ -79,7 +79,7 @@ class Model
         return ret;
     }
 
-    void set_range(range newRange)
+    auto set_range(range newRange) -> void
     {
         if (elements != newRange) {
             elements = newRange;
@@ -87,17 +87,17 @@ class Model
         }
     }
 
-    [[nodiscard]] size_t size() const
+    [[nodiscard]] auto size() const -> std::size_t
     {
         return elements.size();
     }
 
-    [[nodiscard]] bool is_min() const
+    [[nodiscard]] auto is_min() const -> bool
     {
         return it == elements.begin();
     }
 
-    [[nodiscard]] bool is_max() const
+    [[nodiscard]] auto is_max() const -> bool
     {
         return std::next(it) == elements.end();
     }
@@ -129,7 +129,7 @@ class Model<ElementType, force, std::enable_if_t<std::is_fundamental_v<ElementTy
             ElementType max{};
             ElementType step{};
 
-            bool operator!=(const range &oth) const
+            constexpr auto operator!=(const range &oth) const -> bool
             {
                 return min != oth.min || max != oth.max || step != oth.step;
             }
@@ -152,17 +152,17 @@ class Model<ElementType, force, std::enable_if_t<std::is_fundamental_v<ElementTy
     Model(range &elements, Boundaries boundaries) : elements{elements}, value{elements.min}, boundaries{boundaries}
     {}
 
-    ElementType get() const
+    auto get() const -> ElementType
     {
         return value;
     }
 
-    void set(ElementType val)
+    auto set(ElementType val) -> void
     {
         value = val;
     }
 
-    bool next()
+    auto next() -> bool
     {
         bool ret{true};
         if (value >= elements.max) {
@@ -180,7 +180,7 @@ class Model<ElementType, force, std::enable_if_t<std::is_fundamental_v<ElementTy
         return ret;
     }
 
-    bool previous()
+    auto previous() -> bool
     {
         bool ret{true};
         if (value <= elements.min) {
@@ -198,7 +198,7 @@ class Model<ElementType, force, std::enable_if_t<std::is_fundamental_v<ElementTy
         return ret;
     }
 
-    void set_range(range newRange)
+    auto set_range(range newRange) -> void
     {
         if (elements != newRange) {
             elements = newRange;
@@ -206,12 +206,12 @@ class Model<ElementType, force, std::enable_if_t<std::is_fundamental_v<ElementTy
         }
     }
 
-    [[nodiscard]] bool is_min() const
+    [[nodiscard]] auto is_min() const -> bool
     {
         return value == elements.min;
     }
 
-    [[nodiscard]] bool is_max() const
+    [[nodiscard]] auto is_max() const -> bool
     {
         return value == elements.max;
     }

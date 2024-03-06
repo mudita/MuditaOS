@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,6 +6,7 @@
 #include "AbstractSnoozeSettingsModel.hpp"
 #include <common/models/SettingsModel.hpp>
 #include <common/models/AudioModel.hpp>
+#include <common/SoundsRepository.hpp>
 
 namespace app::bell_settings
 {
@@ -14,8 +15,8 @@ namespace app::bell_settings
       public:
         using SettingsModel::SettingsModel;
 
-        void setValue(bool value) override;
-        bool getValue() const override;
+        auto setValue(bool value) -> void override;
+        auto getValue() const -> bool override;
     };
 
     class SnoozeLengthModel : public gui::SettingsModel<std::uint8_t>
@@ -23,8 +24,8 @@ namespace app::bell_settings
       public:
         using SettingsModel::SettingsModel;
 
-        void setValue(std::uint8_t value) override;
-        std::uint8_t getValue() const override;
+        auto setValue(std::uint8_t value) -> void override;
+        auto getValue() const -> std::uint8_t override;
     };
 
     class SnoozeChimeIntervalModel : public gui::SettingsModel<std::uint8_t>
@@ -32,17 +33,20 @@ namespace app::bell_settings
       public:
         using SettingsModel::SettingsModel;
 
-        void setValue(std::uint8_t value) override;
-        std::uint8_t getValue() const override;
+        auto setValue(std::uint8_t value) -> void override;
+        auto getValue() const -> std::uint8_t override;
     };
 
     class SnoozeChimeToneModel : public gui::SettingsModel<UTF8>
     {
       public:
-        using SettingsModel::SettingsModel;
+        SnoozeChimeToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository);
 
-        void setValue(UTF8 value) override;
-        UTF8 getValue() const override;
+        auto setValue(UTF8 value) -> void override;
+        auto getValue() const -> UTF8 override;
+
+      private:
+        SimpleSoundsRepository &soundsRepository;
     };
 
     class SnoozeChimeVolumeModel : public gui::AbstractSettingsModel<std::uint8_t>
@@ -50,9 +54,9 @@ namespace app::bell_settings
       public:
         explicit SnoozeChimeVolumeModel(AbstractAudioModel &audioModel);
 
-        void setValue(std::uint8_t value) override;
-        std::uint8_t getValue() const override;
-        void restoreDefault() override;
+        auto setValue(std::uint8_t value) -> void override;
+        auto getValue() const -> std::uint8_t override;
+        auto restoreDefault() -> void override;
 
       private:
         AbstractAudioModel &audioModel;

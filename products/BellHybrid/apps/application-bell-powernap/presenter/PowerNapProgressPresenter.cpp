@@ -18,22 +18,20 @@ namespace
 
 namespace app::powernap
 {
-    PowerNapProgressPresenter::PowerNapProgressPresenter(
-        app::ApplicationCommon *app,
-        settings::Settings *settings,
-        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository,
-        AbstractAudioModel &audioModel,
-        std::unique_ptr<AbstractTimeModel> timeModel,
-        std::unique_ptr<PowerNapFrontlightModel> frontlightModel,
-        const std::chrono::seconds &powerNapAlarmDuration)
-        : app{app}, settings{settings}, soundsRepository{std::move(soundsRepository)},
-          audioModel{audioModel}, timeModel{std::move(timeModel)}, frontlightModel{std::move(frontlightModel)},
+    PowerNapProgressPresenter::PowerNapProgressPresenter(app::ApplicationCommon *app,
+                                                         settings::Settings *settings,
+                                                         AbstractAudioModel &audioModel,
+                                                         std::unique_ptr<AbstractTimeModel> timeModel,
+                                                         std::unique_ptr<PowerNapFrontlightModel> frontlightModel,
+                                                         const std::chrono::seconds &powerNapAlarmDuration)
+        : app{app}, settings{settings}, audioModel{audioModel}, timeModel{std::move(timeModel)},
+          frontlightModel{std::move(frontlightModel)},
           napAlarmTimer{sys::TimerFactory::createSingleShotTimer(
               app, powerNapAlarmTimerName, powerNapAlarmDuration, [this](sys::Timer &) { onNapAlarmFinished(); })}
 
     {}
 
-    void PowerNapProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
+    auto PowerNapProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) -> void
     {
         timer = std::move(_timer);
         timer->registerOnFinishedCallback([this]() {
@@ -42,42 +40,42 @@ namespace app::powernap
         });
     }
 
-    void PowerNapProgressPresenter::activate()
+    auto PowerNapProgressPresenter::activate() -> void
     {
         Expects(timer != nullptr);
-        const auto value = settings->getValue(powernapDBRecordName);
+        const auto &value = settings->getValue(powernapDBRecordName);
         static_cast<app::Application *>(app)->suspendIdleTimer();
         timer->reset(std::chrono::minutes{utils::getNumericValue<int>(value)});
         timer->start();
         napFinished = false;
     }
 
-    void PowerNapProgressPresenter::abortNap()
+    auto PowerNapProgressPresenter::abortNap() -> void
     {
         napFinished = false;
         timer->stop();
         napAlarmTimer.stop();
     }
 
-    void PowerNapProgressPresenter::endNap()
+    auto PowerNapProgressPresenter::endNap() -> void
     {
         abortNap();
         onNapAlarmFinished();
     }
 
-    void PowerNapProgressPresenter::pause()
+    auto PowerNapProgressPresenter::pause() -> void
     {
         timer->stop();
         getView()->pause();
     }
 
-    void PowerNapProgressPresenter::resume()
+    auto PowerNapProgressPresenter::resume() -> void
     {
         timer->start();
         getView()->resume();
     }
 
-    void PowerNapProgressPresenter::onNapFinished()
+    auto PowerNapProgressPresenter::onNapFinished() -> void
     {
         if (napFinished) {
             return;
@@ -88,18 +86,17 @@ namespace app::powernap
             frontlightModel->startBrightnessFadeIn();
         }
 
-        const auto &filePath = soundsRepository->titleToPath(
-            settings->getValue(bell::settings::Alarm::tone, settings::SettingsScope::Global));
+        const auto &filePath    = settings->getValue(bell::settings::Alarm::tonePath, settings::SettingsScope::Global);
         const auto fadeInActive = utils::getNumericValue<bool>(settings->getValue(bell::settings::Alarm::fadeActive,
                                                                                   settings::SettingsScope::Global))
                                       ? audio::FadeIn::Enable
                                       : audio::FadeIn::Disable;
-        audioModel.play(filePath.value_or(""), AbstractAudioModel::PlaybackType::Alarm, {}, fadeInActive);
+        audioModel.play(filePath, AbstractAudioModel::PlaybackType::Alarm, {}, fadeInActive);
         napAlarmTimer.start();
         napFinished = true;
     }
 
-    void PowerNapProgressPresenter::onNapAlarmFinished()
+    auto PowerNapProgressPresenter::onNapAlarmFinished() -> void
     {
         frontlightModel->unlockKeypressTrigger();
         frontlightModel->turnOff();
@@ -107,22 +104,22 @@ namespace app::powernap
         getView()->napEnded();
     }
 
-    void PowerNapProgressPresenter::handleUpdateTimeEvent()
+    auto PowerNapProgressPresenter::handleUpdateTimeEvent() -> void
     {
         getView()->setTime(timeModel->getCurrentTime());
     }
 
-    bool PowerNapProgressPresenter::isNapFinished()
+    auto PowerNapProgressPresenter::isNapFinished() -> bool
     {
         return napFinished;
     }
 
-    void PowerNapProgressPresenter::onBeforeShow()
+    auto PowerNapProgressPresenter::onBeforeShow() -> void
     {
         getView()->setTimeFormat(timeModel->getTimeFormat());
     }
 
-    bool PowerNapProgressPresenter::isTimerStopped()
+    auto PowerNapProgressPresenter::isTimerStopped() -> bool
     {
         return timer->isStopped();
     }

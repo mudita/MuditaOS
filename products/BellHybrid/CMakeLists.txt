@@ -92,7 +92,7 @@ add_directories(
         TARGET create_user_directories
         PREFIX ${SYSROOT_PATH}/user/media/app
         DEPENDS system_directories_common
-        DIRECTORIES relaxation
+        DIRECTORIES relaxation alarm
 )
 
 if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")

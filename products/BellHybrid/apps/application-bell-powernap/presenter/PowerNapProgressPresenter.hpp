@@ -38,65 +38,64 @@ namespace app::powernap
         {
           public:
             ~View()                                                         = default;
-            virtual void napEnded()                                         = 0;
-            virtual void setTime(std::time_t newTime)                       = 0;
-            virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
-            virtual void progressFinished()                                 = 0;
-            virtual void pause()                                            = 0;
-            virtual void resume()                                           = 0;
+            virtual auto napEnded() -> void                                         = 0;
+            virtual auto setTime(std::time_t newTime) -> void                       = 0;
+            virtual auto setTimeFormat(utils::time::Locale::TimeFormat fmt) -> void = 0;
+            virtual auto progressFinished() -> void                                 = 0;
+            virtual auto pause() -> void                                            = 0;
+            virtual auto resume() -> void                                           = 0;
         };
 
         class Presenter : public BasePresenter<PowerNapProgressContract::View>
         {
           public:
-            virtual void activate()                                                 = 0;
-            virtual void endNap()                                                   = 0;
-            virtual void abortNap()                                                 = 0;
-            virtual bool isTimerStopped()                                           = 0;
-            virtual void pause()                                                    = 0;
-            virtual void resume()                                                   = 0;
-            virtual void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) = 0;
-            virtual void handleUpdateTimeEvent()                                    = 0;
-            virtual bool isNapFinished()                                            = 0;
-            virtual void onBeforeShow()                                             = 0;
+            virtual auto activate() -> void                                                 = 0;
+            virtual auto endNap() -> void                                                   = 0;
+            virtual auto abortNap() -> void                                                 = 0;
+            virtual auto isTimerStopped() -> bool                                           = 0;
+            virtual auto pause() -> void                                                    = 0;
+            virtual auto resume() -> void                                                   = 0;
+            virtual auto setTimer(std::unique_ptr<app::TimerWithCallbacks> &&timer) -> void = 0;
+            virtual auto handleUpdateTimeEvent() -> void                                    = 0;
+            virtual auto isNapFinished() -> bool                                            = 0;
+            virtual auto onBeforeShow() -> void                                             = 0;
         };
     };
 
     class PowerNapProgressPresenter : public PowerNapProgressContract::Presenter
     {
+      public:
+        PowerNapProgressPresenter(app::ApplicationCommon *app,
+                                  settings::Settings *settings,
+                                  AbstractAudioModel &audioModel,
+                                  std::unique_ptr<AbstractTimeModel> timeModel,
+                                  std::unique_ptr<PowerNapFrontlightModel> frontlightModel,
+                                  const std::chrono::seconds &powerNapAlarmDuration);
+
+        auto activate() -> void override;
+        auto endNap() -> void override;
+        auto abortNap() -> void override;
+        auto pause() -> void override;
+        auto resume() -> void override;
+        auto setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) -> void override;
+        auto handleUpdateTimeEvent() -> void override;
+        auto isNapFinished() -> bool override;
+        auto isTimerStopped() -> bool override;
+
+        auto onNapFinished() -> void;
+        auto onNapAlarmFinished() -> void;
+        auto onBeforeShow() -> void override;
+
+      private:
+        static constexpr auto endWindowTimeout = std::chrono::seconds{5};
+
         app::ApplicationCommon *app{};
         settings::Settings *settings{};
-        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository;
         AbstractAudioModel &audioModel;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
         std::unique_ptr<PowerNapFrontlightModel> frontlightModel;
         sys::TimerHandle napAlarmTimer;
         bool napFinished{false};
-
-        static constexpr auto endWindowTimeout = std::chrono::seconds{5};
-
-      public:
-        PowerNapProgressPresenter(app::ApplicationCommon *app,
-                                  settings::Settings *settings,
-                                  std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository,
-                                  AbstractAudioModel &audioModel,
-                                  std::unique_ptr<AbstractTimeModel> timeModel,
-                                  std::unique_ptr<PowerNapFrontlightModel> frontlightModel,
-                                  const std::chrono::seconds &powerNapAlarmDuration);
-
-        void activate() override;
-        void endNap() override;
-        void abortNap() override;
-        void pause() override;
-        void resume() override;
-        void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
-        void handleUpdateTimeEvent() override;
-        bool isNapFinished() override;
-        bool isTimerStopped() override;
-
-        void onNapFinished();
-        void onNapAlarmFinished();
-        void onBeforeShow() override;
     };
 } // namespace app::powernap

@@ -5,7 +5,6 @@
 
 #include "AbstractAlarmAction.hpp"
 #include <audio/AudioMessage.hpp>
-#include <common/SoundsRepository.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerHandle.hpp>
 #include <Service/Service.hpp>
@@ -18,22 +17,23 @@ namespace alarms
     class PlayAudioAction : public AbstractAlarmAction
     {
       public:
-        bool turnOff() override;
-        bool execute() override;
-        explicit PlayAudioAction(sys::Service &service,
-                                 const std::filesystem::path &tonesDirPath,
-                                 std::string_view toneSetting,
-                                 audio::PlaybackType                             = audio::PlaybackType::Alarm,
-                                 std::optional<std::string_view> durationSetting = {});
+        PlayAudioAction(sys::Service &service,
+                        std::string_view toneSetting,
+                        audio::PlaybackType                             = audio::PlaybackType::Alarm,
+                        std::optional<std::string_view> durationSetting = {});
+
+        auto turnOff() -> bool override;
+        auto execute() -> bool override;
 
       private:
-        bool play(const std::filesystem::path &path, std::optional<std::chrono::minutes> duration = {});
-        void spawnTimer(std::chrono::minutes timeout);
-        void detachTimer();
+        auto play(const std::filesystem::path &path, std::optional<std::chrono::minutes> duration = {}) -> bool;
+        auto spawnTimer(std::chrono::minutes timeout) -> void;
+        auto detachTimer() -> void;
+        auto getFallbackTonePath() -> std::string;
+        auto handleMissingFile() -> std::string;
 
         sys::Service &service;
         sys::TimerHandle timer;
-        SimpleSoundsRepository soundsRepository;
         const std::string toneSetting;
         const std::optional<std::string> durationSetting;
         const audio::PlaybackType playbackType;
