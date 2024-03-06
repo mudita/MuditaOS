@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationMainWindowPresenter.hpp"
@@ -6,11 +6,11 @@
 
 namespace app::relaxation
 {
-    RelaxationMainWindowPresenter::RelaxationMainWindowPresenter(std::unique_ptr<RelaxationSongsModel> songsModel)
+    RelaxationMainWindowPresenter::RelaxationMainWindowPresenter(std::unique_ptr<SongsModel> songsModel)
         : songsModel{std::move(songsModel)}
     {}
 
-    void RelaxationMainWindowPresenter::createData(RelaxationSongsModel::OnActivateCallback activateCallback)
+    void RelaxationMainWindowPresenter::createData(SongsModel::OnActivateCallback activateCallback)
     {
         songsModel->createData(activateCallback);
         updateViewState();
@@ -28,7 +28,7 @@ namespace app::relaxation
         songsModel->updateRecordsCount();
     }
 
-    std::shared_ptr<RelaxationSongsModel> RelaxationMainWindowPresenter::getSongsModel()
+    std::shared_ptr<SongsModel> RelaxationMainWindowPresenter::getSongsModel()
     {
         return songsModel;
     }

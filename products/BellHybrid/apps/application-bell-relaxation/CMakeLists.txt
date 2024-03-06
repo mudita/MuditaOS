@@ -54,8 +54,6 @@ target_sources(application-bell-relaxation
         windows/RelaxationVolumeWindow.hpp
         windows/RelaxationEndedWindow.hpp
         windows/RelaxationErrorWindow.hpp
-        model/RelaxationSongsModel.hpp
-        model/RelaxationSongsModel.cpp
 
         PUBLIC
         include/application-bell-relaxation/ApplicationBellRelaxation.hpp

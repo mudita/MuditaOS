@@ -3,7 +3,7 @@
 
 #include <common/widgets/ListViewWithLabels.hpp>
 #include <common/widgets/LabelListItem.hpp>
-#include "../../application-bell-relaxation/model/RelaxationSongsModel.hpp" // TODO: remove
+#include <common/models/SongsModel.hpp>
 
 namespace
 {
@@ -107,11 +107,11 @@ namespace gui
                 }
             }
             else {
-                const auto relaxationProvider = dynamic_cast<app::relaxation::RelaxationSongsModel *>(provider.get());
-                if (relaxationProvider == nullptr) {
+                const auto songsProvider = dynamic_cast<app::SongsModel *>(provider.get());
+                if (songsProvider == nullptr) {
                     break;
                 }
-                const auto nextItemExist = relaxationProvider->nextRecordExist(getOrderFromDirection());
+                const auto nextItemExist = songsProvider->nextRecordExist(getOrderFromDirection());
                 if (!nextItemExist && getSlotsLeft() == 1) {
                     body->addWidget(createMarkerItem(currentType));
                     updateState(currentType);

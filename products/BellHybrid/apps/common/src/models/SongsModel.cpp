@@ -1,43 +1,43 @@
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include "RelaxationSongsModel.hpp"
+#include <common/models/SongsModel.hpp>
 #include <common/options/OptionBellMenu.hpp>
 #include <common/widgets/LabelOption.hpp>
 
-namespace app::relaxation
+namespace app
 {
-    RelaxationSongsProvider::RelaxationSongsProvider(ApplicationCommon *app) : DatabaseModel(app)
+    SongsProvider::SongsProvider(ApplicationCommon *app) : DatabaseModel(app)
     {}
 
-    RelaxationSongsModel::RelaxationSongsModel(ApplicationCommon *application,
-                                               std::unique_ptr<AbstractSoundsRepository> soundsRepository,
-                                               const std::map<int, std::string> &pathPrefixes)
-        : RelaxationSongsProvider(application),
+    SongsModel::SongsModel(ApplicationCommon *application,
+                           std::unique_ptr<AbstractSoundsRepository> soundsRepository,
+                           const std::map<int, std::string> &pathPrefixes)
+        : SongsProvider(application),
           application(application), songsRepository{std::move(soundsRepository)}, pathPrefixes{pathPrefixes}
     {}
 
-    void RelaxationSongsModel::createData(OnActivateCallback callback)
+    void SongsModel::createData(OnActivateCallback callback)
     {
         activateCallback = callback;
 
         songsRepository->init();
     }
 
-    void RelaxationSongsModel::updateRecordsCount()
+    void SongsModel::updateRecordsCount()
     {
         songsRepository->updateFilesCount();
     }
 
-    unsigned int RelaxationSongsModel::requestRecordsCount()
+    unsigned int SongsModel::requestRecordsCount()
     {
         return songsRepository->getFilesCount();
     }
-    unsigned int RelaxationSongsModel::getMinimalItemSpaceRequired() const
+    unsigned int SongsModel::getMinimalItemSpaceRequired() const
     {
         return style::bell_options::h + 2 * style::bell_options::option_margin;
     }
-    bool RelaxationSongsModel::nextRecordExist(gui::Order order)
+    bool SongsModel::nextRecordExist(gui::Order order)
     {
         const auto getOppositeOrder = [order]() {
             return order == gui::Order::Next ? gui::Order::Previous : gui::Order::Next;
@@ -47,24 +47,24 @@ namespace app::relaxation
         getRecord(getOppositeOrder());
         return exist;
     }
-    gui::ListItem *RelaxationSongsModel::getItem(gui::Order order)
+    gui::ListItem *SongsModel::getItem(gui::Order order)
     {
         const auto sound = getRecord(order);
         if (!sound) {
             return nullptr;
         }
         auto item = gui::option::LabelOption{getTypeFromPath(sound->fileInfo.path),
-                                                  sound->tags.title,
-                                                  [=]([[maybe_unused]] gui::Item &item) {
-                                                      activateCallback(*sound);
-                                                      return true;
-                                                  },
-                                                  []([[maybe_unused]] gui::Item &item) { return true; },
-                                                  nullptr};
+                                             sound->tags.title,
+                                             [=]([[maybe_unused]] gui::Item &item) {
+                                                 activateCallback(*sound);
+                                                 return true;
+                                             },
+                                             []([[maybe_unused]] gui::Item &item) { return true; },
+                                             nullptr};
 
         return item.build();
     }
-    void RelaxationSongsModel::requestRecords(std::uint32_t offset, std::uint32_t limit)
+    void SongsModel::requestRecords(std::uint32_t offset, std::uint32_t limit)
     {
         songsRepository->getMusicFiles(
             offset,
@@ -72,8 +72,8 @@ namespace app::relaxation
             [this](const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
                    unsigned int repoRecordsCount) { return onMusicListRetrieved(records, repoRecordsCount); });
     }
-    bool RelaxationSongsModel::onMusicListRetrieved(
-        const std::vector<db::multimedia_files::MultimediaFilesRecord> &records, unsigned int repoRecordsCount)
+    bool SongsModel::onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
+                                          unsigned int repoRecordsCount)
     {
         if (list != nullptr && recordsCount != repoRecordsCount) {
             recordsCount = repoRecordsCount;
@@ -82,13 +82,13 @@ namespace app::relaxation
         }
         return updateRecords(records);
     }
-    bool RelaxationSongsModel::updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records)
+    bool SongsModel::updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records)
     {
         DatabaseModel::updateRecords(std::move(records));
         list->onProviderDataUpdate();
         return true;
     }
-    gui::ItemsType RelaxationSongsModel::getTypeFromPath(const std::string &path)
+    gui::ItemsType SongsModel::getTypeFromPath(const std::string &path)
     {
         for (const auto &[type, pathPrefix] : pathPrefixes) {
             if (path.find(pathPrefix) != std::string::npos) {
@@ -97,4 +97,4 @@ namespace app::relaxation
         }
         return std::nullopt;
     }
-} // namespace app::relaxation
+} // namespace app

@@ -26,6 +26,7 @@
 #include <common/models/TimeModel.hpp>
 #include <common/models/BatteryModel.hpp>
 #include <common/models/AudioModel.hpp>
+#include <common/models/SongsModel.hpp>
 #include <common/windows/AppsBatteryStatusWindow.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
@@ -97,8 +98,7 @@ namespace app
                 {paths::audio::userApp() / paths::audio::relaxation(), SoundsRepository::SortingBy::TitleAscending}};
 
             auto soundsRepository = std::make_unique<SoundsRepository>(app, pathsSortingVector);
-            auto songsModel =
-                std::make_unique<relaxation::RelaxationSongsModel>(app, std::move(soundsRepository), pathsTypeMap);
+            auto songsModel       = std::make_unique<app::SongsModel>(app, std::move(soundsRepository), pathsTypeMap);
             auto presenter  = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(songsModel));
             return std::make_unique<gui::RelaxationMainWindow>(app, std::move(presenter));
         });

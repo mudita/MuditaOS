@@ -8,21 +8,21 @@
 #include <apps-common/models/SongsModelInterface.hpp>
 #include <gui/widgets/ListItemProvider.hpp>
 
-namespace app::relaxation
+namespace app
 {
 
-    class RelaxationSongsProvider : public app::DatabaseModel<db::multimedia_files::MultimediaFilesRecord>,
-                                    public gui::ListItemProvider
+    class SongsProvider : public app::DatabaseModel<db::multimedia_files::MultimediaFilesRecord>,
+                          public gui::ListItemProvider
     {
       public:
-        virtual ~RelaxationSongsProvider() = default;
+        virtual ~SongsProvider() = default;
         using OnActivateCallback =
             std::function<bool(const db::multimedia_files::MultimediaFilesRecord &selectedSound)>;
-        explicit RelaxationSongsProvider(ApplicationCommon *application);
+        explicit SongsProvider(ApplicationCommon *application);
         virtual void createData(OnActivateCallback activateCallback) = 0;
     };
 
-    class RelaxationSongsModel : public RelaxationSongsProvider
+    class SongsModel : public SongsProvider
     {
       private:
         ApplicationCommon *application;
@@ -36,11 +36,11 @@ namespace app::relaxation
         gui::ItemsType getTypeFromPath(const std::string &path);
 
       public:
-        virtual ~RelaxationSongsModel() = default;
+        virtual ~SongsModel() = default;
 
-        RelaxationSongsModel(ApplicationCommon *application,
-                             std::unique_ptr<AbstractSoundsRepository> soundsRepository,
-                             const std::map<int, std::string> &pathPrefixes);
+        SongsModel(ApplicationCommon *application,
+                   std::unique_ptr<AbstractSoundsRepository> soundsRepository,
+                   const std::map<int, std::string> &pathPrefixes);
 
         unsigned int requestRecordsCount() override;
 
@@ -54,4 +54,4 @@ namespace app::relaxation
         void updateRecordsCount();
         bool nextRecordExist(gui::Order order);
     };
-} // namespace app::relaxation
+} // namespace app
