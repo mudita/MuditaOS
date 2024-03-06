@@ -26,15 +26,17 @@ local function remove_cache()
     end
 end
 
-local function remove_user_relaxation_files()
-    print(string.format("Removing user relaxation files from '%s'", paths.user_relaxation_file))
-    helpers.rm_files_from_dir(paths.user_relaxation_file)
+local function remove_user_files()
+    print(string.format("Removing user relaxation files from '%s'", paths.user_relaxation_dir))
+    helpers.rm_files_from_dir(paths.user_relaxation_dir)
+    print(string.format("Removing user alarm files from '%s'", paths.user_alarm_dir))
+    helpers.rm_files_from_dir(paths.user_alarm_dir)
 end
 
 function factory.execute()
     remove_old_databases()
     copy_clean_databases()
-    remove_user_relaxation_files()
+    remove_user_files()
     remove_cache()
 end
 

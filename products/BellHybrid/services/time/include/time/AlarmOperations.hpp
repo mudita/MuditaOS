@@ -4,8 +4,6 @@
 #pragma once
 
 #include <AlarmOperations.hpp>
-#include <db/SystemSettings.hpp>
-#include <common/models/BedtimeModel.hpp>
 #include <service-db/Settings.hpp>
 
 namespace alarms
