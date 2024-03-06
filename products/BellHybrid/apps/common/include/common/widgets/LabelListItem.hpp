@@ -11,9 +11,13 @@ namespace gui
 {
     class LabelListItem : public ListItem
     {
+      private:
+        ItemsType labelType;
+
       public:
-        LabelListItem();
+        LabelListItem(ItemsType type);
         virtual ~LabelListItem() = default;
+        ItemsType getType();
     };
 
     class LabelMarkerItem : public ListItem

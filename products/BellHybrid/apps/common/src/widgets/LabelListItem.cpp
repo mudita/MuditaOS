@@ -11,8 +11,13 @@ namespace
 
 namespace gui
 {
-    LabelListItem::LabelListItem()
+    LabelListItem::LabelListItem(ItemsType type) : labelType{type}
     {}
+
+    ItemsType LabelListItem::getType()
+    {
+        return labelType;
+    }
 
     LabelMarkerItem::LabelMarkerItem(const UTF8 &labelText)
     {

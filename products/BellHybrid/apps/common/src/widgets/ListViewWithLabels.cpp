@@ -80,7 +80,7 @@ namespace gui
             return;
         };
         previousType = currentType;
-        // currentType  = LabelListItem->getType();
+        currentType  = LabelListItem->getType();
 
         switch (direction) {
         case listview::Direction::Bottom:
@@ -139,7 +139,7 @@ namespace gui
         ListViewEngine::reset();
     }
 
-    void ListViewWithLabels::updateState(ListViewWithLabels::ItemsType newMarker)
+    void ListViewWithLabels::updateState(ItemsType newMarker)
     {
         currentMarker = newMarker;
         itemsOnPage++;

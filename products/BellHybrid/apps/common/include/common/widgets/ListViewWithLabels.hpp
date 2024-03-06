@@ -6,7 +6,7 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <ListViewWithArrows.hpp>
 #include <common/data/RelaxationCommon.hpp>
-#include <common/widgets/LabelListItem.hpp>
+//#include <common/widgets/LabelListItem.hpp>
 
 #include <optional>
 #include <map>
@@ -16,17 +16,12 @@ namespace gui
     class ListItemProvider;
     class LabelMarkerItem;
 
-    enum class EmptyEnum
-    {
-    };
+    using ItemsType     = std::optional<int>;
+    using TypeLabelsMap = std::map<int, std::string>;
 
-    // template <typename T = EmptyEnum>
     class ListViewWithLabels : public ListViewWithArrows
     {
       public:
-        using ItemsType     = std::optional<int>;
-        using TypeLabelsMap = std::map<int, std::string>;
-
         ListViewWithLabels(Item *parent,
                            unsigned int x,
                            unsigned int y,
