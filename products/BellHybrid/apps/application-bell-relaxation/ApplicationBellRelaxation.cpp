@@ -181,7 +181,8 @@ namespace app
                 return sys::msgHandled();
             }
             userInterfaceDBNotification(
-                msgl, [&]([[maybe_unused]] sys::Message *, [[maybe_unused]] const std::string &) { return true; });
+                msgl,
+                []([[maybe_unused]] sys::Message *msg, [[maybe_unused]] const std::string &name) { return true; });
             return sys::msgHandled();
         }
         return handleAsyncResponse(resp);

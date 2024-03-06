@@ -18,14 +18,20 @@ namespace app::bell_settings
         }
     }
 
+    AlarmToneModel::AlarmToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository)
+        : gui::SettingsModel<UTF8>{app}, soundsRepository{soundsRepository}
+    {}
+
     void AlarmToneModel::setValue(UTF8 value)
     {
-        settings.setValue(bell::settings::Alarm::tone, value, settings::SettingsScope::Global);
+        const auto &path = soundsRepository.titleToPath(value).value_or("");
+        settings.setValue(bell::settings::Alarm::tonePath, path, settings::SettingsScope::Global);
     }
 
     UTF8 AlarmToneModel::getValue() const
     {
-        return settings.getValue(bell::settings::Alarm::tone, settings::SettingsScope::Global);
+        const auto &path = settings.getValue(bell::settings::Alarm::tonePath, settings::SettingsScope::Global);
+        return soundsRepository.pathToTitle(path).value_or("");
     }
 
     void AlarmVolumeModel::setValue(std::uint8_t value)

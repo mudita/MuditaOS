@@ -1,12 +1,14 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ApplicationBellBedtime.hpp"
 #include "presenter/BellBedtimeWindowPresenter.hpp"
 #include "windows/BellBedtimeWindow.hpp"
-#include "common/models/BedtimeModel.hpp"
-#include <common/windows/BellFinishedWindow.hpp>
 #include "models/BedtimeListItemProvider.hpp"
+#include <common/models/BedtimeModel.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
+#include <common/SoundsRepository.hpp>
+#include <Paths.hpp>
 
 namespace app
 {
@@ -14,8 +16,8 @@ namespace app
                                                    std::string parent,
                                                    StatusIndicators statusIndicators,
                                                    StartInBackground startInBackground,
-                                                   uint32_t stackDepth)
-        : Application(name, parent, statusIndicators, startInBackground, stackDepth)
+                                                   std::uint32_t stackDepth)
+        : Application(std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth)
     {}
 
     sys::ReturnCodes ApplicationBellBedtime::InitHandler()
@@ -32,13 +34,16 @@ namespace app
 
     void ApplicationBellBedtime::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &) {
-            auto audioModel   = std::make_unique<AudioModel>(app);
-            auto bedtimeModel = std::make_unique<bell_bedtime::BedtimeModel>(app, *audioModel);
-            auto provider     = std::make_shared<bell_bedtime::BedtimeListItemProvider>(std::move(bedtimeModel));
-            auto presenter    = std::make_unique<bell_bedtime::BellBedtimeWindowPresenter>(provider);
-            return std::make_unique<gui::BellBedtimeWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(
+            gui::name::window::main_window, [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                auto soundsRepository = std::make_unique<SimpleSoundsRepository>(paths::audio::proprietary() /
+                                                                                 paths::audio::bedtimeReminder());
+                auto audioModel       = std::make_unique<AudioModel>(app);
+                auto bedtimeModel = std::make_unique<bell_bedtime::BedtimeModel>(app, *audioModel, *soundsRepository);
+                auto provider     = std::make_shared<bell_bedtime::BedtimeListItemProvider>(std::move(bedtimeModel));
+                auto presenter    = std::make_unique<bell_bedtime::BellBedtimeWindowPresenter>(provider);
+                return std::make_unique<gui::BellBedtimeWindow>(app, std::move(presenter));
+            });
 
         windowsFactory.attach(gui::window::bell_finished::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {
