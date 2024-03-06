@@ -1,11 +1,12 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include "presenter/RelaxationMainWindowPresenter.hpp"
-#include "widgets/RelaxationListView.hpp"
+//#include "widgets/RelaxationListView.hpp"
 
+#include <common/widgets/ListViewWithLabels.hpp>
 #include <common/options/BellOptionWindow.hpp>
 
 namespace gui
@@ -19,7 +20,8 @@ namespace gui
       private:
         std::unique_ptr<app::relaxation::RelaxationMainWindowContract::Presenter> presenter;
 
-        gui::RelaxationListView *songList = nullptr;
+        // gui::RelaxationListView *songList = nullptr;
+        gui::ListViewWithLabels *songList{nullptr};
 
         void buildInterface() override;
         void handleError() override;

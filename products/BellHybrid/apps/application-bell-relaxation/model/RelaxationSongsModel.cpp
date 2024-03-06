@@ -2,8 +2,8 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationSongsModel.hpp"
-#include "common/options/OptionBellMenu.hpp"
-#include "widgets/RelaxationOption.hpp"
+#include <common/options/OptionBellMenu.hpp>
+#include <common/widgets/LabelOption.hpp>
 
 namespace app::relaxation
 {
@@ -12,7 +12,7 @@ namespace app::relaxation
 
     RelaxationSongsModel::RelaxationSongsModel(ApplicationCommon *application,
                                                std::unique_ptr<AbstractSoundsRepository> soundsRepository,
-                                               const std::map<MusicType, std::string> &pathPrefixes)
+                                               const std::map<int, std::string> &pathPrefixes)
         : RelaxationSongsProvider(application),
           application(application), songsRepository{std::move(soundsRepository)}, pathPrefixes{pathPrefixes}
     {}
@@ -53,7 +53,7 @@ namespace app::relaxation
         if (!sound) {
             return nullptr;
         }
-        auto item = gui::option::RelaxationOption{getTypeFromPath(sound->fileInfo.path),
+        auto item = gui::option::LabelOption{getTypeFromPath(sound->fileInfo.path),
                                                   sound->tags.title,
                                                   [=]([[maybe_unused]] gui::Item &item) {
                                                       activateCallback(*sound);
@@ -88,13 +88,13 @@ namespace app::relaxation
         list->onProviderDataUpdate();
         return true;
     }
-    MusicType RelaxationSongsModel::getTypeFromPath(const std::string &path)
+    gui::ItemsType RelaxationSongsModel::getTypeFromPath(const std::string &path)
     {
         for (const auto &[type, pathPrefix] : pathPrefixes) {
             if (path.find(pathPrefix) != std::string::npos) {
                 return type;
             }
         }
-        return MusicType::Relaxation;
+        return std::nullopt;
     }
 } // namespace app::relaxation

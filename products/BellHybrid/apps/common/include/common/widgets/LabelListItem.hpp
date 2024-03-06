@@ -12,10 +12,10 @@ namespace gui
     class LabelListItem : public ListItem
     {
       private:
-        ItemsType labelType;
+        ItemsType labelType{};
 
       public:
-        LabelListItem(ItemsType type);
+        explicit LabelListItem(ItemsType type);
         virtual ~LabelListItem() = default;
         ItemsType getType();
     };

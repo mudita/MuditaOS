@@ -86,10 +86,10 @@ namespace app
     void ApplicationBellRelaxation::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
-            const auto pathsTypeMap = std::map<relaxation::MusicType, std::string>{
-                {relaxation::MusicType::Relaxation, paths::audio::proprietary() / paths::audio::relaxation()},
-                {relaxation::MusicType::ColorsOfNoise, paths::audio::proprietary() / paths::audio::colorOfNoises()},
-                {relaxation::MusicType::User, paths::audio::userApp() / paths::audio::relaxation()}};
+            const auto pathsTypeMap = std::map<int, std::string>{
+                {1, paths::audio::proprietary() / paths::audio::relaxation()},
+                {2, paths::audio::proprietary() / paths::audio::colorOfNoises()},
+                {3, paths::audio::userApp() / paths::audio::relaxation()}};
             const auto pathsSortingVector = std::vector<SoundsRepository::PathSorting>{
                 {paths::audio::proprietary() / paths::audio::relaxation(), SoundsRepository::SortingBy::TitleAscending},
                 {paths::audio::proprietary() / paths::audio::colorOfNoises(),

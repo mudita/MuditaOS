@@ -59,6 +59,7 @@ target_sources(application-bell-common
         src/widgets/ClockVertical.cpp
         src/widgets/ListViewWithLabels.cpp
         src/widgets/LabelListItem.cpp
+        src/widgets/LabelOption.cpp
 
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
@@ -100,7 +101,6 @@ target_sources(application-bell-common
         include/common/data/BatteryUtils.hpp
         include/common/data/FrontlightUtils.hpp
         include/common/data/BatteryStatusSwitchData.hpp
-        include/common/data/RelaxationCommon.hpp
         include/common/models/AbstractAlarmModel.hpp
         include/common/models/AbstractBedtimeModel.hpp
         include/common/models/AbstractSettingsModel.hpp
@@ -139,6 +139,7 @@ target_sources(application-bell-common
         include/common/widgets/ClockVertical.hpp
         include/common/widgets/ListViewWithLabels.hpp
         include/common/widgets/LabelListItem.hpp
+        include/common/widgets/LabelOption.hpp
         include/common/options/BellOptionWindow.hpp
         include/common/options/BellShortOptionWindow.hpp
         include/common/options/OptionBellMenu.hpp

@@ -3,7 +3,7 @@
 
 #include <common/widgets/ListViewWithLabels.hpp>
 //#include "widgets/RelaxationOption.hpp"
-//#include "model/RelaxationSongsModel.hpp"
+#include "../../application-bell-relaxation/model/RelaxationSongsModel.hpp"
 #include <common/widgets/LabelListItem.hpp>
 #include <TextFixedSize.hpp>
 
@@ -109,15 +109,15 @@ namespace gui
                 }
             }
             else {
-                // const auto relaxationProvider = dynamic_cast<app::relaxation::RelaxationSongsModel
-                // *>(provider.get()); if (relaxationProvider == nullptr) {
-                //     break;
-                // }
-                // const auto nextItemExist = relaxationProvider->nextRecordExist(getOrderFromDirection());
-                // if (!nextItemExist && getSlotsLeft() == 1) {
-                //     body->addWidget(createMarkerItem(currentType));
-                //     updateState(currentType);
-                // }
+                const auto relaxationProvider = dynamic_cast<app::relaxation::RelaxationSongsModel *>(provider.get());
+                if (relaxationProvider == nullptr) {
+                    break;
+                }
+                const auto nextItemExist = relaxationProvider->nextRecordExist(getOrderFromDirection());
+                if (!nextItemExist && getSlotsLeft() == 1) {
+                    body->addWidget(createMarkerItem(currentType));
+                    updateState(currentType);
+                }
             }
             break;
         }
