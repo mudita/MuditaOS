@@ -10,13 +10,6 @@
 #include <common/options/OptionBellMenu.hpp>
 #include <i18n/i18n.hpp>
 
-namespace
-{
-    const std::map<int, std::string> typeToLabel{{1, "app_bell_relaxation_sounds"},
-                                                 {2, "app_bell_relaxation_noises"},
-                                                 {3, "app_bell_relaxation_uploaded_sounds"}};
-}
-
 namespace gui
 {
     RelaxationMainWindow::RelaxationMainWindow(
@@ -37,7 +30,7 @@ namespace gui
         navBar->setVisible(false);
 
         songList = new gui::ListViewWithLabels(
-            this, 0, 0, style::window_width, style::window_height, presenter->getSongsModel(), typeToLabel);
+            this, 0, 0, style::window_width, style::window_height, presenter->getSongsModel());
         songList->applySizeRestrictions(style::bell_options_list::w,
                                         style::bell_options_list::h,
                                         style::bell_options_list::outer_layouts_h,

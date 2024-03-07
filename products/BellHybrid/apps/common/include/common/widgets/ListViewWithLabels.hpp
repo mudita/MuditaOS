@@ -14,8 +14,7 @@ namespace gui
     class ListItemProvider;
     class LabelMarkerItem;
 
-    using ItemsType     = std::optional<int>;
-    using TypeLabelsMap = std::map<int, std::string>;
+    using ItemsType = std::optional<std::string>;
 
     class ListViewWithLabels : public ListViewWithArrows
     {
@@ -25,8 +24,7 @@ namespace gui
                            unsigned int y,
                            unsigned int w,
                            unsigned int h,
-                           std::shared_ptr<ListItemProvider> prov,
-                           const TypeLabelsMap labelsPerType = TypeLabelsMap{});
+                           std::shared_ptr<ListItemProvider> prov);
 
         void reset() override;
 
@@ -42,7 +40,6 @@ namespace gui
         ItemsType currentMarker{std::nullopt};
         std::uint32_t itemsOnPage{0};
         bool labelAdded{false};
-        const TypeLabelsMap typeToLabel;
     };
 
 } // namespace gui

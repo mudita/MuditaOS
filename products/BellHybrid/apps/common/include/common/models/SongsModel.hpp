@@ -27,7 +27,7 @@ namespace app
       private:
         ApplicationCommon *application;
         std::unique_ptr<AbstractSoundsRepository> songsRepository;
-        std::map<int, std::string> pathPrefixes;
+        std::map<std::string, std::string> pathPrefixes;
         OnActivateCallback activateCallback{nullptr};
 
         bool onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
@@ -40,7 +40,7 @@ namespace app
 
         SongsModel(ApplicationCommon *application,
                    std::unique_ptr<AbstractSoundsRepository> soundsRepository,
-                   const std::map<int, std::string> &pathPrefixes);
+                   const std::map<std::string, std::string> &pathPrefixes);
 
         unsigned int requestRecordsCount() override;
 

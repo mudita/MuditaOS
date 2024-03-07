@@ -17,9 +17,8 @@ namespace gui
                                            unsigned int y,
                                            unsigned int w,
                                            unsigned int h,
-                                           std::shared_ptr<ListItemProvider> prov,
-                                           const TypeLabelsMap labelsPerType)
-        : ListViewWithArrows(parent, x, y, w, h, std::move(prov)), typeToLabel(labelsPerType)
+                                           std::shared_ptr<ListItemProvider> prov)
+        : ListViewWithArrows(parent, x, y, w, h, std::move(prov))
     {
         body->dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool { return true; };
     }
@@ -65,7 +64,7 @@ namespace gui
     LabelMarkerItem *ListViewWithLabels::createMarkerItem(ItemsType type)
     {
         if (type.has_value()) {
-            const auto label = std::string(utils::translate(typeToLabel.at(type.value())));
+            const auto label = std::string(utils::translate(type.value()));
             return new LabelMarkerItem(label);
         }
         return new LabelMarkerItem(UTF8(""));

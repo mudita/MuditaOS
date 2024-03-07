@@ -12,7 +12,7 @@ namespace app
 
     SongsModel::SongsModel(ApplicationCommon *application,
                            std::unique_ptr<AbstractSoundsRepository> soundsRepository,
-                           const std::map<int, std::string> &pathPrefixes)
+                           const std::map<std::string, std::string> &pathPrefixes)
         : SongsProvider(application),
           application(application), songsRepository{std::move(soundsRepository)}, pathPrefixes{pathPrefixes}
     {}

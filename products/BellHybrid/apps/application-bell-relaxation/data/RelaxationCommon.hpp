@@ -6,5 +6,4 @@
 namespace app::relaxation
 {
     constexpr auto timerValueDBRecordName = "RelaxationTimerValue";
-
 } // namespace app::relaxation

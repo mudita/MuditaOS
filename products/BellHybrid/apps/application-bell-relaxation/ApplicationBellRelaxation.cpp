@@ -87,18 +87,19 @@ namespace app
     void ApplicationBellRelaxation::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
-            const auto pathsTypeMap = std::map<int, std::string>{
-                {1, paths::audio::proprietary() / paths::audio::relaxation()},
-                {2, paths::audio::proprietary() / paths::audio::colorOfNoises()},
-                {3, paths::audio::userApp() / paths::audio::relaxation()}};
+            const std::map<std::string, std::string> labelsWithPaths{
+                {"app_bell_relaxation_sounds", paths::audio::proprietary() / paths::audio::relaxation()},
+                {"app_bell_relaxation_noises", paths::audio::proprietary() / paths::audio::colorOfNoises()},
+                {"app_bell_relaxation_uploaded_sounds", paths::audio::userApp() / paths::audio::relaxation()}};
             const auto pathsSortingVector = std::vector<SoundsRepository::PathSorting>{
                 {paths::audio::proprietary() / paths::audio::relaxation(), SoundsRepository::SortingBy::TitleAscending},
                 {paths::audio::proprietary() / paths::audio::colorOfNoises(),
                  SoundsRepository::SortingBy::TitleAscending},
                 {paths::audio::userApp() / paths::audio::relaxation(), SoundsRepository::SortingBy::TitleAscending}};
 
-            auto soundsRepository = std::make_unique<SoundsRepository>(app, pathsSortingVector);
-            auto songsModel       = std::make_unique<app::SongsModel>(app, std::move(soundsRepository), pathsTypeMap);
+            auto soundsRepository = std::make_unique<SoundsRepository>(app, std::move(pathsSortingVector));
+            auto songsModel =
+                std::make_unique<app::SongsModel>(app, std::move(soundsRepository), std::move(labelsWithPaths));
             auto presenter  = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(songsModel));
             return std::make_unique<gui::RelaxationMainWindow>(app, std::move(presenter));
         });
