@@ -4,8 +4,18 @@
 
 ### Fixed
 * Fixed BIWIN eMMC memory errors
-* Fixed device freeze after changing Relaxation volume intensively
 * Fixed UI freeze after changing any volume intensively
+
+### Added
+
+### Changed / Improved
+* Updated FSL drivers from NXP
+* Increased speed of update process
+
+## [2.6.0 2024-03-07]
+
+### Fixed
+* Fixed device freeze after changing Relaxation volume intensively
 
 ### Added
 * Added new 32px and 170px fonts
@@ -15,9 +25,7 @@
 * Added low battery notification on home screen with quotes
 
 ### Changed / Improved
-* Updated FSL drivers from NXP
 * Increased battery charger stack size
-* Increased speed of update process
 
 ## [2.5.0 2024-02-09]
 
