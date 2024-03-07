@@ -3,17 +3,23 @@
 ## Unreleased
 
 ### Fixed
-* Fixed no response when editing a contact via Center to have the same number as another.
-* Fixed occasional screen backlight flash when turning off the phone.
-* Fixed device freeze after finishing onboarding in Spanish.
 * Fixed crash when deleting all contacts from MC with Phonebook app opened.
 
 ### Added
 
 ### Changed / Improved
+* Increased speed of update process.
+
+## [1.12.0 2024-03-07]
+
+### Fixed
+* Fixed no response when editing a contact via Center to have the same number as another.
+* Fixed occasional screen backlight flash when turning off the phone.
+* Fixed device freeze after finishing onboarding in Spanish.
+
+### Changed / Improved
 * Updated share capital in EULA.
 * Updated copy on final onboarding screen.
-* Increased speed of update process.
 
 ## [1.11.0 2023-12-15]
 
