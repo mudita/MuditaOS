@@ -3,18 +3,21 @@
 
 #include "RelaxationMainWindow.hpp"
 #include <data/RelaxationAudioData.hpp>
+#include <data/RelaxationCommon.hpp>
 #include <data/RelaxationErrorData.hpp>
 #include <ApplicationBellRelaxation.hpp>
-#include "common/options/BellOptionsNavigation.hpp"
-
+#include <common/options/BellOptionsNavigation.hpp>
+#include <common/widgets/ListViewWithLabels.hpp>
 #include <common/options/OptionBellMenu.hpp>
+
 #include <i18n/i18n.hpp>
 
 namespace
 {
-    const std::map<int, std::string> typeToLabel{{1, "app_bell_relaxation_sounds"},
-                                                 {2, "app_bell_relaxation_noises"},
-                                                 {3, "app_bell_relaxation_uploaded_sounds"}};
+    const std::map<app::relaxation::MusicType, std::string> typeToLabel{
+        {app::relaxation::MusicType::Relaxation, "app_bell_relaxation_sounds"},
+        {app::relaxation::MusicType::ColorsOfNoise, "app_bell_relaxation_noises"},
+        {app::relaxation::MusicType::User, "app_bell_relaxation_uploaded_sounds"}};
 }
 
 namespace gui
@@ -36,7 +39,7 @@ namespace gui
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        songList = new gui::ListViewWithLabels(
+        songList = new ListViewWithLabels(
             this, 0, 0, style::window_width, style::window_height, presenter->getSongsModel(), typeToLabel);
         songList->applySizeRestrictions(style::bell_options_list::w,
                                         style::bell_options_list::h,

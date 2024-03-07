@@ -58,7 +58,6 @@ target_sources(application-bell-common
         src/widgets/SnoozeTimer.cpp
         src/widgets/LayoutVertical.cpp
         src/widgets/ClockVertical.cpp
-        src/widgets/ListViewWithLabels.cpp
         src/widgets/LabelListItem.cpp
         src/widgets/LabelOption.cpp
 

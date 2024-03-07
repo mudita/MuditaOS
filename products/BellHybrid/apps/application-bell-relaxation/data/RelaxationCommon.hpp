@@ -7,4 +7,12 @@ namespace app::relaxation
 {
     constexpr auto timerValueDBRecordName = "RelaxationTimerValue";
 
+    enum class MusicType
+    {
+        Relaxation,
+        ColorsOfNoise,
+        User,
+        Undefined
+    };
+
 } // namespace app::relaxation

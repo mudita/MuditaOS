@@ -6,11 +6,11 @@
 
 namespace app::relaxation
 {
-    RelaxationMainWindowPresenter::RelaxationMainWindowPresenter(std::unique_ptr<SongsModel> songsModel)
+    RelaxationMainWindowPresenter::RelaxationMainWindowPresenter(std::unique_ptr<SongsModel<MusicType>> songsModel)
         : songsModel{std::move(songsModel)}
     {}
 
-    void RelaxationMainWindowPresenter::createData(SongsModel::OnActivateCallback activateCallback)
+    void RelaxationMainWindowPresenter::createData(SongsModel<MusicType>::OnActivateCallback activateCallback)
     {
         songsModel->createData(activateCallback);
         updateViewState();
@@ -28,7 +28,7 @@ namespace app::relaxation
         songsModel->updateRecordsCount();
     }
 
-    std::shared_ptr<SongsModel> RelaxationMainWindowPresenter::getSongsModel()
+    std::shared_ptr<SongsModel<MusicType>> RelaxationMainWindowPresenter::getSongsModel()
     {
         return songsModel;
     }

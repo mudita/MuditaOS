@@ -3,6 +3,8 @@
 
 #pragma once
 
+#include "data/RelaxationCommon.hpp"
+
 #include <apps-common/BasePresenter.hpp>
 #include <module-db/Interface/MultimediaFilesRecord.hpp>
 #include <common/models/SongsModel.hpp>
@@ -31,24 +33,24 @@ namespace app::relaxation
         {
 
           public:
-            virtual void createData(SongsModel::OnActivateCallback activateCallback)           = 0;
+            virtual void createData(SongsModel<MusicType>::OnActivateCallback activateCallback) = 0;
             virtual void updateViewState()                                                     = 0;
             virtual void updateRecordsCount()                                                  = 0;
-            virtual std::shared_ptr<SongsModel> getSongsModel()                                = 0;
+            virtual std::shared_ptr<SongsModel<MusicType>> getSongsModel()                      = 0;
         };
     };
 
     class RelaxationMainWindowPresenter : public RelaxationMainWindowContract::Presenter
     {
       private:
-        std::shared_ptr<SongsModel> songsModel;
-        void createData(SongsModel::OnActivateCallback activateCallback) override;
+        std::shared_ptr<app::SongsModel<MusicType>> songsModel;
+        void createData(app::SongsModel<MusicType>::OnActivateCallback activateCallback) override;
         void updateViewState() override;
         void updateRecordsCount() override;
-        std::shared_ptr<SongsModel> getSongsModel() override;
+        std::shared_ptr<app::SongsModel<MusicType>> getSongsModel() override;
 
       public:
-        explicit RelaxationMainWindowPresenter(std::unique_ptr<SongsModel> songsModel);
+        explicit RelaxationMainWindowPresenter(std::unique_ptr<SongsModel<MusicType>> songsModel);
     };
 
 } // namespace app::relaxation

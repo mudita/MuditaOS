@@ -4,8 +4,7 @@
 #pragma once
 
 #include "presenter/RelaxationMainWindowPresenter.hpp"
-//#include "widgets/RelaxationListView.hpp"
-
+#include "data/RelaxationCommon.hpp"
 #include <common/widgets/ListViewWithLabels.hpp>
 #include <common/options/BellOptionWindow.hpp>
 
@@ -20,7 +19,7 @@ namespace gui
       private:
         std::unique_ptr<app::relaxation::RelaxationMainWindowContract::Presenter> presenter;
 
-        gui::ListViewWithLabels *songList{nullptr};
+        ListViewWithLabels<app::relaxation::MusicType> *songList{nullptr};
 
         void buildInterface() override;
         void handleError() override;

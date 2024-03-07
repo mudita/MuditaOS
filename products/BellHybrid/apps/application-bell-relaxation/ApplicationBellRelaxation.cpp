@@ -87,10 +87,10 @@ namespace app
     void ApplicationBellRelaxation::createUserInterface()
     {
         windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
-            const auto pathsTypeMap = std::map<int, std::string>{
-                {1, paths::audio::proprietary() / paths::audio::relaxation()},
-                {2, paths::audio::proprietary() / paths::audio::colorOfNoises()},
-                {3, paths::audio::userApp() / paths::audio::relaxation()}};
+            const auto pathsTypeMap = std::map<app::relaxation::MusicType, std::string>{
+                {relaxation::MusicType::Relaxation, paths::audio::proprietary() / paths::audio::relaxation()},
+                {relaxation::MusicType::ColorsOfNoise, paths::audio::proprietary() / paths::audio::colorOfNoises()},
+                {relaxation::MusicType::User, paths::audio::userApp() / paths::audio::relaxation()}};
             const auto pathsSortingVector = std::vector<SoundsRepository::PathSorting>{
                 {paths::audio::proprietary() / paths::audio::relaxation(), SoundsRepository::SortingBy::TitleAscending},
                 {paths::audio::proprietary() / paths::audio::colorOfNoises(),
@@ -98,7 +98,8 @@ namespace app
                 {paths::audio::userApp() / paths::audio::relaxation(), SoundsRepository::SortingBy::TitleAscending}};
 
             auto soundsRepository = std::make_unique<SoundsRepository>(app, pathsSortingVector);
-            auto songsModel       = std::make_unique<app::SongsModel>(app, std::move(soundsRepository), pathsTypeMap);
+            auto songsModel       = std::make_unique<app::SongsModel<relaxation::MusicType>>(
+                app, std::move(soundsRepository), pathsTypeMap);
             auto presenter  = std::make_unique<relaxation::RelaxationMainWindowPresenter>(std::move(songsModel));
             return std::make_unique<gui::RelaxationMainWindow>(app, std::move(presenter));
         });

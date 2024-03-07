@@ -4,22 +4,30 @@
 #pragma once
 
 #include <common/widgets/LabelListItem.hpp>
-#include <common/widgets/ListViewWithLabels.hpp>
 #include <common/options/OptionBellMenu.hpp>
 namespace gui::option
 {
+    template <typename T>
     class LabelOption : public OptionBellMenu
     {
       private:
-        ItemsType type{};
+        std::optional<T> type{};
 
       public:
-        LabelOption(ItemsType type,
+        LabelOption(std::optional<T> type,
                     const UTF8 &text,
                     std::function<bool(Item &)> activatedCallback,
                     std::function<bool(Item &)> focusChangedCallback,
-                    AppWindow *app);
+                    gui::AppWindow *app)
+            : OptionBellMenu(text, std::move(activatedCallback), std::move(focusChangedCallback), app), type(type)
+        {}
 
-        [[nodiscard]] auto build() const -> ListItem * override;
+        auto build() const -> ListItem *
+        {
+            auto labelItem = new LabelListItem<T>(type);
+            OptionBellMenu::prepareListItem(labelItem);
+            return labelItem;
+        }
     };
+
 } // namespace gui::option

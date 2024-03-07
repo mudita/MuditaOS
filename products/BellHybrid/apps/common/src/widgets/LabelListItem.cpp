@@ -11,14 +11,6 @@ namespace
 
 namespace gui
 {
-    LabelListItem::LabelListItem(ItemsType type) : labelType{type}
-    {}
-
-    ItemsType LabelListItem::getType()
-    {
-        return labelType;
-    }
-
     LabelMarkerItem::LabelMarkerItem(const UTF8 &labelText)
     {
         setMinimumSize(style::bell_options::default_text_width, style::bell_options::h);

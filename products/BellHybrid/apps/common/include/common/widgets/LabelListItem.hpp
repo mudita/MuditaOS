@@ -5,19 +5,23 @@
 
 #include "ListItem.hpp"
 #include "widgets/TextWithIconsWidget.hpp"
-#include <common/widgets/ListViewWithLabels.hpp>
 
 namespace gui
 {
+    template <typename T>
     class LabelListItem : public ListItem
     {
       private:
-        ItemsType labelType{};
+        std::optional<T> labelType{};
 
       public:
-        explicit LabelListItem(ItemsType type);
+        explicit LabelListItem(std::optional<T> type) : labelType{type}
+        {}
         virtual ~LabelListItem() = default;
-        ItemsType getType();
+        std::optional<T> getType()
+        {
+            return labelType;
+        }
     };
 
     class LabelMarkerItem : public ListItem
