@@ -42,7 +42,7 @@ namespace gui
                 itemsOnPage++;
             }
             else {
-                // Add invisible item to list to avoid memory leak
+                /* Add invisible item to list to avoid memory leak */
                 item->setVisible(false);
                 body->addWidget(item);
                 break;
@@ -61,44 +61,44 @@ namespace gui
         }
     }
 
-    LabelMarkerItem *ListViewWithLabels::createMarkerItem(ItemsType type)
+    LabelMarkerItem *ListViewWithLabels::createMarkerItem(ListLabel label)
     {
-        if (type.has_value()) {
-            const auto label = std::string(utils::translate(type.value()));
-            return new LabelMarkerItem(label);
+        if (label.has_value()) {
+            const auto labelString = std::string(utils::translate(label.value()));
+            return new LabelMarkerItem(labelString);
         }
         return new LabelMarkerItem(UTF8(""));
     }
 
     void ListViewWithLabels::addLabelMarker(ListItem *item)
     {
-        const auto LabelListItem = dynamic_cast<gui::LabelListItem *>(item);
-        if (LabelListItem == nullptr) {
+        const auto labelListItem = dynamic_cast<gui::LabelListItem *>(item);
+        if (labelListItem == nullptr) {
             return;
         };
-        previousType = currentType;
-        currentType  = LabelListItem->getType();
+        previous = current;
+        current  = labelListItem->getLabel();
 
         switch (direction) {
         case listview::Direction::Bottom:
-            if (currentType != previousType && currentType != currentMarker) {
-                body->addWidget(createMarkerItem(*currentType));
-                updateState(currentType);
+            if (current != previous && current != currentMarker) {
+                body->addWidget(createMarkerItem(*current));
+                updateState(current);
             }
             break;
 
         case listview::Direction::Top:
-            if (currentType != previousType && previousType != currentMarker) {
+            if (current != previous && previous != currentMarker) {
                 const auto initialSlotsLeft = getSlotsLeft();
 
-                body->removeWidget(LabelListItem);
-                body->addWidget(createMarkerItem(*previousType));
-                updateState(previousType);
+                body->removeWidget(labelListItem);
+                body->addWidget(createMarkerItem(*previous));
+                updateState(previous);
 
                 /* Add item to body even if it won't fit to avoid manual memory
                  * management for item, but apply correction to currentPageSize
                  * if it is not visible. */
-                body->addWidget(LabelListItem);
+                body->addWidget(labelListItem);
 
                 if (initialSlotsLeft == 0) {
                     currentPageSize--;
@@ -112,8 +112,8 @@ namespace gui
                 }
                 const auto nextItemExist = songsProvider->nextRecordExist(getOrderFromDirection());
                 if (!nextItemExist && getSlotsLeft() == 1) {
-                    body->addWidget(createMarkerItem(currentType));
-                    updateState(currentType);
+                    body->addWidget(createMarkerItem(current));
+                    updateState(current);
                 }
             }
             break;
@@ -131,14 +131,14 @@ namespace gui
     void ListViewWithLabels::reset()
     {
         currentMarker.reset();
-        previousType.reset();
-        currentType.reset();
+        previous.reset();
+        current.reset();
         ListViewEngine::reset();
     }
 
-    void ListViewWithLabels::updateState(ItemsType newMarker)
+    void ListViewWithLabels::updateState(ListLabel marker)
     {
-        currentMarker = newMarker;
+        currentMarker = marker;
         itemsOnPage++;
         labelAdded = true;
     }

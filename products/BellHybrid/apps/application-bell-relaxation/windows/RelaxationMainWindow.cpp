@@ -2,11 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationMainWindow.hpp"
-#include <data/RelaxationAudioData.hpp>
-#include <data/RelaxationErrorData.hpp>
-#include <ApplicationBellRelaxation.hpp>
-#include "common/options/BellOptionsNavigation.hpp"
 
+#include "data/RelaxationAudioData.hpp"
+#include "data/RelaxationErrorData.hpp"
+
+#include <ApplicationBellRelaxation.hpp>
+#include <common/options/BellOptionsNavigation.hpp>
 #include <common/options/OptionBellMenu.hpp>
 #include <i18n/i18n.hpp>
 

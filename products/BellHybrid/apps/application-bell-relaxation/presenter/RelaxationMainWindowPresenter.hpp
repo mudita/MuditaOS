@@ -4,9 +4,7 @@
 #pragma once
 
 #include <apps-common/BasePresenter.hpp>
-#include <module-db/Interface/MultimediaFilesRecord.hpp>
 #include <common/models/SongsModel.hpp>
-#include <vector>
 
 namespace app::music
 {

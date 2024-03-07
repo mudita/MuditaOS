@@ -11,10 +11,10 @@ namespace gui::option
     class LabelOption : public OptionBellMenu
     {
       private:
-        ItemsType type{};
+        ListLabel label{};
 
       public:
-        LabelOption(ItemsType type,
+        LabelOption(ListLabel label,
                     const UTF8 &text,
                     std::function<bool(Item &)> activatedCallback,
                     std::function<bool(Item &)> focusChangedCallback,

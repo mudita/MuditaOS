@@ -33,7 +33,7 @@ namespace app
         bool onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
                                   unsigned int repoRecordsCount);
         [[nodiscard]] bool updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records) override;
-        gui::ItemsType getTypeFromPath(const std::string &path);
+        gui::ListLabel getLabelFromPath(const std::string &path);
 
       public:
         virtual ~SongsModel() = default;

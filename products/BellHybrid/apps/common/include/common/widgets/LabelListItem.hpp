@@ -12,12 +12,12 @@ namespace gui
     class LabelListItem : public ListItem
     {
       private:
-        ItemsType labelType{};
+        ListLabel label{};
 
       public:
-        explicit LabelListItem(ItemsType type);
+        explicit LabelListItem(ListLabel label);
         virtual ~LabelListItem() = default;
-        ItemsType getType();
+        ListLabel getLabel();
     };
 
     class LabelMarkerItem : public ListItem

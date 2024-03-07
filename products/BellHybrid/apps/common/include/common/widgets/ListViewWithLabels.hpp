@@ -7,14 +7,13 @@
 #include <ListViewWithArrows.hpp>
 
 #include <optional>
-#include <map>
 
 namespace gui
 {
     class ListItemProvider;
     class LabelMarkerItem;
 
-    using ItemsType = std::optional<std::string>;
+    using ListLabel = std::optional<std::string>;
 
     class ListViewWithLabels : public ListViewWithArrows
     {
@@ -32,12 +31,12 @@ namespace gui
         std::size_t getSlotsLeft();
         void addItemsOnPage() override;
         void addLabelMarker(ListItem *item);
-        void updateState(ItemsType newMarker);
-        LabelMarkerItem *createMarkerItem(ItemsType type);
+        void updateState(ListLabel newMarker);
+        LabelMarkerItem *createMarkerItem(ListLabel label);
 
-        ItemsType currentType{std::nullopt};
-        ItemsType previousType{std::nullopt};
-        ItemsType currentMarker{std::nullopt};
+        ListLabel current{std::nullopt};
+        ListLabel previous{std::nullopt};
+        ListLabel currentMarker{std::nullopt};
         std::uint32_t itemsOnPage{0};
         bool labelAdded{false};
     };

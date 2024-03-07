@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/models/SongsModel.hpp>
-#include <common/options/OptionBellMenu.hpp>
 #include <common/widgets/LabelOption.hpp>
 
 namespace app
@@ -53,7 +52,7 @@ namespace app
         if (!sound) {
             return nullptr;
         }
-        auto item = gui::option::LabelOption{getTypeFromPath(sound->fileInfo.path),
+        auto item = gui::option::LabelOption{getLabelFromPath(sound->fileInfo.path),
                                              sound->tags.title,
                                              [=]([[maybe_unused]] gui::Item &item) {
                                                  activateCallback(*sound);
@@ -88,11 +87,11 @@ namespace app
         list->onProviderDataUpdate();
         return true;
     }
-    gui::ItemsType SongsModel::getTypeFromPath(const std::string &path)
+    gui::ListLabel SongsModel::getLabelFromPath(const std::string &path)
     {
-        for (const auto &[type, pathPrefix] : pathPrefixes) {
+        for (const auto &[label, pathPrefix] : pathPrefixes) {
             if (path.find(pathPrefix) != std::string::npos) {
-                return type;
+                return label;
             }
         }
         return std::nullopt;

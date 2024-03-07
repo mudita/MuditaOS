@@ -7,17 +7,17 @@
 namespace gui::option
 {
 
-    LabelOption::LabelOption(ItemsType type,
+    LabelOption::LabelOption(ListLabel label,
                              const UTF8 &text,
                              std::function<bool(Item &)> activatedCallback,
                              std::function<bool(Item &)> focusChangedCallback,
                              gui::AppWindow *app)
-        : OptionBellMenu(text, std::move(activatedCallback), std::move(focusChangedCallback), app), type(type)
+        : OptionBellMenu(text, std::move(activatedCallback), std::move(focusChangedCallback), app), label(label)
     {}
 
     auto LabelOption::build() const -> ListItem *
     {
-        auto labelItem = new LabelListItem(type);
+        auto labelItem = new LabelListItem(label);
         OptionBellMenu::prepareListItem(labelItem);
         return labelItem;
     }
