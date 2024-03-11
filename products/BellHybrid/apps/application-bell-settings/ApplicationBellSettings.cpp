@@ -8,7 +8,6 @@
 #include "models/AboutYourBellModel.hpp"
 #include "models/alarm_settings/AlarmSettingsListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpListItemProvider.hpp"
-#include "models/alarm_settings/BedtimeSettingsListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpSettingsModel.hpp"
 #include "models/alarm_settings/SnoozeListItemProvider.hpp"
 #include "models/alarm_settings/SnoozeSettingsModel.hpp"
@@ -34,7 +33,6 @@
 #include <Paths.hpp>
 #include <apps-common/windows/Dialog.hpp>
 #include <common/BellPowerOffPresenter.hpp>
-// #include <common/models/BedtimeModel.hpp>
 #include <common/models/LayoutModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
@@ -125,25 +123,13 @@ namespace app
 
         windowsFactory.attach(
             gui::window::name::bellSettingsBedtimeTone, [this](ApplicationCommon *app, const std::string &name) {
-                // auto soundsRepository = std::make_unique<SimpleSoundsRepository>(paths::audio::proprietary() /
-                //                                                                  paths::audio::bedtimeReminder());
-                // auto bedtimeModel = std::make_shared<bell_bedtime::BedtimeModel>(app, *audioModel,
-                // *soundsRepository);
-
-                // auto provider = std::make_shared<bell_settings::BedtimeSettingsListItemProvider>(
-                //     bedtimeModel, soundsRepository->getSongTitles());
-
-                const LabelsWithPaths emptylabelWithPath{{"", ""}};
-
                 const SoundsRepository::PathSorting pathSorting{.prefix = paths::audio::proprietary() /
                                                                           paths::audio::bedtimeReminder(),
                                                                 .sorting = SoundsRepository::SortingBy::TitleAscending};
 
                 auto soundsRepository = std::make_unique<SoundsRepository>(app, pathSorting);
-                auto songsModel = std::make_unique<SongsModel>(app, std::move(soundsRepository), emptylabelWithPath);
+                auto songsModel       = std::make_unique<SongsModel>(app, std::move(soundsRepository));
                 auto presenter  = std::make_unique<bell_settings::BedTimeSettingsPresenter>(std::move(songsModel));
-                // auto presenter = std::make_unique<bell_settings::BedTimeSettingsPresenter>(
-                //     provider, bedtimeModel, *audioModel, std::move(soundsRepository));
                 return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app, std::move(presenter));
             });
 

@@ -3,11 +3,7 @@
 
 #include "BellSettingsBedtimeToneWindow.hpp"
 #include "application-bell-settings/ApplicationBellSettings.hpp"
-// #include "BellSettingsStyle.hpp"
-// #include "data/RelaxationAudioData.hpp"
-// #include "data/RelaxationErrorData.hpp"
 
-// #include <ApplicationBellRelaxation.hpp>
 #include <common/options/BellOptionsNavigation.hpp>
 #include <common/options/OptionBellMenu.hpp>
 #include <i18n/i18n.hpp>
@@ -31,7 +27,7 @@ namespace gui
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        songList = new gui::ListViewWithLabels(
+        songList = new gui::ListViewWithArrows(
             this, 0, 0, style::window_width, style::window_height, presenter->getSongsModel());
         songList->applySizeRestrictions(style::bell_options_list::w,
                                         style::bell_options_list::h,

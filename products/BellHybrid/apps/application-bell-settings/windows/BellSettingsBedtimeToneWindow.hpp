@@ -3,9 +3,8 @@
 
 #pragma once
 
-// #include "ApplicationBellSettings.hpp"
 #include "presenter/BedtimeSettingsPresenter.hpp"
-#include <common/widgets/ListViewWithLabels.hpp>
+#include <ListViewWithArrows.hpp>
 #include <common/options/BellOptionWindow.hpp>
 
 namespace gui
@@ -21,7 +20,7 @@ namespace gui
       private:
         std::unique_ptr<app::bell_settings::BedtimeSettingsWindowContract::Presenter> presenter;
 
-        gui::ListViewWithLabels *songList{nullptr};
+        ListViewWithArrows *songList{nullptr};
 
         void buildInterface() override;
         void handleError() override;

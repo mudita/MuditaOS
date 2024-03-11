@@ -41,7 +41,7 @@ namespace app
 
         SongsModel(ApplicationCommon *application,
                    std::unique_ptr<AbstractSoundsRepository> soundsRepository,
-                   const LabelsWithPaths &pathPrefixes);
+                   const LabelsWithPaths &pathPrefixes = {});
 
         unsigned int requestRecordsCount() override;
 
