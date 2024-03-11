@@ -1,78 +1,78 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellSettingsBedtimeToneWindow.hpp"
 #include "application-bell-settings/ApplicationBellSettings.hpp"
-#include "BellSettingsStyle.hpp"
-#include <common/windows/BellFinishedWindow.hpp>
-#include <module-gui/gui/input/InputEvent.hpp>
-#include <module-gui/gui/widgets/SideListView.hpp>
+// #include "BellSettingsStyle.hpp"
+// #include "data/RelaxationAudioData.hpp"
+// #include "data/RelaxationErrorData.hpp"
+
+// #include <ApplicationBellRelaxation.hpp>
+#include <common/options/BellOptionsNavigation.hpp>
+#include <common/options/OptionBellMenu.hpp>
+#include <i18n/i18n.hpp>
 
 namespace gui
 {
     BellSettingsBedtimeToneWindow::BellSettingsBedtimeToneWindow(
-        app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::SettingsPresenter::Presenter> presenter)
-        : AppWindow(app, name), presenter{std::move(presenter)}
+        app::ApplicationCommon *app,
+        std::unique_ptr<app::bell_settings::BedtimeSettingsWindowContract::Presenter> &&presenter)
+        : AppWindow(app, gui::name::window::main_window), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);
-        buildInterface();
-    }
-
-    void BellSettingsBedtimeToneWindow::rebuild()
-    {
-        erase();
         buildInterface();
     }
 
     void BellSettingsBedtimeToneWindow::buildInterface()
     {
         AppWindow::buildInterface();
+
         statusBar->setVisible(false);
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        sidelistview = new SideListView(
-            this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider(), PageBarType::None);
-        sidelistview->setEdges(RectangleEdge::None);
+        songList = new gui::ListViewWithLabels(
+            this, 0, 0, style::window_width, style::window_height, presenter->getSongsModel());
+        songList->applySizeRestrictions(style::bell_options_list::w,
+                                        style::bell_options_list::h,
+                                        style::bell_options_list::outer_layouts_h,
+                                        style::bell_options_list::outer_layouts_margin);
 
-        sidelistview->rebuildList(listview::RebuildType::Full);
+        songList->setListTitle(utils::translate("app_bellmain_relaxation"));
 
-        presenter->loadData();
-    }
+        auto storedCallback     = songList->inputCallback;
+        songList->inputCallback = [&, storedCallback](Item &item, const InputEvent &event) {
+            return storedCallback(item, invertNavigationDirection(event));
+        };
+        setFocusItem(songList);
 
-    void BellSettingsBedtimeToneWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
-    {
-        setFocusItem(sidelistview);
-    }
-
-    bool BellSettingsBedtimeToneWindow::onInput(const gui::InputEvent &inputEvent)
-    {
-        if (sidelistview->onInput(inputEvent)) {
+        presenter->createData([this](const db::multimedia_files::MultimediaFilesRecord &selectedSound) {
+            activate(selectedSound);
             return true;
-        }
-        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-            exit();
-            return true;
-        }
-        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-            presenter->exitWithoutSave();
-        }
-
-        return AppWindow::onInput(inputEvent);
+        });
     }
 
-    void BellSettingsBedtimeToneWindow::exit()
+    void BellSettingsBedtimeToneWindow::activate(const db::multimedia_files::MultimediaFilesRecord &selectedSound)
     {
-        presenter->saveData();
-        application->switchWindow(
-            window::bell_finished::defaultName,
-            BellFinishedWindowData::Factory::create("circle_success_big", gui::name::window::main_window));
+        // auto audioContext = std::make_unique<RelaxationAudioContext>(selectedSound);
+        // auto switchData   = std::make_unique<RelaxationSwitchData>(std::move(audioContext));
+        // application->switchWindow(gui::window::name::relaxationTimerSelect, std::move(switchData));
     }
 
-    void BellSettingsBedtimeToneWindow::onClose(CloseReason reason)
+    void BellSettingsBedtimeToneWindow::handleError()
     {
-        if (reason != CloseReason::Popup) {
-            presenter->eraseProviderData();
-        }
+        // auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::FilesLimitExceeded);
+        // application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
+    }
+
+    void BellSettingsBedtimeToneWindow::updateViewState()
+    {
+        songList->rebuildList(gui::listview::RebuildType::InPlace);
+    }
+    void BellSettingsBedtimeToneWindow::rebuild()
+    {
+        presenter->updateRecordsCount();
+        songList->reset();
+        songList->rebuildList(gui::listview::RebuildType::Full);
     }
 } /* namespace gui */

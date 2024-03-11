@@ -3,17 +3,13 @@
 
 #pragma once
 
-#include "models/alarm_settings/BedtimeSettingsListItemProvider.hpp"
-#include <common/models/AbstractAudioModel.hpp>
-#include <common/SoundsRepository.hpp>
-#include <common/models/AbstractBedtimeModel.hpp>
 #include <apps-common/BasePresenter.hpp>
-#include <memory>
+#include <common/models/SongsModel.hpp>
 
-namespace gui
+namespace app::music
 {
-    class ListItemProvider;
-} // namespace gui
+    class AbstractSongsRepository;
+}
 
 namespace app::bell_settings
 {
@@ -23,43 +19,33 @@ namespace app::bell_settings
         class View
         {
           public:
-            virtual ~View() noexcept = default;
-            virtual void exit()      = 0;
+            virtual ~View() = default;
+
+            virtual void updateViewState() = 0;
+            virtual void handleError()     = 0;
         };
 
-        class Presenter : public BasePresenter<View>
+        class Presenter : public BasePresenter<BedtimeSettingsWindowContract::View>
         {
+
           public:
-            virtual ~Presenter() noexcept                                                   = default;
-            virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
-            virtual auto saveData() -> void                                                 = 0;
-            virtual auto loadData() -> void                                                 = 0;
-            virtual auto eraseProviderData() -> void                                        = 0;
-            virtual void exitWithoutSave()                                                  = 0;
+            virtual void createData(SongsModel::OnActivateCallback activateCallback) = 0;
+            virtual void updateViewState()                                           = 0;
+            virtual void updateRecordsCount()                                        = 0;
+            virtual std::shared_ptr<SongsModel> getSongsModel()                      = 0;
         };
     };
 
-    class SettingsPresenter : public BedtimeSettingsWindowContract::Presenter
+    class BedTimeSettingsPresenter : public BedtimeSettingsWindowContract::Presenter
     {
       public:
-        SettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
-                          std::shared_ptr<AbstractBedtimeModel> model,
-                          AbstractAudioModel &audioModel,
-                          std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository);
-
-        auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
-        auto saveData() -> void override;
-        auto loadData() -> void override;
-        auto eraseProviderData() -> void override;
-        void exitWithoutSave() override;
+        explicit BedTimeSettingsPresenter(std::unique_ptr<SongsModel> songsModel);
 
       private:
-        void stopSound();
-
-        std::shared_ptr<BedtimeSettingsListItemProvider> provider;
-        std::shared_ptr<AbstractBedtimeModel> model;
-        AbstractAudioModel &audioModel;
-        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository;
-        UTF8 currentSoundPath;
+        std::shared_ptr<SongsModel> songsModel;
+        void createData(SongsModel::OnActivateCallback activateCallback) override;
+        void updateViewState() override;
+        void updateRecordsCount() override;
+        std::shared_ptr<SongsModel> getSongsModel() override;
     };
 } // namespace app::bell_settings

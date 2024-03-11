@@ -2,71 +2,32 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BedtimeSettingsPresenter.hpp"
+#include <apps-common/models/SongsRepository.hpp>
 
 namespace app::bell_settings
 {
-    SettingsPresenter::SettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
-                                         std::shared_ptr<AbstractBedtimeModel> model,
-                                         AbstractAudioModel &audioModel,
-                                         std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository)
-        : provider(std::move(provider)),
-          model(std::move(model)), audioModel{audioModel}, soundsRepository{std::move(soundsRepository)}
+    BedTimeSettingsPresenter::BedTimeSettingsPresenter(std::unique_ptr<SongsModel> songsModel)
+        : songsModel{std::move(songsModel)}
+    {}
+
+    void BedTimeSettingsPresenter::createData(SongsModel::OnActivateCallback activateCallback)
     {
-        auto playSound = [this](const UTF8 &val) {
-            currentSoundPath = val;
-            this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::Bedtime);
-            this->audioModel.play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
-                                  AbstractAudioModel::PlaybackType::Bedtime,
-                                  {});
-        };
-
-        this->provider->onExit = [this]() { getView()->exit(); };
-
-        this->provider->onToneEnter  = playSound;
-        this->provider->onToneChange = playSound;
-
-        this->provider->onVolumeEnter  = playSound;
-        this->provider->onVolumeExit   = [this](const auto &) { this->stopSound(); };
-        this->provider->onVolumeChange = [this, playSound](const auto &val) {
-            this->audioModel.setVolume(
-                val, AbstractAudioModel::PlaybackType::Bedtime, audio::VolumeUpdateType::SkipUpdateDB);
-            if (this->audioModel.hasPlaybackFinished()) {
-                playSound(currentSoundPath);
-            }
-        };
+        songsModel->createData(activateCallback);
+        updateViewState();
     }
-
-    auto SettingsPresenter::saveData() -> void
+    void BedTimeSettingsPresenter::updateViewState()
     {
-        for (const auto &item : provider->getListItems()) {
-            item->getValue();
+        auto view = getView();
+        if (view != nullptr) {
+            view->updateViewState();
         }
     }
-
-    auto SettingsPresenter::loadData() -> void
+    void BedTimeSettingsPresenter::updateRecordsCount()
     {
-        for (const auto &item : provider->getListItems()) {
-            item->setValue();
-        }
+        songsModel->updateRecordsCount();
     }
-
-    auto SettingsPresenter::getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider>
+    std::shared_ptr<SongsModel> BedTimeSettingsPresenter::getSongsModel()
     {
-        return provider;
-    }
-
-    void SettingsPresenter::eraseProviderData()
-    {
-        provider->clearData();
-    }
-
-    void SettingsPresenter::stopSound()
-    {
-        this->audioModel.stopPlayedByThis({});
-    }
-    void SettingsPresenter::exitWithoutSave()
-    {
-        this->stopSound();
-        model->getBedtimeVolume().restoreDefault();
+        return songsModel;
     }
 } // namespace app::bell_settings
