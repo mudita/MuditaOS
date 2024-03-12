@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 /*
@@ -97,6 +97,7 @@ extern "C"
 #define PINMUX_EMMC_CMD   IOMUXC_GPIO_SD_B1_05_USDHC2_CMD
 #define PINMUX_EMMC_RESET IOMUXC_GPIO_SD_B1_06_USDHC2_RESET_B
 
+    void PINMUX_InitEMMC(void);
     void emmc_pin_config(uint32_t freq);
 
 //#define PINMUX_AUDIOCODEC_SAIx_MCLK      IOMUXC_GPIO_AD_B0_10_SAI2_MCLK
