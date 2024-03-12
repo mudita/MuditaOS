@@ -44,7 +44,7 @@ namespace gui
 
         auto activateCallback = [this](const db::multimedia_files::MultimediaFilesRecord &selectedSound) {
             // TODO: [CS] save to DataBase
-            return true;
+            return onExit();
         };
 
         auto scrollCallback = [this](const db::multimedia_files::MultimediaFilesRecord &selectedSound) {
@@ -62,6 +62,21 @@ namespace gui
         // application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
     }
 
+    bool BellSettingsBedtimeToneWindow::onExit()
+    {
+        presenter->stopSong();
+        application->returnToPreviousWindow();
+        return true;
+    }
+
+    bool BellSettingsBedtimeToneWindow::onInput(const gui::InputEvent &inputEvent)
+    {
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            return onExit();
+        }
+        return AppWindow::onInput(inputEvent);
+    }
+
     void BellSettingsBedtimeToneWindow::onClose(CloseReason reason)
     {
         presenter->stopSong();
@@ -71,6 +86,7 @@ namespace gui
     {
         songList->rebuildList(gui::listview::RebuildType::InPlace);
     }
+
     void BellSettingsBedtimeToneWindow::rebuild()
     {
         presenter->updateRecordsCount();

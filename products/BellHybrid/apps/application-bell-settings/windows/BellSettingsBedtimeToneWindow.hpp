@@ -27,6 +27,8 @@ namespace gui
         void handleError() override;
         void rebuild() override;
         void updateViewState() override;
+        bool onExit() override;
         void onClose(CloseReason reason) override;
+        bool onInput(const InputEvent &inputEvent) override;
     };
 } /* namespace gui */

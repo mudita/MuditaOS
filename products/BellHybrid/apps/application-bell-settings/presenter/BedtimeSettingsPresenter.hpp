@@ -25,6 +25,7 @@ namespace app::bell_settings
 
             virtual void updateViewState() = 0;
             virtual void handleError()     = 0;
+            virtual bool onExit()          = 0;
         };
 
         class Presenter : public BasePresenter<BedtimeSettingsWindowContract::View>
@@ -33,8 +34,8 @@ namespace app::bell_settings
           public:
             virtual void createData(SettingsSongsModel::OnActivateCallback activateCallback,
                                     SettingsSongsModel::OnScrollCallback scrollCallback) = 0;
-            virtual void updateViewState()                                           = 0;
-            virtual void updateRecordsCount()                                        = 0;
+            virtual void updateViewState()                                               = 0;
+            virtual void updateRecordsCount()                                            = 0;
             virtual std::shared_ptr<SettingsSongsModel> getSongsModel()                  = 0;
             virtual void playSong(std::string path)                                      = 0;
             virtual void stopSong()                                                      = 0;
