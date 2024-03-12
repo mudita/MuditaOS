@@ -27,6 +27,7 @@ target_sources(application-bell-settings
         models/AboutYourBellModel.cpp
         models/FrontlightListItemProvider.cpp
         models/FrontlightModel.cpp
+        models/SettingsSongsModel.cpp
         models/alarm_settings/AlarmSettingsListItemProvider.cpp
         models/alarm_settings/AlarmSettingsModel.cpp
         models/alarm_settings/BedtimeSettingsListItemProvider.cpp
@@ -72,6 +73,7 @@ target_sources(application-bell-settings
 
         models/AboutYourBellModel.hpp
         models/FrontlightListItemProvider.hpp
+        models/SettingsSongsModel.hpp
         models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp
         models/alarm_settings/AbstractSnoozeSettingsModel.hpp
         models/alarm_settings/AlarmSettingsListItemProvider.hpp

@@ -3,8 +3,10 @@
 
 #pragma once
 
+#include "models/SettingsSongsModel.hpp"
+
 #include <apps-common/BasePresenter.hpp>
-#include <common/models/SongsModel.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 
 namespace app::music
 {
@@ -29,23 +31,32 @@ namespace app::bell_settings
         {
 
           public:
-            virtual void createData(SongsModel::OnActivateCallback activateCallback) = 0;
+            virtual void createData(SettingsSongsModel::OnActivateCallback activateCallback,
+                                    SettingsSongsModel::OnScrollCallback scrollCallback) = 0;
             virtual void updateViewState()                                           = 0;
             virtual void updateRecordsCount()                                        = 0;
-            virtual std::shared_ptr<SongsModel> getSongsModel()                      = 0;
+            virtual std::shared_ptr<SettingsSongsModel> getSongsModel()                  = 0;
+            virtual void playSong(std::string path)                                      = 0;
+            virtual void stopSong()                                                      = 0;
         };
     };
 
     class BedTimeSettingsPresenter : public BedtimeSettingsWindowContract::Presenter
     {
       public:
-        explicit BedTimeSettingsPresenter(std::unique_ptr<SongsModel> songsModel);
+        BedTimeSettingsPresenter(std::unique_ptr<SettingsSongsModel> songsModel, AbstractAudioModel &audioModel);
+
+        void playSong(std::string path) override;
+        void stopSong() override;
 
       private:
-        std::shared_ptr<SongsModel> songsModel;
-        void createData(SongsModel::OnActivateCallback activateCallback) override;
+        std::shared_ptr<SettingsSongsModel> songsModel;
+        AbstractAudioModel &audioModel;
+
+        void createData(SettingsSongsModel::OnActivateCallback activateCallback,
+                        SettingsSongsModel::OnScrollCallback scrollCallback) override;
         void updateViewState() override;
         void updateRecordsCount() override;
-        std::shared_ptr<SongsModel> getSongsModel() override;
+        std::shared_ptr<SettingsSongsModel> getSongsModel() override;
     };
 } // namespace app::bell_settings

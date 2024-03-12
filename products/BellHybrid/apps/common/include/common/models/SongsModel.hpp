@@ -25,17 +25,6 @@ namespace app
 
     class SongsModel : public SongsProvider
     {
-      private:
-        ApplicationCommon *application;
-        std::unique_ptr<AbstractSoundsRepository> songsRepository;
-        LabelsWithPaths pathPrefixes;
-        OnActivateCallback activateCallback{nullptr};
-
-        bool onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
-                                  unsigned int repoRecordsCount);
-        [[nodiscard]] bool updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records) override;
-        gui::ListLabel getLabelFromPath(const std::string &path);
-
       public:
         virtual ~SongsModel() = default;
 
@@ -54,5 +43,19 @@ namespace app
         void createData(OnActivateCallback activateCallback) override;
         void updateRecordsCount();
         bool nextRecordExist(gui::Order order);
+
+      protected:
+        OnActivateCallback activateCallback{nullptr};
+
+        gui::ListLabel getLabelFromPath(const std::string &path);
+
+      private:
+        ApplicationCommon *application;
+        std::unique_ptr<AbstractSoundsRepository> songsRepository;
+        LabelsWithPaths pathPrefixes;
+
+        bool onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
+                                  unsigned int repoRecordsCount);
+        [[nodiscard]] bool updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records) override;
     };
 } // namespace app

@@ -2,19 +2,21 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BedtimeSettingsPresenter.hpp"
-#include <apps-common/models/SongsRepository.hpp>
 
 namespace app::bell_settings
 {
-    BedTimeSettingsPresenter::BedTimeSettingsPresenter(std::unique_ptr<SongsModel> songsModel)
-        : songsModel{std::move(songsModel)}
+    BedTimeSettingsPresenter::BedTimeSettingsPresenter(std::unique_ptr<SettingsSongsModel> songsModel,
+                                                       AbstractAudioModel &audioModel)
+        : songsModel{std::move(songsModel)}, audioModel{audioModel}
     {}
 
-    void BedTimeSettingsPresenter::createData(SongsModel::OnActivateCallback activateCallback)
+    void BedTimeSettingsPresenter::createData(SettingsSongsModel::OnActivateCallback activateCallback,
+                                              SettingsSongsModel::OnScrollCallback scrollCallback)
     {
-        songsModel->createData(activateCallback);
+        songsModel->createData(activateCallback, scrollCallback);
         updateViewState();
     }
+
     void BedTimeSettingsPresenter::updateViewState()
     {
         auto view = getView();
@@ -22,12 +24,26 @@ namespace app::bell_settings
             view->updateViewState();
         }
     }
+
     void BedTimeSettingsPresenter::updateRecordsCount()
     {
         songsModel->updateRecordsCount();
     }
-    std::shared_ptr<SongsModel> BedTimeSettingsPresenter::getSongsModel()
+
+    std::shared_ptr<SettingsSongsModel> BedTimeSettingsPresenter::getSongsModel()
     {
         return songsModel;
+    }
+
+    void BedTimeSettingsPresenter::playSong(std::string path)
+    {
+        // TODO: [CS] volume
+        // this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::Bedtime);
+        audioModel.play(path, AbstractAudioModel::PlaybackType::Bedtime, {});
+    }
+
+    void BedTimeSettingsPresenter::stopSong()
+    {
+        audioModel.stopPlayedByThis({});
     }
 } // namespace app::bell_settings

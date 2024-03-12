@@ -42,23 +42,29 @@ namespace gui
         };
         setFocusItem(songList);
 
-        presenter->createData([this](const db::multimedia_files::MultimediaFilesRecord &selectedSound) {
-            activate(selectedSound);
+        auto activateCallback = [this](const db::multimedia_files::MultimediaFilesRecord &selectedSound) {
+            // TODO: [CS] save to DataBase
             return true;
-        });
-    }
+        };
 
-    void BellSettingsBedtimeToneWindow::activate(const db::multimedia_files::MultimediaFilesRecord &selectedSound)
-    {
-        // auto audioContext = std::make_unique<RelaxationAudioContext>(selectedSound);
-        // auto switchData   = std::make_unique<RelaxationSwitchData>(std::move(audioContext));
-        // application->switchWindow(gui::window::name::relaxationTimerSelect, std::move(switchData));
+        auto scrollCallback = [this](const db::multimedia_files::MultimediaFilesRecord &selectedSound) {
+            presenter->playSong(selectedSound.fileInfo.path);
+            return true;
+        };
+
+        presenter->createData(std::move(activateCallback), std::move(scrollCallback));
     }
 
     void BellSettingsBedtimeToneWindow::handleError()
     {
+        // TODO: [CS] handle error
         // auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::FilesLimitExceeded);
         // application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
+    }
+
+    void BellSettingsBedtimeToneWindow::onClose(CloseReason reason)
+    {
+        presenter->stopSong();
     }
 
     void BellSettingsBedtimeToneWindow::updateViewState()

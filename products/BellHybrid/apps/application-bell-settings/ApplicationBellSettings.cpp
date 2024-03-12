@@ -6,6 +6,7 @@
 #include "presenter/LayoutWindowPresenter.hpp"
 #include "models/TemperatureUnitModel.hpp"
 #include "models/AboutYourBellModel.hpp"
+#include "models/SettingsSongsModel.hpp"
 #include "models/alarm_settings/AlarmSettingsListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpSettingsModel.hpp"
@@ -41,7 +42,6 @@
 #include <common/models/AudioModel.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/models/AlarmSettingsModel.hpp>
-#include <common/models/SongsModel.hpp>
 #include <common/SoundsRepository.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
@@ -128,8 +128,9 @@ namespace app
                                                                 .sorting = SoundsRepository::SortingBy::TitleAscending};
 
                 auto soundsRepository = std::make_unique<SoundsRepository>(app, pathSorting);
-                auto songsModel       = std::make_unique<SongsModel>(app, std::move(soundsRepository));
-                auto presenter  = std::make_unique<bell_settings::BedTimeSettingsPresenter>(std::move(songsModel));
+                auto songsModel = std::make_unique<bell_settings::SettingsSongsModel>(app, std::move(soundsRepository));
+                auto presenter =
+                    std::make_unique<bell_settings::BedTimeSettingsPresenter>(std::move(songsModel), *audioModel);
                 return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app, std::move(presenter));
             });
 

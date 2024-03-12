@@ -4,6 +4,7 @@
 #pragma once
 
 #include "presenter/BedtimeSettingsPresenter.hpp"
+
 #include <ListViewWithArrows.hpp>
 #include <common/options/BellOptionWindow.hpp>
 
@@ -26,6 +27,6 @@ namespace gui
         void handleError() override;
         void rebuild() override;
         void updateViewState() override;
-        void activate(const db::multimedia_files::MultimediaFilesRecord &selectedSound);
+        void onClose(CloseReason reason) override;
     };
 } /* namespace gui */
