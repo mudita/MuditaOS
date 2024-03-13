@@ -6,6 +6,7 @@
 
 #include <common/options/BellOptionsNavigation.hpp>
 #include <common/options/OptionBellMenu.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui
@@ -44,7 +45,7 @@ namespace gui
 
         auto activateCallback = [this](const db::multimedia_files::MultimediaFilesRecord &selectedSound) {
             // TODO: [CS] save to DataBase
-            return onExit();
+            return onSelect();
         };
 
         auto scrollCallback = [this](const db::multimedia_files::MultimediaFilesRecord &selectedSound) {
@@ -62,7 +63,16 @@ namespace gui
         // application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
     }
 
-    bool BellSettingsBedtimeToneWindow::onExit()
+    bool BellSettingsBedtimeToneWindow::onSelect()
+    {
+        presenter->stopSong();
+        application->switchWindow(
+            window::bell_finished::defaultName,
+            BellFinishedWindowData::Factory::create("circle_success_big", gui::name::window::main_window));
+        return true;
+    }
+
+    bool BellSettingsBedtimeToneWindow::onReturn()
     {
         presenter->stopSong();
         application->returnToPreviousWindow();
@@ -72,7 +82,7 @@ namespace gui
     bool BellSettingsBedtimeToneWindow::onInput(const gui::InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-            return onExit();
+            return onReturn();
         }
         return AppWindow::onInput(inputEvent);
     }

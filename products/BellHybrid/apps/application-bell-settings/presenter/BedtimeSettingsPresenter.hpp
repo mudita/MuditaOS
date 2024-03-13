@@ -25,7 +25,8 @@ namespace app::bell_settings
 
             virtual void updateViewState() = 0;
             virtual void handleError()     = 0;
-            virtual bool onExit()          = 0;
+            virtual bool onSelect()        = 0;
+            virtual bool onReturn()        = 0;
         };
 
         class Presenter : public BasePresenter<BedtimeSettingsWindowContract::View>
