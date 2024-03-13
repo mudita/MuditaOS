@@ -35,7 +35,7 @@ namespace gui
                                         style::bell_options_list::outer_layouts_h,
                                         style::bell_options_list::outer_layouts_margin);
 
-        songList->setListTitle(utils::translate("app_bellmain_relaxation"));
+        songList->setListTitle(utils::translate("app_bell_settings_bedtime_settings_tone"));
 
         auto storedCallback     = songList->inputCallback;
         songList->inputCallback = [&, storedCallback](Item &item, const InputEvent &event) {
