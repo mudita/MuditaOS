@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -271,5 +271,26 @@ namespace alarms
         explicit GetSnoozedAlarmsResponseMessage(std::vector<SingleEventRecord> snoozedAlarms)
             : snoozedAlarms(std::move(snoozedAlarms)){};
         const std::vector<SingleEventRecord> snoozedAlarms;
+    };
+
+    class PreWakeUpChangeState : public AlarmMessage
+    {
+      public:
+        explicit PreWakeUpChangeState(bool isActive) : activity(isActive)
+        {}
+
+        bool isActive() const
+        {
+            return activity;
+        };
+
+      private:
+        bool activity;
+    };
+
+    class TurnOffPreWakeUpRequestMessage : public AlarmMessage
+    {
+      public:
+        TurnOffPreWakeUpRequestMessage(){};
     };
 } // namespace alarms

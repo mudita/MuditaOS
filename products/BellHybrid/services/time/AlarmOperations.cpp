@@ -1,8 +1,8 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <BellAlarmHandler.hpp>
-
+#include <service-time/AlarmMessage.hpp>
 #include <time/AlarmOperations.hpp>
 #include <time/dateCommon.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
@@ -143,12 +143,18 @@ namespace alarms
         auto snoozeChimeSettingsProvider = std::make_unique<SnoozeChimeSettingsProviderImpl>(service);
         auto onboardingSettingsProvider  = std::make_unique<OnboardingSettingsProviderImpl>(service);
         auto bedtimeSettingsProvider     = std::make_unique<BedtimeSettingsProviderImpl>(service);
-        auto alarmOperations             = std::make_unique<AlarmOperations>(std::move(alarmEventsRepo),
+        auto onPreWakeUpChangeState      = [service](bool isActive) {
+            auto message = std::make_shared<alarms::PreWakeUpChangeState>(isActive);
+            service->bus.sendMulticast(std::move(message), sys::BusChannel::AlarmNotifications);
+        };
+        auto alarmOperations = std::make_unique<AlarmOperations>(std::move(alarmEventsRepo),
                                                                  getCurrentTimeCallback,
                                                                  std::move(preWakeUpSettingsProvider),
                                                                  std::move(snoozeChimeSettingsProvider),
                                                                  std::move(onboardingSettingsProvider),
-                                                                 std::move(bedtimeSettingsProvider));
+                                                                 std::move(bedtimeSettingsProvider),
+                                                                 std::move(onPreWakeUpChangeState));
+
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::Clock,
                                                   std::make_shared<alarms::BellAlarmClockHandler>(service));
         alarmOperations->addAlarmExecutionHandler(alarms::AlarmType::PreWakeUpChime,
@@ -168,10 +174,12 @@ namespace alarms
                                      std::unique_ptr<PreWakeUpSettingsProvider> &&preWakeUpSettingsProvider,
                                      std::unique_ptr<SnoozeChimeSettingsProvider> &&snoozeChimeSettings,
                                      std::unique_ptr<OnboardingSettingsProvider> &&onboardingSettings,
-                                     std::unique_ptr<AbstractBedtimeSettingsProvider> &&bedtimeSettingsProvider)
+                                     std::unique_ptr<AbstractBedtimeSettingsProvider> &&bedtimeSettingsProvider,
+                                     PreWakeUp::ChangeStateCallback &&callback)
         : AlarmOperationsCommon{std::move(alarmEventsRepo), std::move(getCurrentTimeCallback)},
-          preWakeUp(std::move(preWakeUpSettingsProvider)), snoozeChimeSettings(std::move(snoozeChimeSettings)),
-          onboardingSettings(std::move(onboardingSettings)), bedtime(std::move(bedtimeSettingsProvider))
+          preWakeUp(std::move(preWakeUpSettingsProvider), std::move(callback)),
+          snoozeChimeSettings(std::move(snoozeChimeSettings)), onboardingSettings(std::move(onboardingSettings)),
+          bedtime(std::move(bedtimeSettingsProvider))
     {}
 
     void AlarmOperations::minuteUpdated(TimePoint now)
@@ -347,8 +355,8 @@ namespace alarms
         AlarmOperationsCommon::handleAlarmEvent(event, alarmType, newStateOn);
     }
 
-    PreWakeUp::PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider)
-        : settingsProvider{std::move(settingsProvider)}
+    PreWakeUp::PreWakeUp(std::unique_ptr<PreWakeUpSettingsProvider> &&settingsProvider, ChangeStateCallback &&callback)
+        : settingsProvider{std::move(settingsProvider)}, onChangeStateCallback(std::move(callback))
     {}
 
     auto PreWakeUp::decide(TimePoint now, const SingleEventRecord &event) -> Decision
@@ -375,6 +383,9 @@ namespace alarms
 
     auto PreWakeUp::setActive(bool state) -> void
     {
+        if (onChangeStateCallback != nullptr) {
+            onChangeStateCallback(state);
+        }
         active = state;
     }
 
