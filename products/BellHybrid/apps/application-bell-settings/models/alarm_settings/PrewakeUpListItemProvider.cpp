@@ -8,12 +8,10 @@
 #include <common/widgets/list_items/Numeric.hpp>
 #include <common/widgets/list_items/NumericWithBar.hpp>
 #include <common/widgets/ListItems.hpp>
-#include <common/widgets/list_items/Text.hpp>
-#include <apps-common/ApplicationCommon.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
 #include <utility>
 
-#include <ListViewWithLabelsItem.hpp>
+#include <SongsListViewItem.hpp>
 #include <Paths.hpp>
 
 namespace app::bell_settings
@@ -21,14 +19,13 @@ namespace app::bell_settings
     using namespace gui;
 
     PrewakeUpListItemProvider::PrewakeUpListItemProvider(AbstractPrewakeUpSettingsModel &settingsModel,
-                                                         std::vector<UTF8> chimeToneRange,
-                                                         std::shared_ptr<SongsModel> model)
-        : settingsModel{settingsModel}, model{std::move(model)}
+                                                         std::shared_ptr<SongsModel> songsModel)
+        : settingsModel{settingsModel}, songsModel{std::move(songsModel)}
     {
-        buildListItems(std::move(chimeToneRange));
+        buildListItems();
     }
 
-    void PrewakeUpListItemProvider::buildListItems(std::vector<UTF8> chimeToneRange)
+    void PrewakeUpListItemProvider::buildListItems()
     {
         constexpr auto brightnessMin  = 1U;
         constexpr auto brightnessMax  = 10U;
@@ -54,27 +51,27 @@ namespace app::bell_settings
 
         internalData.emplace_back(chimeDuration);
 
-        auto chimeTone = new ListViewWithLabelsItem("!!! Lol !!!", model);
+        auto chimeTone =
+            new SongsListViewItem(utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_tone"),
+                                  settingsModel.getChimeTone(),
+                                  songsModel);
 
-        //        auto chimeTone =
-        //            new list_items::Text(std::move(chimeToneRange),
-        //                                 settingsModel.getChimeTone(),
-        //                                 utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_tone"));
-        //        chimeTone->set_on_value_change_cb([this](const auto &val) {
-        //            if (onToneChange) {
-        //                onToneChange(val);
-        //            }
-        //        });
-        //        chimeTone->onEnter = [this, chimeTone]() {
-        //            if (onToneEnter) {
-        //                onToneEnter(chimeTone->value());
-        //            }
-        //        };
-        //        chimeTone->onExit = [this, chimeTone]() {
-        //            if (onToneExit) {
-        //                onToneExit(chimeTone->value());
-        //            }
-        //        };
+        chimeTone->set_on_value_change_cb([this](const auto &val) {
+            if (onToneChange) {
+                onToneChange(val);
+            }
+        });
+
+        chimeTone->onEnter = [this, chimeTone]() {
+            if (onToneEnter) {
+                onToneEnter(chimeTone->value());
+            }
+        };
+        chimeTone->onExit = [this, chimeTone]() {
+            if (onToneExit) {
+                onToneExit(chimeTone->value());
+            }
+        };
         internalData.emplace_back(chimeTone);
 
         constexpr auto volumeStep = 1U;

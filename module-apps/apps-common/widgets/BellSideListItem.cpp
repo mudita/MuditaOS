@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TextFixedSize.hpp"
@@ -7,12 +7,11 @@
 
 namespace gui
 {
-
-    BellSideListItem::BellSideListItem()
+    BellSideListItem::BellSideListItem(BellBaseLayout::LayoutType type)
     {
         setMinimumSize(style::sidelistview::list_item::w, style::sidelistview::list_item::h);
         setEdges(RectangleEdge::None);
-        body = new BellBaseLayout(this);
+        body = new BellBaseLayout(this, 0, 0, 0, 0, type);
     }
 
     void BellSideListItem::setBottomDescriptionText(const std::string &description)
@@ -46,5 +45,4 @@ namespace gui
         textBox->setRichText(description);
         textBox->drawUnderline(false);
     }
-
 } /* namespace gui */

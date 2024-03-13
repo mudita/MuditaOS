@@ -12,7 +12,7 @@ namespace app::relaxation
 
     void RelaxationMainWindowPresenter::createData(SongsModel::OnActivateCallback activateCallback)
     {
-        songsModel->createData(activateCallback);
+        songsModel->createData(activateCallback, nullptr);
         updateViewState();
     }
     void RelaxationMainWindowPresenter::updateViewState()

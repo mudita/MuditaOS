@@ -29,7 +29,7 @@ namespace gui
         itemsOnPage     = 0;
         labelAdded      = false;
 
-        ListItem *item = nullptr;
+        ListItem *item;
         while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
             /* If direction is top-to-bottom, add label mark before adding relaxation item. */
             if (direction == listview::Direction::Bottom) {
@@ -106,7 +106,8 @@ namespace gui
                 }
             }
             else {
-                const auto songsProvider = dynamic_cast<app::SongsModel *>(provider.get());
+                const auto songsProvider = dynamic_cast<app::SongsModel *>(
+                    provider.get()); // TODO this is bad, as it reduces the usage to only SongsModel
                 if (songsProvider == nullptr) {
                     break;
                 }
@@ -138,9 +139,8 @@ namespace gui
 
     void ListViewWithLabels::updateState(ListLabel marker)
     {
-        currentMarker = marker;
+        currentMarker = std::move(marker);
         itemsOnPage++;
         labelAdded = true;
     }
-
 } // namespace gui

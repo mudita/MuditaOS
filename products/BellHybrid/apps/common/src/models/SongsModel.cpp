@@ -16,10 +16,10 @@ namespace app
           application(application), songsRepository{std::move(soundsRepository)}, pathPrefixes{pathPrefixes}
     {}
 
-    void SongsModel::createData(OnActivateCallback callback)
+    void SongsModel::createData(OnActivateCallback onActivate, OnFocusChangeCallback onFocusChange)
     {
-        activateCallback = callback;
-
+        activateCallback    = std::move(onActivate);
+        focusChangeCallback = std::move(onFocusChange);
         songsRepository->init();
     }
 
@@ -52,18 +52,27 @@ namespace app
     gui::ListItem *SongsModel::getItem(gui::Order order)
     {
         const auto sound = getRecord(order);
-        if (!sound) {
+        if (sound == nullptr) {
             return nullptr;
         }
+
+        // TODO add tick here
+
         auto item = gui::option::LabelOption{getLabelFromPath(sound->fileInfo.path),
                                              sound->tags.title,
-                                             [=]([[maybe_unused]] gui::Item &item) {
-                                                 activateCallback(*sound);
+                                             [this, sound]([[maybe_unused]] gui::Item &item) {
+                                                 if (activateCallback) {
+                                                     activateCallback(*sound);
+                                                 }
                                                  return true;
                                              },
-                                             []([[maybe_unused]] gui::Item &item) { return true; },
+                                             [this, sound](gui::Item &item) {
+                                                 if (focusChangeCallback && item.focus) {
+                                                     focusChangeCallback(*sound);
+                                                 }
+                                                 return true;
+                                             },
                                              nullptr};
-
         return item.build();
     }
 
@@ -102,4 +111,20 @@ namespace app
         return std::nullopt;
     }
 
+    //    void SongsModel::setCurrentRecord(const std::string &path)
+    //    {
+    //        currentRecordPath = path;
+    //    }
+
+    unsigned int SongsModel::getRecordIndexForPath(const std::string &path)
+    {
+        const auto it = std::find_if(records.begin(), records.end(), [path](auto record) {
+            LOG_ERROR("%s", record->fileInfo.path.c_str());
+            return record->fileInfo.path == path;
+        });
+        if (it != records.end()) {
+            return std::distance(records.begin(), it);
+        }
+        return 0;
+    }
 } // namespace app

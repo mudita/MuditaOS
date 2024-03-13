@@ -16,32 +16,25 @@ namespace app
                           public gui::ListItemProvider
     {
       public:
-        virtual ~SongsProvider() = default;
         using OnActivateCallback =
             std::function<bool(const db::multimedia_files::MultimediaFilesRecord &selectedSound)>;
+        using OnFocusChangeCallback =
+            std::function<bool(const db::multimedia_files::MultimediaFilesRecord &focusedSound)>;
+
         explicit SongsProvider(ApplicationCommon *application);
-        virtual void createData(OnActivateCallback activateCallback) = 0;
+        virtual ~SongsProvider() = default;
+
+        virtual auto createData(OnActivateCallback activateCallback, OnFocusChangeCallback focusChangeCallback)
+            -> void = 0;
     };
 
     class SongsModel : public SongsProvider
     {
-      private:
-        ApplicationCommon *application;
-        std::unique_ptr<AbstractSoundsRepository> songsRepository;
-        LabelsWithPaths pathPrefixes;
-        OnActivateCallback activateCallback{nullptr};
-
-        bool onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
-                                  unsigned int repoRecordsCount);
-        [[nodiscard]] bool updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records) override;
-        gui::ListLabel getLabelFromPath(const std::string &path);
-
       public:
-        virtual ~SongsModel() = default;
-
         SongsModel(ApplicationCommon *application,
                    std::unique_ptr<AbstractSoundsRepository> soundsRepository,
                    const LabelsWithPaths &pathPrefixes);
+        virtual ~SongsModel() = default;
 
         unsigned int requestRecordsCount() override;
 
@@ -51,8 +44,23 @@ namespace app
 
         void requestRecords(std::uint32_t offset, std::uint32_t limit) override;
 
-        void createData(OnActivateCallback activateCallback) override;
+        void createData(OnActivateCallback activateCallback, OnFocusChangeCallback focusChangeCallback) override;
         void updateRecordsCount();
         bool nextRecordExist(gui::Order order);
+        unsigned int getRecordIndexForPath(const std::string &path);
+        //        void setCurrentRecord(const std::string &path);
+
+      private:
+        bool onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
+                                  unsigned int repoRecordsCount);
+        [[nodiscard]] bool updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records) override;
+        gui::ListLabel getLabelFromPath(const std::string &path);
+
+        ApplicationCommon *application;
+        std::unique_ptr<AbstractSoundsRepository> songsRepository;
+        LabelsWithPaths pathPrefixes;
+        std::string currentRecordPath;
+        OnActivateCallback activateCallback{nullptr};
+        OnFocusChangeCallback focusChangeCallback{nullptr};
     };
 } // namespace app

@@ -6,21 +6,17 @@
 
 namespace app::bell_settings
 {
-    PrewakeUpWindowPresenter::PrewakeUpWindowPresenter(
-        std::unique_ptr<PrewakeUpListItemProvider> &&provider,
-        std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
-        AbstractAudioModel &audioModel,
-        std::unique_ptr<AbstractSimpleSoundsRepository> &&soundsRepository,
-        std::unique_ptr<AbstractFrontlightModel> &&frontlight)
-        : provider{std::move(provider)}, model{std::move(model)}, audioModel{audioModel},
-          soundsRepository{std::move(soundsRepository)}, frontlight{std::move(frontlight)}
+    PrewakeUpWindowPresenter::PrewakeUpWindowPresenter(std::unique_ptr<PrewakeUpListItemProvider> &&provider,
+                                                       std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
+                                                       AbstractAudioModel &audioModel,
+                                                       std::unique_ptr<AbstractFrontlightModel> &&frontlight)
+        : provider{std::move(provider)}, model{std::move(model)}, audioModel{audioModel}, frontlight{
+                                                                                              std::move(frontlight)}
     {
         auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
             this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::PreWakeup);
-            this->audioModel.play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
-                                  AbstractAudioModel::PlaybackType::PreWakeup,
-                                  {});
+            this->audioModel.play(currentSoundPath, AbstractAudioModel::PlaybackType::PreWakeup, {});
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };

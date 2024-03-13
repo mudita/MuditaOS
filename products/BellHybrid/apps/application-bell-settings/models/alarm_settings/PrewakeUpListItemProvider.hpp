@@ -16,21 +16,20 @@ namespace app::list_items
 namespace app::bell_settings
 {
     class AbstractFrontlightModel;
+
     class PrewakeUpListItemProvider : public SettingsListItemProvider
     {
       public:
-        PrewakeUpListItemProvider(
-            AbstractPrewakeUpSettingsModel &settingsModel,
-            std::vector<UTF8> chimeToneRange,
-            std::shared_ptr<SongsModel> model); // TODO chimeToneRange is probably no longer needed
+        PrewakeUpListItemProvider(AbstractPrewakeUpSettingsModel &settingsModel,
+                                  std::shared_ptr<SongsModel> songsModel);
 
         auto getCurrentVolume() -> std::uint8_t;
 
       private:
-        void buildListItems(std::vector<UTF8> preWakeupToneRange);
+        void buildListItems();
 
         AbstractPrewakeUpSettingsModel &settingsModel;
         app::list_items::NumericWithBar *prewakeUpVolume{nullptr};
-        std::shared_ptr<SongsModel> model;
+        std::shared_ptr<SongsModel> songsModel;
     };
 } // namespace app::bell_settings

@@ -162,11 +162,8 @@ namespace app
 
         windowsFactory.attach(
             gui::BellSettingsPrewakeUpWindow::name, [this](ApplicationCommon *app, const std::string &name) {
-                auto soundsRepository =
-                    std::make_unique<SimpleSoundsRepository>(paths::audio::proprietary() / paths::audio::preWakeup());
                 auto prewakeUpChimeDurationModel = std::make_unique<bell_settings::PrewakeUpChimeDurationModel>(this);
-                auto prewakeUpChimeToneModel =
-                    std::make_unique<bell_settings::PrewakeUpChimeToneModel>(this, *soundsRepository);
+                auto prewakeUpChimeToneModel     = std::make_unique<bell_settings::PrewakeUpChimeToneModel>(this);
                 auto prewakeUpChimeVolumeModel =
                     std::make_unique<bell_settings::PrewakeUpChimeVolumeModel>(*audioModel);
                 auto prewakeUpLightDurationModel = std::make_unique<bell_settings::PrewakeUpLightDurationModel>(this);
@@ -178,30 +175,23 @@ namespace app
                                                                             std::move(prewakeUpLightDurationModel),
                                                                             std::move(prewakeUpFrontlightModel));
 
-                const app::LabelsWithPaths labelsWithPaths{
-                    {"app_bell_relaxation_sounds", paths::audio::proprietary() / paths::audio::relaxation()}};
-                const auto pathsSortingVector = std::vector<SoundsRepository::PathSorting>{
-                    {paths::audio::proprietary() / paths::audio::relaxation(),
-                     SoundsRepository::SortingBy::TitleAscending}};
+                const auto &preWakeupSoundsPath =
+                    paths::audio::proprietary() /
+                    paths::audio::relaxation(); // TODO just for testing to have longer list
+                const auto &labelsWithPaths = app::LabelsWithPaths{
+                    {"app_bell_settings_alarm_settings_prewake_up_chime_tone", preWakeupSoundsPath}};
+                const auto &pathsSortingVector = std::vector<SoundsRepository::PathSorting>{
+                    {preWakeupSoundsPath, SoundsRepository::SortingBy::TitleAscending}};
 
-                auto soundsRepo = std::make_unique<SoundsRepository>(this, pathsSortingVector);
-                auto songsModel = std::make_shared<SongsModel>(
-                    this, std::move(soundsRepo), labelsWithPaths); // TODO this should be unique_ptr if possible
+                auto soundsRepository = std::make_unique<SoundsRepository>(this, pathsSortingVector);
+                auto songsModel = std::make_unique<SongsModel>(this, std::move(soundsRepository), labelsWithPaths);
 
-                songsModel->createData([](auto &) {
-                    LOG_ERROR("Callback!");
-                    return true;
-                }); // TODO this should not be here
-                auto provider = std::make_unique<bell_settings::PrewakeUpListItemProvider>(
-                    *prewakeUpSettingsModel, soundsRepository->getSongTitles(), songsModel);
+                auto provider = std::make_unique<bell_settings::PrewakeUpListItemProvider>(*prewakeUpSettingsModel,
+                                                                                           std::move(songsModel));
 
                 auto frontlightModel = std::make_unique<bell_settings::FrontlightModel>(app);
-                auto presenter =
-                    std::make_unique<bell_settings::PrewakeUpWindowPresenter>(std::move(provider),
-                                                                              std::move(prewakeUpSettingsModel),
-                                                                              *audioModel,
-                                                                              std::move(soundsRepository),
-                                                                              std::move(frontlightModel));
+                auto presenter       = std::make_unique<bell_settings::PrewakeUpWindowPresenter>(
+                    std::move(provider), std::move(prewakeUpSettingsModel), *audioModel, std::move(frontlightModel));
                 return std::make_unique<gui::BellSettingsPrewakeUpWindow>(app, std::move(presenter));
             });
 

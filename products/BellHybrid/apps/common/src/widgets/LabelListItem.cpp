@@ -11,7 +11,7 @@ namespace
 
 namespace gui
 {
-    LabelListItem::LabelListItem(ListLabel label) : label{label}
+    LabelListItem::LabelListItem(ListLabel label) : label{std::move(label)}
     {}
 
     ListLabel LabelListItem::getLabel()
@@ -47,5 +47,4 @@ namespace gui
         };
         activeItem = false;
     }
-
 } // namespace gui
