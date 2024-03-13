@@ -13,13 +13,17 @@
 #include <gui/widgets/ListViewEngine.hpp>
 #include <utility>
 
+#include <ListViewWithLabelsItem.hpp>
+#include <Paths.hpp>
+
 namespace app::bell_settings
 {
     using namespace gui;
 
     PrewakeUpListItemProvider::PrewakeUpListItemProvider(AbstractPrewakeUpSettingsModel &settingsModel,
-                                                         std::vector<UTF8> chimeToneRange)
-        : settingsModel{settingsModel}
+                                                         std::vector<UTF8> chimeToneRange,
+                                                         std::shared_ptr<SongsModel> model)
+        : settingsModel{settingsModel}, model{std::move(model)}
     {
         buildListItems(std::move(chimeToneRange));
     }
@@ -50,25 +54,27 @@ namespace app::bell_settings
 
         internalData.emplace_back(chimeDuration);
 
-        auto chimeTone =
-            new list_items::Text(std::move(chimeToneRange),
-                                 settingsModel.getChimeTone(),
-                                 utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_tone"));
-        chimeTone->set_on_value_change_cb([this](const auto &val) {
-            if (onToneChange) {
-                onToneChange(val);
-            }
-        });
-        chimeTone->onEnter = [this, chimeTone]() {
-            if (onToneEnter) {
-                onToneEnter(chimeTone->value());
-            }
-        };
-        chimeTone->onExit = [this, chimeTone]() {
-            if (onToneExit) {
-                onToneExit(chimeTone->value());
-            }
-        };
+        auto chimeTone = new ListViewWithLabelsItem("!!! Lol !!!", model);
+
+        //        auto chimeTone =
+        //            new list_items::Text(std::move(chimeToneRange),
+        //                                 settingsModel.getChimeTone(),
+        //                                 utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_tone"));
+        //        chimeTone->set_on_value_change_cb([this](const auto &val) {
+        //            if (onToneChange) {
+        //                onToneChange(val);
+        //            }
+        //        });
+        //        chimeTone->onEnter = [this, chimeTone]() {
+        //            if (onToneEnter) {
+        //                onToneEnter(chimeTone->value());
+        //            }
+        //        };
+        //        chimeTone->onExit = [this, chimeTone]() {
+        //            if (onToneExit) {
+        //                onToneExit(chimeTone->value());
+        //            }
+        //        };
         internalData.emplace_back(chimeTone);
 
         constexpr auto volumeStep = 1U;

@@ -46,6 +46,8 @@
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 
+#include <common/models/SongsModel.hpp>
+
 namespace app
 {
     ApplicationBellSettings::ApplicationBellSettings(std::string name,
@@ -176,8 +178,23 @@ namespace app
                                                                             std::move(prewakeUpLightDurationModel),
                                                                             std::move(prewakeUpFrontlightModel));
 
-                auto provider         = std::make_unique<bell_settings::PrewakeUpListItemProvider>(
-                    *prewakeUpSettingsModel, soundsRepository->getSongTitles());
+                const app::LabelsWithPaths labelsWithPaths{
+                    {"app_bell_relaxation_sounds", paths::audio::proprietary() / paths::audio::relaxation()}};
+                const auto pathsSortingVector = std::vector<SoundsRepository::PathSorting>{
+                    {paths::audio::proprietary() / paths::audio::relaxation(),
+                     SoundsRepository::SortingBy::TitleAscending}};
+
+                auto soundsRepo = std::make_unique<SoundsRepository>(this, pathsSortingVector);
+                auto songsModel = std::make_shared<SongsModel>(
+                    this, std::move(soundsRepo), labelsWithPaths); // TODO this should be unique_ptr if possible
+
+                songsModel->createData([](auto &) {
+                    LOG_ERROR("Callback!");
+                    return true;
+                }); // TODO this should not be here
+                auto provider = std::make_unique<bell_settings::PrewakeUpListItemProvider>(
+                    *prewakeUpSettingsModel, soundsRepository->getSongTitles(), songsModel);
+
                 auto frontlightModel = std::make_unique<bell_settings::FrontlightModel>(app);
                 auto presenter =
                     std::make_unique<bell_settings::PrewakeUpWindowPresenter>(std::move(provider),

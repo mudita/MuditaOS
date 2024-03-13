@@ -6,6 +6,7 @@
 #include "SettingsListItemProvider.hpp"
 #include "AbstractPrewakeUpSettingsModel.hpp"
 #include <common/models/AbstractSettingsModel.hpp>
+#include <common/models/SongsModel.hpp>
 
 namespace app::list_items
 {
@@ -18,7 +19,10 @@ namespace app::bell_settings
     class PrewakeUpListItemProvider : public SettingsListItemProvider
     {
       public:
-        PrewakeUpListItemProvider(AbstractPrewakeUpSettingsModel &settingsModel, std::vector<UTF8> chimeToneRange);
+        PrewakeUpListItemProvider(
+            AbstractPrewakeUpSettingsModel &settingsModel,
+            std::vector<UTF8> chimeToneRange,
+            std::shared_ptr<SongsModel> model); // TODO chimeToneRange is probably no longer needed
 
         auto getCurrentVolume() -> std::uint8_t;
 
@@ -27,5 +31,6 @@ namespace app::bell_settings
 
         AbstractPrewakeUpSettingsModel &settingsModel;
         app::list_items::NumericWithBar *prewakeUpVolume{nullptr};
+        std::shared_ptr<SongsModel> model;
     };
 } // namespace app::bell_settings
