@@ -4,8 +4,9 @@
 #pragma once
 
 #include "SettingsListItemProvider.hpp"
-#include <common/models/AbstractAlarmSettingsModel.hpp>
+#include "AbstractAlarmSettingsModel.hpp"
 #include <common/models/AbstractSettingsModel.hpp>
+#include <common/models/SongsModel.hpp>
 
 namespace app::list_items
 {
@@ -18,14 +19,16 @@ namespace app::bell_settings
     class AlarmSettingsListItemProvider : public SettingsListItemProvider
     {
       public:
-        AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &settingsModel, std::vector<UTF8> alarmToneRange);
+        AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &settingsModel,
+                                      std::shared_ptr<SongsModel> songsModel);
 
         auto getCurrentVolume() -> std::uint8_t;
 
       private:
-        void buildListItems(std::vector<UTF8> alarmTonesRange);
+        void buildListItems();
 
         AbstractAlarmSettingsModel &settingsModel;
         app::list_items::NumericWithBar *alarmVolume{nullptr};
+        std::shared_ptr<SongsModel> songsModel;
     };
 } // namespace app::bell_settings

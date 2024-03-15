@@ -10,19 +10,20 @@
 #include <common/widgets/list_items/Numeric.hpp>
 #include <common/widgets/list_items/NumericWithBar.hpp>
 #include <apps-common/ApplicationCommon.hpp>
+#include <SongsListViewItem.hpp>
 
 namespace app::bell_settings
 {
     using namespace gui;
 
     AlarmSettingsListItemProvider::AlarmSettingsListItemProvider(AbstractAlarmSettingsModel &settingsModel,
-                                                                 std::vector<UTF8> alarmToneRange)
-        : settingsModel{settingsModel}
+                                                                 std::shared_ptr<SongsModel> songsModel)
+        : settingsModel{settingsModel}, songsModel{std::move(songsModel)}
     {
-        buildListItems(std::move(alarmToneRange));
+        buildListItems();
     }
 
-    void AlarmSettingsListItemProvider::buildListItems(std::vector<UTF8> alarmTonesRange)
+    void AlarmSettingsListItemProvider::buildListItems()
     {
         constexpr auto brightnessMin  = 1U;
         constexpr auto brightnessMax  = 10U;
@@ -30,9 +31,8 @@ namespace app::bell_settings
         constexpr auto itemCount      = 5U;
         internalData.reserve(itemCount);
 
-        auto alarmTone = new list_items::Text(std::move(alarmTonesRange),
-                                              settingsModel.getAlarmTone(),
-                                              utils::translate("app_bell_settings_alarm_settings_tone"));
+        auto alarmTone = new SongsListViewItem(
+            utils::translate("app_bell_settings_alarm_settings_chime"), settingsModel.getAlarmTone(), songsModel);
         alarmTone->set_on_value_change_cb([this](const auto &val) {
             if (onToneChange) {
                 onToneChange(val);
