@@ -100,6 +100,7 @@ set(SOURCES
         queries/multimedia_files/QueryMultimediaFilesGetLimited.cpp
         queries/multimedia_files/QueryMultimediaFilesRemove.cpp
         queries/multimedia_files/QueryMultimediaFilesCount.cpp
+        queries/multimedia_files/QueryMultimediaFilesGetOffset.cpp
         queries/notes/QueryNoteRemove.cpp
         queries/notes/QueryNotesGet.cpp
         queries/notes/QueryNotesGetByText.cpp

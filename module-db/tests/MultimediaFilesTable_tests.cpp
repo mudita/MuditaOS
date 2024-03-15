@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <catch2/catch.hpp>
@@ -12,6 +12,7 @@
 #include <queries/multimedia_files/QueryMultimediaFilesGetLimited.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesRemove.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesCount.hpp>
+#include <queries/multimedia_files/QueryMultimediaFilesGetOffset.hpp>
 
 #include <algorithm>
 using namespace db::multimedia_files;
@@ -455,6 +456,16 @@ TEST_CASE("Multimedia DB tests")
             return result->getCount();
         };
 
+        auto getOffsetQuery = [&](const std::string &folderPath, const std::string &recordPath, SortingBy sorting) {
+            auto query =
+                std::make_shared<db::multimedia_files::query::GetOffsetByPath>(folderPath, recordPath, sorting);
+            auto ret    = multimediaFilesRecordInterface.runQuery(query);
+            auto result = dynamic_cast<db::multimedia_files::query::GetOffsetResult *>(ret.get());
+            REQUIRE(result != nullptr);
+            auto record = result->getResult();
+            return record;
+        };
+
         SECTION("add, get, remove query")
         {
             const auto path = "audio/user";
@@ -664,6 +675,14 @@ TEST_CASE("Multimedia DB tests")
                              artistsList[i].tags.album.title == album.title));
                 }
             }
+        }
+
+        SECTION("Get offset by path")
+        {
+            REQUIRE(getOffsetQuery("user/audio", "user/audio/file1.mp3", SortingBy::TrackIdAscending).offset == 1);
+            REQUIRE(getOffsetQuery("user/audio", "user/audio/file4.mp3", SortingBy::TrackIdAscending).offset == 4);
+            REQUIRE(getOffsetQuery("user", "user/audio/file7.mp3", SortingBy::TrackIdAscending).offset == 7);
+            REQUIRE(getOffsetQuery("user", "user/file3.mp3", SortingBy::TrackIdAscending).offset == 10);
         }
     }
 }

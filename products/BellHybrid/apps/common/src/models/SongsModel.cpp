@@ -63,11 +63,14 @@ namespace app
         });
     }
 
-    auto SongsModel::createData(OnActivateCallback onActivate, OnFocusAcquireCallback onFocusAcquire) -> void
+    auto SongsModel::createData(OnActivateCallback onActivate,
+                                OnFocusAcquireCallback onFocusAcquire,
+                                const std::string &savedPath,
+                                OnOffsetUpdateCallback offsetUpdateCallback) -> void
     {
-        activateCallback     = std::move(onActivate);
+        activateCallback    = std::move(onActivate);
         focusAcquireCallback = std::move(onFocusAcquire);
-        songsRepository->init();
+        songsRepository->init(savedPath, std::move(offsetUpdateCallback));
     }
 
     auto SongsModel::updateRecordsCount() -> void
