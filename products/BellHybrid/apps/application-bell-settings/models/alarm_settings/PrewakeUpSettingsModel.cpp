@@ -23,20 +23,14 @@ namespace app::bell_settings
         return utils::toNumeric(str);
     }
 
-    PrewakeUpChimeToneModel::PrewakeUpChimeToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository)
-        : gui::SettingsModel<UTF8>{app}, soundsRepository{soundsRepository}
-    {}
-
     void PrewakeUpChimeToneModel::setValue(UTF8 value)
     {
-        const auto &path = soundsRepository.titleToPath(value).value_or("");
-        settings.setValue(bell::settings::PrewakeUp::tonePath, path, settings::SettingsScope::Global);
+        settings.setValue(bell::settings::PrewakeUp::tonePath, value, settings::SettingsScope::Global);
     }
 
     UTF8 PrewakeUpChimeToneModel::getValue() const
     {
-        const auto &path = settings.getValue(bell::settings::PrewakeUp::tonePath, settings::SettingsScope::Global);
-        return soundsRepository.pathToTitle(path).value_or("");
+        return settings.getValue(bell::settings::PrewakeUp::tonePath, settings::SettingsScope::Global);
     }
 
     void PrewakeUpChimeVolumeModel::setValue(std::uint8_t value)

@@ -29,7 +29,7 @@ namespace gui
         itemsOnPage     = 0;
         labelAdded      = false;
 
-        ListItem *item = nullptr;
+        ListItem *item;
         while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
             /* If direction is top-to-bottom, add label mark before adding relaxation item. */
             if (direction == listview::Direction::Bottom) {
@@ -64,7 +64,7 @@ namespace gui
     LabelMarkerItem *ListViewWithLabels::createMarkerItem(ListLabel label)
     {
         if (label.has_value()) {
-            const auto labelString = UTF8(utils::translate(label.value()));
+            const auto &labelString = UTF8(utils::translate(label.value()));
             return new LabelMarkerItem(labelString);
         }
         return new LabelMarkerItem(UTF8(""));
@@ -106,7 +106,8 @@ namespace gui
                 }
             }
             else {
-                const auto songsProvider = dynamic_cast<app::SongsModel *>(provider.get());
+                /* This is bad, as it limits usage of this widget to just SongsModel */
+                const auto songsProvider = std::dynamic_pointer_cast<app::SongsModel>(provider);
                 if (songsProvider == nullptr) {
                     break;
                 }
@@ -138,9 +139,8 @@ namespace gui
 
     void ListViewWithLabels::updateState(ListLabel marker)
     {
-        currentMarker = marker;
+        currentMarker = std::move(marker);
         itemsOnPage++;
         labelAdded = true;
     }
-
 } // namespace gui

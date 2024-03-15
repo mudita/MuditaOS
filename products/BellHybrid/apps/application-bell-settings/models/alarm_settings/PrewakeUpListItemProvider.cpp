@@ -8,23 +8,24 @@
 #include <common/widgets/list_items/Numeric.hpp>
 #include <common/widgets/list_items/NumericWithBar.hpp>
 #include <common/widgets/ListItems.hpp>
-#include <common/widgets/list_items/Text.hpp>
-#include <apps-common/ApplicationCommon.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
 #include <utility>
+
+#include <SongsListViewItem.hpp>
+#include <Paths.hpp>
 
 namespace app::bell_settings
 {
     using namespace gui;
 
     PrewakeUpListItemProvider::PrewakeUpListItemProvider(AbstractPrewakeUpSettingsModel &settingsModel,
-                                                         std::vector<UTF8> chimeToneRange)
-        : settingsModel{settingsModel}
+                                                         std::shared_ptr<SongsModel> songsModel)
+        : settingsModel{settingsModel}, songsModel{std::move(songsModel)}
     {
-        buildListItems(std::move(chimeToneRange));
+        buildListItems();
     }
 
-    void PrewakeUpListItemProvider::buildListItems(std::vector<UTF8> chimeToneRange)
+    void PrewakeUpListItemProvider::buildListItems()
     {
         constexpr auto brightnessMin  = 1U;
         constexpr auto brightnessMax  = 10U;
@@ -32,12 +33,11 @@ namespace app::bell_settings
         constexpr auto itemCount      = 5U;
         internalData.reserve(itemCount);
 
-        const std::string minStr = utils::translate("common_minute_short");
-        auto chimeDuration       = new list_items::NumberWithSuffix(
+        auto chimeDuration = new list_items::NumberWithSuffix(
             list_items::NumberWithSuffix::spinner_type::range{0, 5, 10, 15},
             settingsModel.getChimeDuration(),
-            utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_top_description"),
-            utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_bottom_description"));
+            utils::translate("app_bell_settings_alarm_settings_prewake_up_time_top_description"),
+            utils::translate("app_bell_settings_alarm_settings_prewake_up_time_bottom_description"));
 
         chimeDuration->onProceed = [chimeDuration, this]() {
             if (chimeDuration->value() == 0) {
@@ -51,14 +51,16 @@ namespace app::bell_settings
         internalData.emplace_back(chimeDuration);
 
         auto chimeTone =
-            new list_items::Text(std::move(chimeToneRange),
-                                 settingsModel.getChimeTone(),
-                                 utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_tone"));
+            new SongsListViewItem(utils::translate("app_bell_settings_alarm_settings_prewake_up_chime_top_description"),
+                                  settingsModel.getChimeTone(),
+                                  songsModel);
+
         chimeTone->set_on_value_change_cb([this](const auto &val) {
             if (onToneChange) {
                 onToneChange(val);
             }
         });
+
         chimeTone->onEnter = [this, chimeTone]() {
             if (onToneEnter) {
                 onToneEnter(chimeTone->value());

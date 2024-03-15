@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellBaseLayout.hpp"
@@ -6,7 +6,7 @@
 
 namespace gui
 {
-    BellBaseLayout::BellBaseLayout(Item *parent, Position x, Position y, Length w, Length h, bool withSideArrows)
+    BellBaseLayout::BellBaseLayout(Item *parent, Position x, Position y, Length w, Length h, LayoutType type)
         : VThreeBox(parent, x, y, w, h)
     {
         setMinimumSize(style::bell_base_layout::w, style::bell_base_layout::h);
@@ -34,7 +34,7 @@ namespace gui
 
         resizeItems();
 
-        if (withSideArrows) {
+        if (type == LayoutType::WithArrows) {
             addSideArrows();
         }
     }

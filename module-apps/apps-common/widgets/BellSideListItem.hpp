@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,13 +10,14 @@
 namespace gui
 {
     class TextFixedSize;
+
     class BellSideListItem : public ListItem
     {
       public:
         void setBottomDescriptionText(const std::string &description);
 
       protected:
-        BellSideListItem();
+        BellSideListItem(BellBaseLayout::LayoutType type = BellBaseLayout::LayoutType::WithArrows);
         void setupBottomTextBox(const std::string &description);
         void setupTopTextBox(const std::string &description);
 

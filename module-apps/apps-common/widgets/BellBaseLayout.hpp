@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -29,14 +29,24 @@ namespace gui
     class BellBaseLayout : public VThreeBox<VBox, VBox, VBox>
     {
       public:
+        enum class LayoutType
+        {
+            WithArrows,
+            WithoutArrows
+        };
+
         enum class Arrow
         {
             Left,
             Right
         };
 
-        explicit BellBaseLayout(
-            Item *parent, Position x = 0, Position y = 0, Length w = 0, Length h = 0, bool withSideArrows = true);
+        explicit BellBaseLayout(Item *parent,
+                                Position x      = 0,
+                                Position y      = 0,
+                                Length w        = 0,
+                                Length h        = 0,
+                                LayoutType type = LayoutType::WithArrows);
 
         [[nodiscard]] Item *getCenterBox() const noexcept;
         void resizeCenter();
@@ -52,5 +62,4 @@ namespace gui
 
         void addSideArrows();
     };
-
 } /* namespace gui */

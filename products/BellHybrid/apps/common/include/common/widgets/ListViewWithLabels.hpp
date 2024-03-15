@@ -40,5 +40,4 @@ namespace gui
         std::uint32_t itemsOnPage{0};
         bool labelAdded{false};
     };
-
 } // namespace gui

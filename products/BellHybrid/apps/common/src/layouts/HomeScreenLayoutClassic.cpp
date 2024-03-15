@@ -33,7 +33,8 @@ namespace gui
 {
     HomeScreenLayoutClassic::HomeScreenLayoutClassic(std::string name)
         : BaseHomeScreenLayoutProvider(std::move(name)),
-          BellBaseLayout(nullptr, 0, 0, style::window_width, style::window_height, false)
+          BellBaseLayout(
+              nullptr, 0, 0, style::window_width, style::window_height, BellBaseLayout::LayoutType::WithoutArrows)
     {
         buildInterface();
     }
