@@ -41,7 +41,12 @@ namespace gui
         AppWindow::buildInterface();
 
         statusBar->setVisible(false);
-        auto body = new gui::BellBaseLayout(this, 0, 0, style::bell_base_layout::w, style::bell_base_layout::h, false);
+        auto body = new gui::BellBaseLayout(this,
+                                            0,
+                                            0,
+                                            style::bell_base_layout::w,
+                                            style::bell_base_layout::h,
+                                            BellBaseLayout::LayoutType::WithoutArrows);
         auto vBox =
             new VBox(body->getCenterBox(), 0, 0, style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
         vBox->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));

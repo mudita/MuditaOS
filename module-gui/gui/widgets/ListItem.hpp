@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,10 +7,8 @@
 
 namespace gui
 {
-
     class ListItem : public Rect
     {
-
       public:
         bool deleteByList = true;
         void accept(GuiVisitor &visitor) override;
@@ -29,4 +27,4 @@ namespace gui
         std::function<void(std::shared_ptr<T> record)> onLoadCallback               = nullptr;
         std::function<bool(std::shared_ptr<T> record)> onCheckUnsavedChangeCallback = nullptr;
     };
-} /* namespace gui */
+} // namespace gui

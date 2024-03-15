@@ -23,13 +23,10 @@ namespace app::bell_settings
     class PrewakeUpChimeToneModel : public gui::SettingsModel<UTF8>
     {
       public:
-        PrewakeUpChimeToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository);
+        using SettingsModel::SettingsModel;
 
         void setValue(UTF8 value) override;
         UTF8 getValue() const override;
-
-      private:
-        SimpleSoundsRepository &soundsRepository;
     };
 
     class PrewakeUpChimeVolumeModel : public gui::AbstractSettingsModel<std::uint8_t>
