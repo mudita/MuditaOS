@@ -54,7 +54,6 @@ target_sources(application-bell-settings
         widgets/DateSetListItem.cpp
         widgets/TimeSetListItem.cpp
         widgets/AboutYourBellListItem.cpp
-        widgets/DialogYesNo.cpp
         widgets/SongsListViewItem.cpp
 
         windows/BellSettingsBedtimeToneWindow.cpp
@@ -98,7 +97,6 @@ target_sources(application-bell-settings
         widgets/DateFormatSetListItem.hpp
         widgets/TimeSetListItem.hpp
         widgets/AboutYourBellListItem.hpp
-        widgets/DialogYesNo.hpp
         widgets/SongsListViewItem.hpp
 
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp

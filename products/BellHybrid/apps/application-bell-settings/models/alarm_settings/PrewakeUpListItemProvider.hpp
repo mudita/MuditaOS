@@ -4,9 +4,11 @@
 #pragma once
 
 #include "SettingsListItemProvider.hpp"
-#include "AbstractPrewakeUpSettingsModel.hpp"
-#include <common/models/AbstractSettingsModel.hpp>
-#include <common/models/SongsModel.hpp>
+
+namespace app
+{
+    class SongsModel;
+}
 
 namespace app::list_items
 {
@@ -16,6 +18,7 @@ namespace app::list_items
 namespace app::bell_settings
 {
     class AbstractFrontlightModel;
+    class AbstractPrewakeUpSettingsModel;
 
     class PrewakeUpListItemProvider : public SettingsListItemProvider
     {
