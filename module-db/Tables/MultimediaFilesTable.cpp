@@ -13,8 +13,8 @@ namespace
     std::string getSorting(db::multimedia_files::SortingBy sorting)
     {
         switch (sorting) {
-        case db::multimedia_files::SortingBy::IdAscending:
-            return "_id ASC";
+        case db::multimedia_files::SortingBy::TrackIdAscending:
+            return "track ASC";
         case db::multimedia_files::SortingBy::TitleAscending:
         default:
             return "title ASC";

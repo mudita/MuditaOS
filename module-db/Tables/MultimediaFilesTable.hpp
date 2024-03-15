@@ -73,7 +73,7 @@ namespace db::multimedia_files
     enum class SortingBy
     {
         TitleAscending,
-        IdAscending
+        TrackIdAscending
     };
 
     class MultimediaFilesTable : public Table<TableRow, TableFields>

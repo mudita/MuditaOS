@@ -1,7 +1,7 @@
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <common/models/AlarmSettingsModel.hpp>
+#include "AlarmSettingsModel.hpp"
 #include <db/SystemSettings.hpp>
 
 namespace app::bell_settings
@@ -18,20 +18,14 @@ namespace app::bell_settings
         }
     }
 
-    AlarmToneModel::AlarmToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository)
-        : gui::SettingsModel<UTF8>{app}, soundsRepository{soundsRepository}
-    {}
-
     void AlarmToneModel::setValue(UTF8 value)
     {
-        const auto &path = soundsRepository.titleToPath(value).value_or("");
-        settings.setValue(bell::settings::Alarm::tonePath, path, settings::SettingsScope::Global);
+        settings.setValue(bell::settings::Alarm::tonePath, value, settings::SettingsScope::Global);
     }
 
     UTF8 AlarmToneModel::getValue() const
     {
-        const auto &path = settings.getValue(bell::settings::Alarm::tonePath, settings::SettingsScope::Global);
-        return soundsRepository.pathToTitle(path).value_or("");
+        return settings.getValue(bell::settings::Alarm::tonePath, settings::SettingsScope::Global);
     }
 
     void AlarmVolumeModel::setValue(std::uint8_t value)
