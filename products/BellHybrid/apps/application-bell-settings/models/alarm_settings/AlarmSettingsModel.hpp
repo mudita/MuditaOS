@@ -6,21 +6,16 @@
 #include "AbstractAlarmSettingsModel.hpp"
 #include <common/models/SettingsModel.hpp>
 #include <common/models/AudioModel.hpp>
-#include <common/data/FrontlightUtils.hpp>
-#include <common/SoundsRepository.hpp>
 
 namespace app::bell_settings
 {
     class AlarmToneModel : public gui::SettingsModel<UTF8>
     {
       public:
-        AlarmToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository);
+        using SettingsModel::SettingsModel;
 
         void setValue(UTF8 value) override;
         UTF8 getValue() const override;
-
-      private:
-        SimpleSoundsRepository &soundsRepository;
     };
 
     class AlarmVolumeModel : public gui::AbstractSettingsModel<std::uint8_t>

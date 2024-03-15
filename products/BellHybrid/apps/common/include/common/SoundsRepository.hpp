@@ -57,7 +57,7 @@ class SoundsRepository : public AbstractSoundsRepository, public app::AsyncCallb
   public:
     enum class SortingBy
     {
-        IdAscending,
+        TrackIdAscending,
         TitleAscending
     };
     struct PathSorting

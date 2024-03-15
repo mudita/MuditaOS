@@ -115,8 +115,6 @@ target_sources(application-bell-common
         include/common/models/UserSessionModel.hpp
         include/common/models/AudioModel.hpp
         include/common/models/FrontlightModel.hpp
-        include/common/models/AlarmSettingsModel.hpp
-        include/common/models/AbstractAlarmSettingsModel.hpp
         include/common/models/LayoutModel.hpp
         include/common/models/LowBatteryInfoModel.hpp
         include/common/models/QuoteModel.hpp

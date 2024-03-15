@@ -49,7 +49,6 @@ namespace app::bell_settings
         AlarmSettingsPresenter(std::unique_ptr<AlarmSettingsListItemProvider> &&provider,
                                std::unique_ptr<AbstractAlarmSettingsModel> &&settingsModel,
                                AbstractAudioModel &audioModel,
-                               std::unique_ptr<AbstractSimpleSoundsRepository> &&soundsRepository,
                                std::unique_ptr<AbstractFrontlightModel> &&frontlight);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
@@ -65,7 +64,7 @@ namespace app::bell_settings
         std::shared_ptr<AlarmSettingsListItemProvider> provider;
         std::unique_ptr<AbstractAlarmSettingsModel> settingsModel;
         AbstractAudioModel &audioModel;
-        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository;
         std::unique_ptr<AbstractFrontlightModel> frontlight;
+        UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings
