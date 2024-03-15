@@ -26,7 +26,7 @@ namespace gui
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, true);
+        body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height);
 
         auto topMessage = new TextFixedSize(body->firstBox);
         topMessage->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);

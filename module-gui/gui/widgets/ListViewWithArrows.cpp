@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ListViewWithArrows.hpp"
 #include "TextFixedSize.hpp"
+#include "ImageBox.hpp"
 #include <InputEvent.hpp>
 
 namespace gui
@@ -140,6 +141,11 @@ namespace gui
         listOverlay->firstBox->resizeItems();
     }
 
+    void ListViewWithArrows::setListTitleFont(const UTF8 &fontName)
+    {
+        titleBody->setFont(fontName);
+    }
+
     void ListViewWithArrows::applyScrollCallbacks()
     {
         updateScrollCallback = [this](ListViewScrollUpdateData data) {
@@ -214,5 +220,4 @@ namespace gui
 
         return true;
     }
-
 } /* namespace gui */

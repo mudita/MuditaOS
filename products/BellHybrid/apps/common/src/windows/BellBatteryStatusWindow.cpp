@@ -49,7 +49,8 @@ namespace gui
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, false);
+        body = new BellBaseLayout(
+            this, 0, 0, style::window_width, style::window_height, BellBaseLayout::LayoutType::WithoutArrows);
 
         topDescription = new TextFixedSize(body->firstBox);
         topDescription->setMinimumSize(style::bell_base_layout::outer_layouts_w,

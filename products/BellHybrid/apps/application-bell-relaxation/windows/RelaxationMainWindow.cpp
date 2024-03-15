@@ -40,7 +40,7 @@ namespace gui
         songList->setListTitle(utils::translate("app_bellmain_relaxation"));
 
         auto storedCallback     = songList->inputCallback;
-        songList->inputCallback = [&, storedCallback](Item &item, const InputEvent &event) {
+        songList->inputCallback = [storedCallback](Item &item, const InputEvent &event) {
             return storedCallback(item, invertNavigationDirection(event));
         };
         setFocusItem(songList);
@@ -68,11 +68,11 @@ namespace gui
     {
         songList->rebuildList(gui::listview::RebuildType::InPlace);
     }
+
     void RelaxationMainWindow::rebuild()
     {
         presenter->updateRecordsCount();
         songList->reset();
         songList->rebuildList(gui::listview::RebuildType::Full);
     }
-
 } // namespace gui

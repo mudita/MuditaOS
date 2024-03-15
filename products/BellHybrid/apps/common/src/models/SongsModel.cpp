@@ -16,10 +16,10 @@ namespace app
           application(application), songsRepository{std::move(soundsRepository)}, pathPrefixes{pathPrefixes}
     {}
 
-    void SongsModel::createData(OnActivateCallback callback)
+    void SongsModel::createData(OnActivateCallback onActivate, OnFocusAcquireCallback onFocusAcquire)
     {
-        activateCallback = callback;
-
+        activateCallback    = std::move(onActivate);
+        focusAcquireCallback = std::move(onFocusAcquire);
         songsRepository->init();
     }
 
@@ -40,30 +40,33 @@ namespace app
 
     bool SongsModel::nextRecordExist(gui::Order order)
     {
-        const auto getOppositeOrder = [order]() {
-            return order == gui::Order::Next ? gui::Order::Previous : gui::Order::Next;
-        };
-
         auto exist = getRecord(order) != nullptr;
-        getRecord(getOppositeOrder());
+        getRecord(~order);
         return exist;
     }
 
     gui::ListItem *SongsModel::getItem(gui::Order order)
     {
         const auto sound = getRecord(order);
-        if (!sound) {
+        if (sound == nullptr) {
             return nullptr;
         }
+
         auto item = gui::option::LabelOption{getLabelFromPath(sound->fileInfo.path),
                                              sound->tags.title,
-                                             [=]([[maybe_unused]] gui::Item &item) {
-                                                 activateCallback(*sound);
+                                             [this, sound]([[maybe_unused]] gui::Item &item) {
+                                                 if (activateCallback) {
+                                                     return activateCallback(*sound);
+                                                 }
                                                  return true;
                                              },
-                                             []([[maybe_unused]] gui::Item &item) { return true; },
+                                             [this, sound](gui::Item &item) {
+                                                 if (focusAcquireCallback && item.focus) {
+                                                     return focusAcquireCallback(*sound);
+                                                 }
+                                                 return true;
+                                             },
                                              nullptr};
-
         return item.build();
     }
 
@@ -101,5 +104,4 @@ namespace app
         }
         return std::nullopt;
     }
-
 } // namespace app
