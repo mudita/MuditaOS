@@ -12,6 +12,7 @@
 #include "models/alarm_settings/PrewakeUpSettingsModel.hpp"
 #include "models/alarm_settings/SnoozeListItemProvider.hpp"
 #include "models/alarm_settings/SnoozeSettingsModel.hpp"
+#include "models/alarm_settings/AlarmSettingsModel.hpp"
 #include "presenter/BedtimeSettingsPresenter.hpp"
 #include "presenter/AboutYourBellWindowPresenter.hpp"
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
@@ -42,7 +43,6 @@
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/models/AudioModel.hpp>
 #include <common/models/TimeModel.hpp>
-#include <common/models/AlarmSettingsModel.hpp>
 #include <common/models/SongsModel.hpp>
 #include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
@@ -176,7 +176,7 @@ namespace app
 
                 const auto &pathSorting =
                     SoundsRepository::PathSorting{paths::audio::proprietary() / paths::audio::preWakeup(),
-                                                  SoundsRepository::SortingBy::TitleAscending};
+                                                  SoundsRepository::SortingBy::TrackIdAscending};
                 auto soundsRepository = std::make_unique<SoundsRepository>(this, pathSorting);
                 auto songsModel       = std::make_unique<SongsModel>(this, std::move(soundsRepository));
 
@@ -221,9 +221,18 @@ namespace app
         windowsFactory.attach(
             gui::BellSettingsAlarmSettingsWindow::name,
             [this](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
-                auto soundsRepository =
-                    std::make_unique<SimpleSoundsRepository>(paths::audio::proprietary() / paths::audio::alarm());
-                auto alarmToneModel       = std::make_unique<bell_settings::AlarmToneModel>(this, *soundsRepository);
+                const auto &pathSorting = std::vector<SoundsRepository::PathSorting>{
+                    {paths::audio::proprietary() / paths::audio::alarm(),
+                     SoundsRepository::SortingBy::TrackIdAscending},
+                    {paths::audio::userApp() / paths::audio::alarm(), SoundsRepository::SortingBy::TitleAscending}};
+                const app::LabelsWithPaths labelsWithPaths{
+                    {"app_bell_settings_alarm_settings_sounds", paths::audio::proprietary() / paths::audio::alarm()},
+                    {"app_bell_settings_alarm_settings_custom_sounds",
+                     paths::audio::userApp() / paths::audio::alarm()}};
+                auto soundsRepository = std::make_unique<SoundsRepository>(this, pathSorting);
+                auto songsModel = std::make_unique<SongsModel>(this, std::move(soundsRepository), labelsWithPaths);
+
+                auto alarmToneModel       = std::make_unique<bell_settings::AlarmToneModel>(this);
                 auto alarmVolumeModel     = std::make_unique<bell_settings::AlarmVolumeModel>(*audioModel);
                 auto alarmFadeOnOffModel  = std::make_unique<bell_settings::AlarmFadeOnOffModel>(this);
                 auto alarmLightOnOffModel = std::make_unique<bell_settings::AlarmLightOnOffModel>(this);
@@ -236,12 +245,11 @@ namespace app
                                                                         std::move(alarmFrontlightModel));
 
                 auto frontlightModel  = std::make_unique<bell_settings::FrontlightModel>(app);
-                auto provider         = std::make_unique<bell_settings::AlarmSettingsListItemProvider>(
-                    *alarmSettingsModel, soundsRepository->getSongTitles());
+                auto provider  = std::make_unique<bell_settings::AlarmSettingsListItemProvider>(*alarmSettingsModel,
+                                                                                               std::move(songsModel));
                 auto presenter = std::make_unique<bell_settings::AlarmSettingsPresenter>(std::move(provider),
                                                                                          std::move(alarmSettingsModel),
                                                                                          *audioModel,
-                                                                                         std::move(soundsRepository),
                                                                                          std::move(frontlightModel));
                 return std::make_unique<gui::BellSettingsAlarmSettingsWindow>(app, std::move(presenter));
             });

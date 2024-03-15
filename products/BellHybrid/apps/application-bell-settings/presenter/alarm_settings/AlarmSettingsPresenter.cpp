@@ -9,28 +9,31 @@ namespace app::bell_settings
     AlarmSettingsPresenter::AlarmSettingsPresenter(std::unique_ptr<AlarmSettingsListItemProvider> &&provider,
                                                    std::unique_ptr<AbstractAlarmSettingsModel> &&settingsModel,
                                                    AbstractAudioModel &audioModel,
-                                                   std::unique_ptr<AbstractSimpleSoundsRepository> &&soundsRepository,
                                                    std::unique_ptr<AbstractFrontlightModel> &&frontlight)
         : provider{std::move(provider)}, settingsModel{std::move(settingsModel)}, audioModel{audioModel},
-          soundsRepository{std::move(soundsRepository)}, frontlight{std::move(frontlight)}
+          frontlight{std::move(frontlight)}
     {
 
         auto playSound = [this](const UTF8 &val) {
+            currentSoundPath = val;
             this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::Alarm);
-            this->audioModel.play(
-                this->soundsRepository->titleToPath(val).value_or(""), AbstractAudioModel::PlaybackType::Alarm, {});
+            this->audioModel.play(currentSoundPath, AbstractAudioModel::PlaybackType::Alarm, {});
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
 
         this->provider->onToneEnter  = playSound;
+        this->provider->onToneExit   = [this](const auto &) { stopSound(); };
         this->provider->onToneChange = playSound;
 
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
-        this->provider->onVolumeChange = [this](const auto &val) {
+        this->provider->onVolumeChange = [this, playSound](const auto &val) {
             this->audioModel.setVolume(
                 val, AbstractAudioModel::PlaybackType::Alarm, audio::VolumeUpdateType::SkipUpdateDB);
+            if (this->audioModel.hasPlaybackFinished()) {
+                playSound(currentSoundPath);
+            }
         };
 
         auto setBrightness = [this](const auto &brightness) {

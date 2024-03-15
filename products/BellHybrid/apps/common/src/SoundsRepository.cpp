@@ -34,8 +34,8 @@ namespace
     constexpr db::multimedia_files::SortingBy transformSorting(SoundsRepository::SortingBy sorting)
     {
         switch (sorting) {
-        case SoundsRepository::SortingBy::IdAscending:
-            return db::multimedia_files::SortingBy::IdAscending;
+        case SoundsRepository::SortingBy::TrackIdAscending:
+            return db::multimedia_files::SortingBy::TrackIdAscending;
         case SoundsRepository::SortingBy::TitleAscending:
         default:
             return db::multimedia_files::SortingBy::TitleAscending;
