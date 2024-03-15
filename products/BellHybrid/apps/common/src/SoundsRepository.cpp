@@ -5,6 +5,7 @@
 
 #include <module-db/queries/multimedia_files/QueryMultimediaFilesGetLimited.hpp>
 #include <module-db/queries/multimedia_files/QueryMultimediaFilesCount.hpp>
+#include <module-db/queries/multimedia_files/QueryMultimediaFilesGetOffset.hpp>
 #include <AsyncTask.hpp>
 #include <algorithm>
 
@@ -13,6 +14,7 @@ namespace fs = std::filesystem;
 namespace
 {
     constexpr auto allowedExtensions = {".wav", ".mp3", ".flac"};
+    constexpr auto defaultOffset{0};
 
     constexpr std::uint32_t calculateOffset(std::uint32_t offset, std::uint32_t filesCount)
     {
@@ -107,9 +109,10 @@ SoundsRepository::SoundsRepository(app::ApplicationCommon *application, const st
     }
 }
 
-void SoundsRepository::init()
+void SoundsRepository::init(const std::string &savedPath, OnOffsetUpdateCallback offsetUpdateCallback)
 {
     updateFilesCount();
+    updateOffsetFromSavedPath(savedPath, std::move(offsetUpdateCallback));
 }
 
 void SoundsRepository::getMusicFiles(std::uint32_t offset,
@@ -211,4 +214,58 @@ bool SoundsRepository::updateCountCallback(const std::uint32_t id, const std::ui
         return true;
     }
     return false;
+}
+
+void SoundsRepository::updateOffsetFromSavedPath(const std::string &savedPath,
+                                                 OnOffsetUpdateCallback offsetUpdateCallback)
+{
+    if (offsetUpdateCallback == nullptr) {
+        return;
+    }
+    const auto path = getPathDetails(savedPath);
+    if (!path.has_value()) {
+        offsetUpdateCallback(defaultOffset);
+        return;
+    }
+
+    auto query = std::make_unique<db::multimedia_files::query::GetOffsetByPath>(
+        path->prefix, savedPath, transformSorting(path->sorting));
+    auto task = app::AsyncQuery::createFromQuery(std::move(query), db::Interface::Name::MultimediaFiles);
+    task->setCallback([this, offsetUpdateCallback, savedPath](auto response) {
+        auto result = dynamic_cast<db::multimedia_files::query::GetOffsetResult *>(response);
+        if (result == nullptr || result->getResult().path != savedPath) {
+            offsetUpdateCallback(defaultOffset);
+            return false;
+        }
+        const auto calculatedOffset = calculateOffsetFromDB(result->getResult().offset, savedPath);
+        offsetUpdateCallback(calculatedOffset.has_value() ? calculatedOffset.value() : defaultOffset);
+        return true;
+    });
+    task->execute(application, this);
+}
+
+std::optional<SoundsRepository::PathDetails> SoundsRepository::getPathDetails(const std::string &songPath)
+{
+    for (const auto &path : paths) {
+        if (songPath.find(path.prefix) != std::string::npos) {
+            return path;
+        }
+    }
+    return std::nullopt;
+}
+
+std::optional<std::uint32_t> SoundsRepository::calculateOffsetFromDB(std::uint32_t offset, const std::string songPath)
+{
+    // the offset returned by the database is incremented from 1,
+    // while the offset used in listView is from 0
+    if (offset > 0) {
+        offset--;
+    }
+    for (const auto &path : paths) {
+        if (songPath.find(path.prefix) != std::string::npos) {
+            return offset;
+        }
+        offset += path.count;
+    }
+    return std::nullopt;
 }

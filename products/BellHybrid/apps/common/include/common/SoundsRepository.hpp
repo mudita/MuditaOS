@@ -40,10 +40,11 @@ class AbstractSoundsRepository
   public:
     using OnGetMusicFilesListCallback =
         std::function<bool(const std::vector<db::multimedia_files::MultimediaFilesRecord> &, std::uint32_t)>;
+    using OnOffsetUpdateCallback = std::function<bool(std::uint32_t offset)>;
 
     virtual ~AbstractSoundsRepository() noexcept = default;
 
-    virtual void init()                                                     = 0;
+    virtual void init(const std::string &savedPath, OnOffsetUpdateCallback offsetUpdateCallback) = 0;
     virtual void getMusicFiles(std::uint32_t offset,
                                std::uint32_t limit,
                                const OnGetMusicFilesListCallback &callback) = 0;
@@ -68,7 +69,7 @@ class SoundsRepository : public AbstractSoundsRepository, public app::AsyncCallb
 
     SoundsRepository(app::ApplicationCommon *application, const PathSorting &path);
     SoundsRepository(app::ApplicationCommon *application, const std::vector<PathSorting> &pathsVector);
-    void init() override;
+    void init(const std::string &savedPath = "", OnOffsetUpdateCallback offsetUpdateCallback = nullptr) override;
     void getMusicFiles(std::uint32_t offset,
                        std::uint32_t limit,
                        const OnGetMusicFilesListCallback &viewUpdateCallback) override;
@@ -96,4 +97,7 @@ class SoundsRepository : public AbstractSoundsRepository, public app::AsyncCallb
                        const std::uint32_t offset,
                        const std::uint32_t limit,
                        const OnGetMusicFilesListCallback &viewUpdateCallback);
+    std::optional<PathDetails> getPathDetails(const std::string &songPath);
+    void updateOffsetFromSavedPath(const std::string &savedPath, OnOffsetUpdateCallback offsetUpdateCallback);
+    std::optional<std::uint32_t> calculateOffsetFromDB(std::uint32_t offset, const std::string songPath);
 };

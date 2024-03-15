@@ -386,4 +386,31 @@ namespace db::multimedia_files
 
         return (*retQuery)[0].getUInt32();
     }
+
+    auto MultimediaFilesTable::getOffsetOfSortedRecordByPath(const std::string &folderPath,
+                                                             const std::string &recordPath,
+                                                             SortingBy sorting) -> SortedRecord
+    {
+        const std::string query = "SELECT * FROM ("
+                                  "      SELECT"
+                                  "          ROW_NUMBER () OVER ("
+                                  "              ORDER BY " +
+                                  getSorting(sorting) +
+                                  "          ) offset,"
+                                  "          path"
+                                  "      FROM"
+                                  "          files"
+                                  "      WHERE path LIKE '" +
+                                  folderPath + "%%'" +
+                                  "  )"
+                                  "  WHERE"
+                                  "      path='" +
+                                  recordPath + "'";
+
+        std::unique_ptr<QueryResult> retQuery = db->query(query.c_str());
+        if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+            return SortedRecord{.path = recordPath, .offset = 0};
+        }
+        return SortedRecord{.path = (*retQuery)[1].getString(), .offset = (*retQuery)[0].getUInt32()};
+    }
 } // namespace db::multimedia_files
