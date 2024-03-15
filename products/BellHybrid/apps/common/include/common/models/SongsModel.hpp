@@ -20,12 +20,15 @@ namespace app
             std::function<bool(const db::multimedia_files::MultimediaFilesRecord &selectedSound)>;
         using OnFocusAcquireCallback =
             std::function<bool(const db::multimedia_files::MultimediaFilesRecord &focusedSound)>;
+        using OnOffsetUpdateCallback = AbstractSoundsRepository::OnOffsetUpdateCallback;
 
         explicit SongsProvider(ApplicationCommon *application);
         virtual ~SongsProvider() = default;
 
-        virtual auto createData(OnActivateCallback activateCallback, OnFocusAcquireCallback focusChangeCallback)
-            -> void = 0;
+        virtual auto createData(OnActivateCallback activateCallback,
+                                OnFocusAcquireCallback focusChangeCallback,
+                                const std::string &savedPath,
+                                OnOffsetUpdateCallback offsetUpdateCallback) -> void = 0;
     };
 
     class SongsModel : public SongsProvider
@@ -44,8 +47,10 @@ namespace app
 
         auto requestRecords(std::uint32_t offset, std::uint32_t limit) -> void override;
 
-        auto createData(OnActivateCallback activateCallback        = nullptr,
-                        OnFocusAcquireCallback focusChangeCallback = nullptr) -> void override;
+        auto createData(OnActivateCallback activateCallback         = nullptr,
+                        OnFocusAcquireCallback focusChangeCallback  = nullptr,
+                        const std::string &savedPath                = "",
+                        OnOffsetUpdateCallback offsetUpdateCallback = nullptr) -> void override;
         auto updateRecordsCount() -> void;
         auto nextRecordExists(gui::Order order) -> bool;
 

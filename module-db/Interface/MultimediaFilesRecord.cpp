@@ -11,6 +11,7 @@
 #include <queries/multimedia_files/QueryMultimediaFilesGetLimited.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesRemove.hpp>
 #include <queries/multimedia_files/QueryMultimediaFilesCount.hpp>
+#include <queries/multimedia_files/QueryMultimediaFilesGetOffset.hpp>
 
 namespace db::multimedia_files
 {
@@ -83,6 +84,9 @@ namespace db::multimedia_files
         }
         if (typeid(*query) == typeid(query::GetCountForPath)) {
             return runQueryImplGetCountForPath(std::static_pointer_cast<query::GetCountForPath>(query));
+        }
+        if (typeid(*query) == typeid(query::GetOffsetByPath)) {
+            return runQueryImplGetOffsetByPath(std::static_pointer_cast<query::GetOffsetByPath>(query));
         }
         return nullptr;
     }
@@ -259,7 +263,7 @@ namespace db::multimedia_files
     {
         const auto records =
             database->files.getLimitOffsetByPaths(query->paths, query->offset, query->limit, query->sorting);
-        auto response      = std::make_unique<query::GetLimitedResult>(records, database->files.count(query->paths));
+        auto response = std::make_unique<query::GetLimitedResult>(records, database->files.count(query->paths));
         response->setRequestQuery(query);
 
         return response;
@@ -279,6 +283,16 @@ namespace db::multimedia_files
     {
         const auto ret = database->files.count(std::vector{query->path});
         auto response  = std::make_unique<query::GetCountResult>(ret);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    std::unique_ptr<db::multimedia_files::query::GetOffsetResult> MultimediaFilesRecordInterface::
+        runQueryImplGetOffsetByPath(const std::shared_ptr<db::multimedia_files::query::GetOffsetByPath> &query)
+    {
+        const auto ret =
+            database->files.getOffsetOfSortedRecordByPath(query->folderPath, query->recordPath, query->sorting);
+        auto response = std::make_unique<query::GetOffsetResult>(ret);
         response->setRequestQuery(query);
         return response;
     }

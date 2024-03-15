@@ -52,6 +52,12 @@ namespace db::multimedia_files
         auto isValid() const -> bool;
     };
 
+    struct SortedRecord
+    {
+        std::string path{};
+        std::uint32_t offset{};
+    };
+
     enum class TableFields
     {
         path,
@@ -116,6 +122,10 @@ namespace db::multimedia_files
 
         /// @note entry.ID is skipped
         bool addOrUpdate(TableRow entry, std::string oldPath = "");
+
+        auto getOffsetOfSortedRecordByPath(const std::string &folderPath,
+                                           const std::string &recordPath,
+                                           SortingBy sorting = SortingBy::TitleAscending) -> SortedRecord;
 
       private:
         auto getFieldName(TableFields field) -> std::string;

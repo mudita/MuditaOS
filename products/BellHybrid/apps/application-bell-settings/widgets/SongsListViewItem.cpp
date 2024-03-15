@@ -43,10 +43,16 @@ namespace gui
             onValueChange(record.fileInfo.path);
             return true;
         };
+        auto onOffsetUpdateCallback = [this](std::uint32_t offset) {
+            list->rebuildList(listview::RebuildType::OnPageElement, offset);
+            return true;
+        };
 
         setValue();
-        this->songsModel->createData(onListItemActivate, onListItemFocusAcquire);
-        list->rebuildList(listview::RebuildType::Full);
+        this->songsModel->createData(std::move(onListItemActivate),
+                                     std::move(onListItemFocusAcquire),
+                                     this->settingsModel.getValue(),
+                                     std::move(onOffsetUpdateCallback));
     }
 
     auto SongsListViewItem::value() const -> UTF8
