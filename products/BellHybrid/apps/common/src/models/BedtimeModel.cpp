@@ -61,20 +61,14 @@ namespace app::bell_bedtime
         return std::mktime(&tm);
     }
 
-    BedtimeToneModel::BedtimeToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository)
-        : gui::SettingsModel<UTF8>{app}, soundsRepository{soundsRepository}
-    {}
-
     auto BedtimeToneModel::setValue(UTF8 value) -> void
     {
-        const auto &path = soundsRepository.titleToPath(value).value_or("");
-        settings.setValue(bell::settings::Bedtime::tonePath, path, settings::SettingsScope::Global);
+        settings.setValue(bell::settings::Bedtime::tonePath, value, settings::SettingsScope::Global);
     }
 
     auto BedtimeToneModel::getValue() const -> UTF8
     {
-        const auto &path = settings.getValue(bell::settings::Bedtime::tonePath, settings::SettingsScope::Global);
-        return soundsRepository.pathToTitle(path).value_or("");
+        return settings.getValue(bell::settings::Bedtime::tonePath, settings::SettingsScope::Global);
     }
 
     auto BedtimeVolumeModel::setValue(std::uint8_t value) -> void

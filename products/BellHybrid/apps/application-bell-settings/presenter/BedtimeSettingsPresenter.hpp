@@ -44,8 +44,7 @@ namespace app::bell_settings
       public:
         SettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
                           std::shared_ptr<AbstractBedtimeModel> model,
-                          AbstractAudioModel &audioModel,
-                          std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository);
+                          AbstractAudioModel &audioModel);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto saveData() -> void override;
@@ -59,7 +58,6 @@ namespace app::bell_settings
         std::shared_ptr<BedtimeSettingsListItemProvider> provider;
         std::shared_ptr<AbstractBedtimeModel> model;
         AbstractAudioModel &audioModel;
-        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository;
         UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings

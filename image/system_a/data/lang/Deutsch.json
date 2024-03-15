@@ -94,7 +94,7 @@
     "app_bell_settings_alarm_settings_volume": "Alarmlautst\u00e4rke",
     "app_bell_settings_bedtime_settings_tone": "Klang",
     "app_bell_settings_bedtime_settings_volume": "<text>Lautst\u00e4rke</text>",
-    "app_bell_settings_bedtime_tone": "Schlafens-Klang",
+    "app_bell_settings_bedtime_chime": "Schlafens-Klang",
     "app_bell_settings_display_factory_reset_confirmation": "<text>L\u00f6scht alle Benutzerdateien<br/>und setzt das Ger\u00e4t auf<br/>Werkseinstellungen zur\u00fcck.</text>",
     "app_bell_settings_factory_reset": "Zur\u00fccksetzen",
     "app_bell_settings_factory_reset_option_back": "Zur\u00fcck",

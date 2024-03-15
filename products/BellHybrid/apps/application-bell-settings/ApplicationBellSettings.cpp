@@ -44,7 +44,6 @@
 #include <common/models/TimeModel.hpp>
 #include <common/models/AlarmSettingsModel.hpp>
 #include <common/models/SongsModel.hpp>
-#include <service-evtmgr/EventManagerServiceAPI.hpp>
 #include <service-appmgr/messages/GetCurrentDisplayLanguageResponse.hpp>
 
 namespace app
@@ -124,14 +123,19 @@ namespace app
 
         windowsFactory.attach(
             gui::window::name::bellSettingsBedtimeTone, [this](ApplicationCommon *app, const std::string &name) {
-                auto soundsRepository = std::make_unique<SimpleSoundsRepository>(paths::audio::proprietary() /
-                                                                                 paths::audio::bedtimeReminder());
-                auto bedtimeModel = std::make_shared<bell_bedtime::BedtimeModel>(app, *audioModel, *soundsRepository);
+                auto bedtimeModel = std::make_shared<bell_bedtime::BedtimeModel>(app, *audioModel);
 
-                auto provider = std::make_shared<bell_settings::BedtimeSettingsListItemProvider>(
-                    bedtimeModel, soundsRepository->getSongTitles());
-                auto presenter = std::make_unique<bell_settings::SettingsPresenter>(
-                    provider, bedtimeModel, *audioModel, std::move(soundsRepository));
+                const auto &pathSorting =
+                    SoundsRepository::PathSorting{paths::audio::proprietary() / paths::audio::bedtimeReminder(),
+                                                  SoundsRepository::SortingBy::TitleAscending};
+
+                auto soundsRepository = std::make_unique<SoundsRepository>(this, pathSorting);
+                auto songsModel       = std::make_unique<SongsModel>(this, std::move(soundsRepository));
+
+                auto provider = std::make_shared<bell_settings::BedtimeSettingsListItemProvider>(bedtimeModel,
+                                                                                                 std::move(songsModel));
+                auto presenter =
+                    std::make_unique<bell_settings::SettingsPresenter>(provider, bedtimeModel, *audioModel);
                 return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app, std::move(presenter));
             });
 

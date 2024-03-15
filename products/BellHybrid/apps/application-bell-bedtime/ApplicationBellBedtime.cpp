@@ -8,7 +8,6 @@
 #include <common/models/BedtimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/SoundsRepository.hpp>
-#include <Paths.hpp>
 
 namespace app
 {
@@ -36,10 +35,8 @@ namespace app
     {
         windowsFactory.attach(
             gui::name::window::main_window, [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
-                auto soundsRepository = std::make_unique<SimpleSoundsRepository>(paths::audio::proprietary() /
-                                                                                 paths::audio::bedtimeReminder());
                 auto audioModel       = std::make_unique<AudioModel>(app);
-                auto bedtimeModel = std::make_unique<bell_bedtime::BedtimeModel>(app, *audioModel, *soundsRepository);
+                auto bedtimeModel     = std::make_unique<bell_bedtime::BedtimeModel>(app, *audioModel);
                 auto provider     = std::make_shared<bell_bedtime::BedtimeListItemProvider>(std::move(bedtimeModel));
                 auto presenter    = std::make_unique<bell_bedtime::BellBedtimeWindowPresenter>(provider);
                 return std::make_unique<gui::BellBedtimeWindow>(app, std::move(presenter));

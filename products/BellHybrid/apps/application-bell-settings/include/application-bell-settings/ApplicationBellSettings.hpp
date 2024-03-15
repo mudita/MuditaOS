@@ -12,9 +12,6 @@ namespace gui::window::name
 {
     inline constexpr auto bellSettings             = gui::name::window::main_window;
     inline constexpr auto bellSettingsTimeUnits    = "BellSettingsTimeUnits";
-    inline constexpr auto bellSettingsDialog       = "BellSettingsDialog";
-    inline constexpr auto bellSettingsFinished     = "BellSettingsFinished";
-    inline constexpr auto bellSettingsFrontlight   = "BellSettingsFrontlight";
     inline constexpr auto bellSettingsHomeView     = "BellSettingsHomeView";
     inline constexpr auto bellSettingsLanguage     = "BellSettingsLanguage";
     inline constexpr auto bellSettingsLayout       = "BellSettingsLayout";
@@ -33,11 +30,11 @@ namespace app
         void onStop() override;
 
       public:
-        ApplicationBellSettings(std::string name                    = applicationBellSettingsName,
-                                std::string parent                  = "",
-                                StatusIndicators statusIndicators   = StatusIndicators{},
-                                StartInBackground startInBackground = {false},
-                                std::uint32_t stackDepth            = 1024 * 8);
+        explicit ApplicationBellSettings(std::string name                    = applicationBellSettingsName,
+                                         std::string parent                  = "",
+                                         StatusIndicators statusIndicators   = StatusIndicators{},
+                                         StartInBackground startInBackground = {false},
+                                         std::uint32_t stackDepth            = 1024 * 8);
 
         sys::ReturnCodes InitHandler() override;
 

@@ -2,15 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PrewakeUpListItemProvider.hpp"
+#include "AbstractPrewakeUpSettingsModel.hpp"
 #include "common/models/AbstractAudioModel.hpp"
-#include <common/models/FrontlightModel.hpp>
 #include <common/widgets/list_items/NumberWithSuffix.hpp>
 #include <common/widgets/list_items/Numeric.hpp>
 #include <common/widgets/list_items/NumericWithBar.hpp>
-#include <common/widgets/ListItems.hpp>
 #include <gui/widgets/ListViewEngine.hpp>
-#include <utility>
-
 #include <SongsListViewItem.hpp>
 #include <Paths.hpp>
 
