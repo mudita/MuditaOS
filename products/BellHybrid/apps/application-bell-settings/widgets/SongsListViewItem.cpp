@@ -4,7 +4,9 @@
 #include "SongsListViewItem.hpp"
 #include <common/options/BellOptionWindow.hpp>
 #include <common/widgets/ListViewWithLabels.hpp>
+#include <common/options/BellOptionsNavigation.hpp>
 #include <common/models/SongsModel.hpp>
+#include <common/data/StyleCommon.hpp>
 
 namespace gui
 {
@@ -23,7 +25,13 @@ namespace gui
                                     style::bell_options_list::outer_layouts_h,
                                     style::bell_options_list::outer_layouts_margin);
         list->setListTitle(title);
-        list->setListTitleFont(style::window::font::mediumbiglight); // TODO fix this random font
+
+        inputCallback = [&](Item &, const InputEvent &inputEvent) -> bool {
+            if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
+                list->setFocusItem(nullptr);
+            }
+            return body->onInput(invertNavigationDirection(inputEvent));
+        };
 
         focusChangedCallback = [this]([[maybe_unused]] Item &item) {
             if (focus) {
@@ -34,9 +42,9 @@ namespace gui
         };
 
         auto onListItemActivate = [this](const auto &record) {
-            list->setFocusItem(nullptr);
             return true;
         };
+
         auto onListItemFocusChange = [this](const auto &record) {
             focusedRecordPath = record.fileInfo.path;
             onValueChange(focusedRecordPath);
