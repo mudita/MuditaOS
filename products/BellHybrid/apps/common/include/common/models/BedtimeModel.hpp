@@ -6,7 +6,6 @@
 #include "AbstractBedtimeModel.hpp"
 #include "SettingsModel.hpp"
 #include <common/models/AudioModel.hpp>
-#include <common/SoundsRepository.hpp>
 #include <ApplicationCommon.hpp>
 
 namespace app::bell_bedtime
@@ -51,13 +50,10 @@ namespace app::bell_bedtime
     class BedtimeToneModel : public gui::SettingsModel<UTF8>
     {
       public:
-        BedtimeToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository);
+        using SettingsModel::SettingsModel;
 
         auto setValue(UTF8 value) -> void override;
         auto getValue() const -> UTF8 override;
-
-      private:
-        SimpleSoundsRepository &soundsRepository;
     };
 
     class BedtimeModel : public AbstractBedtimeModel
@@ -65,11 +61,11 @@ namespace app::bell_bedtime
       public:
         BedtimeModel() = delete;
 
-        BedtimeModel(ApplicationCommon *app, AbstractAudioModel &audioModel, SimpleSoundsRepository &soundsRepository)
+        BedtimeModel(ApplicationCommon *app, AbstractAudioModel &audioModel)
         {
             bedtimeOnOff  = std::make_unique<bell_bedtime::BedtimeOnOffModel>(app);
             bedtimeTime   = std::make_unique<bell_bedtime::BedtimeTimeModel>(app);
-            bedtimeTone   = std::make_unique<bell_bedtime::BedtimeToneModel>(app, soundsRepository);
+            bedtimeTone   = std::make_unique<bell_bedtime::BedtimeToneModel>(app);
             bedtimeVolume = std::make_unique<bell_bedtime::BedtimeVolumeModel>(audioModel);
         }
 

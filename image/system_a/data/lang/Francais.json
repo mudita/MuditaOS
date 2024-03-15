@@ -95,7 +95,7 @@
     "app_bell_settings_alarm_settings_volume": "Volume",
     "app_bell_settings_bedtime_settings_tone": "M\u00e9lodie de l'heure du coucher",
     "app_bell_settings_bedtime_settings_volume": "Volume",
-    "app_bell_settings_bedtime_tone": "Heure du coucher",
+    "app_bell_settings_bedtime_chime": "Heure du coucher",
     "app_bell_settings_display_factory_reset_confirmation": "<text>La r\u00e9initialisation d'usine<br/>supprimera tous les fichiers de l'utilisateur et remettra l'appareil sur ses param\u00e8tres d'usine.</text>",
     "app_bell_settings_factory_reset": "R\u00e9initialisation",
     "app_bell_settings_factory_reset_option_back": "Retour",
