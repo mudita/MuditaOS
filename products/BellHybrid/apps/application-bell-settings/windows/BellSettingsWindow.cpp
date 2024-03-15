@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AboutYourBellWindow.hpp"
@@ -8,20 +8,15 @@
 #include "alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
 
 #include <application-bell-settings/ApplicationBellSettings.hpp>
-#include <data/BellSettingsStyle.hpp>
 
-#include <application-bell-main/ApplicationBellMain.hpp>
 #include <apps-common/messages/DialogMetadataMessage.hpp>
 #include <common/options/OptionBellMenu.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/windows/BellFactoryReset.hpp>
-#include <apps-common/windows/Dialog.hpp>
-#include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <service-appmgr/messages/SwitchRequest.hpp>
 
 namespace gui
 {
-
     BellSettingsWindow::BellSettingsWindow(app::ApplicationCommon *app)
         : BellOptionWindow(app, gui::window::name::bellSettings)
     {
@@ -63,8 +58,9 @@ namespace gui
         addWinSettings(utils::translate("app_bell_settings_alarm_settings"),
                        BellSettingsAlarmSettingsMenuWindow::name,
                        defaultCallback);
-        addWinSettings(
-            utils::translate("app_bell_settings_bedtime_tone"), window::name::bellSettingsBedtimeTone, defaultCallback);
+        addWinSettings(utils::translate("app_bell_settings_bedtime_chime"),
+                       window::name::bellSettingsBedtimeTone,
+                       defaultCallback);
         addWinSettings(bellSettingsTimeUnitsTitle, window::name::bellSettingsTimeUnits, defaultCallback);
         addWinSettings(
             utils::translate("app_bell_settings_language"), gui::window::name::bellSettingsLanguage, defaultCallback);
@@ -81,5 +77,4 @@ namespace gui
 
         return settingsOptionList;
     }
-
 } // namespace gui

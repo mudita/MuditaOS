@@ -93,7 +93,7 @@
     "app_bell_settings_alarm_settings_volume": "Volumen de alarma",
     "app_bell_settings_bedtime_settings_tone": "Hora de dormir",
     "app_bell_settings_bedtime_settings_volume": "Volumen",
-    "app_bell_settings_bedtime_tone": "Hora de dormir",
+    "app_bell_settings_bedtime_chime": "Hora de dormir",
     "app_bell_settings_display_factory_reset_confirmation": "<text>La configuraci\u00f3n de f\u00e1brica<br/>eliminar\u00e1 todos los archivos.</text>",
     "app_bell_settings_factory_reset": "Restablecer",
     "app_bell_settings_factory_reset_option_back": "Atr\u00e1s",
