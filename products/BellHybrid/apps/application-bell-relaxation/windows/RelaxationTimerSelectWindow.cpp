@@ -78,7 +78,7 @@ namespace gui
         AppWindow::buildInterface();
         statusBar->setVisible(false);
 
-        body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, true);
+        body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height);
         createTopMessage();
         createSpinner();
         createBottomDescription();

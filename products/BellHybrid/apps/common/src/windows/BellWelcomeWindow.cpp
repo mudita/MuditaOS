@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "windows/BellWelcomeWindow.hpp"
@@ -28,7 +28,8 @@ namespace gui
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        body = new BellBaseLayout(this, 0, 0, style::window_width, style::window_height, false);
+        body = new BellBaseLayout(
+            this, 0, 0, style::window_width, style::window_height, BellBaseLayout::LayoutType::WithoutArrows);
 
         auto muditaLogo = new ImageBox(body->firstBox, new Image(this->icon, ImageTypeSpecifier::W_G));
         muditaLogo->setMinimumSizeToFitImage();

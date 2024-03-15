@@ -8,7 +8,6 @@
 #include <models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp>
 #include <common/models/AbstractAudioModel.hpp>
 #include <common/models/FrontlightModel.hpp>
-#include <common/SoundsRepository.hpp>
 #include <memory>
 
 namespace gui
@@ -48,7 +47,6 @@ namespace app::bell_settings
         PrewakeUpWindowPresenter(std::unique_ptr<PrewakeUpListItemProvider> &&provider,
                                  std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
                                  AbstractAudioModel &audioModel,
-                                 std::unique_ptr<AbstractSimpleSoundsRepository> &&soundsRepository,
                                  std::unique_ptr<AbstractFrontlightModel> &&frontlight);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
@@ -63,7 +61,6 @@ namespace app::bell_settings
         std::shared_ptr<PrewakeUpListItemProvider> provider;
         std::unique_ptr<AbstractPrewakeUpSettingsModel> model;
         AbstractAudioModel &audioModel;
-        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository;
         std::unique_ptr<AbstractFrontlightModel> frontlight;
         UTF8 currentSoundPath;
     };
