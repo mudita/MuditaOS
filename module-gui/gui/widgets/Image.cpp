@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Image.hpp"
@@ -11,13 +11,13 @@
 
 namespace gui
 {
-
     Image::Image() : Rect(), imageMap{nullptr}
     {
         type = ItemType::IMAGE;
     }
 
-    Image::Image(Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, const UTF8 imageName)
+    Image::Image(
+        Item *parent, std::uint32_t x, std::uint32_t y, std::uint32_t w, std::uint32_t h, const UTF8 &imageName)
         : Rect(parent, x, y, w, h), imageMap{nullptr}
     {
         type = ItemType::IMAGE;
@@ -38,17 +38,17 @@ namespace gui
         set(imageName, specifier);
     }
 
-    bool Image::set(int id)
+    bool Image::set(std::uint32_t id)
     {
-        auto map = ImageManager::getInstance().getImageMap(id);
+        const auto map = ImageManager::getInstance().getImageMap(id);
         if (map == nullptr) {
-            LOG_ERROR("Unable to get an image map for id: %d", id);
+            LOG_ERROR("Unable to get an image map for id: %" PRIu32, id);
             return false;
         }
 
         imageMap = map;
-        auto w   = imageMap->getWidth();
-        auto h   = imageMap->getHeight();
+        const auto w = imageMap->getWidth();
+        const auto h = imageMap->getHeight();
         setMinimumWidth(w);
         setMinimumHeight(h);
         setArea(BoundingBox(getX(), getY(), w, h));
