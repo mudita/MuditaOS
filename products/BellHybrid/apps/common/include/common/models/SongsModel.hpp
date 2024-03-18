@@ -36,30 +36,34 @@ namespace app
                    const LabelsWithPaths &pathPrefixes = {});
         virtual ~SongsModel() = default;
 
-        unsigned int requestRecordsCount() override;
+        auto requestRecordsCount() -> unsigned override;
 
-        [[nodiscard]] unsigned int getMinimalItemSpaceRequired() const override;
+        [[nodiscard]] auto getMinimalItemSpaceRequired() const -> unsigned override;
 
-        gui::ListItem *getItem(gui::Order order) override;
+        auto getItem(gui::Order order) -> gui::ListItem * override;
 
-        void requestRecords(std::uint32_t offset, std::uint32_t limit) override;
+        auto requestRecords(std::uint32_t offset, std::uint32_t limit) -> void override;
 
-        void createData(OnActivateCallback activateCallback        = nullptr,
-                        OnFocusAcquireCallback focusChangeCallback = nullptr) override;
-        void updateRecordsCount();
-        bool nextRecordExist(gui::Order order);
+        auto createData(OnActivateCallback activateCallback        = nullptr,
+                        OnFocusAcquireCallback focusChangeCallback = nullptr) -> void override;
+        auto updateRecordsCount() -> void;
+        auto nextRecordExists(gui::Order order) -> bool;
+
+        auto setCurrentlyChosenRecordPath(const std::string &path) -> void;
+        [[nodiscard]] auto getCurrentlyChosenRecordPath() const -> std::string;
 
       private:
-        bool onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
-                                  unsigned int repoRecordsCount);
-        [[nodiscard]] bool updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records) override;
-        gui::ListLabel getLabelFromPath(const std::string &path);
+        auto onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
+                                  unsigned repoRecordsCount) -> bool;
+        [[nodiscard]] auto updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records)
+            -> bool override;
+        auto getLabelFromPath(const std::string &path) -> gui::ListLabel;
 
-        ApplicationCommon *application;
+        ApplicationCommon *application{nullptr};
         std::unique_ptr<AbstractSoundsRepository> songsRepository;
         LabelsWithPaths pathPrefixes;
-        std::string currentRecordPath;
         OnActivateCallback activateCallback{nullptr};
         OnFocusAcquireCallback focusAcquireCallback{nullptr};
+        std::string currentlyChosenRecordPath{};
     };
 } // namespace app

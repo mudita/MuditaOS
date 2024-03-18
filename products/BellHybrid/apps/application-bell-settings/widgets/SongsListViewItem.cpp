@@ -13,11 +13,11 @@ namespace gui
                                          AbstractSettingsModel<UTF8> &settingsModel,
                                          std::shared_ptr<app::SongsModel> songsModel)
         : BellSideListItemWithCallbacks({}, BellBaseLayout::LayoutType::WithoutArrows), settingsModel{settingsModel},
-          songsModel{songsModel}
+          songsModel{std::move(songsModel)}
     {
         rearrangeBaseLayout();
 
-        list = new ListViewWithLabels(body, 0, 0, style::window_width, style::window_height, songsModel);
+        list = new ListViewWithLabels(body, 0, 0, style::window_width, style::window_height, this->songsModel);
         list->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         list->applySizeRestrictions(style::bell_options_list::w,
                                     style::bell_options_list::h,
@@ -31,40 +31,32 @@ namespace gui
             return storedCallback(item, invertNavigationDirection(event));
         };
 
-        focusChangedCallback = [this]([[maybe_unused]] Item &item) {
-            if (focus) {
-                set_value(focusedRecordPath);
-            }
-            OnFocusChangedCallback();
-            return true;
-        };
+        getValue = [this]() { this->settingsModel.setValue(this->value()); };
+        setValue = [this]() { set_value(this->settingsModel.getValue()); };
 
-        auto onListItemActivate = []([[maybe_unused]] const db::multimedia_files::MultimediaFilesRecord &record) {
+        auto onListItemActivate = [this]([[maybe_unused]] const db::multimedia_files::MultimediaFilesRecord &record) {
+            set_value(record.fileInfo.path);
+            list->rebuildList(listview::RebuildType::InPlace);
             return false;
         };
         auto onListItemFocusAcquire = [this](const db::multimedia_files::MultimediaFilesRecord &record) {
-            focusedRecordPath = record.fileInfo.path;
-            onValueChange(focusedRecordPath);
+            onValueChange(record.fileInfo.path);
             return true;
         };
 
-        songsModel->createData(onListItemActivate, onListItemFocusAcquire);
+        setValue();
+        this->songsModel->createData(onListItemActivate, onListItemFocusAcquire);
         list->rebuildList(listview::RebuildType::Full);
-
-        getValue = [this]() {
-            this->settingsModel.setValue(focusedRecordPath);
-        };
-        setValue = [this]() { focusedRecordPath = this->settingsModel.getValue(); };
     }
 
     auto SongsListViewItem::value() const -> UTF8
     {
-        return focusedRecordPath;
+        return songsModel->getCurrentlyChosenRecordPath();
     }
 
     auto SongsListViewItem::set_value(const UTF8 &value) -> void
     {
-        focusedRecordPath = value;
+        songsModel->setCurrentlyChosenRecordPath(value);
     }
 
     auto SongsListViewItem::set_on_value_change_cb(std::function<void(const UTF8 &)> &&cb) -> void

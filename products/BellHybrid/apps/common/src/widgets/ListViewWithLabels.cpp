@@ -5,11 +5,6 @@
 #include <common/widgets/LabelListItem.hpp>
 #include <common/models/SongsModel.hpp>
 
-namespace
-{
-    constexpr auto maxItemDisplayed{4U};
-} // namespace
-
 namespace gui
 {
     ListViewWithLabels::ListViewWithLabels(Item *parent,
@@ -111,8 +106,8 @@ namespace gui
                 if (songsProvider == nullptr) {
                     break;
                 }
-                const auto nextItemExist = songsProvider->nextRecordExist(getOrderFromDirection());
-                if (!nextItemExist && getSlotsLeft() == 1) {
+                const auto nextItemExists = songsProvider->nextRecordExists(getOrderFromDirection());
+                if (!nextItemExists && getSlotsLeft() == 1) {
                     body->addWidget(createMarkerItem(current));
                     updateState(current);
                 }
@@ -121,8 +116,9 @@ namespace gui
         }
     }
 
-    std::size_t ListViewWithLabels::getSlotsLeft()
+    std::size_t ListViewWithLabels::getSlotsLeft() const
     {
+        constexpr auto maxItemDisplayed{4U};
         if (itemsOnPage > maxItemDisplayed) {
             return 0;
         }

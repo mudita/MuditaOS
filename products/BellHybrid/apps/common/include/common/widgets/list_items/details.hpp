@@ -8,7 +8,6 @@
 #include <common/data/StyleCommon.hpp>
 
 #include <apps-common/widgets/spinners/Spinners.hpp>
-#include <apps-common/widgets/TimeSetFmtSpinner.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
 #include "common/data/ListItemBarStyle.hpp"
