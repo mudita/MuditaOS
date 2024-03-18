@@ -15,6 +15,7 @@ namespace app::relaxation
         songsModel->createData(activateCallback);
         updateViewState();
     }
+
     void RelaxationMainWindowPresenter::updateViewState()
     {
         auto view = getView();
@@ -22,10 +23,12 @@ namespace app::relaxation
             view->updateViewState();
         }
     }
+
     void RelaxationMainWindowPresenter::updateRecordsCount()
     {
         songsModel->updateRecordsCount();
     }
+
     std::shared_ptr<SongsModel> RelaxationMainWindowPresenter::getSongsModel()
     {
         return songsModel;

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <options/OptionBellMenu.hpp>
@@ -6,9 +6,9 @@
 
 namespace
 {
-    constexpr auto ellipsis       = "...";
-    constexpr auto ellipsisSpace  = 2u;
-    constexpr auto linesMaxNumber = 1u;
+    constexpr auto ellipsis{"..."};
+    constexpr auto ellipsisSpace{2U};
+    constexpr auto linesMaxNumber{1U};
 
     UTF8 adjustTextLength(const UTF8 &textToDisplay, std::uint32_t maxCharsInLine)
     {
@@ -17,7 +17,6 @@ namespace
         }
         return textToDisplay;
     }
-
 } // namespace
 
 namespace gui::option
@@ -51,6 +50,7 @@ namespace gui::option
         const auto maxTextCharsToDisplay =
             optionText->getTextFormat().getFont()->getCharCountInSpace(text, style::bell_options::default_text_width);
         optionText->setRichText(adjustTextLength(text, maxTextCharsToDisplay));
+
         optionItem->dimensionChangedCallback = [optionBodyHBox](gui::Item &, const BoundingBox &newDim) -> bool {
             optionBodyHBox->setArea({0, 0, newDim.w, newDim.h});
             return true;

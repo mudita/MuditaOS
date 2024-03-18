@@ -28,7 +28,7 @@ namespace gui
         void reset() override;
 
       private:
-        std::size_t getSlotsLeft();
+        [[nodiscard]] std::size_t getSlotsLeft() const;
         void addItemsOnPage() override;
         void addLabelMarker(ListItem *item);
         void updateState(ListLabel newMarker);

@@ -4,11 +4,6 @@
 #include <common/widgets/LabelListItem.hpp>
 #include "common/options/OptionBellMenu.hpp"
 
-namespace
-{
-    constexpr auto linesMaxNumber = 1U;
-}
-
 namespace gui
 {
     LabelListItem::LabelListItem(ListLabel label) : label{std::move(label)}
@@ -21,6 +16,8 @@ namespace gui
 
     LabelMarkerItem::LabelMarkerItem(const UTF8 &labelText)
     {
+        constexpr auto linesMaxNumber{1U};
+
         setMinimumSize(style::bell_options::default_text_width, style::bell_options::h);
         setMargins(gui::Margins(0, style::bell_options::option_margin, 0, style::bell_options::option_margin));
         setAlignment(gui::Alignment::Horizontal::Center);
