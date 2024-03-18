@@ -91,17 +91,6 @@ namespace bsp
         {
             return ((PMU->REG_2P5 & PMU_REG_2P5_BO_VDD2P5_MASK) != 0);
         }
-
-        void disableSystick()
-        {
-            SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
-            NVIC_ClearPendingIRQ(SysTick_IRQn);
-        }
-
-        void enableSystick()
-        {
-            SysTick->CTRL |= SysTick_CTRL_ENABLE_Msk;
-        }
     } // namespace
 
     void allowEnteringWfiMode()
@@ -141,12 +130,7 @@ namespace bsp
         setWaitModeConfig();
         peripheralEnterDozeMode();
 
-        disableSystick();
         const auto enterWfiTicks = ulHighFrequencyTimerTicks();
-
-        const auto savedPrimask = DisableGlobalIRQ();
-        __DSB();
-        __ISB();
 
         /* Clear the SLEEPDEEP bit to go into sleep mode (WAIT) */
         SCB->SCR &= ~SCB_SCR_SLEEPDEEP_Msk;
@@ -160,16 +144,14 @@ namespace bsp
         __NOP();
 
         const auto exitWfiTicks = ulHighFrequencyTimerTicks();
-        enableSystick();
+        timeSpentInWFI          = ulHighFrequencyTimerTicksToMs(utils::computeIncrease(exitWfiTicks, enterWfiTicks));
 
         peripheralExitDozeMode();
+        setRunModeConfig();
         watchdog::refresh();
-        EnableGlobalIRQ(savedPrimask);
 
         blockEnteringWfiMode();
-        setRunModeConfig();
 
-        timeSpentInWFI = ulHighFrequencyTimerTicksToMs(utils::computeIncrease(exitWfiTicks, enterWfiTicks));
         return timeSpentInWFI;
     }
 } // namespace bsp

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LinuxLPM.h"
@@ -56,4 +56,11 @@ namespace bsp
     void LinuxLPM::EnableSysTick()
     {}
 
+    std::uint32_t LinuxLPM::DisableInterrupts()
+    {
+        return 0;
+    }
+
+    void LinuxLPM::EnableInterrupts([[maybe_unused]] std::uint32_t primask)
+    {}
 } // namespace bsp

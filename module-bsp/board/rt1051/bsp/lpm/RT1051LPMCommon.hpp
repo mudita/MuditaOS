@@ -18,8 +18,6 @@ namespace bsp
         void SetCpuFrequency(CpuFrequencyMHz freq) final;
         [[nodiscard]] std::uint32_t GetCpuFrequency() const noexcept final;
         void SwitchOscillatorSource(OscillatorSource source) final;
-        void DisableSysTick() final;
-        void EnableSysTick() final;
 
       private:
         void onChangeUp(CpuFrequencyMHz freq, CpuFrequencyMHz newFrequency);

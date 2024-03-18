@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <SystemManager/CpuStatistics.hpp>
@@ -63,10 +63,10 @@ namespace sys
 
     void CpuStatistics::UpdatePercentageCpuLoad()
     {
-        uint32_t idleTickCount     = xTaskGetIdleRunTimeCounter();
-        uint32_t totalTickCount    = ulHighFrequencyTimerTicks();
-        uint32_t idleTickIncrease  = utils::computeIncrease(idleTickCount, lastIdleTickCount);
-        uint32_t totalTickIncrease = utils::computeIncrease(totalTickCount, lastTotalTickCount);
+        const auto idleTickCount     = xTaskGetIdleRunTimeCounter();
+        const auto totalTickCount    = ulHighFrequencyTimerTicks();
+        const auto idleTickIncrease  = utils::computeIncrease(idleTickCount, lastIdleTickCount);
+        const auto totalTickIncrease = utils::computeIncrease(totalTickCount, lastTotalTickCount);
         lastIdleTickCount          = idleTickCount;
         lastTotalTickCount         = totalTickCount;
         if (totalTickIncrease != 0u) {
@@ -77,10 +77,9 @@ namespace sys
         }
     }
 
-    uint32_t CpuStatistics::GetPercentageCpuLoad()
+    std::uint32_t CpuStatistics::GetPercentageCpuLoad()
     {
         UpdatePercentageCpuLoad();
         return cpuLoad;
     }
-
 } // namespace sys
