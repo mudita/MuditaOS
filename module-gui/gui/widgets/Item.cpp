@@ -345,11 +345,9 @@ namespace gui
     Alignment Item::getAlignment(Axis axis)
     {
         if (axis == Axis::X) {
-            return Alignment(alignment.horizontal, Alignment::Vertical::None);
+            return {alignment.horizontal, Alignment::Vertical::None};
         }
-        else {
-            return Alignment(Alignment::Horizontal::None, alignment.vertical);
-        }
+        return {Alignment::Horizontal::None, alignment.vertical};
     }
 
     Alignment &Item::getAlignment()

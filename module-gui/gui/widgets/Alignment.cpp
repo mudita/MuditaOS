@@ -1,11 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Alignment.hpp"
 
 namespace gui
 {
-
     bool Alignment::operator==(const Alignment &alignment) const
     {
         return !(horizontal != alignment.horizontal || vertical != alignment.vertical);
@@ -43,5 +42,4 @@ namespace gui
             return 0;
         }
     }
-
 } /* namespace gui */

@@ -34,5 +34,6 @@ namespace app::bell_settings
         AbstractPrewakeUpSettingsModel &settingsModel;
         app::list_items::NumericWithBar *prewakeUpVolume{nullptr};
         std::shared_ptr<SongsModel> songsModel;
+        UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings

@@ -16,14 +16,6 @@ namespace gui::option
 {
     class OptionBellMenu : public option::Base
     {
-      protected:
-        UTF8 text;
-        std::function<bool(Item &)> activatedCallback    = nullptr;
-        std::function<bool(Item &)> focusChangedCallback = nullptr;
-        AppWindow *app                                   = nullptr;
-
-        void prepareListItem(ListItem *item) const;
-
       public:
         OptionBellMenu(const UTF8 &text,
                        std::function<bool(Item &)> activatedCallback,
@@ -32,10 +24,20 @@ namespace gui::option
             : text(text), activatedCallback(std::move(activatedCallback)),
               focusChangedCallback(std::move(focusChangedCallback)), app(app)
         {}
+
         [[nodiscard]] auto build() const -> ListItem * override;
+
         [[nodiscard]] auto str() const -> std::string override
         {
             return text;
         }
+
+      protected:
+        UTF8 text;
+        std::function<bool(Item &)> activatedCallback{nullptr};
+        std::function<bool(Item &)> focusChangedCallback{nullptr};
+        AppWindow *app{nullptr};
+
+        void prepareListItem(ListItem *item) const;
     };
 } // namespace gui::option
