@@ -42,20 +42,14 @@ namespace app::bell_settings
             settings.getValue(bell::settings::Snooze::interval, settings::SettingsScope::Global));
     }
 
-    SnoozeChimeToneModel::SnoozeChimeToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository)
-        : gui::SettingsModel<UTF8>{app}, soundsRepository{soundsRepository}
-    {}
-
     auto SnoozeChimeToneModel::setValue(UTF8 value) -> void
     {
-        const auto &path = soundsRepository.titleToPath(value).value_or("");
-        settings.setValue(bell::settings::Snooze::tonePath, path, settings::SettingsScope::Global);
+        settings.setValue(bell::settings::Snooze::tonePath, value, settings::SettingsScope::Global);
     }
 
     auto SnoozeChimeToneModel::getValue() const -> UTF8
     {
-        const auto &path = settings.getValue(bell::settings::Snooze::tonePath, settings::SettingsScope::Global);
-        return soundsRepository.pathToTitle(path).value_or("");
+        return settings.getValue(bell::settings::Snooze::tonePath, settings::SettingsScope::Global);
     }
 
     auto SnoozeChimeVolumeModel::setValue(std::uint8_t value) -> void

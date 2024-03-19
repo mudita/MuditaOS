@@ -40,13 +40,10 @@ namespace app::bell_settings
     class SnoozeChimeToneModel : public gui::SettingsModel<UTF8>
     {
       public:
-        SnoozeChimeToneModel(sys::Service *app, SimpleSoundsRepository &soundsRepository);
+        using SettingsModel::SettingsModel;
 
         auto setValue(UTF8 value) -> void override;
         auto getValue() const -> UTF8 override;
-
-      private:
-        SimpleSoundsRepository &soundsRepository;
     };
 
     class SnoozeChimeVolumeModel : public gui::AbstractSettingsModel<std::uint8_t>

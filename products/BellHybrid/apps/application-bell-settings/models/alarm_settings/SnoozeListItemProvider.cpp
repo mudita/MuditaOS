@@ -6,11 +6,10 @@
 #include <common/widgets/list_items/NumberWithSuffix.hpp>
 #include <common/widgets/list_items/Numeric.hpp>
 #include <common/widgets/list_items/NumericWithBar.hpp>
-#include <common/widgets/list_items/Text.hpp>
 #include <common/widgets/ListItems.hpp>
 #include <common/LanguageUtils.hpp>
+#include <SongsListViewItem.hpp>
 
-#include <apps-common/ApplicationCommon.hpp>
 #include <utility>
 
 namespace app::bell_settings
@@ -48,20 +47,20 @@ namespace app::bell_settings
         return chimeInterval;
     }
 
-    SnoozeListItemProvider::SnoozeListItemProvider(AbstractSnoozeSettingsModel &model,
-                                                   std::vector<UTF8> chimeTonesRange)
-        : model{model}
+    SnoozeListItemProvider::SnoozeListItemProvider(AbstractSnoozeSettingsModel &settingsModel,
+                                                   std::shared_ptr<SongsModel> songsModel)
+        : settingsModel{settingsModel}, songsModel{std::move(songsModel)}
     {
-        buildListItems(std::move(chimeTonesRange));
+        buildListItems();
     }
 
-    void SnoozeListItemProvider::buildListItems(std::vector<UTF8> chimeTonesRange)
+    void SnoozeListItemProvider::buildListItems()
     {
         constexpr auto itemCount = 5U;
         internalData.reserve(itemCount);
 
-        auto onOff =
-            new OnOffListItem(model.getSnoozeOnOff(), utils::translate("app_bell_settings_alarm_settings_snooze"));
+        auto onOff = new OnOffListItem(settingsModel.getSnoozeOnOff(),
+                                       utils::translate("app_bell_settings_alarm_settings_snooze"));
 
         internalData.emplace_back(onOff);
         constexpr auto snoozeLengthStep = 1U;
@@ -69,10 +68,10 @@ namespace app::bell_settings
         constexpr auto snoozeLengthMax  = 30U;
 
         auto chimeLengthBottomDescription =
-            utils::language::getCorrectMinutesNumeralForm(model.getSnoozeLength().getValue());
+            utils::language::getCorrectMinutesNumeralForm(settingsModel.getSnoozeLength().getValue());
         auto chimeLength = new list_items::Numeric(
             list_items::Numeric::spinner_type::range{snoozeLengthMin, snoozeLengthMax, snoozeLengthStep},
-            model.getSnoozeLength(),
+            settingsModel.getSnoozeLength(),
             utils::translate("app_bell_settings_alarm_settings_snooze_length"),
             chimeLengthBottomDescription);
 
@@ -90,7 +89,7 @@ namespace app::bell_settings
 
         auto chimeInterval = new list_items::NumberWithSuffix(
             getDefaultChimeIntervalRange(),
-            model.getSnoozeChimeInterval(),
+            settingsModel.getSnoozeChimeInterval(),
             utils::translate("app_bell_settings_alarm_settings_snooze_chime_interval"),
             utils::translate("app_bell_settings_alarm_settings_snooze_chime_interval_bot_desc"));
         chimeLength->setValue();
@@ -116,27 +115,36 @@ namespace app::bell_settings
             return false;
         };
 
+        chimeInterval->onProceed = [chimeInterval, this]() {
+            if (chimeInterval->value() == 0) {
+                this->onExit();
+                return true;
+            }
+            return false;
+        };
+
         auto snoozeChimeTone =
-            new list_items::Text(std::move(chimeTonesRange),
-                                 model.getSnoozeChimeTone(),
-                                 utils::translate("app_bell_settings_alarm_settings_snooze_chime_tone"));
-        snoozeChimeTone->set_on_value_change_cb([this](const auto &val) {
+            new SongsListViewItem(utils::translate("app_bell_settings_alarm_settings_snooze_chime_tone"),
+                                  settingsModel.getSnoozeChimeTone(),
+                                  songsModel);
+        snoozeChimeTone->set_on_value_change_cb([chimeInterval, this](const auto &val) {
+            currentSoundPath = val;
             if (onToneChange) {
                 onToneChange(val);
             }
         });
-        snoozeChimeTone->onEnter = [this, snoozeChimeTone, chimeInterval]() {
+        snoozeChimeTone->onEnter = [this, chimeInterval]() {
             if (chimeInterval->value() == 0) {
                 this->onExit();
                 return;
             }
             if (onToneEnter) {
-                onToneEnter(snoozeChimeTone->value());
+                onToneEnter(currentSoundPath);
             }
         };
-        snoozeChimeTone->onExit = [this, snoozeChimeTone]() {
+        snoozeChimeTone->onExit = [this]() {
             if (onToneExit) {
-                onToneExit(snoozeChimeTone->value());
+                onToneExit(currentSoundPath);
             }
         };
         internalData.emplace_back(snoozeChimeTone);
@@ -146,7 +154,7 @@ namespace app::bell_settings
         constexpr auto volumeMax  = AbstractAudioModel::maxVolume;
         snoozeChimeVolume         = new list_items::NumericWithBar(
             list_items::NumericWithBar::spinner_type::range{volumeMin, volumeMax, volumeStep},
-            model.getSnoozeChimeVolume(),
+            settingsModel.getSnoozeChimeVolume(),
             volumeMax,
             utils::translate("app_bell_settings_alarm_settings_snooze_chime_volume"));
         snoozeChimeVolume->set_on_value_change_cb([this](const auto &val) {
