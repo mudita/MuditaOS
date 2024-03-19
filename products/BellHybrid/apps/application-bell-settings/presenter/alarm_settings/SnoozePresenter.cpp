@@ -6,19 +6,15 @@
 
 namespace app::bell_settings
 {
-    SnoozePresenter::SnoozePresenter(std::shared_ptr<SnoozeListItemProvider> provider,
-                                     std::unique_ptr<AbstractSnoozeSettingsModel> snoozeSettingsModel,
-                                     AbstractAudioModel &audioModel,
-                                     std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository)
-        : provider{provider}, snoozeSettingsModel{std::move(snoozeSettingsModel)}, audioModel{audioModel},
-          soundsRepository{std::move(soundsRepository)}
+    SnoozePresenter::SnoozePresenter(std::unique_ptr<SnoozeListItemProvider> &&provider,
+                                     std::unique_ptr<AbstractSnoozeSettingsModel> &&snoozeSettingsModel,
+                                     AbstractAudioModel &audioModel)
+        : provider{std::move(provider)}, snoozeSettingsModel{std::move(snoozeSettingsModel)}, audioModel{audioModel}
     {
         auto playSound = [this](const UTF8 &val) {
             currentSoundPath = val;
             this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::Snooze);
-            this->audioModel.play(this->soundsRepository->titleToPath(currentSoundPath).value_or(""),
-                                  AbstractAudioModel::PlaybackType::Snooze,
-                                  {});
+            this->audioModel.play(currentSoundPath, AbstractAudioModel::PlaybackType::Snooze, {});
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
