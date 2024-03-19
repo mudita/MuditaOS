@@ -33,19 +33,22 @@ namespace app::bell_settings
 
         auto alarmTone = new SongsListViewItem(
             utils::translate("app_bell_settings_alarm_settings_chime"), settingsModel.getAlarmTone(), songsModel);
+
+        currentSoundPath = settingsModel.getAlarmTone().getValue();
         alarmTone->set_on_value_change_cb([this](const auto &val) {
+            currentSoundPath = val;
             if (onToneChange) {
-                onToneChange(val);
+                onToneChange(currentSoundPath);
             }
         });
-        alarmTone->onEnter = [this, alarmTone]() {
+        alarmTone->onEnter = [this]() {
             if (onToneEnter) {
-                onToneEnter(alarmTone->value());
+                onToneEnter(currentSoundPath);
             }
         };
-        alarmTone->onExit = [this, alarmTone]() {
+        alarmTone->onExit = [this]() {
             if (onToneExit) {
-                onToneExit(alarmTone->value());
+                onToneExit(currentSoundPath);
             }
         };
         internalData.emplace_back(alarmTone);

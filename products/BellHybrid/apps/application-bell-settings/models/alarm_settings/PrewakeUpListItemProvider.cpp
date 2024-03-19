@@ -52,10 +52,11 @@ namespace app::bell_settings
                                   settingsModel.getChimeTone(),
                                   songsModel);
 
+        currentSoundPath = settingsModel.getChimeTone().getValue();
         chimeTone->set_on_value_change_cb([this](const auto &val) {
             currentSoundPath = val;
             if (onToneChange) {
-                onToneChange(val);
+                onToneChange(currentSoundPath);
             }
         });
 
@@ -104,7 +105,7 @@ namespace app::bell_settings
             utils::translate("app_bell_settings_alarm_settings_prewake_up_light_top_description"),
             utils::translate("app_bell_settings_alarm_settings_prewake_up_light_bottom_description"));
 
-        lightDuration->onReturn = [chimeDuration, this]() {
+        lightDuration->onReturn = [this, chimeDuration]() {
             if (chimeDuration->value() == 0) {
                 list->rebuildList(gui::listview::RebuildType::OnOffset, 0);
                 return true;
@@ -112,7 +113,7 @@ namespace app::bell_settings
             return false;
         };
 
-        lightDuration->onProceed = [lightDuration, this]() {
+        lightDuration->onProceed = [this, lightDuration]() {
             if (lightDuration->value() == 0) {
                 this->onExit();
                 return true;

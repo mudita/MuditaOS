@@ -65,12 +65,13 @@ namespace app
 
     auto SongsModel::createData(OnActivateCallback onActivate,
                                 OnFocusAcquireCallback onFocusAcquire,
-                                const std::string &savedPath,
-                                OnOffsetUpdateCallback offsetUpdateCallback) -> void
+                                OnOffsetUpdateCallback offsetUpdateCallback,
+                                const std::string &chosenRecordPath) -> void
     {
+        currentlyChosenRecordPath = chosenRecordPath;
         activateCallback    = std::move(onActivate);
         focusAcquireCallback = std::move(onFocusAcquire);
-        songsRepository->init(savedPath, std::move(offsetUpdateCallback));
+        songsRepository->init(currentlyChosenRecordPath, std::move(offsetUpdateCallback));
     }
 
     auto SongsModel::updateRecordsCount() -> void
@@ -113,7 +114,7 @@ namespace app
         return std::nullopt;
     }
 
-    auto SongsModel::setCurrentlyChosenRecordPath(const std::string &path) -> void
+    auto SongsModel::updateCurrentlyChosenRecordPath(const std::string &path) -> void
     {
         currentlyChosenRecordPath = path;
     }

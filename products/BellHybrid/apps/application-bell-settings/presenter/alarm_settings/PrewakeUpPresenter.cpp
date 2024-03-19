@@ -26,7 +26,7 @@ namespace app::bell_settings
         this->provider->onToneChange = playSound;
 
         this->provider->onVolumeEnter  = playSound;
-        this->provider->onVolumeExit   = [this](const auto &) { this->stopSound(); };
+        this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
             this->audioModel.setVolume(
                 val, AbstractAudioModel::PlaybackType::PreWakeup, audio::VolumeUpdateType::SkipUpdateDB);

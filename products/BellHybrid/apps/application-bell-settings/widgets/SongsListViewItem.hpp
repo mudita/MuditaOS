@@ -33,5 +33,6 @@ namespace gui
         std::shared_ptr<app::SongsModel> songsModel;
         ListViewWithLabels *list{nullptr};
         std::function<void(const UTF8 &)> onValueChange;
+        bool listLoadingDone{false};
     };
 } // namespace gui

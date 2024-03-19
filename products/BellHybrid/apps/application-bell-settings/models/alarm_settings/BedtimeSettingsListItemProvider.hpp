@@ -32,5 +32,6 @@ namespace app::bell_settings
         std::shared_ptr<AbstractBedtimeModel> settingsModel;
         std::shared_ptr<SongsModel> songsModel;
         app::list_items::NumericWithBar *bedtimeVolume{nullptr};
+        UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings

@@ -26,6 +26,25 @@ namespace gui
         list->setListTitle(title);
         list->setListTitleFont(style::bell_sidelist_item::title_font);
 
+        focusChangedCallback = [this]([[maybe_unused]] Item &item) {
+            if (focus) {
+                /* Prevent re-focusing if list already focused, as it
+                 * will cause loss of currently active list position. */
+                if (!list->focus) {
+                    setFocusItem(body);
+                }
+                if (onEnter) {
+                    onEnter();
+                }
+            }
+            else {
+                if (onExit) {
+                    onExit();
+                }
+            }
+            return true;
+        };
+
         auto storedCallback = list->inputCallback;
         list->inputCallback = [storedCallback](Item &item, const InputEvent &event) {
             return storedCallback(item, invertNavigationDirection(event));
@@ -40,7 +59,18 @@ namespace gui
             return false;
         };
         auto onListItemFocusAcquire = [this](const db::multimedia_files::MultimediaFilesRecord &record) {
-            onValueChange(record.fileInfo.path);
+            const auto &recordPath = record.fileInfo.path;
+
+            /* Suppress initial calls of this function while the list is being
+             * loaded, only handle those caused by knob rotation. */
+            if (!listLoadingDone) {
+                if (recordPath == value()) {
+                    listLoadingDone = true;
+                }
+            }
+            else {
+                onValueChange(recordPath);
+            }
             return true;
         };
         auto onOffsetUpdateCallback = [this](std::uint32_t offset) {
@@ -48,11 +78,10 @@ namespace gui
             return true;
         };
 
-        setValue();
         this->songsModel->createData(std::move(onListItemActivate),
                                      std::move(onListItemFocusAcquire),
-                                     this->settingsModel.getValue(),
-                                     std::move(onOffsetUpdateCallback));
+                                     std::move(onOffsetUpdateCallback),
+                                     this->settingsModel.getValue());
     }
 
     auto SongsListViewItem::value() const -> UTF8
@@ -62,7 +91,7 @@ namespace gui
 
     auto SongsListViewItem::set_value(const UTF8 &value) -> void
     {
-        songsModel->setCurrentlyChosenRecordPath(value);
+        songsModel->updateCurrentlyChosenRecordPath(value);
     }
 
     auto SongsListViewItem::set_on_value_change_cb(std::function<void(const UTF8 &)> &&cb) -> void
