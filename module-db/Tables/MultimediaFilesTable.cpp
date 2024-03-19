@@ -408,6 +408,9 @@ namespace db::multimedia_files
                                   recordPath + "'";
 
         std::unique_ptr<QueryResult> retQuery = db->query(query.c_str());
+        if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
+            return SortedRecord{.path = recordPath, .offset = 0};
+        }
         return SortedRecord{.path = (*retQuery)[1].getString(), .offset = (*retQuery)[0].getUInt32()};
     }
 } // namespace db::multimedia_files
