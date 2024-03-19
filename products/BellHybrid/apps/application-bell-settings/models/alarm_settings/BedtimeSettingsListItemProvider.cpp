@@ -25,19 +25,21 @@ namespace app::bell_settings
         auto chimeTone = new SongsListViewItem(
             utils::translate("app_bell_settings_bedtime_settings_tone"), settingsModel->getBedtimeTone(), songsModel);
 
+        currentSoundPath = settingsModel->getBedtimeTone().getValue();
         chimeTone->set_on_value_change_cb([this](const auto &val) {
+            currentSoundPath = val;
             if (onToneChange) {
-                onToneChange(val);
+                onToneChange(currentSoundPath);
             }
         });
-        chimeTone->onEnter = [this, chimeTone]() {
+        chimeTone->onEnter = [this]() {
             if (onToneEnter) {
-                onToneEnter(chimeTone->value());
+                onToneEnter(currentSoundPath);
             }
         };
-        chimeTone->onExit = [this, chimeTone]() {
+        chimeTone->onExit = [this]() {
             if (onToneExit) {
-                onToneExit(chimeTone->value());
+                onToneExit(currentSoundPath);
             }
         };
         internalData.emplace_back(chimeTone);

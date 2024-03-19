@@ -127,10 +127,12 @@ namespace app::bell_settings
             new SongsListViewItem(utils::translate("app_bell_settings_alarm_settings_snooze_chime_tone"),
                                   settingsModel.getSnoozeChimeTone(),
                                   songsModel);
-        snoozeChimeTone->set_on_value_change_cb([chimeInterval, this](const auto &val) {
+
+        currentSoundPath = settingsModel.getSnoozeChimeTone().getValue();
+        snoozeChimeTone->set_on_value_change_cb([this](const auto &val) {
             currentSoundPath = val;
             if (onToneChange) {
-                onToneChange(val);
+                onToneChange(currentSoundPath);
             }
         });
         snoozeChimeTone->onEnter = [this, chimeInterval]() {

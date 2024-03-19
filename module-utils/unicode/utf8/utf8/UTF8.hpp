@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -86,6 +86,10 @@ class UTF8
     UTF8 operator+(const UTF8 &utf) const;
     UTF8 &operator+=(const UTF8 &utf);
     bool operator==(const UTF8 &utf) const;
+    friend bool operator==(const std::string &lhs, const UTF8 &rhs)
+    {
+        return rhs == lhs;
+    }
     bool operator!=(const UTF8 &utf) const
     {
         return !operator==(utf);

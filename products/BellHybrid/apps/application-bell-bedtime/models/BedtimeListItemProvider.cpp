@@ -24,7 +24,7 @@ namespace app::bell_bedtime
         constexpr auto itemCount = 2U;
         internalData.reserve(itemCount);
 
-        auto onOff       = new OnOffListItem(model.get()->getBedtimeOnOff(), utils::translate("app_bellmain_bedtime"));
+        auto onOff       = new OnOffListItem(model->getBedtimeOnOff(), utils::translate("app_bellmain_bedtime"));
         onOff->onProceed = [onOff, this]() {
             if (not onOff->isActive()) {
                 this->onExit();
@@ -33,7 +33,7 @@ namespace app::bell_bedtime
             return false;
         };
         internalData.emplace_back(onOff);
-        internalData.emplace_back(new TimeListItem(model.get()->getBedtimeTime(),
+        internalData.emplace_back(new TimeListItem(model->getBedtimeTime(),
                                                    stm::api::timeFormat(),
                                                    bell_bedtime_style::time_set_fmt_spinner::focusFont,
                                                    bell_bedtime_style::time_set_fmt_spinner::noFocusFont,
