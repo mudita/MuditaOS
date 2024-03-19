@@ -39,10 +39,9 @@ namespace app::bell_settings
     class SnoozePresenter : public AbstractSnoozePresenter
     {
       public:
-        SnoozePresenter(std::shared_ptr<SnoozeListItemProvider> provider,
-                        std::unique_ptr<AbstractSnoozeSettingsModel> snoozeSettingsModel,
-                        AbstractAudioModel &audioModel,
-                        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository);
+        SnoozePresenter(std::unique_ptr<SnoozeListItemProvider> &&provider,
+                        std::unique_ptr<AbstractSnoozeSettingsModel> &&snoozeSettingsModel,
+                        AbstractAudioModel &audioModel);
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         void saveData() override;
         void loadData() override;
@@ -55,7 +54,6 @@ namespace app::bell_settings
         std::shared_ptr<SnoozeListItemProvider> provider;
         std::unique_ptr<AbstractSnoozeSettingsModel> snoozeSettingsModel;
         AbstractAudioModel &audioModel;
-        std::unique_ptr<AbstractSimpleSoundsRepository> soundsRepository;
         UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings
