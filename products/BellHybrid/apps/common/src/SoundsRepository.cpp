@@ -254,7 +254,7 @@ std::optional<SoundsRepository::PathDetails> SoundsRepository::getPathDetails(co
     return std::nullopt;
 }
 
-std::optional<std::uint32_t> SoundsRepository::calculateOffsetFromDB(std::uint32_t offset, const std::string songPath)
+std::optional<std::uint32_t> SoundsRepository::calculateOffsetFromDB(std::uint32_t offset, const std::string &songPath)
 {
     // the offset returned by the database is incremented from 1,
     // while the offset used in listView is from 0

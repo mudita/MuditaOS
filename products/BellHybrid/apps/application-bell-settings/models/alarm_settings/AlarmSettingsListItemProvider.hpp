@@ -30,5 +30,6 @@ namespace app::bell_settings
         AbstractAlarmSettingsModel &settingsModel;
         app::list_items::NumericWithBar *alarmVolume{nullptr};
         std::shared_ptr<SongsModel> songsModel;
+        UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings
