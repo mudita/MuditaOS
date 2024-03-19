@@ -27,8 +27,8 @@ namespace app
 
         virtual auto createData(OnActivateCallback activateCallback,
                                 OnFocusAcquireCallback focusChangeCallback,
-                                const std::string &savedPath,
-                                OnOffsetUpdateCallback offsetUpdateCallback) -> void = 0;
+                                OnOffsetUpdateCallback offsetUpdateCallback,
+                                const std::string &savedPath) -> void = 0;
     };
 
     class SongsModel : public SongsProvider
@@ -49,12 +49,12 @@ namespace app
 
         auto createData(OnActivateCallback activateCallback         = nullptr,
                         OnFocusAcquireCallback focusChangeCallback  = nullptr,
-                        const std::string &savedPath                = "",
-                        OnOffsetUpdateCallback offsetUpdateCallback = nullptr) -> void override;
+                        OnOffsetUpdateCallback offsetUpdateCallback = nullptr,
+                        const std::string &chosenRecordPath         = "") -> void override;
         auto updateRecordsCount() -> void;
         auto nextRecordExists(gui::Order order) -> bool;
 
-        auto setCurrentlyChosenRecordPath(const std::string &path) -> void;
+        auto updateCurrentlyChosenRecordPath(const std::string &path) -> void;
         [[nodiscard]] auto getCurrentlyChosenRecordPath() const -> std::string;
 
       private:

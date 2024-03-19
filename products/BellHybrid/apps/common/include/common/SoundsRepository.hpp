@@ -15,8 +15,8 @@ class AbstractSimpleSoundsRepository
 {
   public:
     virtual ~AbstractSimpleSoundsRepository()                                         = default;
-    virtual std::optional<std::filesystem::path> titleToPath(const UTF8 &title) const = 0;
-    virtual std::optional<UTF8> pathToTitle(std::filesystem::path) const              = 0;
+    [[nodiscard]] virtual std::optional<std::filesystem::path> titleToPath(const UTF8 &title) const = 0;
+    [[nodiscard]] virtual std::optional<UTF8> pathToTitle(std::filesystem::path) const              = 0;
     virtual std::vector<UTF8> getSongTitles()                                         = 0;
 };
 
@@ -25,8 +25,8 @@ class SimpleSoundsRepository : public AbstractSimpleSoundsRepository
   public:
     explicit SimpleSoundsRepository(std::filesystem::path dirToScan);
 
-    std::optional<std::filesystem::path> titleToPath(const UTF8 &title) const override;
-    std::optional<UTF8> pathToTitle(std::filesystem::path path) const override;
+    [[nodiscard]] std::optional<std::filesystem::path> titleToPath(const UTF8 &title) const override;
+    [[nodiscard]] std::optional<UTF8> pathToTitle(std::filesystem::path path) const override;
     std::vector<UTF8> getSongTitles() override;
 
   private:
@@ -99,5 +99,5 @@ class SoundsRepository : public AbstractSoundsRepository, public app::AsyncCallb
                        const OnGetMusicFilesListCallback &viewUpdateCallback);
     std::optional<PathDetails> getPathDetails(const std::string &songPath);
     void updateOffsetFromSavedPath(const std::string &savedPath, OnOffsetUpdateCallback offsetUpdateCallback);
-    std::optional<std::uint32_t> calculateOffsetFromDB(std::uint32_t offset, const std::string songPath);
+    std::optional<std::uint32_t> calculateOffsetFromDB(std::uint32_t offset, const std::string &songPath);
 };
