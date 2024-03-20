@@ -1,19 +1,11 @@
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <common/widgets/LabelListItem.hpp>
+#include <common/widgets/LabelMarkerItem.hpp>
 #include "common/options/OptionBellMenu.hpp"
 
 namespace gui
 {
-    LabelListItem::LabelListItem(ListLabel label) : label{std::move(label)}
-    {}
-
-    ListLabel LabelListItem::getLabel()
-    {
-        return label;
-    }
-
     LabelMarkerItem::LabelMarkerItem(const UTF8 &labelText)
     {
         constexpr auto linesMaxNumber{1U};

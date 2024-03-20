@@ -50,6 +50,7 @@ class AbstractSoundsRepository
                                const OnGetMusicFilesListCallback &callback) = 0;
 
     virtual std::uint32_t getFilesCount() = 0;
+    virtual std::uint32_t getFilesCountFromPath(const std::string &filesPath) = 0;
     virtual void updateFilesCount()       = 0;
 };
 
@@ -75,6 +76,7 @@ class SoundsRepository : public AbstractSoundsRepository, public app::AsyncCallb
                        const OnGetMusicFilesListCallback &viewUpdateCallback) override;
 
     std::uint32_t getFilesCount() override;
+    std::uint32_t getFilesCountFromPath(const std::string &filesPath) override;
     void updateFilesCount() override;
 
   private:
