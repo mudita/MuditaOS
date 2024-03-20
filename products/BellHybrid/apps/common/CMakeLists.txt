@@ -62,7 +62,7 @@ target_sources(application-bell-common
         src/widgets/LayoutVertical.cpp
         src/widgets/ClockVertical.cpp
         src/widgets/ListViewWithLabels.cpp
-        src/widgets/LabelListItem.cpp
+        src/widgets/LabelMarkerItem.cpp
         src/widgets/LabelOptionWithTick.cpp
 
         src/options/BellOptionWindow.cpp
@@ -145,7 +145,7 @@ target_sources(application-bell-common
         include/common/widgets/LayoutVertical.hpp
         include/common/widgets/ClockVertical.hpp
         include/common/widgets/ListViewWithLabels.hpp
-        include/common/widgets/LabelListItem.hpp
+        include/common/widgets/LabelMarkerItem.hpp
         include/common/widgets/LabelOptionWithTick.hpp
 
         include/common/options/BellOptionWindow.hpp

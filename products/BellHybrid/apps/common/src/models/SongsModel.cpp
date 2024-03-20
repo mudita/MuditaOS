@@ -23,7 +23,7 @@ namespace app
 
     auto SongsModel::getMinimalItemSpaceRequired() const -> unsigned
     {
-        return style::bell_options::h + 2 * style::bell_options::option_margin;
+        return style::bell_options::h + 3 * style::bell_options::option_margin;
     }
 
     auto SongsModel::getItem(gui::Order order) -> gui::ListItem *
@@ -104,14 +104,24 @@ namespace app
         return true;
     }
 
-    auto SongsModel::getLabelFromPath(const std::string &path) -> gui::ListLabel
+    auto SongsModel::getLabelFromPath(const std::string &path) -> std::string
     {
         for (const auto &[label, pathPrefix] : pathPrefixes) {
             if (path.find(pathPrefix) != std::string::npos) {
                 return label;
             }
         }
-        return std::nullopt;
+        return {};
+    }
+
+    auto SongsModel::getLabelsFilesCount() -> std::vector<std::pair<std::string, std::uint32_t>>
+    {
+        std::vector<std::pair<std::string, std::uint32_t>> labelWithFilesCount;
+        for (const auto &[label, pathPrefix] : pathPrefixes) {
+            const auto count = songsRepository->getFilesCountFromPath(pathPrefix);
+            labelWithFilesCount.push_back({label, count});
+        }
+        return labelWithFilesCount;
     }
 
     auto SongsModel::updateCurrentlyChosenRecordPath(const std::string &path) -> void

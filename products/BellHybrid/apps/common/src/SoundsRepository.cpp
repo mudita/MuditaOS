@@ -185,6 +185,16 @@ std::uint32_t SoundsRepository::getFilesCount()
         paths.begin(), paths.end(), 0, [](const std::uint32_t sum, const auto &record) { return sum + record.count; });
 }
 
+std::uint32_t SoundsRepository::getFilesCountFromPath(const std::string &filesPath)
+{
+    for (const auto &path : paths) {
+        if (filesPath == path.prefix) {
+            return path.count;
+        }
+    }
+    return 0;
+}
+
 void SoundsRepository::updateFilesCount()
 {
     for (const auto &path : paths) {
