@@ -13,8 +13,6 @@ namespace gui
     class ListItemProvider;
     class LabelMarkerItem;
 
-    using ListLabel = std::optional<std::string>;
-
     class ListViewWithLabels : public ListViewWithArrows
     {
       public:
@@ -25,19 +23,20 @@ namespace gui
                            unsigned int h,
                            std::shared_ptr<ListItemProvider> prov);
 
-        void reset() override;
-
       private:
         [[nodiscard]] std::size_t getSlotsLeft() const;
         void addItemsOnPage() override;
-        void addLabelMarker(ListItem *item);
-        void updateState(ListLabel newMarker);
-        LabelMarkerItem *createMarkerItem(ListLabel label);
+        void addItems();
+        void addLabelItem();
+        void getLabels();
+        std::uint32_t getLabelsCount(unsigned int index);
+        LabelMarkerItem *createMarkerItem(const std::string &label);
 
-        ListLabel current{std::nullopt};
-        ListLabel previous{std::nullopt};
-        ListLabel currentMarker{std::nullopt};
+        std::vector<std::pair<std::string, std::uint32_t>> labelFiles;
+        unsigned int currentFocusIndex{0};
+        unsigned int hiddenItemIndex{0};
         std::uint32_t itemsOnPage{0};
-        bool labelAdded{false};
+        std::uint32_t labelsCount{0};
+        bool wasSetFocus{false};
     };
 } // namespace gui
