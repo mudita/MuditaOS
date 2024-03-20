@@ -391,23 +391,12 @@ namespace db::multimedia_files
                                                              const std::string &recordPath,
                                                              SortingBy sorting) -> SortedRecord
     {
-        const std::string query = "SELECT * FROM ("
-                                  "      SELECT"
-                                  "          ROW_NUMBER () OVER ("
-                                  "              ORDER BY " +
-                                  getSorting(sorting) +
-                                  "          ) offset,"
-                                  "          path"
-                                  "      FROM"
-                                  "          files"
-                                  "      WHERE path LIKE '" +
-                                  folderPath + "%%'" +
-                                  "  )"
-                                  "  WHERE"
-                                  "      path='" +
-                                  recordPath + "'";
-
-        std::unique_ptr<QueryResult> retQuery = db->query(query.c_str());
+        std::unique_ptr<QueryResult> retQuery =
+            db->query("SELECT * FROM ( SELECT ROW_NUMBER () OVER ( ORDER BY %q ) offset, "
+                      " path FROM files WHERE path LIKE '%q%%' ) WHERE path='%q'",
+                      getSorting(sorting).c_str(),
+                      folderPath.c_str(),
+                      recordPath.c_str());
         if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
             return SortedRecord{.path = recordPath, .offset = 0};
         }

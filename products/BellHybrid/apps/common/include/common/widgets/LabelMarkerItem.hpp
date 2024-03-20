@@ -9,17 +9,6 @@
 
 namespace gui
 {
-    class LabelListItem : public ListItem
-    {
-      private:
-        ListLabel label{};
-
-      public:
-        explicit LabelListItem(ListLabel label);
-        virtual ~LabelListItem() = default;
-        ListLabel getLabel();
-    };
-
     class LabelMarkerItem : public ListItem
     {
       public:

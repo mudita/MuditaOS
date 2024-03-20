@@ -4,13 +4,13 @@
 #pragma once
 
 #include <common/SoundsRepository.hpp>
-#include <common/widgets/LabelListItem.hpp>
+#include <common/widgets/LabelMarkerItem.hpp>
 #include <apps-common/models/SongsModelInterface.hpp>
 #include <gui/widgets/ListItemProvider.hpp>
 
 namespace app
 {
-    using LabelsWithPaths = std::map<std::string, std::string>;
+    using LabelsWithPaths = std::vector<std::pair<std::string, std::string>>;
 
     class SongsProvider : public app::DatabaseModel<db::multimedia_files::MultimediaFilesRecord>,
                           public gui::ListItemProvider
@@ -55,6 +55,7 @@ namespace app
         auto nextRecordExists(gui::Order order) -> bool;
 
         auto updateCurrentlyChosenRecordPath(const std::string &path) -> void;
+        auto getLabelsFilesCount() -> std::vector<std::pair<std::string, std::uint32_t>>;
         [[nodiscard]] auto getCurrentlyChosenRecordPath() const -> std::string;
 
       private:
@@ -62,7 +63,7 @@ namespace app
                                   unsigned repoRecordsCount) -> bool;
         [[nodiscard]] auto updateRecords(std::vector<db::multimedia_files::MultimediaFilesRecord> records)
             -> bool override;
-        auto getLabelFromPath(const std::string &path) -> gui::ListLabel;
+        auto getLabelFromPath(const std::string &path) -> std::string;
 
         ApplicationCommon *application{nullptr};
         std::unique_ptr<AbstractSoundsRepository> songsRepository;
