@@ -92,6 +92,11 @@ namespace bsp
             return ((PMU->REG_2P5 & PMU_REG_2P5_BO_VDD2P5_MASK) != 0);
         }
 
+        bool isDebugSessionActive()
+        {
+            return ((CoreDebug->DHCSR & CoreDebug_DHCSR_C_DEBUGEN_Msk) != 0);
+        }
+
         void disableSystick()
         {
             SysTick->CTRL &= ~SysTick_CTRL_ENABLE_Msk;
@@ -127,6 +132,11 @@ namespace bsp
             return 0;
         }
         timeSpentInWFI = 0;
+        if (isDebugSessionActive()) {
+            LOG_INFO("WFI disabled - active core debug session detected");
+            blockEnteringWfiMode();
+            return 0;
+        }
         if (isTimerTaskScheduledSoon()) {
             blockEnteringWfiMode();
             return 0;
