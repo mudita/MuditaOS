@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -192,7 +192,7 @@ namespace gui
         /// @param newDim : new bounding box dimensions (item size & position)
         /// @note TODO should be fixed so that api would be consistent
         virtual bool onDimensionChanged(const BoundingBox &oldDim, const BoundingBox &newDim);
-        /// called on Timer event in application, triggeres timerCallback
+        /// called on Timer event in application, triggers timerCallback
         /// @param : timer timer element which triggered this action
         virtual bool onTimer(sys::Timer &timer);
 

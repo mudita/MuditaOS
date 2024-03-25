@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WindowWithTimer.hpp"
@@ -14,24 +14,29 @@ namespace gui
 
     WindowWithTimer::WindowWithTimer(app::ApplicationCommon *app,
                                      const std::string &name,
-                                     const std::chrono::milliseconds timeout)
+                                     std::chrono::milliseconds timeout)
         : AppWindow{app, name}, timeout{timeout}
     {
         popupTimer    = app::GuiTimerFactory::createSingleShotTimer(application, this, popup::timerName, timeout);
         timerCallback = [this, name](Item &, sys::Timer &timer) {
-            if (application->getCurrentWindow()->getName() == name) {
-                LOG_DEBUG("Delayed exit timer callback from: %s", name.c_str());
+            if (windowTimerActionCallback) {
+                windowTimerActionCallback();
+            }
+
+            const auto &currentWindowName = application->getCurrentWindow()->getName();
+            if (currentWindowName == name) {
+                LOG_INFO("Delayed exit timer callback from '%s'", name.c_str());
                 application->returnToPreviousWindow();
                 return true;
             }
-            else {
-                LOG_DEBUG("Delayed exit from: %s not succeeded, different window displayed already", name.c_str());
-                return false;
-            }
+            LOG_WARN("Delayed exit from '%s' unsuccessful, different window '%s' displayed already",
+                     name.c_str(),
+                     currentWindowName.c_str());
+            return false;
         };
     }
 
-    void WindowWithTimer::resetTimer(const std::chrono::seconds newTimeout)
+    void WindowWithTimer::resetTimer(std::chrono::seconds newTimeout)
     {
         if (newTimeout != noTimeoutChange) {
             timeout = newTimeout;
@@ -71,8 +76,13 @@ namespace gui
         detachTimerIfExists();
     }
 
-    bool WindowWithTimer::onInput(const gui::InputEvent &inputEvent)
+    bool WindowWithTimer::onInput([[maybe_unused]] const gui::InputEvent &inputEvent)
     {
         return false;
+    }
+
+    void WindowWithTimer::setWindowTimerActionCallback(std::function<void()> &&callback)
+    {
+        windowTimerActionCallback = std::move(callback);
     }
 } // namespace gui
