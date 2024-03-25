@@ -7,12 +7,13 @@
 
 #include <apps-common/popups/WindowWithTimer.hpp>
 #include <apps-common/widgets/spinners/Spinners.hpp>
-#include <common/models/AbstractAudioModel.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 
 namespace gui
 {
     class BellBaseLayout;
+
     class RelaxationVolumeWindow : public WindowWithTimer
     {
       public:
@@ -28,6 +29,5 @@ namespace gui
 
         void buildInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
-        void onClose(CloseReason reason) override;
     };
 } // namespace gui

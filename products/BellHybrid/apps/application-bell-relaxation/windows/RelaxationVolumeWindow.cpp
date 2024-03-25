@@ -5,8 +5,8 @@
 #include <data/RelaxationStyle.hpp>
 #include <ApplicationBellRelaxation.hpp>
 
-#include <apps-common/widgets/BellBaseLayout.hpp>
 #include <popups/data/PopupData.hpp>
+#include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 
 namespace gui
@@ -73,6 +73,8 @@ namespace gui
 
         setFocusItem(body);
         body->resize();
+
+        setWindowTimerActionCallback([this]() { presenter->saveVolume(spinner->value()); });
     }
 
     bool RelaxationVolumeWindow::onInput(const InputEvent &inputEvent)
@@ -90,11 +92,5 @@ namespace gui
         progress->setValue(selectedValue);
         body->setMinMaxArrowsVisibility(selectedValue == data.min, selectedValue == data.max);
         return ret;
-    }
-
-    void RelaxationVolumeWindow::onClose(CloseReason reason)
-    {
-        presenter->saveVolume(spinner->value());
-        WindowWithTimer::onClose(reason);
     }
 } // namespace gui
