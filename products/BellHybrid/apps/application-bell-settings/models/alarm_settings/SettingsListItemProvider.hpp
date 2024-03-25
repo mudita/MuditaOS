@@ -15,6 +15,7 @@ namespace app::bell_settings
       public:
         /// Val contains currently chosen tone
         using ToneCallback = std::function<void(const UTF8 &val)>;
+        using ToneProceedCallback = std::function<bool(const UTF8 &val)>;
         /// Val contains currently chosen volume (1-10 range)
         using VolumeCallback      = std::function<void(const uint32_t &val)>;
         using VolumeEnterCallback = ToneCallback;
@@ -39,6 +40,7 @@ namespace app::bell_settings
         ToneCallback onToneEnter;
         ToneCallback onToneExit;
         ToneCallback onToneChange;
+        ToneProceedCallback onToneProceed;
 
         VolumeEnterCallback onVolumeEnter;
         VolumeCallback onVolumeExit;

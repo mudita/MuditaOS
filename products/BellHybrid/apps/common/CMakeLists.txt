@@ -27,6 +27,7 @@ target_sources(application-bell-common
         src/SoundsProvider.cpp
         src/BellSideListItemWithCallbacks.cpp
         src/TimeUtils.cpp
+        src/AudioErrorPresenter.cpp
 
         src/windows/BellFactoryReset.cpp
         src/windows/BellFinishedWindow.cpp
@@ -36,6 +37,7 @@ target_sources(application-bell-common
         src/windows/ShortcutsWindow.cpp
         src/windows/BellBatteryStatusWindow.cpp
         src/windows/AppsBatteryStatusWindow.cpp
+        src/windows/AudioErrorWindow.cpp
 
         src/models/SettingsModel.cpp
         src/models/BedtimeModel.cpp
@@ -92,6 +94,7 @@ target_sources(application-bell-common
         include/common/SoundsRepository.hpp
         include/common/BellPowerOffPresenter.hpp
         include/common/BellFactoryResetPresenter.hpp
+        include/common/AudioErrorPresenter.hpp
         include/common/windows/BellFactoryReset.hpp
         include/common/windows/BellFinishedWindow.hpp
         include/common/windows/BellTurnOffWindow.hpp
@@ -101,6 +104,7 @@ target_sources(application-bell-common
         include/common/windows/ShortcutsWindow.hpp
         include/common/windows/BellBatteryStatusWindow.hpp
         include/common/windows/AppsBatteryStatusWindow.hpp
+        include/common/windows/AudioErrorWindow.hpp
         include/common/TimeUtils.hpp
 
         include/common/data/BatteryUtils.hpp
