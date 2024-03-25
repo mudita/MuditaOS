@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -70,10 +70,4 @@ namespace gui::relaxationStyle
             inline constexpr auto maxSizeY  = 84U;
         } // namespace clock
     }     // namespace relStyle
-
-    namespace error
-    {
-        inline constexpr auto imageMarginTop = 122U;
-        inline constexpr auto textPaddingTop = 30U;
-    } // namespace error
 } // namespace gui::relaxationStyle

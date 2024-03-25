@@ -8,13 +8,29 @@ namespace app::bell_settings
 {
     SnoozePresenter::SnoozePresenter(std::unique_ptr<SnoozeListItemProvider> &&provider,
                                      std::unique_ptr<AbstractSnoozeSettingsModel> &&snoozeSettingsModel,
-                                     AbstractAudioModel &audioModel)
-        : provider{std::move(provider)}, snoozeSettingsModel{std::move(snoozeSettingsModel)}, audioModel{audioModel}
+                                     AbstractAudioModel &audioModel,
+                                     std::unique_ptr<AudioErrorModel> &&audioErrorModel)
+        : provider{std::move(provider)}, snoozeSettingsModel{std::move(snoozeSettingsModel)}, audioModel{audioModel},
+          audioErrorModel{std::move(audioErrorModel)}
     {
         auto playSound = [this](const UTF8 &val) {
+            auto onStartCallback = [this, val](audio::RetCode retCode) {
+                if (retCode != audio::RetCode::Success) {
+                    handleAudioError(val, gui::AudioErrorType::UnsupportedMediaType);
+                }
+            };
+
+            auto onFinishedCallback = [this, val](AbstractAudioModel::PlaybackFinishStatus status) {
+                if (status == AbstractAudioModel::PlaybackFinishStatus::Error) {
+                    handleAudioError(val, gui::AudioErrorType::FileDeleted);
+                }
+            };
+
             currentSoundPath = val;
             this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::Snooze);
-            this->audioModel.play(currentSoundPath, AbstractAudioModel::PlaybackType::Snooze, {});
+            this->audioModel.setPlaybackFinishedCb(std::move(onFinishedCallback));
+            this->audioModel.play(
+                currentSoundPath, AbstractAudioModel::PlaybackType::Snooze, std::move(onStartCallback));
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
@@ -22,6 +38,7 @@ namespace app::bell_settings
         this->provider->onToneEnter  = playSound;
         this->provider->onToneExit   = [this](const auto &) { stopSound(); };
         this->provider->onToneChange = playSound;
+        this->provider->onToneProceed = [this](const auto &path) { return validatePath(path); };
 
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
@@ -34,7 +51,7 @@ namespace app::bell_settings
         };
     }
 
-    void SnoozePresenter::saveData()
+    auto SnoozePresenter::saveData() -> void
     {
         stopSound();
         for (const auto &item : provider->getListItems()) {
@@ -42,7 +59,7 @@ namespace app::bell_settings
         }
     }
 
-    void SnoozePresenter::loadData()
+    auto SnoozePresenter::loadData() -> void
     {
         for (const auto &item : provider->getListItems()) {
             item->setValue();
@@ -54,18 +71,49 @@ namespace app::bell_settings
         return provider;
     }
 
-    void SnoozePresenter::stopSound()
+    auto SnoozePresenter::stopSound() -> void
     {
         audioModel.stopPlayedByThis({});
     }
 
-    void SnoozePresenter::eraseProviderData()
+    auto SnoozePresenter::eraseProviderData() -> void
     {
         provider->clearData();
     }
 
-    void SnoozePresenter::exitWithoutSave()
+    auto SnoozePresenter::exitWithoutSave() -> void
     {
         snoozeSettingsModel->getSnoozeChimeVolume().restoreDefault();
+    }
+
+    auto SnoozePresenter::handleAudioError(const UTF8 &path, gui::AudioErrorType errorType) -> void
+    {
+        const bool validPath = !audioErrorModel->isPathOnErrorList(path);
+        if (validPath) {
+            audioErrorModel->addPathToErrorList(path, errorType);
+            showAudioError(errorType);
+        }
+    }
+
+    auto SnoozePresenter::validatePath(const UTF8 &path) const -> bool
+    {
+        const auto errorType = audioErrorModel->getErrorType(path);
+        if (errorType.has_value()) {
+            showAudioError(errorType.value());
+            return true;
+        }
+        return false;
+    }
+
+    auto SnoozePresenter::showAudioError(gui::AudioErrorType errorType) const -> void
+    {
+        switch (errorType) {
+        case gui::AudioErrorType::FileDeleted:
+            getView()->handleDeletedFile();
+            break;
+        default:
+            getView()->handleError();
+            break;
+        }
     }
 } // namespace app::bell_settings

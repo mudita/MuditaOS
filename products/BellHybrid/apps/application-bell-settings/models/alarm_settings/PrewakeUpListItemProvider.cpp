@@ -70,6 +70,12 @@ namespace app::bell_settings
                 onToneExit(currentSoundPath);
             }
         };
+        chimeTone->onProceed = [this]() {
+            if (onToneProceed) {
+                return onToneProceed(currentSoundPath);
+            }
+            return false;
+        };
         internalData.emplace_back(chimeTone);
 
         constexpr auto volumeStep = 1U;

@@ -1,11 +1,11 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationRunningProgressWindow.hpp"
 #include <data/RelaxationStyle.hpp>
 #include <data/RelaxationSwitchData.hpp>
-#include <data/RelaxationErrorData.hpp>
-
+#include <common/BellCommonNames.hpp>
+#include <popups/data/AudioErrorParams.hpp>
 #include <ApplicationBellRelaxation.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
@@ -177,13 +177,13 @@ namespace gui
 
     void RelaxationRunningProgressWindow::handleError()
     {
-        auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::UnsupportedMediaType);
-        application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
+        auto switchData = std::make_unique<AudioErrorParams>(AudioErrorType::UnsupportedMediaType);
+        application->switchWindow(gui::window::name::audioErrorWindow, std::move(switchData));
     }
 
     void RelaxationRunningProgressWindow::handleDeletedFile()
     {
-        auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::FileDeleted);
-        application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
+        auto switchData = std::make_unique<AudioErrorParams>(AudioErrorType::FileDeleted);
+        application->switchWindow(gui::window::name::audioErrorWindow, std::move(switchData));
     }
 } // namespace gui

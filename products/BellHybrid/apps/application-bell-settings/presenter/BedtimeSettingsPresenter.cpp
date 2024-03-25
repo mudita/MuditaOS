@@ -5,21 +5,38 @@
 
 namespace app::bell_settings
 {
-    SettingsPresenter::SettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
+    SettingsPresenter::SettingsPresenter(std::unique_ptr<BedtimeSettingsListItemProvider> &&provider,
                                          std::shared_ptr<AbstractBedtimeModel> model,
-                                         AbstractAudioModel &audioModel)
-        : provider(std::move(provider)), model(std::move(model)), audioModel{audioModel}
+                                         AbstractAudioModel &audioModel,
+                                         std::unique_ptr<AudioErrorModel> &&audioErrorModel)
+        : provider{std::move(provider)}, model{std::move(model)}, audioModel{audioModel}, audioErrorModel{std::move(
+                                                                                              audioErrorModel)}
     {
         auto playSound = [this](const UTF8 &val) {
+            auto onStartCallback = [this, val](audio::RetCode retCode) {
+                if (retCode != audio::RetCode::Success) {
+                    handleAudioError(val, gui::AudioErrorType::UnsupportedMediaType);
+                }
+            };
+
+            auto onFinishedCallback = [this, val](AbstractAudioModel::PlaybackFinishStatus status) {
+                if (status == AbstractAudioModel::PlaybackFinishStatus::Error) {
+                    handleAudioError(val, gui::AudioErrorType::FileDeleted);
+                }
+            };
+
             currentSoundPath = val;
             this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::Bedtime);
-            this->audioModel.play(currentSoundPath, AbstractAudioModel::PlaybackType::Bedtime, {});
+            this->audioModel.setPlaybackFinishedCb(std::move(onFinishedCallback));
+            this->audioModel.play(
+                currentSoundPath, AbstractAudioModel::PlaybackType::Bedtime, std::move(onStartCallback));
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
 
         this->provider->onToneEnter  = playSound;
         this->provider->onToneChange = playSound;
+        this->provider->onToneProceed = [this](const auto &path) { return validatePath(path); };
 
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { this->stopSound(); };
@@ -56,13 +73,45 @@ namespace app::bell_settings
         provider->clearData();
     }
 
-    void SettingsPresenter::stopSound()
+    auto SettingsPresenter::stopSound() -> void
     {
         this->audioModel.stopPlayedByThis({});
     }
-    void SettingsPresenter::exitWithoutSave()
+
+    auto SettingsPresenter::exitWithoutSave() -> void
     {
         this->stopSound();
         model->getBedtimeVolume().restoreDefault();
+    }
+
+    auto SettingsPresenter::handleAudioError(const UTF8 &path, gui::AudioErrorType errorType) -> void
+    {
+        const bool validPath = !audioErrorModel->isPathOnErrorList(path);
+        if (validPath) {
+            audioErrorModel->addPathToErrorList(path, errorType);
+            showAudioError(errorType);
+        }
+    }
+
+    auto SettingsPresenter::validatePath(const UTF8 &path) const -> bool
+    {
+        const auto errorType = audioErrorModel->getErrorType(path);
+        if (errorType.has_value()) {
+            showAudioError(errorType.value());
+            return true;
+        }
+        return false;
+    }
+
+    auto SettingsPresenter::showAudioError(gui::AudioErrorType errorType) const -> void
+    {
+        switch (errorType) {
+        case gui::AudioErrorType::FileDeleted:
+            getView()->handleDeletedFile();
+            break;
+        default:
+            getView()->handleError();
+            break;
+        }
     }
 } // namespace app::bell_settings

@@ -4,7 +4,8 @@
 #include "RelaxationRunningLoopWindow.hpp"
 #include <data/RelaxationStyle.hpp>
 #include <data/RelaxationSwitchData.hpp>
-#include <data/RelaxationErrorData.hpp>
+#include <popups/data/AudioErrorParams.hpp>
+#include <common/BellCommonNames.hpp>
 
 #include <ApplicationBellRelaxation.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
@@ -232,13 +233,13 @@ namespace gui
 
     void RelaxationRunningLoopWindow::handleError()
     {
-        auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::UnsupportedMediaType);
-        application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
+        auto switchData = std::make_unique<AudioErrorParams>(AudioErrorType::UnsupportedMediaType);
+        application->switchWindow(gui::window::name::audioErrorWindow, std::move(switchData));
     }
 
     void RelaxationRunningLoopWindow::handleDeletedFile()
     {
-        auto switchData = std::make_unique<RelaxationErrorData>(RelaxationErrorType::FileDeleted);
-        application->switchWindow(gui::window::name::relaxationError, std::move(switchData));
+        auto switchData = std::make_unique<AudioErrorParams>(AudioErrorType::FileDeleted);
+        application->switchWindow(gui::window::name::audioErrorWindow, std::move(switchData));
     }
 } // namespace gui

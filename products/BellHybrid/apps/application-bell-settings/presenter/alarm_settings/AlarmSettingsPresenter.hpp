@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "models/AudioErrorModel.hpp"
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/AudioOperations.hpp>
 #include <common/models/AbstractAudioModel.hpp>
@@ -28,6 +29,8 @@ namespace app::bell_settings
           public:
             virtual ~View() noexcept = default;
             virtual void exit()      = 0;
+            virtual void handleError()       = 0;
+            virtual void handleDeletedFile() = 0;
         };
 
         class Presenter : public BasePresenter<View>
@@ -49,7 +52,8 @@ namespace app::bell_settings
         AlarmSettingsPresenter(std::unique_ptr<AlarmSettingsListItemProvider> &&provider,
                                std::unique_ptr<AbstractAlarmSettingsModel> &&settingsModel,
                                AbstractAudioModel &audioModel,
-                               std::unique_ptr<AbstractFrontlightModel> &&frontlight);
+                               std::unique_ptr<AbstractFrontlightModel> &&frontlight,
+                               std::unique_ptr<AudioErrorModel> &&audioErrorModel);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto loadData() -> void override;
@@ -60,11 +64,15 @@ namespace app::bell_settings
 
       private:
         auto stopSound() -> void;
+        auto handleAudioError(const UTF8 &path, gui::AudioErrorType errorType) -> void;
+        auto showAudioError(gui::AudioErrorType errorType) const -> void;
+        auto validatePath(const UTF8 &path) const -> bool;
 
         std::shared_ptr<AlarmSettingsListItemProvider> provider;
         std::unique_ptr<AbstractAlarmSettingsModel> settingsModel;
         AbstractAudioModel &audioModel;
         std::unique_ptr<AbstractFrontlightModel> frontlight;
+        std::unique_ptr<AudioErrorModel> audioErrorModel;
         UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings

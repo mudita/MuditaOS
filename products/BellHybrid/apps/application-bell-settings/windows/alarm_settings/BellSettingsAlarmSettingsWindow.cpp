@@ -5,8 +5,10 @@
 #include "BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "BellSettingsAlarmSettingsWindow.hpp"
 #include "BellSettingsStyle.hpp"
-#include <common/windows/BellFinishedWindow.hpp>
 
+#include <common/windows/BellFinishedWindow.hpp>
+#include <popups/data/AudioErrorParams.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <apps-common/options/OptionStyle.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/SideListView.hpp>
@@ -78,5 +80,17 @@ namespace gui
     void BellSettingsAlarmSettingsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
     {
         setFocusItem(sidelistview);
+    }
+
+    void BellSettingsAlarmSettingsWindow::handleError()
+    {
+        auto switchData = std::make_unique<AudioErrorParams>(AudioErrorType::UnsupportedMediaType);
+        app::manager::Controller::sendAction(application, app::manager::actions::ShowPopup, std::move(switchData));
+    }
+
+    void BellSettingsAlarmSettingsWindow::handleDeletedFile()
+    {
+        auto switchData = std::make_unique<AudioErrorParams>(AudioErrorType::FileDeleted);
+        app::manager::Controller::sendAction(application, app::manager::actions::ShowPopup, std::move(switchData));
     }
 } /* namespace gui */

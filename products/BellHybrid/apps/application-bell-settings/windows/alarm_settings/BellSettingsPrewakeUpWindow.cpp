@@ -1,12 +1,14 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
 #include "BellSettingsAlarmSettingsMenuWindow.hpp"
 #include "BellSettingsPrewakeUpWindow.hpp"
 #include "BellSettingsStyle.hpp"
-#include <common/windows/BellFinishedWindow.hpp>
 
+#include <common/windows/BellFinishedWindow.hpp>
+#include <popups/data/AudioErrorParams.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <apps-common/options/OptionStyle.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/SideListView.hpp>
@@ -77,5 +79,17 @@ namespace gui
         if (reason != CloseReason::Popup) {
             presenter->eraseProviderData();
         }
+    }
+
+    void BellSettingsPrewakeUpWindow::handleError()
+    {
+        auto switchData = std::make_unique<AudioErrorParams>(AudioErrorType::UnsupportedMediaType);
+        app::manager::Controller::sendAction(application, app::manager::actions::ShowPopup, std::move(switchData));
+    }
+
+    void BellSettingsPrewakeUpWindow::handleDeletedFile()
+    {
+        auto switchData = std::make_unique<AudioErrorParams>(AudioErrorType::FileDeleted);
+        app::manager::Controller::sendAction(application, app::manager::actions::ShowPopup, std::move(switchData));
     }
 } /* namespace gui */

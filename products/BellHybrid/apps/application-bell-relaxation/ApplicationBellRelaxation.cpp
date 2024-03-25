@@ -9,7 +9,6 @@
 #include "presenter/RelaxationVolumePresenter.hpp"
 #include "presenter/RelaxationPausedPresenter.hpp"
 #include "presenter/RelaxationEndedPresenter.hpp"
-#include "presenter/RelaxationErrorPresenter.hpp"
 #include "windows/RelaxationMainWindow.hpp"
 #include "windows/RelaxationPausedWindow.hpp"
 #include "windows/RelaxationRunningProgressWindow.hpp"
@@ -17,7 +16,6 @@
 #include "windows/RelaxationTimerSelectWindow.hpp"
 #include "windows/RelaxationVolumeWindow.hpp"
 #include "windows/RelaxationEndedWindow.hpp"
-#include "windows/RelaxationErrorWindow.hpp"
 #include "widgets/RelaxationPlayer.hpp"
 #include <Paths.hpp>
 #include <apps-common/messages/AppMessage.hpp>
@@ -28,6 +26,9 @@
 #include <common/models/AudioModel.hpp>
 #include <common/models/SongsModel.hpp>
 #include <common/windows/AppsBatteryStatusWindow.hpp>
+#include <common/AudioErrorPresenter.hpp>
+#include <common/windows/AudioErrorWindow.hpp>
+#include <common/BellCommonNames.hpp>
 #include <service-db/DBNotificationMessage.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 
@@ -147,10 +148,13 @@ namespace app
                                   return std::make_unique<gui::AppsBatteryStatusWindow>(app, name);
                               });
 
-        windowsFactory.attach(gui::window::name::relaxationError, [](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<relaxation::RelaxationErrorPresenter>(app);
-            return std::make_unique<gui::RelaxationErrorWindow>(app, std::move(presenter));
-        });
+        windowsFactory.attach(gui::window::name::audioErrorWindow,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  auto presenter      = std::make_unique<gui::AudioErrorPresenter>(app);
+                                  auto onExitCallback = [this]() { switchWindow(gui::name::window::main_window); };
+                                  return std::make_unique<gui::AudioErrorWindow>(
+                                      app, name, std::move(presenter), std::move(onExitCallback));
+                              });
 
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,
