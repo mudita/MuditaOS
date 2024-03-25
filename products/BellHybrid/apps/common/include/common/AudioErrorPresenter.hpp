@@ -10,9 +10,9 @@ namespace app
     class ApplicationCommon;
 }
 
-namespace app::relaxation
+namespace gui
 {
-    class RelaxationErrorContract
+    class AudioErrorContract
     {
       public:
         class View
@@ -20,19 +20,19 @@ namespace app::relaxation
           public:
             virtual ~View() = default;
         };
-        class Presenter : public BasePresenter<RelaxationErrorContract::View>
+        class Presenter : public app::BasePresenter<AudioErrorContract::View>
         {
           public:
             virtual void activate() = 0;
         };
     };
 
-    class RelaxationErrorPresenter : public RelaxationErrorContract::Presenter
+    class AudioErrorPresenter : public AudioErrorContract::Presenter
     {
         app::ApplicationCommon *app{};
         void activate() override;
 
       public:
-        explicit RelaxationErrorPresenter(app::ApplicationCommon *app);
+        explicit AudioErrorPresenter(app::ApplicationCommon *app);
     };
-} // namespace app::relaxation
+} // namespace gui

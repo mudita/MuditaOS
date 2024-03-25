@@ -149,6 +149,12 @@ namespace app::bell_settings
                 onToneExit(currentSoundPath);
             }
         };
+        snoozeChimeTone->onProceed = [this]() {
+            if (onToneProceed) {
+                return onToneProceed(currentSoundPath);
+            }
+            return false;
+        };
         internalData.emplace_back(snoozeChimeTone);
 
         constexpr auto volumeStep = 1U;
