@@ -1,9 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AppWindow.hpp"
 #include "ApplicationCommon.hpp"
 #include "data/AlarmPopupRequestParams.hpp"
+#include "data/AudioErrorParams.hpp"
 #include "service-db/Settings.hpp"
 #include "service-db/agents/settings/SystemSettings.hpp"
 #include "popups/data/PopupData.hpp"
@@ -133,6 +134,19 @@ namespace app
                                   std::make_unique<gui::AlarmPopupRequestParams>(popupParams));
                 return true;
             });
+
+        auto audioErrorBlueprint = [&](gui::popup::ID id, std::unique_ptr<gui::PopupRequestParams> &params) {
+            auto popupParams = dynamic_cast<gui::AudioErrorParams *>(params.get());
+            if (popupParams == nullptr) {
+                return false;
+            }
+            switchWindowPopup(gui::popup::resolveWindowName(id),
+                              popupParams->getDisposition(),
+                              std::make_unique<gui::AudioErrorParams>(popupParams),
+                              SwitchReason::Popup);
+            return true;
+        };
+        popupBlueprint.registerBlueprint(ID::AudioError, audioErrorBlueprint);
     }
 
     std::optional<gui::popup::Blueprint> ApplicationCommon::popupBlueprintFallback(gui::popup::ID id)

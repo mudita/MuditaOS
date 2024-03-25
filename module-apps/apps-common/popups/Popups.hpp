@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,6 +34,7 @@ namespace gui
             BedtimeNotification,
             ChargingNotification,
             ChargingDoneNotification,
+            AudioError,
             AppTestPopup,
             Invalid,
         };
@@ -65,6 +66,7 @@ namespace gui
             inline constexpr auto bedtime_notification_window       = "BedtimeNotificationPopup";
             inline constexpr auto charging_notification_window      = "ChargingNotificationPopup";
             inline constexpr auto charging_done_notification_window = "ChargingDoneNotificationPopup";
+            inline constexpr auto audio_error_window                = "AudioErrorPopup";
             inline constexpr auto test_popup                        = "test_popup";
         } // namespace window
 

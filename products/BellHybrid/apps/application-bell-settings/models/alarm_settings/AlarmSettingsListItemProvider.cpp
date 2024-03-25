@@ -51,6 +51,12 @@ namespace app::bell_settings
                 onToneExit(currentSoundPath);
             }
         };
+        alarmTone->onProceed = [this]() {
+            if (onToneProceed) {
+                return onToneProceed(currentSoundPath);
+            }
+            return false;
+        };
         internalData.emplace_back(alarmTone);
 
         constexpr auto volumeStep = 1U;

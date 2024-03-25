@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "models/AudioErrorModel.hpp"
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/AudioOperations.hpp>
 #include <models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp>
@@ -25,8 +26,10 @@ namespace app::bell_settings
         class View
         {
           public:
-            virtual ~View() noexcept = default;
-            virtual void exit()      = 0;
+            virtual ~View() noexcept                 = default;
+            virtual auto exit() -> void              = 0;
+            virtual auto handleError() -> void       = 0;
+            virtual auto handleDeletedFile() -> void = 0;
         };
 
         class Presenter : public BasePresenter<View>
@@ -37,7 +40,7 @@ namespace app::bell_settings
             virtual auto saveData() -> void                                                 = 0;
             virtual auto loadData() -> void                                                 = 0;
             virtual auto eraseProviderData() -> void                                        = 0;
-            virtual void exitWithoutSave()                                                  = 0;
+            virtual auto exitWithoutSave() -> void                                          = 0;
         };
     };
 
@@ -47,21 +50,26 @@ namespace app::bell_settings
         PrewakeUpWindowPresenter(std::unique_ptr<PrewakeUpListItemProvider> &&provider,
                                  std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
                                  AbstractAudioModel &audioModel,
-                                 std::unique_ptr<AbstractFrontlightModel> &&frontlight);
+                                 std::unique_ptr<AbstractFrontlightModel> &&frontlight,
+                                 std::unique_ptr<AudioErrorModel> &&audioErrorModel);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto saveData() -> void override;
         auto loadData() -> void override;
         auto eraseProviderData() -> void override;
-        void exitWithoutSave() override;
+        auto exitWithoutSave() -> void override;
 
       private:
-        void stopSound();
+        auto stopSound() -> void;
+        auto handleAudioError(const UTF8 &path, gui::AudioErrorType errorType) -> void;
+        auto showAudioError(gui::AudioErrorType errorType) const -> void;
+        auto validatePath(const UTF8 &path) const -> bool;
 
         std::shared_ptr<PrewakeUpListItemProvider> provider;
         std::unique_ptr<AbstractPrewakeUpSettingsModel> model;
         AbstractAudioModel &audioModel;
         std::unique_ptr<AbstractFrontlightModel> frontlight;
+        std::unique_ptr<AudioErrorModel> audioErrorModel;
         UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings

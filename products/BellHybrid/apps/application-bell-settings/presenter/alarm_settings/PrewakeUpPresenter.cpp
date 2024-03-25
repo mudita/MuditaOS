@@ -9,14 +9,29 @@ namespace app::bell_settings
     PrewakeUpWindowPresenter::PrewakeUpWindowPresenter(std::unique_ptr<PrewakeUpListItemProvider> &&provider,
                                                        std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
                                                        AbstractAudioModel &audioModel,
-                                                       std::unique_ptr<AbstractFrontlightModel> &&frontlight)
-        : provider{std::move(provider)}, model{std::move(model)}, audioModel{audioModel}, frontlight{
-                                                                                              std::move(frontlight)}
+                                                       std::unique_ptr<AbstractFrontlightModel> &&frontlight,
+                                                       std::unique_ptr<AudioErrorModel> &&audioErrorModel)
+        : provider{std::move(provider)}, model{std::move(model)}, audioModel{audioModel},
+          frontlight{std::move(frontlight)}, audioErrorModel{std::move(audioErrorModel)}
     {
         auto playSound = [this](const UTF8 &val) {
+            auto onStartCallback = [this, val](audio::RetCode retCode) {
+                if (retCode != audio::RetCode::Success) {
+                    handleAudioError(val, gui::AudioErrorType::UnsupportedMediaType);
+                }
+            };
+
+            auto onFinishedCallback = [this, val](AbstractAudioModel::PlaybackFinishStatus status) {
+                if (status == AbstractAudioModel::PlaybackFinishStatus::Error) {
+                    handleAudioError(val, gui::AudioErrorType::FileDeleted);
+                }
+            };
+
             currentSoundPath = val;
             this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::PreWakeup);
-            this->audioModel.play(currentSoundPath, AbstractAudioModel::PlaybackType::PreWakeup, {});
+            this->audioModel.setPlaybackFinishedCb(std::move(onFinishedCallback));
+            this->audioModel.play(
+                currentSoundPath, AbstractAudioModel::PlaybackType::PreWakeup, std::move(onStartCallback));
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };
@@ -24,6 +39,7 @@ namespace app::bell_settings
         this->provider->onToneEnter  = playSound;
         this->provider->onToneExit   = [this](const auto &) { stopSound(); };
         this->provider->onToneChange = playSound;
+        this->provider->onToneProceed = [this](const auto &path) { return validatePath(path); };
 
         this->provider->onVolumeEnter  = playSound;
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
@@ -72,13 +88,44 @@ namespace app::bell_settings
         provider->clearData();
     }
 
-    void PrewakeUpWindowPresenter::stopSound()
+    auto PrewakeUpWindowPresenter::stopSound() -> void
     {
         this->audioModel.stopPlayedByThis({});
     }
 
-    void PrewakeUpWindowPresenter::exitWithoutSave()
+    auto PrewakeUpWindowPresenter::exitWithoutSave() -> void
     {
         model->getChimeVolume().restoreDefault();
+    }
+
+    auto PrewakeUpWindowPresenter::handleAudioError(const UTF8 &path, gui::AudioErrorType errorType) -> void
+    {
+        const bool validPath = !audioErrorModel->isPathOnErrorList(path);
+        if (validPath) {
+            audioErrorModel->addPathToErrorList(path, errorType);
+            showAudioError(errorType);
+        }
+    }
+
+    auto PrewakeUpWindowPresenter::validatePath(const UTF8 &path) const -> bool
+    {
+        const auto errorType = audioErrorModel->getErrorType(path);
+        if (errorType.has_value()) {
+            showAudioError(errorType.value());
+            return true;
+        }
+        return false;
+    }
+
+    auto PrewakeUpWindowPresenter::showAudioError(gui::AudioErrorType errorType) const -> void
+    {
+        switch (errorType) {
+        case gui::AudioErrorType::FileDeleted:
+            getView()->handleDeletedFile();
+            break;
+        default:
+            getView()->handleError();
+            break;
+        }
     }
 } // namespace app::bell_settings

@@ -13,6 +13,8 @@
 #include <common/popups/BellRebootWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
+#include <common/AudioErrorPresenter.hpp>
+#include <common/windows/AudioErrorWindow.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <common/popups/BedtimeNotificationWindow.hpp>
 #include <common/popups/ChargingNotificationWindow.hpp>
@@ -77,6 +79,13 @@ namespace app
                     window::alarm_deactivated_window, [this](app::ApplicationCommon *app, const std::string &name) {
                         auto presenter = std::make_unique<app::popup::AlarmActivatedPresenter>(*alarmModel);
                         return std::make_unique<gui::AlarmDeactivatedWindow>(app, std::move(presenter));
+                    });
+                break;
+            case ID::AudioError:
+                windowsFactory.attach(
+                    window::audio_error_window, [this](app::ApplicationCommon *app, const std::string &name) {
+                        auto presenter = std::make_unique<gui::AudioErrorPresenter>(app);
+                        return std::make_unique<gui::AudioErrorWindow>(app, name, std::move(presenter));
                     });
                 break;
             case ID::PowerOff:

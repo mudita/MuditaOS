@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Popups.hpp"
@@ -56,6 +56,8 @@ namespace gui::popup
             return gui::popup::window::charging_notification_window;
         case ID::ChargingDoneNotification:
             return gui::popup::window::charging_done_notification_window;
+        case ID::AudioError:
+            return gui::popup::window::audio_error_window;
         case ID::AppTestPopup:
             return gui::popup::window::test_popup;
         case ID::Invalid:

@@ -27,6 +27,7 @@ target_sources(application-bell-settings
         models/AboutYourBellModel.cpp
         models/FrontlightListItemProvider.cpp
         models/FrontlightModel.cpp
+        models/AudioErrorModel.cpp
         models/alarm_settings/AlarmSettingsListItemProvider.cpp
         models/alarm_settings/AlarmSettingsModel.cpp
         models/alarm_settings/BedtimeSettingsListItemProvider.cpp
@@ -119,6 +120,7 @@ target_sources(application-bell-settings
 
     PUBLIC
         include/application-bell-settings/models/DateTimeUnitsModel.hpp
+        include/application-bell-settings/models/AudioErrorModel.hpp
         include/application-bell-settings/presenter/TimeUnitsPresenter.hpp
         include/application-bell-settings/windows/BellSettingsTimeUnitsWindow.hpp
         include/application-bell-settings/ApplicationBellSettings.hpp

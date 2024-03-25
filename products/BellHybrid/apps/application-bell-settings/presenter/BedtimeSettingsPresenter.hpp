@@ -3,6 +3,7 @@
 
 #pragma once
 
+#include "models/AudioErrorModel.hpp"
 #include "models/alarm_settings/BedtimeSettingsListItemProvider.hpp"
 #include <common/models/AbstractAudioModel.hpp>
 #include <common/SoundsRepository.hpp>
@@ -23,8 +24,10 @@ namespace app::bell_settings
         class View
         {
           public:
-            virtual ~View() noexcept = default;
-            virtual void exit()      = 0;
+            virtual ~View() noexcept                 = default;
+            virtual auto exit() -> void              = 0;
+            virtual auto handleError() -> void       = 0;
+            virtual auto handleDeletedFile() -> void = 0;
         };
 
         class Presenter : public BasePresenter<View>
@@ -35,29 +38,34 @@ namespace app::bell_settings
             virtual auto saveData() -> void                                                 = 0;
             virtual auto loadData() -> void                                                 = 0;
             virtual auto eraseProviderData() -> void                                        = 0;
-            virtual void exitWithoutSave()                                                  = 0;
+            virtual auto exitWithoutSave() -> void                                          = 0;
         };
     };
 
     class SettingsPresenter : public BedtimeSettingsWindowContract::Presenter
     {
       public:
-        SettingsPresenter(std::shared_ptr<BedtimeSettingsListItemProvider> provider,
+        SettingsPresenter(std::unique_ptr<BedtimeSettingsListItemProvider> &&provider,
                           std::shared_ptr<AbstractBedtimeModel> model,
-                          AbstractAudioModel &audioModel);
+                          AbstractAudioModel &audioModel,
+                          std::unique_ptr<AudioErrorModel> &&audioErrorModel);
 
         auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> override;
         auto saveData() -> void override;
         auto loadData() -> void override;
         auto eraseProviderData() -> void override;
-        void exitWithoutSave() override;
+        auto exitWithoutSave() -> void override;
 
       private:
-        void stopSound();
+        auto stopSound() -> void;
+        auto handleAudioError(const UTF8 &path, gui::AudioErrorType errorType) -> void;
+        auto showAudioError(gui::AudioErrorType errorType) const -> void;
+        auto validatePath(const UTF8 &path) const -> bool;
 
         std::shared_ptr<BedtimeSettingsListItemProvider> provider;
         std::shared_ptr<AbstractBedtimeModel> model;
         AbstractAudioModel &audioModel;
+        std::unique_ptr<AudioErrorModel> audioErrorModel;
         UTF8 currentSoundPath;
     };
 } // namespace app::bell_settings
