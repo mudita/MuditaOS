@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellMainMenuWindow.hpp"
@@ -22,6 +22,7 @@ namespace gui
         : BellOptionWindow(app, gui::window::name::bell_main_menu)
     {
         addOptions(mainMenuOptionsList());
+        setListTitle(utils::translate("app_bellmain_menu"));
     }
 
     std::list<Option> BellMainMenuWindow::mainMenuOptionsList()
@@ -49,11 +50,10 @@ namespace gui
         addAppMenu(utils::translate("app_bellmain_alarm"), app::applicationBellAlarmName);
         addAppMenu(utils::translate("app_bellmain_power_nap"), app::applicationBellPowerNapName);
         addAppMenu(utils::translate("app_bellmain_relaxation"), app::applicationBellRelaxationName);
-        addAppMenu(utils::translate("app_bellmain_meditation_timer"), app::MeditationTimer::defaultName);
+        addAppMenu(utils::translate("app_bellmain_meditation_timer"), app::applicationMeditationTimerName);
         addAppMenu(utils::translate("app_bellmain_bedtime"), app::applicationBellBedtimeName);
         addAppMenu(utils::translate("app_bellmain_settings"), app::applicationBellSettingsName);
 
         return menuOptionList;
     }
-
 } // namespace gui
