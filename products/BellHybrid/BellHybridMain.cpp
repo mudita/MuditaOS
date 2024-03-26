@@ -110,7 +110,7 @@ int main()
                 app::CreateLauncher<app::ApplicationBellOnBoarding>(app::applicationBellOnBoardingName));
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellRelaxation>(app::applicationBellRelaxationName));
-            applications.push_back(app::CreateLauncher<app::MeditationTimer>(app::MeditationTimer::defaultName));
+            applications.push_back(app::CreateLauncher<app::MeditationTimer>(app::applicationMeditationTimerName));
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(
