@@ -19,6 +19,7 @@ namespace gui::window::name
     inline constexpr auto relaxationLowBattery      = "RelaxationLowBatteryWindow";
     inline constexpr auto relaxationError           = "RelaxationError";
 } // namespace gui::window::name
+
 namespace app
 {
     namespace relaxation

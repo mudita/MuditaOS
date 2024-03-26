@@ -18,12 +18,12 @@ namespace app::meditation::models
 
 namespace app
 {
+    inline constexpr auto applicationMeditationTimerName = "ApplicationMeditationTimer";
+
     class MeditationTimer : public Application
     {
       public:
-        static constexpr auto defaultName = "ApplicationMeditationTimer";
-
-        explicit MeditationTimer(std::string name                    = defaultName,
+        explicit MeditationTimer(std::string name                    = applicationMeditationTimerName,
                                  std::string parent                  = "",
                                  StatusIndicators statusIndicators   = StatusIndicators{},
                                  StartInBackground startInBackground = {false},

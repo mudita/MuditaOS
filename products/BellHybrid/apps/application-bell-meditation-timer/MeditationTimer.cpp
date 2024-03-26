@@ -57,7 +57,7 @@ namespace app
             return ret;
         }
 
-        cpuSentinel                  = std::make_shared<sys::CpuSentinel>(defaultName, this);
+        cpuSentinel                  = std::make_shared<sys::CpuSentinel>(applicationMeditationTimerName, this);
         auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
         bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
         cpuSentinel->BlockWfiMode(true);
@@ -78,7 +78,7 @@ namespace app
     void MeditationTimer::createUserInterface()
     {
         windowsFactory.attach(meditation::MeditationMainWindow::defaultName,
-                              [this](ApplicationCommon *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<meditation::MeditationMainWindow>(app);
                               });
 
@@ -146,6 +146,7 @@ namespace app
 
         return handleAsyncResponse(resp);
     }
+
     MeditationTimer::~MeditationTimer()
     {
         cpuSentinel->BlockWfiMode(false);
