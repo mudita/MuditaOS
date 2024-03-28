@@ -261,7 +261,7 @@ namespace app
                                                                         std::move(alarmFrontlightModel));
 
                 auto frontlightModel = std::make_unique<bell_settings::FrontlightModel>(app);
-                auto provider  = std::make_unique<bell_settings::AlarmSettingsListItemProvider>(*alarmSettingsModel,
+                auto provider = std::make_unique<bell_settings::AlarmSettingsListItemProvider>(*alarmSettingsModel,
                                                                                                std::move(songsModel));
                 auto audioErrorModel = std::make_unique<bell_settings::AudioErrorModel>();
                 auto presenter       = std::make_unique<bell_settings::AlarmSettingsPresenter>(app,

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,7 +12,6 @@
 
 namespace gui
 {
-
     class CallLogMainWindow : public AppWindow
     {
         std::shared_ptr<CalllogModel> calllogModel = nullptr;
@@ -41,5 +40,4 @@ namespace gui
         void onEmptyList();
         void onListFilled();
     };
-
 } /* namespace gui */

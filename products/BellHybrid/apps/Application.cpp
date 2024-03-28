@@ -20,6 +20,8 @@
 #include <common/popups/ChargingNotificationWindow.hpp>
 #include <apps-common/WindowsPopupFilter.hpp>
 #include <service-evtmgr/KbdMessage.hpp>
+#include <service-time/AlarmMessage.hpp>
+#include <products/BellHybrid/keymap/include/keymap/KeyMap.hpp>
 
 namespace app
 {
@@ -83,7 +85,7 @@ namespace app
                 break;
             case ID::AudioError:
                 windowsFactory.attach(
-                    window::audio_error_window, [this](app::ApplicationCommon *app, const std::string &name) {
+                    window::audio_error_window, [](app::ApplicationCommon *app, const std::string &name) {
                         auto presenter = std::make_unique<gui::AudioErrorPresenter>(app);
                         return std::make_unique<gui::AudioErrorWindow>(app, name, std::move(presenter));
                     });
