@@ -2,11 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/widgets/LabelOptionWithTick.hpp>
-#include <common/widgets/LabelListItem.hpp>
+#include <common/widgets/LabelMarkerItem.hpp>
 
 namespace gui::option
 {
-    LabelOptionWithTick::LabelOptionWithTick(ListLabel label,
+    LabelOptionWithTick::LabelOptionWithTick(const std::string &label,
                                              const UTF8 &text,
                                              TickState tickState,
                                              std::function<bool(Item &)> activatedCallback,
@@ -18,7 +18,7 @@ namespace gui::option
 
     auto LabelOptionWithTick::build() const -> ListItem *
     {
-        auto labelOption = new LabelListItem(label);
+        auto labelOption = new ListItem();
         prepareLabelOption(labelOption);
         return labelOption;
     }

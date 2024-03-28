@@ -17,7 +17,7 @@ namespace gui::option
             Hide
         };
 
-        LabelOptionWithTick(ListLabel label,
+        LabelOptionWithTick(const std::string &label,
                             const UTF8 &text,
                             TickState tickState,
                             std::function<bool(Item &)> activatedCallback,
@@ -30,7 +30,7 @@ namespace gui::option
         auto prepareLabelOption(ListItem *item) const -> void;
         auto getAdjustedText(TextFixedSize *textItem) const -> UTF8;
 
-        ListLabel label;
+        std::string label;
         TickState tickState;
     };
 } // namespace gui::option

@@ -2,9 +2,14 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/widgets/ListViewWithLabels.hpp>
-#include <common/widgets/LabelListItem.hpp>
+#include <common/widgets/LabelMarkerItem.hpp>
+#include <common/widgets/LabelOptionWithTick.hpp>
 #include <common/models/SongsModel.hpp>
 
+namespace
+{
+    constexpr auto maxItemsOnPage{4U};
+}
 namespace gui
 {
     ListViewWithLabels::ListViewWithLabels(Item *parent,
@@ -16,127 +21,168 @@ namespace gui
         : ListViewWithArrows(parent, x, y, w, h, std::move(prov))
     {
         body->dimensionChangedCallback = [&](gui::Item &, const BoundingBox &newDim) -> bool { return true; };
+
+        updateScrollCallback = [this](ListViewScrollUpdateData data) {
+            if (currentPageSize + data.startIndex < data.elementsCount) {
+                listOverlay->lastBox->setVisible(true);
+            }
+            else {
+                listOverlay->lastBox->setVisible(false);
+            }
+
+            if (data.startIndex == 0 && titleBody) {
+                titleBody->setVisible(true);
+                arrowTop->setVisible(false);
+                listOverlay->firstBox->setVisible(true);
+            }
+            else if (data.startIndex > 1) {
+                if (titleBody) {
+                    titleBody->setVisible(false);
+                }
+                arrowTop->setVisible(true);
+                listOverlay->firstBox->setVisible(true);
+            }
+            else {
+                listOverlay->firstBox->setVisible(false);
+            }
+
+            listOverlay->resizeItems();
+            // Second resize is needed as we need to first apply max size for center box and next extra margins.
+            listOverlay->resizeItems();
+        };
+    }
+
+    void ListViewWithLabels::addLabelItem()
+    {
+        if (!labelsCount) {
+            return;
+        }
+
+        const std::int32_t size = direction == listview::Direction::Top ? -currentPageSize : currentPageSize;
+
+        auto position = 0U;
+        for (auto i = 0U; i < labelsCount; ++i) {
+            // First label always starts from 0
+            if (i == 0) {
+                position = 0;
+            }
+            else {
+                position += labelFiles[i - 1].second;
+            }
+            const auto &[labelName, filesCount] = labelFiles[i];
+            const auto isSpace                  = (getSlotsLeft() > 0);
+            if (((startIndex + size) == position) && (filesCount > 0) && isSpace) {
+                // Make sure that hidden item doesn't allow
+                // to display label on the next page
+                if ((hiddenItemIndex == position) && (position > 0)) {
+                    hiddenItemIndex = 0;
+                    break;
+                }
+                body->addWidget(createMarkerItem(labelName));
+                itemsOnPage++;
+            }
+        }
+    }
+
+    void ListViewWithLabels::getLabels()
+    {
+        const auto songsProvider = std::dynamic_pointer_cast<app::SongsModel>(provider);
+        if (songsProvider) {
+            labelFiles  = songsProvider->getLabelsFilesCount();
+            labelsCount = labelFiles.size();
+        }
+    }
+
+    std::uint32_t ListViewWithLabels::getLabelsCount(unsigned int index)
+    {
+        auto total  = 0U;
+        auto offset = 0U;
+        for (const auto &[_, files] : labelFiles) {
+            if (index > offset) {
+                total++;
+            }
+            offset += files;
+        }
+        return total;
     }
 
     void ListViewWithLabels::addItemsOnPage()
     {
-        currentPageSize = 0;
-        itemsOnPage     = 0;
-        labelAdded      = false;
+        getLabels();
 
-        ListItem *item;
-        while ((item = provider->getItem(getOrderFromDirection())) != nullptr) {
-            /* If direction is top-to-bottom, add label mark before adding relaxation item. */
-            if (direction == listview::Direction::Bottom) {
-                addLabelMarker(item);
+        const auto rebuildType = lastRebuildRequest.first;
+        if ((storedFocusIndex != listview::nPos) && (rebuildType != listview::RebuildType::InPlace)) {
+            const auto totalLabels = getLabelsCount(startIndex + storedFocusIndex);
+            const auto nextPage    = (totalLabels + storedFocusIndex) / maxItemsOnPage;
+            currentFocusIndex      = storedFocusIndex + totalLabels;
+            if (nextPage) {
+                startIndex += maxItemsOnPage - totalLabels;
+                currentFocusIndex %= maxItemsOnPage;
             }
-            /* Check if new item fits, if it does - add it, if not - handle label insertion
-             * case for bottom-to-top navigation direction. */
+            else if (startIndex) {
+                startIndex -= totalLabels;
+            }
+            else {
+                currentFocusIndex -= totalLabels;
+            }
+            requestNextPage();
+            wasSetFocus = true;
+        }
+        else {
+            currentPageSize = 0;
+            itemsOnPage     = 0;
+            if (wasSetFocus) {
+                storedFocusIndex = currentFocusIndex;
+                wasSetFocus      = false;
+            }
+            addItems();
+        }
+    }
+
+    void ListViewWithLabels::addItems()
+    {
+        ListItem *item;
+        while (true) {
+            item = provider->getItem(getOrderFromDirection());
+            if (item == nullptr) {
+                // Add label if the direction is Top and we are on the first page
+                // So we don't get more songs items but we need to add a label
+                addLabelItem();
+                break;
+            }
+            addLabelItem();
+            // Check if new item fits, if it does - add it
             if (getSlotsLeft() > 0) {
                 body->addWidget(item);
                 itemsOnPage++;
             }
             else {
-                /* Add invisible item to list to avoid memory leak */
+                // Add invisible item to list to avoid memory leak
                 item->setVisible(false);
                 body->addWidget(item);
+                // Save the hidden index for calculating label position
+                hiddenItemIndex = startIndex;
+                if (direction == listview::Direction::Bottom) {
+                    hiddenItemIndex += currentPageSize;
+                }
                 break;
-            }
-            /* If direction is bottom-to-top, add label mark after adding relaxation item. */
-            if (direction == listview::Direction::Top) {
-                addLabelMarker(item);
             }
             currentPageSize++;
         }
-
         recalculateStartIndex();
-
-        if (!labelAdded) {
-            currentMarker.reset();
-        }
     }
 
-    LabelMarkerItem *ListViewWithLabels::createMarkerItem(ListLabel label)
+    LabelMarkerItem *ListViewWithLabels::createMarkerItem(const std::string &label)
     {
-        if (label.has_value()) {
-            const auto &labelString = UTF8(utils::translate(label.value()));
-            return new LabelMarkerItem(labelString);
-        }
-        return new LabelMarkerItem(UTF8(""));
-    }
-
-    void ListViewWithLabels::addLabelMarker(ListItem *item)
-    {
-        const auto labelListItem = dynamic_cast<gui::LabelListItem *>(item);
-        if (labelListItem == nullptr) {
-            return;
-        };
-        previous = current;
-        current  = labelListItem->getLabel();
-
-        switch (direction) {
-        case listview::Direction::Bottom:
-            if (current != previous && current != currentMarker) {
-                body->addWidget(createMarkerItem(*current));
-                updateState(current);
-            }
-            break;
-
-        case listview::Direction::Top:
-            if (current != previous && previous != currentMarker) {
-                const auto initialSlotsLeft = getSlotsLeft();
-
-                body->removeWidget(labelListItem);
-                body->addWidget(createMarkerItem(*previous));
-                updateState(previous);
-
-                /* Add item to body even if it won't fit to avoid manual memory
-                 * management for item, but apply correction to currentPageSize
-                 * if it is not visible. */
-                body->addWidget(labelListItem);
-
-                if (initialSlotsLeft == 0) {
-                    currentPageSize--;
-                    itemsOnPage--;
-                }
-            }
-            else {
-                /* This is bad, as it limits usage of this widget to just SongsModel */
-                const auto songsProvider = std::dynamic_pointer_cast<app::SongsModel>(provider);
-                if (songsProvider == nullptr) {
-                    break;
-                }
-                const auto nextItemExists = songsProvider->nextRecordExists(getOrderFromDirection());
-                if (!nextItemExists && getSlotsLeft() == 1) {
-                    body->addWidget(createMarkerItem(current));
-                    updateState(current);
-                }
-            }
-            break;
-        }
+        const auto &labelString = UTF8(utils::translate(label));
+        return new LabelMarkerItem(labelString);
     }
 
     std::size_t ListViewWithLabels::getSlotsLeft() const
     {
-        constexpr auto maxItemDisplayed{4U};
-        if (itemsOnPage > maxItemDisplayed) {
+        if (itemsOnPage > maxItemsOnPage) {
             return 0;
         }
-        return maxItemDisplayed - itemsOnPage;
-    }
-
-    void ListViewWithLabels::reset()
-    {
-        currentMarker.reset();
-        previous.reset();
-        current.reset();
-        ListViewEngine::reset();
-    }
-
-    void ListViewWithLabels::updateState(ListLabel marker)
-    {
-        currentMarker = std::move(marker);
-        itemsOnPage++;
-        labelAdded = true;
+        return maxItemsOnPage - itemsOnPage;
     }
 } // namespace gui
