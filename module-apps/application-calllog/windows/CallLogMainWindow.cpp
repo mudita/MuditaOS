@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CallLogMainWindow.hpp"
@@ -10,9 +10,11 @@
 #include <DialogMetadataMessage.hpp>
 
 #include <service-appmgr/Controller.hpp>
+#include <service-db/DBNotificationMessage.hpp>
 #include <queries/calllog/QueryCalllogDeleteAll.hpp>
 #include <i18n/i18n.hpp>
 #include <Label.hpp>
+#include <ImageBox.hpp>
 #include <Margins.hpp>
 #include <Style.hpp>
 #include <InputEvent.hpp>
@@ -20,7 +22,6 @@
 #include <cassert>
 #include <functional>
 #include <memory>
-#include <service-db/DBNotificationMessage.hpp>
 
 using namespace style;
 using namespace callLogStyle;
@@ -31,7 +32,6 @@ namespace gui
     CallLogMainWindow::CallLogMainWindow(app::ApplicationCommon *app)
         : AppWindow(app, calllog::settings::MainWindowStr), calllogModel{std::make_shared<CalllogModel>(app)}
     {
-
         buildInterface();
     }
 

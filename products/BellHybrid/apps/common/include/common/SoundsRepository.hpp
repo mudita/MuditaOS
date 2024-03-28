@@ -14,7 +14,7 @@
 class AbstractSimpleSoundsRepository
 {
   public:
-    virtual ~AbstractSimpleSoundsRepository()                                         = default;
+    virtual ~AbstractSimpleSoundsRepository()                                                       = default;
     [[nodiscard]] virtual std::optional<std::filesystem::path> titleToPath(const UTF8 &title) const = 0;
     [[nodiscard]] virtual std::optional<UTF8> pathToTitle(std::filesystem::path) const              = 0;
     virtual std::vector<UTF8> getSongTitles()                                         = 0;
@@ -47,11 +47,11 @@ class AbstractSoundsRepository
     virtual void init(const std::string &savedPath, OnOffsetUpdateCallback offsetUpdateCallback) = 0;
     virtual void getMusicFiles(std::uint32_t offset,
                                std::uint32_t limit,
-                               const OnGetMusicFilesListCallback &callback) = 0;
+                               const OnGetMusicFilesListCallback &callback)                      = 0;
 
-    virtual std::uint32_t getFilesCount() = 0;
+    virtual std::uint32_t getFilesCount()                                     = 0;
     virtual std::uint32_t getFilesCountFromPath(const std::string &filesPath) = 0;
-    virtual void updateFilesCount()       = 0;
+    virtual void updateFilesCount()                                           = 0;
 };
 
 class SoundsRepository : public AbstractSoundsRepository, public app::AsyncCallbackReceiver

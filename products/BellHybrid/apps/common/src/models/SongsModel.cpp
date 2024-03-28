@@ -69,8 +69,8 @@ namespace app
                                 const std::string &chosenRecordPath) -> void
     {
         currentlyChosenRecordPath = chosenRecordPath;
-        activateCallback    = std::move(onActivate);
-        focusAcquireCallback = std::move(onFocusAcquire);
+        activateCallback          = std::move(onActivate);
+        focusAcquireCallback      = std::move(onFocusAcquire);
         songsRepository->init(currentlyChosenRecordPath, std::move(offsetUpdateCallback));
     }
 
