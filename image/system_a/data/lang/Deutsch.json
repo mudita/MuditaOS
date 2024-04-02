@@ -28,6 +28,8 @@
     "app_bell_bedtime_notification": "Schlafenszeit",
     "app_bell_charging_done_notification": "Vollst\u00e4ndig aufgeladen",
     "app_bell_charging_notification": "Wird aufgeladen",
+    "app_bell_focus_settings": "Einstellungen",
+    "app_bell_focus_start": "-",
     "app_bell_goodbye": "Auf Wiedersehen",
     "app_bell_greeting_msg": [
         "Guten Morgen! Stehen Sie auf"
@@ -121,6 +123,7 @@
     "app_bell_welcome_message": "<text>Mudita Harmony<br/>ist ausgeschaltet</text>",
     "app_bellmain_alarm": "Alarm",
     "app_bellmain_bedtime": "Schlafenszeit",
+    "app_bellmain_focus_timer": "-",
     "app_bellmain_home_screen_bottom_desc": "Der n\u00e4chste Alarm klingelt",
     "app_bellmain_home_screen_bottom_desc_and": "&",
     "app_bellmain_home_screen_bottom_desc_dp": "Tief dr\u00fccken, um zu aktivieren",
