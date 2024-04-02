@@ -3,15 +3,21 @@
 ## Unreleased
 
 ### Fixed
-* Fixed BIWIN eMMC memory errors
-* Fixed UI freeze after changing any volume intensively
 
 ### Added
 
 ### Changed / Improved
+* Updated button handling during pre wake up
+
+## [2.6.1 2024-04-02]
+
+### Fixed
+* Fixed BIWIN eMMC memory errors
+* Fixed UI freeze after changing any volume intensively
+
+### Changed / Improved
 * Updated FSL drivers from NXP
 * Increased speed of update process
-* Updated button handling during pre wake up
 
 ## [2.6.0 2024-03-07]
 
