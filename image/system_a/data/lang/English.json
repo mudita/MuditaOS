@@ -25,6 +25,8 @@
     "app_bell_bedtime_notification": "It is your bedtime",
     "app_bell_charging_done_notification": "Fully charged",
     "app_bell_charging_notification": "Charging",
+    "app_bell_focus_settings": "Settings",
+    "app_bell_focus_start": "Focus now",
     "app_bell_goodbye": "Goodbye",
     "app_bell_greeting_msg": [
         "<text>Good Morning!<br />It's a Beautiful Day!</text>",
@@ -153,6 +155,7 @@
     "app_bell_alarm_lowBattery_info": "Charge your Harmony to make sure your alarm will ring",
     "app_bellmain_alarm": "Alarm",
     "app_bellmain_bedtime": "Bedtime",
+    "app_bellmain_focus_timer": "Focus timer",
     "app_bellmain_home_screen_bottom_desc": "Next alarm will ring",
     "app_bellmain_home_screen_bottom_desc_and": "&",
     "app_bellmain_home_screen_bottom_desc_dp": "Deep press to activate",

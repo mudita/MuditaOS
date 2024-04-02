@@ -10,6 +10,7 @@
 #include <application-bell-meditation-timer/MeditationTimer.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
+#include <application-bell-focus-timer/ApplicationFocusTimer.hpp>
 
 #include <Dialog.hpp>
 #include <DialogMetadataMessage.hpp>
@@ -52,6 +53,7 @@ namespace gui
         addAppMenu(utils::translate("app_bellmain_relaxation"), app::applicationBellRelaxationName);
         addAppMenu(utils::translate("app_bellmain_meditation_timer"), app::applicationMeditationTimerName);
         addAppMenu(utils::translate("app_bellmain_bedtime"), app::applicationBellBedtimeName);
+        addAppMenu(utils::translate("app_bellmain_focus_timer"), app::applicationFocusTimerName);
         addAppMenu(utils::translate("app_bellmain_settings"), app::applicationBellSettingsName);
 
         return menuOptionList;

@@ -53,6 +53,7 @@ target_link_libraries(application-bell-main
         bell::app-relaxation
         bell::app-bedtime
         bell::app-meditation-timer
+        bell::app-focus-timer
         bell::app-settings
         bell::app-powernap
         bell::keymap

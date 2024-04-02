@@ -25,6 +25,8 @@
     "app_bell_bedtime_notification": "C'est l'heure du coucher",
     "app_bell_charging_done_notification": "Compl\u00e8tement charg\u00e9",
     "app_bell_charging_notification": "En charge",
+    "app_bell_focus_settings": "Param\u00e8tres",
+    "app_bell_focus_start": "-",
     "app_bell_goodbye": "Au revoir",
     "app_bell_greeting_msg": [
         "Re-bonjour!"
@@ -120,6 +122,7 @@
     "app_bell_alarm_lowBattery_info": "Chargez votre Harmony pour vous assurer que l'alarme sonne",
     "app_bellmain_alarm": "Alarme",
     "app_bellmain_bedtime": "Heure du coucher",
+    "app_bellmain_focus_timer": "-",
     "app_bellmain_home_screen_bottom_desc": "La prochaine alarme sonnera",
     "app_bellmain_home_screen_bottom_desc_and": "&",
     "app_bellmain_home_screen_bottom_desc_dp": "Appuyer fort pour activer",
