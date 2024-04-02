@@ -53,6 +53,7 @@ target_link_libraries(BellHybrid
         bell::app-common
         bell::app-main
         bell::app-meditation-timer
+        bell::app-focus-timer
         bell::app-powernap
         bell::app-settings
         bell::db

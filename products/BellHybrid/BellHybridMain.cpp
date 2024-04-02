@@ -13,6 +13,7 @@
 #include <application-bell-meditation-timer/MeditationTimer.hpp>
 #include <application-bell-settings/ApplicationBellSettings.hpp>
 #include <application-bell-powernap/ApplicationBellPowerNap.hpp>
+#include <application-bell-focus-timer/ApplicationFocusTimer.hpp>
 
 // modules
 #include <module-db/databases/MultimediaFilesDB.hpp>
@@ -111,6 +112,7 @@ int main()
             applications.push_back(
                 app::CreateLauncher<app::ApplicationBellRelaxation>(app::applicationBellRelaxationName));
             applications.push_back(app::CreateLauncher<app::MeditationTimer>(app::applicationMeditationTimerName));
+            applications.push_back(app::CreateLauncher<app::ApplicationFocusTimer>(app::applicationFocusTimerName));
             // start application manager
             return sysmgr->RunSystemService(
                 std::make_shared<app::manager::ApplicationManager>(

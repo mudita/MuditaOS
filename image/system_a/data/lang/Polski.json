@@ -24,6 +24,8 @@
     "app_bell_bedtime_notification": "Pora na sen",
     "app_bell_charging_done_notification": "W pe\u0142ni na\u0142adowany",
     "app_bell_charging_notification": "\u0141adowanie",
+    "app_bell_focus_settings": "Ustawienia",
+    "app_bell_focus_start": "-",
     "app_bell_goodbye": "Do widzenia",
     "app_bell_greeting_msg": [
         "<text>Dzie\u0144 dobry!<br />Pobudka</text>"
@@ -119,6 +121,7 @@
     "app_bell_alarm_lowBattery_info": "Naładuj Harmony aby mieć pewność, że alarm zadzwoni",
     "app_bellmain_alarm": "Alarm",
     "app_bellmain_bedtime": "Pora snu",
+    "app_bellmain_focus_timer": "-",
     "app_bellmain_home_screen_bottom_desc": "Alarm zadzwoni",
     "app_bellmain_home_screen_bottom_desc_and": "i",
     "app_bellmain_home_screen_bottom_desc_dp": "Naci\u015bnij g\u0142\u0119boko, aby aktywowa\u0107",
