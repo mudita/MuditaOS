@@ -27,6 +27,8 @@
     "app_bell_bedtime_notification": "Es tu hora de dormir",
     "app_bell_charging_done_notification": "Completamente cargado",
     "app_bell_charging_notification": "Cargando",
+    "app_bell_focus_settings": "Ajustes",
+    "app_bell_focus_start": "-",
     "app_bell_goodbye": "Adi\u00f3s",
     "app_bell_greeting_msg": [
         "\u00a1Hola! Lev\u00e1ntate y brilla"
@@ -120,6 +122,7 @@
     "app_bell_welcome_message": "<text>Mudita Harmony<br/>est\u00e1 apagado</text>",
     "app_bellmain_alarm": "Alarma",
     "app_bellmain_bedtime": "Hora de dormir",
+    "app_bellmain_focus_timer": "-",
     "app_bellmain_home_screen_bottom_desc": "La siguiente alarma sonar\u00e1",
     "app_bellmain_home_screen_bottom_desc_and": "&",
     "app_bellmain_home_screen_bottom_desc_dp": "Presionar a fondo para activar",
