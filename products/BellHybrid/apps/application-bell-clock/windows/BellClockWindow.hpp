@@ -22,14 +22,17 @@ namespace gui
     class BellClockWindow : public AppWindow, public app::bell_clock::View
     {
       public:
+        static constexpr auto name = "BellClockWindow";
         BellClockWindow(app::ApplicationCommon *app,
                         std::unique_ptr<app::bell_clock::BellClockWindowPresenter> &&windowPresenter,
                         std::string name = window::name::bellClock);
 
         void buildInterface() override;
-        auto onInput(const InputEvent &inputEvent) -> bool override;
+        RefreshModes updateTime() override;
+        bool onInput(const InputEvent &inputEvent) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;
-        void exit() override;
+        void setTime(std::time_t time) override;
 
       private:
         std::unique_ptr<app::bell_clock::BellClockWindowPresenter> presenter;

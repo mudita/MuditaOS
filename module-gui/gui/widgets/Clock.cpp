@@ -5,6 +5,18 @@
 #include "Clock.hpp"
 #include "DrawCommand.hpp"
 
+namespace
+{
+    constexpr auto minuteArrowLength = 202U;
+    constexpr auto hourArrowLength   = 136U;
+    constexpr auto minuteDegree      = 6.0f;
+    constexpr auto hourDegree        = 30.0f;
+    constexpr auto arrowBegin        = 90U;
+    constexpr auto circleSize        = 15U;
+    constexpr auto arrowHourWidth    = 16U;
+    constexpr auto arrowMinuteWidth  = 10U;
+} // namespace
+
 namespace gui
 {
     Clock::Clock(Item *parent) : Item{}
@@ -13,7 +25,6 @@ namespace gui
         if (parent != nullptr) {
             parent->addWidget(this);
         }
-        updateArrows(Direction::Clockwise);
     }
 
     bool Clock::isPreviousEvent(const InputEvent &inputEvent)
@@ -30,33 +41,30 @@ namespace gui
     {
         if (inputEvent.isShortRelease()) {
             if (isPreviousEvent(inputEvent)) {
-                updateArrows(Direction::Clockwise);
+                // setTime(storeHour, --storeMinute);
                 return true;
             }
             else if (isNextEvent(inputEvent)) {
-                updateArrows(Direction::Counterclockwise);
+                // setTime(storeHour, ++storeMinute);
                 return true;
             }
         }
         return false;
     }
 
-    void Clock::updateArrows(Direction dir)
+    void Clock::setTime(int hour, int minute)
     {
-        if (dir == Direction::Clockwise) {
-            arrowDeg += stepDegree;
-        }
-        else {
-            arrowDeg -= stepDegree;
-        }
+        const auto fraction  = 0.5f * minute;
+        const auto hourAngle = trigonometry::toRadians((hourDegree * hour) + fraction - arrowBegin);
+        arrowEndHour.x       = static_cast<int>(center.x + hourArrowLength * cos(hourAngle));
+        arrowEndHour.y       = static_cast<int>(center.y + hourArrowLength * sin(hourAngle));
 
-        float angle      = angleStep * arrowDeg;
-        arrowEndMinute.x = static_cast<int>(center.x + 180.f * cos(angle));
-        arrowEndMinute.y = static_cast<int>(center.y + 180.f * sin(angle));
+        const auto minuteAngle = trigonometry::toRadians((minuteDegree * minute) - arrowBegin);
+        arrowEndMinute.x       = static_cast<int>(center.x + minuteArrowLength * cos(minuteAngle));
+        arrowEndMinute.y       = static_cast<int>(center.y + minuteArrowLength * sin(minuteAngle));
 
-        angle          = angleStep * arrowDeg / stepDegree;
-        arrowEndHour.x = static_cast<int>(center.x + 90.f * cos(angle));
-        arrowEndHour.y = static_cast<int>(center.y + 90.f * sin(angle));
+        storeHour   = hour;
+        storeMinute = minute;
     }
 
     void Clock::buildDrawListImplementation(std::list<Command> &commands)
@@ -67,7 +75,7 @@ namespace gui
         auto arrowMinute = std::make_unique<DrawLine>(center, arrowEndMinute, ColorFullBlack, arrowMinuteWidth);
         commands.emplace_back(std::move(arrowMinute));
 
-        auto dot = std::make_unique<DrawCircle>(center, 15, 0, ColorFullBlack, true, ColorFullBlack);
+        auto dot = std::make_unique<DrawCircle>(center, circleSize, 0, ColorFullBlack, true, ColorFullBlack);
         commands.emplace_back(std::move(dot));
     }
 } // namespace gui

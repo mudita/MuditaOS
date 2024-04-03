@@ -22,11 +22,7 @@ namespace gui
         static constexpr auto middleX          = displayX / 2;
         static constexpr auto middleY          = displayY / 2;
         static constexpr gui::Point center     = {middleX, middleY};
-        static constexpr auto arrowHourWidth   = 16U;
-        static constexpr auto arrowMinuteWidth = 10U;
-        static constexpr auto stepDegree       = 6U;
-        static constexpr auto points           = 360U;
-        static constexpr auto angleStep        = (2.0f * M_PI) / points;
+
     } // namespace
     class Clock : public Item
     {
@@ -36,6 +32,7 @@ namespace gui
         bool isPreviousEvent(const InputEvent &inputEvent);
         bool isNextEvent(const InputEvent &inputEvent);
         bool onInput(const InputEvent &inputEvent);
+        void setTime(int hour, int minute);
 
         void buildDrawListImplementation(std::list<Command> &commands) override;
 
@@ -48,8 +45,7 @@ namespace gui
 
         Point arrowEndMinute{center};
         Point arrowEndHour{center};
-        std::int32_t arrowDeg{0};
-
-        void updateArrows(Direction dir);
+        int storeHour{0};
+        int storeMinute{0};
     };
 } // namespace gui

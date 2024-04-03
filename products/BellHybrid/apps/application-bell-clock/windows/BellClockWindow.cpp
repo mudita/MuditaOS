@@ -15,13 +15,26 @@
 #include <widgets/SideListView.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
 #include <common/widgets/BellBattery.hpp>
-#include <common/windows/BellFinishedWindow.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 
 namespace
 {
     auto batteryValue = 50;
-    inline constexpr auto font = style::window::font::largelight;
+
+    constexpr auto font   = style::window::font::largelight;
+    constexpr auto dialRadius = 226U;
+
+    namespace topBox
+    {
+        constexpr auto width  = 400U;
+        constexpr auto height = 120U;
+    } // namespace topBox
+
+    namespace bottomBox
+    {
+        constexpr auto width  = 240U;
+        constexpr auto height = 100U;
+    } // namespace bottomBox
 }
 
 namespace gui
@@ -45,7 +58,7 @@ namespace gui
 
         Arc::ShapeParams arcParams;
         arcParams.setCenterPoint(Point(getWidth() / 2, getHeight() / 2))
-            .setRadius(192U)
+            .setRadius(dialRadius)
             .setStartAngle(0U)
             .setSweepAngle(360U)
             .setPenWidth(1U)
@@ -57,7 +70,7 @@ namespace gui
                                       ArcProgressBar::ProgressChange::DecrementFromFull);
         progress->setMaximum(3);
 
-        top = new VBox(this, 100, 120, 400, 120);
+        top = new VBox(this, 100, 120, topBox::width, topBox::height);
         top->setEdges(RectangleEdge::None);
 
         alarm = new AlarmSetSpinner(top);
@@ -71,7 +84,7 @@ namespace gui
         alarm->setVisible(true);
         alarm->setAlarmTimeVisible(true);
 
-        bottom = new VBox(this, 180, 300, 240, 100);
+        bottom = new VBox(this, 180, 300, bottomBox::width, bottomBox::height);
         bottom->setEdges(RectangleEdge::None);
 
         battery = new BellBattery(bottom, gui::BatteryWidthMode::FitToContent);
@@ -100,6 +113,9 @@ namespace gui
             battery->informContentChanged();
             return true;
         }
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
+            application->returnToPreviousWindow();
+        }
         return AppWindow::onInput(inputEvent);
     }
 
@@ -109,14 +125,24 @@ namespace gui
         buildInterface();
     }
 
-    void BellClockWindow::exit()
+    void BellClockWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
-        application->switchWindow(
-            gui::window::bell_finished::defaultName,
-            BellFinishedWindowData::Factory::create("circle_success_big",
-                                                    "",
-                                                    "",
-                                                    BellFinishedWindowData::ExitBehaviour::CloseApplication,
-                                                    std::chrono::seconds::zero()));
+        if (presenter != nullptr) {
+            presenter->updateTime();
+        }
+    }
+
+    RefreshModes BellClockWindow::updateTime()
+    {
+        if (presenter != nullptr) {
+            return presenter->handleUpdateTimeEvent();
+        }
+        return RefreshModes::GUI_REFRESH_NONE;
+    }
+
+    void BellClockWindow::setTime(std::time_t time)
+    {
+        struct tm *t = gmtime(&time);
+        clock->setTime(t->tm_hour % 12, t->tm_min);
     }
 } /* namespace gui */

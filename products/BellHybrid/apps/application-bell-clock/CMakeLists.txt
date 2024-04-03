@@ -5,10 +5,16 @@ target_sources(application-bell-clock
     PRIVATE
         ApplicationBellClock.cpp
         presenter/BellClockWindowPresenter.cpp
+        presenter/SettingsPresenter.cpp
+        models/DeepRefreshInterval.cpp
         windows/BellClockWindow.cpp
+        windows/BellRefreshClockWindow.cpp
     PRIVATE
         presenter/BellClockWindowPresenter.hpp
+        presenter/SettingsPresenter.hpp
         windows/BellClockWindow.hpp
+        windows/BellRefreshClockWindow.hpp
+        data/Contract.hpp
     PUBLIC
         include/application-bell-clock/ApplicationBellClock.hpp
 )

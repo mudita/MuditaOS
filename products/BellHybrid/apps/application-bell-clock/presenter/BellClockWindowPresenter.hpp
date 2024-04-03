@@ -3,12 +3,23 @@
 
 #pragma once
 
-#include <memory>
+#include "models/DeepRefreshInterval.hpp"
+
 #include <apps-common/BasePresenter.hpp>
+#include <common/models/TimeModel.hpp>
+#include <gui/Common.hpp>
+
+#include <memory>
 
 namespace app
 {
     class ApplicationCommon;
+    class AbstractTimeModel;
+
+    namespace clock::models
+    {
+        class DeepRefreshInterval;
+    }
 }
 
 namespace gui
@@ -23,18 +34,29 @@ namespace app::bell_clock
     {
       public:
         virtual ~View() noexcept = default;
-        virtual void exit()      = 0;
+        virtual void setTime(std::time_t time) = 0;
     };
 
     class AbstractClockPresenter : public BasePresenter<View>
     {
       public:
         virtual ~AbstractClockPresenter() noexcept = default;
+        virtual gui::RefreshModes handleUpdateTimeEvent() = 0;
     };
 
     class BellClockWindowPresenter : public AbstractClockPresenter
     {
       public:
-        explicit BellClockWindowPresenter();
+        BellClockWindowPresenter(std::unique_ptr<AbstractTimeModel> timeModel,
+                                 clock::models::DeepRefreshInterval &deepRefreshModel);
+        gui::RefreshModes handleUpdateTimeEvent() override;
+
+        void updateTime();
+
+      private:
+        gui::RefreshModes handleCyclicDeepRefresh();
+
+        std::unique_ptr<AbstractTimeModel> timeModel;
+        clock::models::DeepRefreshInterval &deepRefreshModel;
     };
 } // namespace app::bell_clock

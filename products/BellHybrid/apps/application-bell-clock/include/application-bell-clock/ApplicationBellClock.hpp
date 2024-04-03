@@ -10,6 +10,11 @@ namespace gui::window::name
     inline constexpr auto bellClock = "BellClock";
 } // namespace gui::window::name
 
+namespace app::clock::models
+{
+    class DeepRefreshInterval;
+} // namespace app::clock::models
+
 namespace app
 {
     inline constexpr auto applicationBellClockName = "ApplicationBellClock";
@@ -35,6 +40,11 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
+
+      private:
+        sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
+
+        std::shared_ptr<app::clock::models::DeepRefreshInterval> refreshModel;
     };
 
     template <>
