@@ -6,12 +6,13 @@
 
 namespace app::bell_settings
 {
-    AlarmSettingsPresenter::AlarmSettingsPresenter(std::unique_ptr<AlarmSettingsListItemProvider> &&provider,
+    AlarmSettingsPresenter::AlarmSettingsPresenter(ApplicationCommon *app,
+                                                   std::unique_ptr<AlarmSettingsListItemProvider> &&provider,
                                                    std::unique_ptr<AbstractAlarmSettingsModel> &&settingsModel,
                                                    AbstractAudioModel &audioModel,
                                                    std::unique_ptr<AbstractFrontlightModel> &&frontlight,
                                                    std::unique_ptr<AudioErrorModel> &&audioErrorModel)
-        : provider{std::move(provider)}, settingsModel{std::move(settingsModel)}, audioModel{audioModel},
+        : app{app}, provider{std::move(provider)}, settingsModel{std::move(settingsModel)}, audioModel{audioModel},
           frontlight{std::move(frontlight)}, audioErrorModel{std::move(audioErrorModel)}
     {
 
@@ -37,12 +38,15 @@ namespace app::bell_settings
 
         this->provider->onExit = [this]() { getView()->exit(); };
 
-        this->provider->onToneEnter  = playSound;
-        this->provider->onToneExit   = [this](const auto &) { stopSound(); };
-        this->provider->onToneChange = playSound;
+        this->provider->onToneEnter   = playSound;
+        this->provider->onToneExit    = [this](const auto &) { stopSound(); };
+        this->provider->onToneChange  = playSound;
         this->provider->onToneProceed = [this](const auto &path) { return validatePath(path); };
 
-        this->provider->onVolumeEnter  = playSound;
+        this->provider->onVolumeEnter = [this, playSound](const auto &val) {
+            getView()->deepRefresh();
+            playSound(val);
+        };
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
             this->audioModel.setVolume(

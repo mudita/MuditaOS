@@ -27,6 +27,7 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
         void rebuild() override;
         void exit() override;
+        void deepRefresh() override;
         void handleError() override;
         void handleDeletedFile() override;
 

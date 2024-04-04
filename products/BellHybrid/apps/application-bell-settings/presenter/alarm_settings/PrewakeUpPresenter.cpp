@@ -6,12 +6,13 @@
 
 namespace app::bell_settings
 {
-    PrewakeUpWindowPresenter::PrewakeUpWindowPresenter(std::unique_ptr<PrewakeUpListItemProvider> &&provider,
+    PrewakeUpWindowPresenter::PrewakeUpWindowPresenter(ApplicationCommon *app,
+                                                       std::unique_ptr<PrewakeUpListItemProvider> &&provider,
                                                        std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
                                                        AbstractAudioModel &audioModel,
                                                        std::unique_ptr<AbstractFrontlightModel> &&frontlight,
                                                        std::unique_ptr<AudioErrorModel> &&audioErrorModel)
-        : provider{std::move(provider)}, model{std::move(model)}, audioModel{audioModel},
+        : app{app}, provider{std::move(provider)}, model{std::move(model)}, audioModel{audioModel},
           frontlight{std::move(frontlight)}, audioErrorModel{std::move(audioErrorModel)}
     {
         auto playSound = [this](const UTF8 &val) {
@@ -41,7 +42,10 @@ namespace app::bell_settings
         this->provider->onToneChange = playSound;
         this->provider->onToneProceed = [this](const auto &path) { return validatePath(path); };
 
-        this->provider->onVolumeEnter  = playSound;
+        this->provider->onVolumeEnter = [this, playSound](const auto &val) {
+            getView()->deepRefresh();
+            playSound(val);
+        };
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
             this->audioModel.setVolume(

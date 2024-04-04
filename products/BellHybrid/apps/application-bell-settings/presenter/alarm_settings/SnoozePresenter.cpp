@@ -6,12 +6,13 @@
 
 namespace app::bell_settings
 {
-    SnoozePresenter::SnoozePresenter(std::unique_ptr<SnoozeListItemProvider> &&provider,
+    SnoozePresenter::SnoozePresenter(ApplicationCommon *app,
+                                     std::unique_ptr<SnoozeListItemProvider> &&provider,
                                      std::unique_ptr<AbstractSnoozeSettingsModel> &&snoozeSettingsModel,
                                      AbstractAudioModel &audioModel,
                                      std::unique_ptr<AudioErrorModel> &&audioErrorModel)
-        : provider{std::move(provider)}, snoozeSettingsModel{std::move(snoozeSettingsModel)}, audioModel{audioModel},
-          audioErrorModel{std::move(audioErrorModel)}
+        : app{app}, provider{std::move(provider)}, snoozeSettingsModel{std::move(snoozeSettingsModel)},
+          audioModel{audioModel}, audioErrorModel{std::move(audioErrorModel)}
     {
         auto playSound = [this](const UTF8 &val) {
             auto onStartCallback = [this, val](audio::RetCode retCode) {
@@ -40,7 +41,10 @@ namespace app::bell_settings
         this->provider->onToneChange = playSound;
         this->provider->onToneProceed = [this](const auto &path) { return validatePath(path); };
 
-        this->provider->onVolumeEnter  = playSound;
+        this->provider->onVolumeEnter = [this, playSound](const auto &val) {
+            getView()->deepRefresh();
+            playSound(val);
+        };
         this->provider->onVolumeExit   = [this](const auto &) { stopSound(); };
         this->provider->onVolumeChange = [this, playSound](const auto &val) {
             this->audioModel.setVolume(

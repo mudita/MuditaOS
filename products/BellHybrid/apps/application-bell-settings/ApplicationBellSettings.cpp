@@ -137,7 +137,7 @@ namespace app
                                                                                                  std::move(songsModel));
                 auto audioErrorModel = std::make_unique<bell_settings::AudioErrorModel>();
                 auto presenter       = std::make_unique<bell_settings::SettingsPresenter>(
-                    std::move(provider), bedtimeModel, *audioModel, std::move(audioErrorModel));
+                    app, std::move(provider), bedtimeModel, *audioModel, std::move(audioErrorModel));
                 return std::make_unique<gui::BellSettingsBedtimeToneWindow>(app, std::move(presenter));
             });
 
@@ -192,7 +192,8 @@ namespace app
                 auto frontlightModel = std::make_unique<bell_settings::FrontlightModel>(app);
                 auto audioErrorModel = std::make_unique<bell_settings::AudioErrorModel>();
                 auto presenter =
-                    std::make_unique<bell_settings::PrewakeUpWindowPresenter>(std::move(provider),
+                    std::make_unique<bell_settings::PrewakeUpWindowPresenter>(app,
+                                                                              std::move(provider),
                                                                               std::move(prewakeUpSettingsModel),
                                                                               *audioModel,
                                                                               std::move(frontlightModel),
@@ -230,7 +231,7 @@ namespace app
                 auto audioErrorModel  = std::make_unique<bell_settings::AudioErrorModel>();
 
                 auto presenter = std::make_unique<bell_settings::SnoozePresenter>(
-                    std::move(provider), std::move(snoozeSettingsModel), *audioModel, std::move(audioErrorModel));
+                    app, std::move(provider), std::move(snoozeSettingsModel), *audioModel, std::move(audioErrorModel));
                 return std::make_unique<gui::BellSettingsAlarmSettingsSnoozeWindow>(app, std::move(presenter));
             });
         windowsFactory.attach(
@@ -263,7 +264,8 @@ namespace app
                 auto provider  = std::make_unique<bell_settings::AlarmSettingsListItemProvider>(*alarmSettingsModel,
                                                                                                std::move(songsModel));
                 auto audioErrorModel = std::make_unique<bell_settings::AudioErrorModel>();
-                auto presenter       = std::make_unique<bell_settings::AlarmSettingsPresenter>(std::move(provider),
+                auto presenter       = std::make_unique<bell_settings::AlarmSettingsPresenter>(app,
+                                                                                         std::move(provider),
                                                                                          std::move(alarmSettingsModel),
                                                                                          *audioModel,
                                                                                          std::move(frontlightModel),
