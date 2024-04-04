@@ -25,6 +25,7 @@ namespace gui
         void onClose(CloseReason reason) override;
         void rebuild() override;
         void exit() override;
+        void deepRefresh() override;
         void handleError() override;
         void handleDeletedFile() override;
 

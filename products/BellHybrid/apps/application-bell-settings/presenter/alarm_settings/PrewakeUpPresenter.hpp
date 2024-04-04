@@ -28,6 +28,7 @@ namespace app::bell_settings
           public:
             virtual ~View() noexcept                 = default;
             virtual auto exit() -> void              = 0;
+            virtual auto deepRefresh() -> void       = 0;
             virtual auto handleError() -> void       = 0;
             virtual auto handleDeletedFile() -> void = 0;
         };
@@ -47,7 +48,8 @@ namespace app::bell_settings
     class PrewakeUpWindowPresenter : public PrewakeUpWindowContract::Presenter
     {
       public:
-        PrewakeUpWindowPresenter(std::unique_ptr<PrewakeUpListItemProvider> &&provider,
+        PrewakeUpWindowPresenter(ApplicationCommon *app,
+                                 std::unique_ptr<PrewakeUpListItemProvider> &&provider,
                                  std::unique_ptr<AbstractPrewakeUpSettingsModel> &&model,
                                  AbstractAudioModel &audioModel,
                                  std::unique_ptr<AbstractFrontlightModel> &&frontlight,
@@ -65,6 +67,7 @@ namespace app::bell_settings
         auto showAudioError(gui::AudioErrorType errorType) const -> void;
         auto validatePath(const UTF8 &path) const -> bool;
 
+        ApplicationCommon *app;
         std::shared_ptr<PrewakeUpListItemProvider> provider;
         std::unique_ptr<AbstractPrewakeUpSettingsModel> model;
         AbstractAudioModel &audioModel;
