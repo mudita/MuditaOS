@@ -24,6 +24,7 @@ namespace app::bell_settings
       public:
         virtual ~View() noexcept                 = default;
         virtual auto exit() -> void              = 0;
+        virtual auto deepRefresh() -> void       = 0;
         virtual auto handleError() -> void       = 0;
         virtual auto handleDeletedFile() -> void = 0;
     };
@@ -42,7 +43,8 @@ namespace app::bell_settings
     class SnoozePresenter : public AbstractSnoozePresenter
     {
       public:
-        SnoozePresenter(std::unique_ptr<SnoozeListItemProvider> &&provider,
+        SnoozePresenter(ApplicationCommon *app,
+                        std::unique_ptr<SnoozeListItemProvider> &&provider,
                         std::unique_ptr<AbstractSnoozeSettingsModel> &&snoozeSettingsModel,
                         AbstractAudioModel &audioModel,
                         std::unique_ptr<AudioErrorModel> &&audioErrorModel);
@@ -58,6 +60,7 @@ namespace app::bell_settings
         auto showAudioError(gui::AudioErrorType errorType) const -> void;
         auto validatePath(const UTF8 &path) const -> bool;
 
+        ApplicationCommon *app;
         std::shared_ptr<SnoozeListItemProvider> provider;
         std::unique_ptr<AbstractSnoozeSettingsModel> snoozeSettingsModel;
         AbstractAudioModel &audioModel;
