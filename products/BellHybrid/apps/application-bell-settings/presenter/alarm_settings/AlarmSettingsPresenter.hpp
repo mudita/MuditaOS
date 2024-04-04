@@ -28,9 +28,10 @@ namespace app::bell_settings
         {
           public:
             virtual ~View() noexcept = default;
-            virtual void exit()      = 0;
-            virtual void handleError()       = 0;
-            virtual void handleDeletedFile() = 0;
+            virtual auto exit() -> void              = 0;
+            virtual auto deepRefresh() -> void       = 0;
+            virtual auto handleError() -> void       = 0;
+            virtual auto handleDeletedFile() -> void = 0;
         };
 
         class Presenter : public BasePresenter<View>
@@ -49,7 +50,8 @@ namespace app::bell_settings
     class AlarmSettingsPresenter : public AlarmSettingsWindowContract::Presenter
     {
       public:
-        AlarmSettingsPresenter(std::unique_ptr<AlarmSettingsListItemProvider> &&provider,
+        AlarmSettingsPresenter(ApplicationCommon *app,
+                               std::unique_ptr<AlarmSettingsListItemProvider> &&provider,
                                std::unique_ptr<AbstractAlarmSettingsModel> &&settingsModel,
                                AbstractAudioModel &audioModel,
                                std::unique_ptr<AbstractFrontlightModel> &&frontlight,
@@ -68,6 +70,7 @@ namespace app::bell_settings
         auto showAudioError(gui::AudioErrorType errorType) const -> void;
         auto validatePath(const UTF8 &path) const -> bool;
 
+        ApplicationCommon *app;
         std::shared_ptr<AlarmSettingsListItemProvider> provider;
         std::unique_ptr<AbstractAlarmSettingsModel> settingsModel;
         AbstractAudioModel &audioModel;

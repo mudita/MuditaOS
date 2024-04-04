@@ -74,6 +74,11 @@ namespace gui
             BellFinishedWindowData::Factory::create("circle_success_big", BellSettingsAlarmSettingsMenuWindow::name));
     }
 
+    void BellSettingsPrewakeUpWindow::deepRefresh()
+    {
+        getApplication()->render(gui::RefreshModes::GUI_REFRESH_DEEP);
+    }
+
     void BellSettingsPrewakeUpWindow::onClose(CloseReason reason)
     {
         if (reason != CloseReason::Popup) {

@@ -72,6 +72,11 @@ namespace gui
             BellFinishedWindowData::Factory::create("circle_success_big", gui::name::window::main_window));
     }
 
+    void BellSettingsBedtimeToneWindow::deepRefresh()
+    {
+        getApplication()->render(gui::RefreshModes::GUI_REFRESH_DEEP);
+    }
+
     void BellSettingsBedtimeToneWindow::onClose(CloseReason reason)
     {
         if (reason != CloseReason::Popup) {
