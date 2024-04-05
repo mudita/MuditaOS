@@ -11,7 +11,10 @@
 #include "presenter/FocusSettingsPresenter.hpp"
 #include "presenter/FocusTimerPresenter.hpp"
 
+#include "common/models/TimeModel.hpp"
 #include <common/models/AudioModel.hpp>
+#include <common/windows/SessionPausedWindow.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 
 namespace app
@@ -63,10 +66,16 @@ namespace app
         });
 
         windowsFactory.attach(focus::window::name::timer, [this](ApplicationCommon *app, const std::string &name) {
+            auto timeModel = std::make_unique<app::TimeModel>();
             auto presenter = std::make_unique<app::focus::FocusTimerPresenter>(
-                app, settings.get(), *batteryModel, *lowBatteryInfoModel);
+                app, settings.get(), std::move(timeModel), *batteryModel, *lowBatteryInfoModel);
             return std::make_unique<focus::FocusTimerWindow>(app, std::move(presenter));
         });
+
+        windowsFactory.attach(gui::window::session_paused::sessionPaused,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::SessionPausedWindow>(app);
+                              });
 
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,

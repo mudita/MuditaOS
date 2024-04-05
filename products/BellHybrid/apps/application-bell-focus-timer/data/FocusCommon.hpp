@@ -4,6 +4,9 @@
 #pragma once
 
 #include <AppWindowConstants.hpp>
+#include <Paths.hpp>
+#include <filesystem>
+#include <string>
 
 namespace app::focus
 {
@@ -15,4 +18,10 @@ namespace app::focus
         inline constexpr auto settings = "FocusTimerSettingsWindow";
         inline constexpr auto timer    = "FocusTimerSessionWindow";
     } // namespace window::name
+
+    inline std::filesystem::path getFocusTimeAudioPath()
+    {
+        return paths::audio::proprietary() / paths::audio::focusTimer() / "FocusTimer_Gong.mp3";
+    }
+
 } // namespace app::focus
