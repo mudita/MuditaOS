@@ -146,7 +146,7 @@ namespace app::focus
         return AppWindow::onInput(inputEvent);
     }
 
-    void FocusTimerWindow::onAllFocusSessionsFinished()
+    void FocusTimerWindow::showEndOfAllSessionsInfo()
     {
         timer->setVisible(false);
         iconPause->setVisible(false);
@@ -157,7 +157,7 @@ namespace app::focus
         playGong();
     }
 
-    void FocusTimerWindow::onFocusSessionStarted()
+    void FocusTimerWindow::showFocusSessionCountdown()
     {
         timer->setVisible(true);
         iconPause->setVisible(false);
@@ -167,7 +167,7 @@ namespace app::focus
         mainVBox->resizeItems();
     }
 
-    void FocusTimerWindow::onFocusSessionFinished()
+    void FocusTimerWindow::showTimeForBreakInfo()
     {
         timer->setVisible(false);
         iconPause->setVisible(false);
@@ -178,7 +178,7 @@ namespace app::focus
         playGong();
     }
 
-    void FocusTimerWindow::onShortBreakStarted()
+    void FocusTimerWindow::showShortBreakCountdown()
     {
         timer->setVisible(true);
         iconPause->setVisible(false);
@@ -188,7 +188,7 @@ namespace app::focus
         mainVBox->resizeItems();
     }
 
-    void FocusTimerWindow::onShortBreakFinished()
+    void FocusTimerWindow::showTimeForFocusInfo()
     {
         timer->setVisible(false);
         iconPause->setVisible(false);

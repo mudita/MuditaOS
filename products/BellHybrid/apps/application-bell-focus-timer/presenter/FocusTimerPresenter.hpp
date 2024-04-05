@@ -9,7 +9,6 @@
 #include <common/models/LowBatteryInfoModel.hpp>
 #include <apps-common/widgets/TimerWithCallbacks.hpp>
 #include <time/time_locale.hpp>
-#include "widgets/ProgressTimer.hpp"
 
 namespace app
 {
@@ -19,18 +18,24 @@ namespace app
 
 namespace app::focus
 {
+    namespace models
+    {
+        class FocusSettingsModel;
+    } // namespace models
+
     class FocusTimerContract
     {
       public:
         class View
         {
           public:
-            virtual ~View() noexcept                                        = default;
-            virtual void onAllFocusSessionsFinished()                       = 0;
-            virtual void onFocusSessionStarted()                            = 0;
-            virtual void onFocusSessionFinished()                           = 0;
-            virtual void onShortBreakStarted()                              = 0;
-            virtual void onShortBreakFinished()                             = 0;
+            virtual ~View() noexcept = default;
+
+            virtual void showFocusSessionCountdown()                        = 0;
+            virtual void showShortBreakCountdown()                          = 0;
+            virtual void showTimeForFocusInfo()                             = 0;
+            virtual void showTimeForBreakInfo()                             = 0;
+            virtual void showEndOfAllSessionsInfo()                         = 0;
             virtual void setTime(std::time_t newTime)                       = 0;
             virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
             virtual void pause()                                            = 0;
@@ -58,16 +63,10 @@ namespace app::focus
     class FocusTimerPresenter : public FocusTimerContract::Presenter
     {
       public:
-        enum class FocusTimerPhase
-        {
-            FocusTime,
-            FocusTimeEnded,
-            ShortBreakTime,
-            ShortBreakTimeEnded,
-            AllFocusSessionsEnded
-        };
         FocusTimerPresenter(app::ApplicationCommon *app,
-                            settings::Settings *settings,
+                            models::FocusSettingsModel &focusTimeModel,
+                            models::FocusSettingsModel &focusRepeatsModel,
+                            models::FocusSettingsModel &shortBreakTimeModel,
                             std::unique_ptr<AbstractTimeModel> timeModel,
                             AbstractBatteryModel &batteryModel,
                             AbstractLowBatteryInfoModel &lowBatteryInfoModel);
@@ -86,8 +85,19 @@ namespace app::focus
         void startTime();
 
       private:
+        enum class FocusTimerPhase
+        {
+            FocusTime,
+            FocusTimeEnded,
+            ShortBreakTime,
+            ShortBreakTimeEnded,
+            AllFocusSessionsEnded
+        };
+
         app::ApplicationCommon *app{nullptr};
-        settings::Settings *settings{nullptr};
+        models::FocusSettingsModel &focusTimeModel;
+        models::FocusSettingsModel &focusRepeatsModel;
+        models::FocusSettingsModel &shortBreakTimeModel;
         AbstractBatteryModel &batteryModel;
         AbstractLowBatteryInfoModel &lowBatteryInfoModel;
 
@@ -102,5 +112,7 @@ namespace app::focus
 
         void executeNextStep();
         bool isMiddleTimeBetweenBreakAndFocus();
+        FocusTimerPhase handleInfoAfterFocusPhase();
+        FocusTimerPhase handleCountdownAfterFocusPhase();
     };
 } // namespace app::focus

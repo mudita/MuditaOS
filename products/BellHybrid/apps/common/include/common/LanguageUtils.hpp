@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,4 +11,6 @@ namespace utils::language
     auto getCorrectSecondsNumeralForm(std::uint32_t val) -> std::string;
 
     auto getCorrectMinutesAccusativeForm(std::uint32_t val) -> std::string;
+
+    auto getCorrectMultiplicityForm(std::uint32_t val) -> std::string;
 } // namespace utils::language
