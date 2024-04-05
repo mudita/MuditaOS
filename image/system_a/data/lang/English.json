@@ -27,6 +27,9 @@
     "app_bell_charging_notification": "Charging",
     "app_bell_focus_settings": "Settings",
     "app_bell_focus_start": "Focus now",
+    "app_bell_focus_time": "Focus timer",
+    "app_bell_focus_repeats": "Focus timer repeats",
+    "app_bell_focus_short_break": "Short break",
     "app_bell_goodbye": "Goodbye",
     "app_bell_greeting_msg": [
         "<text>Good Morning!<br />It's a Beautiful Day!</text>",
@@ -615,6 +618,8 @@
     "common_mo": "MO",
     "common_mon": "Mon",
     "common_monday": "Monday",
+    "common_multiplicity_once": "time",
+    "common_multiplicity_many": "times",
     "common_no": "No",
     "common_november": "November",
     "common_october": "October",

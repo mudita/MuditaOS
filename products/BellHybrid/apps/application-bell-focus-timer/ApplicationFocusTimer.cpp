@@ -11,6 +11,8 @@
 #include "presenter/FocusSettingsPresenter.hpp"
 #include "presenter/FocusTimerPresenter.hpp"
 
+#include "models/FocusSettingsModel.hpp"
+
 #include "common/models/TimeModel.hpp"
 #include <common/models/AudioModel.hpp>
 #include <common/windows/SessionPausedWindow.hpp>
@@ -42,6 +44,13 @@ namespace app
             return ret;
         }
 
+        focusTimeModel = std::make_unique<focus::models::FocusSettingsModel>(
+            this, focus::models::settings::focusTimeName, focus::models::settings::focusTimeDefault);
+        focusRepeatsModel = std::make_unique<focus::models::FocusSettingsModel>(
+            this, focus::models::settings::focusRepeatsName, focus::models::settings::focusRepeatsDefault);
+        shortBreakTimeModel = std::make_unique<focus::models::FocusSettingsModel>(
+            this, focus::models::settings::shortBreakTimeName, focus::models::settings::shortBreakTimeDefault);
+
         batteryModel                 = std::make_unique<app::BatteryModel>(this);
         lowBatteryInfoModel          = std::make_unique<app::LowBatteryInfoModel>();
         cpuSentinel                  = std::make_shared<sys::CpuSentinel>(applicationFocusTimerName, this);
@@ -61,14 +70,20 @@ namespace app
         });
 
         windowsFactory.attach(focus::window::name::settings, [this](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<app::focus::SettingsPresenter>();
+            auto presenter = std::make_unique<app::focus::SettingsPresenter>(
+                *focusTimeModel, *focusRepeatsModel, *shortBreakTimeModel);
             return std::make_unique<focus::SettingsWindow>(app, std::move(presenter));
         });
 
         windowsFactory.attach(focus::window::name::timer, [this](ApplicationCommon *app, const std::string &name) {
             auto timeModel = std::make_unique<app::TimeModel>();
-            auto presenter = std::make_unique<app::focus::FocusTimerPresenter>(
-                app, settings.get(), std::move(timeModel), *batteryModel, *lowBatteryInfoModel);
+            auto presenter = std::make_unique<app::focus::FocusTimerPresenter>(app,
+                                                                               *focusTimeModel,
+                                                                               *focusRepeatsModel,
+                                                                               *shortBreakTimeModel,
+                                                                               std::move(timeModel),
+                                                                               *batteryModel,
+                                                                               *lowBatteryInfoModel);
             return std::make_unique<focus::FocusTimerWindow>(app, std::move(presenter));
         });
 
