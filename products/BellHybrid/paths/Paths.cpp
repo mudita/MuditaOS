@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Paths.hpp"
@@ -35,6 +35,10 @@ std::filesystem::path paths::audio::relaxation() noexcept
 std::filesystem::path paths::audio::meditation() noexcept
 {
     return "meditation";
+}
+std::filesystem::path paths::audio::focusTimer() noexcept
+{
+    return "focus_timer";
 }
 std::filesystem::path paths::audio::colorOfNoises() noexcept
 {
