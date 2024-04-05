@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,6 +17,7 @@ namespace paths
         std::filesystem::path bedtimeReminder() noexcept;
         std::filesystem::path relaxation() noexcept;
         std::filesystem::path meditation() noexcept;
+        std::filesystem::path focusTimer() noexcept;
         std::filesystem::path colorOfNoises() noexcept;
     } // namespace audio
 
