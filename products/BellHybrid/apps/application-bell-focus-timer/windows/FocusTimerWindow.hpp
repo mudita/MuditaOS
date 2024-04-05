@@ -25,11 +25,11 @@ namespace app::focus
         void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
         void buildInterface() override;
         bool onInput(const gui::InputEvent &inputEvent) override;
-        void onAllFocusSessionsFinished() override;
-        void onFocusSessionStarted() override;
-        void onFocusSessionFinished() override;
-        void onShortBreakStarted() override;
-        void onShortBreakFinished() override;
+        void showFocusSessionCountdown() override;
+        void showShortBreakCountdown() override;
+        void showTimeForFocusInfo() override;
+        void showTimeForBreakInfo() override;
+        void showEndOfAllSessionsInfo() override;
         void pause() override;
         void resume() override;
 

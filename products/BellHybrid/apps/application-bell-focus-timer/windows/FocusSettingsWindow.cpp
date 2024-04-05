@@ -67,7 +67,9 @@ namespace app::focus
     }
 
     void SettingsWindow::switchToExitWindow()
-    {}
+    {
+        application->switchWindow(window::name::main);
+    }
 
     void SettingsWindow::onClose(const CloseReason reason)
     {

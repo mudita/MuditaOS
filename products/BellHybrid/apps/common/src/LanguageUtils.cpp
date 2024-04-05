@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <i18n/i18n.hpp>
@@ -38,6 +38,11 @@ namespace
             return transformNumeral(val, minuteLower, minutesLower, minutesLowerGenitive);
         }
     }
+
+    std::string transformMultiplicity(const std::uint32_t val, const std::string &once, const std::string &many)
+    {
+        return (val == 1) ? once : many;
+    }
 } // namespace
 
 namespace utils::language
@@ -65,5 +70,11 @@ namespace utils::language
                                    utils::translate("common_minute_lower_accusative"),
                                    utils::translate("common_minutes_lower"),
                                    utils::translate("common_minutes_lower_genitive"));
+    }
+
+    auto getCorrectMultiplicityForm(std::uint32_t val) -> std::string
+    {
+        return transformMultiplicity(
+            val, utils::translate("common_multiplicity_once"), utils::translate("common_multiplicity_many"));
     }
 } // namespace utils::language
