@@ -84,6 +84,7 @@
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Under_the_Water.mp3", "output": "assets/audio/relaxation/Under_the_Water.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/bg_sounds/Woodland_Ambiance.mp3", "output": "assets/audio/relaxation/Woodland_Ambiance.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/meditation/Meditation_Gong.mp3", "output": "assets/audio/meditation/Meditation_Gong.mp3"},
+        {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/focus_timer/FocusTimer_Gong.mp3", "output": "assets/audio/focus_timer/FocusTimer_Gong.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/prewakeup/Joyful_Awakening.mp3", "output": "assets/audio/prewakeup/Joyful_Awakening.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/prewakeup/Morning_Spirit.mp3", "output": "assets/audio/prewakeup/Morning_Spirit.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/prewakeup/Radiant_Morning.mp3", "output": "assets/audio/prewakeup/Radiant_Morning.mp3"},
