@@ -8,6 +8,11 @@
 #include <common/models/BatteryModel.hpp>
 #include <common/models/LowBatteryInfoModel.hpp>
 
+namespace app::focus::models
+{
+    class FocusSettingsModel;
+} // namespace app::focus::models
+
 namespace app
 {
     inline constexpr auto applicationFocusTimerName      = "ApplicationFocusTimer";
@@ -36,6 +41,10 @@ namespace app
         }
 
       private:
+        std::unique_ptr<focus::models::FocusSettingsModel> focusTimeModel;
+        std::unique_ptr<focus::models::FocusSettingsModel> focusRepeatsModel;
+        std::unique_ptr<focus::models::FocusSettingsModel> shortBreakTimeModel;
+
         std::unique_ptr<AbstractAudioModel> audioModel;
         std::unique_ptr<AbstractBatteryModel> batteryModel;
         std::unique_ptr<AbstractLowBatteryInfoModel> lowBatteryInfoModel;

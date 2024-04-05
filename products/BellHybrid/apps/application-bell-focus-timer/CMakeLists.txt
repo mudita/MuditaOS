@@ -26,6 +26,7 @@ target_sources(application-bell-focus-timer
         windows/FocusTimerWindow.cpp
         presenter/FocusSettingsPresenter.cpp
         presenter/FocusTimerPresenter.cpp
+        models/FocusSettingsModel.cpp
 
     PUBLIC
         include/application-bell-focus-timer/ApplicationFocusTimer.hpp

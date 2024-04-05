@@ -2,20 +2,18 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "FocusTimerPresenter.hpp"
-
 #include "FocusCommon.hpp"
+#include "models/FocusSettingsModel.hpp"
 #include "Application.hpp"
-#include "widgets/ProgressTimer.hpp"
 
-#include <common/LanguageUtils.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
-#include <service-db/Settings.hpp>
+#include <common/LanguageUtils.hpp>
 
 namespace
 {
-    constexpr std::chrono::milliseconds betweenSessionDelayTime{5000};
-    constexpr auto summaryWindowTimeout = std::chrono::seconds{5};
+    constexpr std::chrono::seconds delayBetweenSessions{5};
+    constexpr std::chrono::seconds summaryWindowTimeout{5};
 
     std::string createSummaryText(const std::string &str, const std::string &minutesOfFocus)
     {
@@ -30,31 +28,23 @@ namespace app::focus
 {
 
     FocusTimerPresenter::FocusTimerPresenter(app::ApplicationCommon *app,
-                                             settings::Settings *settings,
+                                             models::FocusSettingsModel &focusTimeModel,
+                                             models::FocusSettingsModel &focusRepeatsModel,
+                                             models::FocusSettingsModel &shortBreakTimeModel,
                                              std::unique_ptr<AbstractTimeModel> timeModel,
                                              AbstractBatteryModel &batteryModel,
                                              AbstractLowBatteryInfoModel &lowBatteryInfoModel)
-        : app{app}, settings{settings}, batteryModel{batteryModel},
+        : app{app}, focusTimeModel{focusTimeModel}, focusRepeatsModel{focusRepeatsModel},
+          shortBreakTimeModel{shortBreakTimeModel}, batteryModel{batteryModel},
           lowBatteryInfoModel{lowBatteryInfoModel}, timeModel{std::move(timeModel)}
     {
-        //        focusSessionDuration = std::chrono::minutes{
-        //                utils::getNumericValue<int>(settings->getValue(focusDBRecordName,
-        //                settings::SettingsScope::AppLocal))};
-        //        shortBreakDuration = std::chrono::minutes{
-        //                utils::getNumericValue<int>(settings->getValue(focusDBRecordName,
-        //                settings::SettingsScope::AppLocal))};
-        //        focusSessionsLeft =
-        //                utils::getNumericValue<int>(settings->getValue(focusDBRecordName,
-        //                settings::SettingsScope::AppLocal));
-
-        focusSessionDuration = std::chrono::minutes{25};
-        shortBreakDuration   = std::chrono::minutes{5};
-
-        allFocusSessionsCount = 10;
+        focusSessionDuration  = std::chrono::minutes{focusTimeModel.getValue()};
+        shortBreakDuration    = std::chrono::minutes{shortBreakTimeModel.getValue()};
+        allFocusSessionsCount = focusRepeatsModel.getValue();
         focusSessionsLeft     = allFocusSessionsCount;
 
         betweenSessionTimer = sys::TimerFactory::createSingleShotTimer(
-            app, "betweenSessionTimer", betweenSessionDelayTime, [this](sys::Timer &) { executeNextStep(); });
+            app, "betweenSessionTimer", delayBetweenSessions, [this](sys::Timer &) { executeNextStep(); });
     }
 
     void FocusTimerPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
@@ -134,33 +124,24 @@ namespace app::focus
         switch (currentTimerPhase) {
         case FocusTimerPhase::FocusTime:
             focusSessionsLeft--;
-            if (focusSessionsLeft == 0) {
-                currentTimerPhase = FocusTimerPhase::AllFocusSessionsEnded;
-                getView()->onAllFocusSessionsFinished();
-                startTime();
-            }
-            else {
-                currentTimerPhase = FocusTimerPhase::FocusTimeEnded;
-                getView()->onFocusSessionFinished();
-                startTime();
-            }
+            currentTimerPhase = handleInfoAfterFocusPhase();
+            startTime();
             break;
 
         case FocusTimerPhase::FocusTimeEnded:
-            currentTimerPhase = FocusTimerPhase::ShortBreakTime;
-            getView()->onShortBreakStarted();
+            currentTimerPhase = handleCountdownAfterFocusPhase();
             startTime();
             break;
 
         case FocusTimerPhase::ShortBreakTime:
             currentTimerPhase = FocusTimerPhase::ShortBreakTimeEnded;
-            getView()->onShortBreakFinished();
+            getView()->showTimeForFocusInfo();
             startTime();
             break;
 
         case FocusTimerPhase::ShortBreakTimeEnded:
             currentTimerPhase = FocusTimerPhase::FocusTime;
-            getView()->onFocusSessionStarted();
+            getView()->showFocusSessionCountdown();
             startTime();
             break;
 
@@ -179,12 +160,12 @@ namespace app::focus
     {
         switch (currentTimerPhase) {
         case FocusTimerPhase::FocusTime:
-            timer->reset(std::chrono::minutes(focusSessionDuration));
+            timer->reset(focusSessionDuration);
             timer->start();
             break;
 
         case FocusTimerPhase::ShortBreakTime:
-            timer->reset(std::chrono::minutes(shortBreakDuration));
+            timer->reset(shortBreakDuration);
             timer->start();
             break;
 
@@ -205,6 +186,31 @@ namespace app::focus
         default:
             return false;
         }
+    }
+
+    FocusTimerPresenter::FocusTimerPhase FocusTimerPresenter::handleInfoAfterFocusPhase()
+    {
+        if (focusSessionsLeft == 0) {
+            getView()->showEndOfAllSessionsInfo();
+            return FocusTimerPhase::AllFocusSessionsEnded;
+        }
+        if (shortBreakDuration.count() > 0) {
+            getView()->showTimeForBreakInfo();
+        }
+        else {
+            getView()->showTimeForFocusInfo();
+        }
+        return FocusTimerPhase::FocusTimeEnded;
+    }
+
+    FocusTimerPresenter::FocusTimerPhase FocusTimerPresenter::handleCountdownAfterFocusPhase()
+    {
+        if (shortBreakDuration.count() > 0) {
+            getView()->showShortBreakCountdown();
+            return FocusTimerPhase::ShortBreakTime;
+        }
+        getView()->showFocusSessionCountdown();
+        return FocusTimerPhase::FocusTime;
     }
 
 } // namespace app::focus

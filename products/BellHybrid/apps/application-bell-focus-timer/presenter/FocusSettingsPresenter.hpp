@@ -14,6 +14,11 @@ namespace app
 
 namespace app::focus
 {
+    namespace models
+    {
+        class FocusSettingsModel;
+    } // namespace models
+
     class SettingsContract
     {
       public:
@@ -39,7 +44,9 @@ namespace app::focus
     class SettingsPresenter : public SettingsContract::Presenter
     {
       public:
-        SettingsPresenter();
+        SettingsPresenter(models::FocusSettingsModel &focusTimeModel,
+                          models::FocusSettingsModel &focusRepeatsModel,
+                          models::FocusSettingsModel &shortBreakTimeModel);
 
         void loadData() override;
         void saveData() override;
@@ -49,6 +56,9 @@ namespace app::focus
         void exitWithoutSave() override;
 
       private:
+        models::FocusSettingsModel &focusTimeModel;
+        models::FocusSettingsModel &focusRepeatsModel;
+        models::FocusSettingsModel &shortBreakTimeModel;
         std::shared_ptr<BellListItemProvider> listItemsProvider;
     };
 } // namespace app::focus
