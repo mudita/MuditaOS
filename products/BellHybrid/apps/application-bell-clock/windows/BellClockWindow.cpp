@@ -15,19 +15,21 @@
 #include <widgets/SideListView.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
 #include <common/widgets/BellBattery.hpp>
-#include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
+
+#include <Style.hpp>
 
 namespace
 {
     auto batteryValue = 50;
 
     constexpr auto font   = style::window::font::largelight;
-    constexpr auto dialRadius = 226U;
 
     namespace topBox
     {
-        constexpr auto width  = 400U;
-        constexpr auto height = 120U;
+        constexpr auto width  = 460U;
+        constexpr auto height = 460U;
+        constexpr auto xPos   = 70U;
+        constexpr auto yPos   = 10U;
     } // namespace topBox
 
     namespace bottomBox
@@ -35,6 +37,20 @@ namespace
         constexpr auto width  = 240U;
         constexpr auto height = 100U;
     } // namespace bottomBox
+
+    namespace dial
+    {
+        constexpr auto font = style::window::font::veryverybiglight;
+
+        constexpr auto textWidth   = 58U;
+        constexpr auto textHeight  = 46U;
+        constexpr auto topPosY     = 16U;
+        constexpr auto centerTextX = (600U / 2U) - (textWidth / 2);
+        constexpr auto centerTextY = (480U / 2U) - (textHeight / 2);
+        constexpr auto rightTextX  = centerTextX + (topBox::width / 2) - 36U;
+        constexpr auto bottomPosY  = centerTextY + (topBox::height / 2) - 30U;
+        constexpr auto leftTextX   = topBox::xPos + 8U;
+    } // namespace dial
 }
 
 namespace gui
@@ -56,21 +72,7 @@ namespace gui
         header->setTitleVisibility(true);
         navBar->setVisible(false);
 
-        Arc::ShapeParams arcParams;
-        arcParams.setCenterPoint(Point(getWidth() / 2, getHeight() / 2))
-            .setRadius(dialRadius)
-            .setStartAngle(0U)
-            .setSweepAngle(360U)
-            .setPenWidth(1U)
-            .setBorderColor(ColorFullBlack);
-
-        progress = new ArcProgressBar(this,
-                                      arcParams,
-                                      ArcProgressBar::ProgressDirection::CounterClockwise,
-                                      ArcProgressBar::ProgressChange::DecrementFromFull);
-        progress->setMaximum(3);
-
-        top = new VBox(this, 100, 120, topBox::width, topBox::height);
+        top = new VBox(this, topBox::xPos, topBox::yPos, topBox::width, topBox::height);
         top->setEdges(RectangleEdge::None);
 
         alarm = new AlarmSetSpinner(top);
@@ -80,11 +82,41 @@ namespace gui
         alarm->setAlarmStatus(AlarmSetSpinner::Status::ACTIVATED);
         alarm->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         const auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        alarm->setMargins(gui::Margins(0, 100U, 0, 0));
         alarm->setTime(now);
         alarm->setVisible(true);
         alarm->setAlarmTimeVisible(true);
 
-        bottom = new VBox(this, 180, 300, bottomBox::width, bottomBox::height);
+        dial[0] = new VBox(this, dial::centerTextX, dial::topPosY, dial::textWidth, dial::textHeight);
+        dial[0]->setEdges(RectangleEdge::None);
+        dial[1] = new VBox(this, dial::rightTextX, dial::centerTextY, dial::textWidth, dial::textHeight);
+        dial[1]->setEdges(RectangleEdge::None);
+        dial[2] = new VBox(this, dial::centerTextX, dial::bottomPosY, dial::textWidth, dial::textHeight);
+        dial[2]->setEdges(RectangleEdge::None);
+        dial[3] = new VBox(this, dial::leftTextX, dial::centerTextY, dial::textWidth, dial::textHeight);
+        dial[3]->setEdges(RectangleEdge::None);
+
+        text[0] = new Text(dial[0], dial::centerTextX, dial::topPosY, dial::textWidth, dial::textHeight);
+        text[0]->setText("12");
+        text[0]->setFont(dial::font);
+        text[0]->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+
+        text[1] = new Text(dial[1], dial::centerTextX, dial::topPosY, dial::textWidth, dial::textHeight);
+        text[1]->setText("3");
+        text[1]->setFont(dial::font);
+        text[1]->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+
+        text[2] = new Text(dial[2], dial::centerTextX, dial::topPosY, dial::textWidth, dial::textHeight);
+        text[2]->setText("6");
+        text[2]->setFont(dial::font);
+        text[2]->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+
+        text[3] = new Text(dial[3], dial::centerTextX, dial::topPosY, dial::textWidth, dial::textHeight);
+        text[3]->setText("9");
+        text[3]->setFont(dial::font);
+        text[3]->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+
+        bottom = new VBox(this, 180U, 280U, bottomBox::width, bottomBox::height);
         bottom->setEdges(RectangleEdge::None);
 
         battery = new BellBattery(bottom, gui::BatteryWidthMode::FitToContent);
@@ -97,8 +129,6 @@ namespace gui
         battery->setBatteryPercentMode(BatteryPercentMode::Show);
 
         clock = new Clock(this); // This must be at the end of the command list to draw
-
-        bottom->resizeItems();
         top->resizeItems();
     }
 

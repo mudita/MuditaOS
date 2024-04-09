@@ -6,7 +6,6 @@
 #include "ApplicationBellClock.hpp"
 #include "presenter/BellClockWindowPresenter.hpp"
 
-#include <apps-common/widgets/BarGraph.hpp>
 #include <apps-common/widgets/TimeFixedWidget.hpp>
 #include <module-gui/gui/widgets/Clock.hpp>
 
@@ -36,13 +35,13 @@ namespace gui
 
       private:
         std::unique_ptr<app::bell_clock::BellClockWindowPresenter> presenter;
-        gui::ArcProgressBar *progress{nullptr};
         gui::Clock *clock{nullptr};
         BellBattery *battery{nullptr};
         AlarmSetSpinner *alarm{nullptr};
 
         VBox *bottom{};
         VBox *top{};
-        Text *text{};
+        VBox *dial[4];
+        Text *text[4];
     };
 } /* namespace gui */

@@ -1,20 +1,26 @@
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <log/log.hpp>
 #include "Clock.hpp"
+#include "Arc.hpp"
 #include "DrawCommand.hpp"
+
+#include <log/log.hpp>
 
 namespace
 {
-    constexpr auto minuteArrowLength = 202U;
-    constexpr auto hourArrowLength   = 136U;
+    constexpr auto minuteArrowLength = 210U;
+    constexpr auto hourArrowLength   = 152U;
     constexpr auto minuteDegree      = 6.0f;
     constexpr auto hourDegree        = 30.0f;
     constexpr auto arrowBegin        = 90U;
-    constexpr auto circleSize        = 15U;
-    constexpr auto arrowHourWidth    = 16U;
-    constexpr auto arrowMinuteWidth  = 10U;
+    constexpr auto circleSize        = 24U;
+    constexpr auto arrowHourWidth    = 15U;
+    constexpr auto arrowMinuteWidth  = 9U;
+
+    constexpr auto dialRadius       = 209U;
+    constexpr auto dialMarkerWidth  = 2U;
+    constexpr auto dialMarkerHeight = 21U;
 } // namespace
 
 namespace gui
@@ -69,6 +75,13 @@ namespace gui
 
     void Clock::buildDrawListImplementation(std::list<Command> &commands)
     {
+        const std::int16_t marker[8] = {-60, -30, 30, 60, 120, 150, 210, 240};
+        for (auto i = 0U; i < 8; i++) {
+            auto arc = std::make_unique<DrawArc>(
+                center, dialRadius, marker[i], dialMarkerWidth, dialMarkerHeight, ColorFullBlack);
+            commands.emplace_back(std::move(arc));
+        }
+
         auto arrowHour = std::make_unique<DrawLine>(center, arrowEndHour, ColorFullBlack, arrowHourWidth);
         commands.emplace_back(std::move(arrowHour));
 

@@ -196,6 +196,10 @@
                 "bell",
                 "rt1051",
                 "RelWithDebInfo",
+                "-DOS_VERSION_MAJOR=2",
+                "-DOS_VERSION_MINOR=6",
+                "-DOS_VERSION_PATCH=101",
+                "-DOS_VERSION_LABEL=BH-1914",
                 "-G",
                 "Ninja"
             ],
