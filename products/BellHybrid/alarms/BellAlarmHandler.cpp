@@ -1,10 +1,11 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellAlarmHandler.hpp"
 #include "src/actions/PlayAudioActions.hpp"
 #include "src/actions/NotifyGUIAction.hpp"
 #include "src/actions/FrontlightAction.hpp"
+#include "src/actions/IgnoreKeysAction.hpp"
 #include "src/actions/NotifyGUIBedtimeReminderAction.hpp"
 
 namespace alarms
@@ -52,6 +53,7 @@ namespace alarms
     {
         Actions actions;
         actions.emplace_back(factory::createPreWakeUpChimeAction(*service));
+        actions.emplace_back(std::make_unique<IgnoreKeysAction>(*service));
         return actions;
     }
 

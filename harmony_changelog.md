@@ -3,11 +3,12 @@
 ## Unreleased
 
 ### Fixed
+* Fixed the backlight blink in pre-wake up
 
 ### Added
 
 ### Changed / Improved
-* Updated button handling during pre wake up
+* Updated button handling during pre-wake up
 
 ## [2.6.1 2024-04-02]
 
