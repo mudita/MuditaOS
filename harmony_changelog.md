@@ -5,6 +5,7 @@
 ### Fixed
 
 ### Added
+* Added custom alarms functionality
 
 ### Changed / Improved
 * Updated button handling during pre wake up
