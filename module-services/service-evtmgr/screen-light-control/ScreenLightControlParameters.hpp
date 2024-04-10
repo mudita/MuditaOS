@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -34,8 +34,8 @@ namespace screen_light_control
         setManualModeBrightness,    ///< Set screen brightness in manual mode control
         setAutomaticModeParameters, ///< Set parameters for automatic mode of screen frontlight
         fadeOut,                    ///< Set light fade out in automatic mode
-        ignoreKeypress,             ///< Enter state that ignores keypress turnon
-        stopIgnoringKeypress,       ///< Leave state that ignores keypress turon
+        ignoreKeypress,             ///< Enter state that ignores keypress
+        stopIgnoringKeypress,       ///< Leave state that ignores keypress
     };
 
     struct ManualModeParameters

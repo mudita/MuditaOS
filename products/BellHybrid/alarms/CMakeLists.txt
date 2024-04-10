@@ -8,6 +8,7 @@ target_sources(alarms
         src/actions/NotifyGUIAction.cpp
         src/actions/NotifyGUIBedtimeReminderAction.cpp
         src/actions/FrontlightAction.cpp
+        src/actions/IgnoreKeysAction.cpp
 
         include/AbstractAlarmAction.hpp
         include/BellAlarmHandler.hpp
@@ -15,6 +16,7 @@ target_sources(alarms
         src/actions/PlayAudioActions.hpp
         src/actions/FrontlightAction.hpp
         src/actions/NotifyGUIAction.hpp
+        src/actions/IgnoreKeysAction.hpp
         src/actions/NotifyGUIBedtimeReminderAction.hpp
     PUBLIC
         include/popups/AlarmActivatedPopupRequestParams.hpp
