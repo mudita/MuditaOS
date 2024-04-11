@@ -43,7 +43,7 @@
 
 int main()
 {
-    constexpr auto ApplicationName = "BellHybrid";
+    constexpr auto ApplicationName = "BellHybridTest";
 
     std::vector<std::string> fileIndexerAudioPaths = {paths::audio::proprietary(), {purefs::dir::getUserMediaPath()}};
 
