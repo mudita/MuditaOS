@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
 #include "ProgressTimer.hpp"
-#include "TimeFixedWidget.hpp"
+#include "AbstractProgressTime.hpp"
 #include <Timers/TimerHandle.hpp>
 #include <time/time_conversion.hpp>
 #include <atomic>
@@ -20,9 +20,9 @@ namespace app
 {
     class ProgressTimerWithBarGraphAndCounter : public ProgressTimer
     {
-        gui::Text *text                  = nullptr;
-        gui::Progress *progress          = nullptr;
-        gui::TimeFixedWidget *timeWidget = nullptr;
+        gui::Text *text{nullptr};
+        gui::Progress *progress{nullptr};
+        gui::AbstractProgressTime *timeWidget{nullptr};
 
         void update() override;
         void updateText();
@@ -34,6 +34,6 @@ namespace app
 
         void attach(gui::Progress *_progress);
         void attach(gui::Text *_text);
-        void attach(gui::TimeFixedWidget *_timeWidget);
+        void attach(gui::AbstractProgressTime *_timeWidget);
     };
 } // namespace app
