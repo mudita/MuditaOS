@@ -77,6 +77,11 @@ namespace app
                                   return std::make_unique<gui::SessionPausedWindow>(app);
                               });
 
+        windowsFactory.attach(gui::window::bell_finished::defaultName,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::BellFinishedWindow>(app, name);
+                              });
+
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,
                       gui::popup::ID::PowerOff,
