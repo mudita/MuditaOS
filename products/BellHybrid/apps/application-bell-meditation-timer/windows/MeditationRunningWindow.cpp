@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -6,10 +6,11 @@
 #include "MeditationRunningWindow.hpp"
 #include "MeditationStyle.hpp"
 
-#include <audio/AudioMessage.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
-#include <purefs/filesystem_paths.hpp>
+#include <apps-common/widgets/BarGraph.hpp>
+#include <common/widgets/BellStatusClock.hpp>
+#include <gui/widgets/Icon.hpp>
 
 namespace
 {
@@ -95,7 +96,7 @@ namespace gui
         updateTime();
 
         if (mode == ShowMode::GUI_SHOW_INIT) {
-            playGong();
+            presenter->playGongSound();
             presenter->start();
         }
     }
@@ -174,18 +175,11 @@ namespace gui
 
     void MeditationRunningWindow::intervalTimeout()
     {
-        playGong();
+        presenter->playGongSound();
     }
 
     void MeditationRunningWindow::endSession()
     {
-        playGong();
-    }
-
-    void MeditationRunningWindow::playGong()
-    {
-        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(app::meditation::getMeditationAudioPath(),
-                                                                        audio::PlaybackType::Meditation);
-        application->bus.sendUnicast(std::move(msg), service::audioServiceName);
+        presenter->playEndSound();
     }
 } // namespace gui

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -48,6 +48,7 @@ namespace app::meditation
             virtual void pause()                                            = 0;
             virtual void resume()                                           = 0;
         };
+
         class Presenter : public BasePresenter<MeditationProgressContract::View>
         {
           public:
@@ -61,28 +62,13 @@ namespace app::meditation
             virtual void abandon()                                                  = 0;
             virtual void finish()                                                   = 0;
             virtual void onBeforeShow()                                             = 0;
+            virtual void playGongSound()                                            = 0;
+            virtual void playEndSound()                                             = 0;
         };
     };
 
     class MeditationProgressPresenter : public MeditationProgressContract::Presenter
     {
-      private:
-        app::ApplicationCommon *app  = nullptr;
-        settings::Settings *settings = nullptr;
-        std::unique_ptr<app::TimerWithCallbacks> timer;
-        std::unique_ptr<AbstractTimeModel> timeModel;
-        models::ChimeInterval &chimeIntervalModel;
-        models::Statistics &statisticsModel;
-        std::chrono::minutes duration;
-        std::chrono::seconds interval;
-
-        static constexpr auto endWindowTimeout = std::chrono::seconds{5};
-
-        void onProgressFinished();
-        void onIntervalReached();
-
-        void addMeditationEntry(std::chrono::minutes elapsed);
-
       public:
         MeditationProgressPresenter(app::ApplicationCommon *app,
                                     settings::Settings *settings,
@@ -100,5 +86,22 @@ namespace app::meditation
         void abandon() override;
         void finish() override;
         void onBeforeShow() override;
+        void playGongSound() override;
+        void playEndSound() override;
+
+      private:
+        app::ApplicationCommon *app{nullptr};
+        settings::Settings *settings{nullptr};
+        std::unique_ptr<app::TimerWithCallbacks> timer;
+        std::unique_ptr<AbstractTimeModel> timeModel;
+        models::ChimeInterval &chimeIntervalModel;
+        models::Statistics &statisticsModel;
+        std::chrono::minutes duration;
+        std::chrono::seconds interval;
+
+        void onProgressFinished();
+        void onIntervalReached();
+
+        void addMeditationEntry(std::chrono::minutes elapsed);
     };
 } // namespace app::meditation

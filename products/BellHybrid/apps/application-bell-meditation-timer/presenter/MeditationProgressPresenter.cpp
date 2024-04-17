@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -10,13 +10,15 @@
 #include <common/LanguageUtils.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
+#include <audio/AudioMessage.hpp>
 #include <service-db/Settings.hpp>
 
 namespace
 {
     constexpr std::chrono::minutes emptyValue{0};
+    constexpr std::chrono::seconds endWindowTimeout{6};
 
-    std::chrono::seconds to_interval(const double ratio, std::chrono::minutes total_duration)
+    std::chrono::seconds to_interval(double ratio, std::chrono::minutes total_duration)
     {
         const long interval = std::chrono::seconds{total_duration}.count() * ratio;
         return std::chrono::seconds{interval};
@@ -36,7 +38,7 @@ namespace app::meditation
         duration = std::chrono::minutes{
             utils::getNumericValue<int>(settings->getValue(meditationDBRecordName, settings::SettingsScope::AppLocal))};
 
-        interval = to_interval(chimeIntervalModel.getValue().to_double(), duration);
+        interval = to_interval(this->chimeIntervalModel.getValue().to_double(), duration);
     }
 
     void MeditationProgressPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
@@ -53,6 +55,11 @@ namespace app::meditation
         getView()->setTime(timeModel->getCurrentTime());
     }
 
+    bool MeditationProgressPresenter::isTimerStopped()
+    {
+        return timer->isStopped();
+    }
+
     void MeditationProgressPresenter::start()
     {
         static_cast<app::Application *>(app)->suspendIdleTimer();
@@ -63,11 +70,6 @@ namespace app::meditation
     void MeditationProgressPresenter::stop()
     {
         finish();
-    }
-
-    bool MeditationProgressPresenter::isTimerStopped()
-    {
-        return timer->isStopped();
     }
 
     void MeditationProgressPresenter::pause()
@@ -118,6 +120,25 @@ namespace app::meditation
                                                          endWindowTimeout));
     }
 
+    void MeditationProgressPresenter::onBeforeShow()
+    {
+        getView()->setTimeFormat(timeModel->getTimeFormat());
+    }
+
+    void MeditationProgressPresenter::playGongSound()
+    {
+        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(app::meditation::getMeditationGongSoundPath(),
+                                                                        audio::PlaybackType::Meditation);
+        app->bus.sendUnicast(std::move(msg), service::audioServiceName);
+    }
+
+    void MeditationProgressPresenter::playEndSound()
+    {
+        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(app::meditation::getMeditationEndSoundPath(),
+                                                                        audio::PlaybackType::Meditation);
+        app->bus.sendUnicast(std::move(msg), service::audioServiceName);
+    }
+
     void MeditationProgressPresenter::onProgressFinished()
     {
         getView()->progressFinished();
@@ -131,10 +152,6 @@ namespace app::meditation
         }
     }
 
-    void MeditationProgressPresenter::onBeforeShow()
-    {
-        getView()->setTimeFormat(timeModel->getTimeFormat());
-    }
     void MeditationProgressPresenter::addMeditationEntry(const std::chrono::minutes elapsed)
     {
         if (elapsed > std::chrono::minutes::zero()) {
