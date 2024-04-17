@@ -78,7 +78,7 @@ namespace app
     void MeditationTimer::createUserInterface()
     {
         windowsFactory.attach(meditation::MeditationMainWindow::defaultName,
-                              [this](ApplicationCommon *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<meditation::MeditationMainWindow>(app);
                               });
 

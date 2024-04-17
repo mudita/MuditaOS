@@ -135,27 +135,27 @@ include(DownloadAsset)
 # copy all assets required to build catalog under current folder as in json recipe
 download_asset_json(json-proprietary-target
                     ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_proprietary.json
-                   ${SYSROOT_PATH}/system_a/
+                    ${SYSROOT_PATH}/system_a/
                     MuditaOSAssets
                     ${MUDITA_CACHE_DIR}
     )
 download_asset_release_json(json-common-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_common.json
-                           ${SYSROOT_PATH}/system_a/
+                            ${SYSROOT_PATH}/system_a/
                             MuditaOSPublicAssets
-                            0.0.22
+                            0.0.25
                             ${MUDITA_CACHE_DIR}
     )
 download_asset_release_json(json-community-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_community.json
-                           ${SYSROOT_PATH}/system_a/
+                            ${SYSROOT_PATH}/system_a/
                             MuditaOSPublicAssets
-                            0.0.22
+                            0.0.25
                             ${MUDITA_CACHE_DIR}
     )
 download_asset_json(json-rt1051-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_rt1051.json
-                           ${SYSROOT_PATH}/system_a/assets
+                            ${SYSROOT_PATH}/system_a/assets
                             MuditaOSAssets
                             ${MUDITA_CACHE_DIR}
     )

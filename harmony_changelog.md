@@ -6,6 +6,7 @@
 * Fixed the backlight blink in pre-wake up
 
 ### Added
+* Added unique sound to indicate the meditation session has ended
 
 ### Changed / Improved
 * Updated button handling during pre-wake up
