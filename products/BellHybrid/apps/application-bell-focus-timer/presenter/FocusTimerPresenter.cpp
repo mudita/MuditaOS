@@ -14,7 +14,16 @@
 
 namespace
 {
-    static constexpr std::chrono::milliseconds betweenSessionDelayTime{5000};
+    constexpr std::chrono::milliseconds betweenSessionDelayTime{5000};
+    constexpr auto summaryWindowTimeout = std::chrono::seconds{5};
+
+    std::string createSummaryText(const std::string &str, const std::string &minutesOfFocus)
+    {
+        auto parser = gui::text::RichTextParser{};
+        const auto result =
+            parser.parse(str, nullptr, gui::text::RichTextParser::TokenMap({{"$VALUE", minutesOfFocus}}));
+        return result->getText();
+    }
 } // namespace
 
 namespace app::focus
@@ -102,7 +111,22 @@ namespace app::focus
     {
         timer->stop();
         betweenSessionTimer.stop();
-        app->switchWindow(focus::window::name::main);
+
+        const auto elapsed        = std::chrono::duration_cast<std::chrono::minutes>(timer->getElapsed());
+        const auto minutesInFocus = ((currentTimerPhase == FocusTimerPhase::FocusTime) ? elapsed.count() : 0) +
+                                    (allFocusSessionsCount - focusSessionsLeft) * focusSessionDuration.count();
+        const auto sumOfFocusTime =
+            std::to_string(minutesInFocus) + " " + utils::language::getCorrectMinutesAccusativeForm(minutesInFocus);
+        const auto textToComplete = utils::translate("app_bell_focus_timer_summary");
+        const auto summaryText    = createSummaryText(textToComplete, sumOfFocusTime);
+
+        app->switchWindow(
+            gui::window::bell_finished::defaultName,
+            gui::BellFinishedWindowData::Factory::create("big_namaste_W_G",
+                                                         focus::window::name::main,
+                                                         summaryText,
+                                                         gui::BellFinishedWindowData::ExitBehaviour::SwitchWindow,
+                                                         summaryWindowTimeout));
     }
 
     void FocusTimerPresenter::executeNextStep()
