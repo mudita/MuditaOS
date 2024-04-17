@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ProgressTimerWithBarGraphAndCounter.hpp"
@@ -46,8 +46,7 @@ namespace app
             return;
         }
         const auto secondsRemaining = std::chrono::duration_cast<std::chrono::seconds>(duration - elapsed);
-        timeWidget->setMinutesBox(secondsRemaining.count() / 60);
-        timeWidget->setSecondsBox(secondsRemaining.count() % 60);
+        timeWidget->updateTime(secondsRemaining.count());
     }
 
     void ProgressTimerWithBarGraphAndCounter::updateProgress()
@@ -73,7 +72,7 @@ namespace app
         text = _text;
     }
 
-    void ProgressTimerWithBarGraphAndCounter::attach(gui::TimeFixedWidget *_timeWidget)
+    void ProgressTimerWithBarGraphAndCounter::attach(gui::AbstractProgressTime *_timeWidget)
     {
         Expects(_timeWidget != nullptr);
         timeWidget = _timeWidget;

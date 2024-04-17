@@ -8,7 +8,7 @@
 
 #include <Text.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
-#include <apps-common/widgets/TimeFixedWidget.hpp>
+#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
 #include <common/widgets/BellStatusClock.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <apps-common/windows/AppWindow.hpp>
@@ -35,13 +35,13 @@ namespace app::focus
 
       private:
         std::unique_ptr<FocusTimerContract::Presenter> presenter;
-        gui::VBox *mainVBox                   = nullptr;
-        gui::ArcProgressBar *progress         = nullptr;
-        gui::TimeFixedWidget *timer           = nullptr;
-        gui::TextFixedSize *bottomDescription = nullptr;
-        gui::Icon *iconPause                  = nullptr;
-        gui::Icon *iconRing                   = nullptr;
-        gui::BellStatusClock *clock           = nullptr;
+        gui::VBox *mainVBox{nullptr};
+        gui::ArcProgressBar *progress{nullptr};
+        gui::TimeMinuteSecondWidget *timer{nullptr};
+        gui::TextFixedSize *bottomDescription{nullptr};
+        gui::Icon *iconPause{nullptr};
+        gui::Icon *iconRing{nullptr};
+        gui::BellStatusClock *clock{nullptr};
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
