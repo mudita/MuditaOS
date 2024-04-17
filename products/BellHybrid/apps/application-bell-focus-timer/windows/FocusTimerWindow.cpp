@@ -77,8 +77,12 @@ namespace app::focus
         clock->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
         clock->setMargins(gui::Margins(0, runningStyle::clock::marginTop, 0, 0));
 
-        timer = new gui::TimeFixedWidget(mainVBox, 0, 0, runningStyle::timer::maxSizeX, runningStyle::timer::maxSizeY);
-        timer->setFontAndDimensions(runningStyle::timer::font);
+        timer = new gui::TimeMinuteSecondWidget(mainVBox,
+                                                0,
+                                                0,
+                                                runningStyle::timer::maxSizeX,
+                                                runningStyle::timer::maxSizeY,
+                                                gui::TimeMinuteSecondWidget::DisplayType::MinutesThenSeconds);
         timer->setMinimumSize(runningStyle::timer::maxSizeX, runningStyle::timer::maxSizeY);
         timer->setMargins(gui::Margins(0, runningStyle::timer::marginTop, 0, 0));
         timer->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));

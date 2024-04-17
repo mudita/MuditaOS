@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeFixedWidget.hpp"
@@ -112,6 +112,12 @@ namespace gui
     {
         colon->setText(colonSign);
         colon->activeItem = false;
+    }
+
+    void TimeFixedWidget::updateTime(std::uint32_t sec)
+    {
+        setMinutesBox(sec / utils::time::secondsInMinute);
+        setSecondsBox(sec % utils::time::secondsInMinute);
     }
 
     void TimeFixedWidget::setMinutesBox(std::uint32_t minutes)

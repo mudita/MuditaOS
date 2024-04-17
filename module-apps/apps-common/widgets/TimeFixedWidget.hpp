@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,11 +7,12 @@
 #include <Text.hpp>
 #include <BoxLayout.hpp>
 #include "widgets/DateWidget.hpp"
+#include "AbstractProgressTime.hpp"
 #include <time/FromTillDate.hpp>
 
 namespace gui
 {
-    class TimeFixedWidget : public Rect
+    class TimeFixedWidget : public Rect, public AbstractProgressTime
     {
       public:
         struct LeftBox
@@ -49,6 +50,7 @@ namespace gui
                         std::uint32_t leftBoxSize,
                         std::uint32_t rightBoxSize);
 
+        void updateTime(std::uint32_t sec) override;
         void init(std::uint32_t w, std::uint32_t h);
 
         void setMinutesBox(std::uint32_t first);
