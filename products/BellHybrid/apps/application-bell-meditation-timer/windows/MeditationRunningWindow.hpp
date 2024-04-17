@@ -1,21 +1,19 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
 #include <Application.hpp>
 #include <AppWindow.hpp>
-#include <InputEvent.hpp>
-#include <Text.hpp>
-#include <apps-common/widgets/BarGraph.hpp>
-#include <apps-common/widgets/TimeFixedWidget.hpp>
-#include <common/widgets/BellStatusClock.hpp>
-#include <gui/widgets/Icon.hpp>
-
 #include "MeditationProgressPresenter.hpp"
 
 namespace gui
 {
+    class ArcProgressBar;
+    class BellStatusClock;
+    class Icon;
+    class TimeFixedWidget;
+
     class MeditationRunningWindow : public AppWindow, public app::meditation::MeditationProgressContract::View
     {
       public:
@@ -23,7 +21,6 @@ namespace gui
             app::ApplicationCommon *app,
             std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> &&windowPresenter);
 
-        // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;
@@ -34,11 +31,11 @@ namespace gui
 
       private:
         std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> presenter;
-        gui::VBox *mainVBox           = nullptr;
-        gui::ArcProgressBar *progress = nullptr;
-        gui::TimeFixedWidget *timer   = nullptr;
-        gui::Icon *icon               = nullptr;
-        gui::BellStatusClock *clock   = nullptr;
+        VBox *mainVBox{nullptr};
+        ArcProgressBar *progress{nullptr};
+        TimeFixedWidget *timer{nullptr};
+        Icon *icon{nullptr};
+        gui::BellStatusClock *clock{nullptr};
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
@@ -47,8 +44,7 @@ namespace gui
         void buildLayout();
         void configureTimer();
 
-        void endSession();
         void intervalTimeout();
-        void playGong();
+        void endSession();
     };
 } // namespace gui
