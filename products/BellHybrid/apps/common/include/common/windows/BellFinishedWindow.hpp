@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -11,7 +11,7 @@ namespace gui
 {
     namespace window::bell_finished
     {
-        constexpr inline auto defaultName = "BellFinishedWindow";
+        inline constexpr auto defaultName = "BellFinishedWindow";
     } // namespace window::bell_finished
 
     class Icon;
@@ -19,7 +19,7 @@ namespace gui
     class BellFinishedWindow : public WindowWithTimer
     {
       public:
-        explicit BellFinishedWindow(app::ApplicationCommon *app, const std::string &name);
+        BellFinishedWindow(app::ApplicationCommon *app, const std::string &name);
 
       protected:
         void buildInterface() override;
@@ -31,5 +31,4 @@ namespace gui
         std::string windowToReturn{};
         BellFinishedWindowData::ExitBehaviour exitBehaviour;
     };
-
 } // namespace gui

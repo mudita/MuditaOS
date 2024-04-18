@@ -57,6 +57,7 @@ namespace app::focus
             virtual void abandon()                                                  = 0;
             virtual void finish()                                                   = 0;
             virtual void onBeforeShow()                                             = 0;
+            virtual void playGong()                                                 = 0;
         };
     };
 
@@ -82,6 +83,7 @@ namespace app::focus
         void abandon() override;
         void finish() override;
         void onBeforeShow() override;
+        void playGong() override;
         void startTime();
 
       private:

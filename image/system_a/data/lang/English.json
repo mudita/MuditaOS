@@ -102,7 +102,7 @@
     "app_bell_relaxation_sounds": "Relaxation sounds",
     "app_bell_relaxation_timer_title": "Relaxation time",
     "app_bell_relaxation_uploaded_sounds": "Uploaded sounds",
-    "app_bell_focus_timer_summary": "<text>Well done!  <token>$VALUE</token> focus complete.</text>",
+    "app_bell_focus_timer_summary": "<text>Well done!  <token>$VALUE</token> focus<br></br>complete.</text>",
     "app_bell_reset_message": "<text>Resetting Mudita<br />Harmony</text>",
     "app_bell_settings_about": "About",
     "app_bell_settings_about_info_text": "www.mudita.com",

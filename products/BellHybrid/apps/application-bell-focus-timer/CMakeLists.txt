@@ -21,11 +21,15 @@ target_include_directories(application-bell-focus-timer
 target_sources(application-bell-focus-timer
     PRIVATE
         ApplicationFocusTimer.cpp
+        
         windows/FocusMainWindow.cpp
         windows/FocusSettingsWindow.cpp
         windows/FocusTimerWindow.cpp
+
+        presenter/FocusMainPresenter.cpp
         presenter/FocusSettingsPresenter.cpp
         presenter/FocusTimerPresenter.cpp
+
         models/FocusSettingsModel.cpp
 
     PUBLIC
@@ -37,6 +41,7 @@ target_link_libraries(application-bell-focus-timer
         app
         bell::app-common
         bell::app-main
+        bell::audio
         bell::keymap
         bell::paths
         bell::db

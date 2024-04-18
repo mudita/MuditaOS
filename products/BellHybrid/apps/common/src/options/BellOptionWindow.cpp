@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "common/options/BellOptionWindow.hpp"
@@ -6,7 +6,6 @@
 #include "common/options/BellOptionsNavigation.hpp"
 
 #include <messages/OptionsWindow.hpp>
-#include <TextFixedSize.hpp>
 
 namespace gui
 {
@@ -66,5 +65,4 @@ namespace gui
 
         optionsList->rebuildList(listview::RebuildType::InPlace);
     }
-
 } /* namespace gui */

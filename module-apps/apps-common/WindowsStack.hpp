@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,12 +20,11 @@ namespace gui
 
 namespace app
 {
-
     class WindowsFactory;
     class ApplicationCommon;
 
-    constexpr auto previousWindow = 1;
-    constexpr auto topWindow      = 0;
+    inline constexpr auto previousWindow = 1;
+    inline constexpr auto topWindow      = 0;
 
     struct WindowData
     {
@@ -48,8 +47,8 @@ namespace app
         WindowsStack() = default;
 
         /// iterators, unfortunately used in applications
-        std::map<std::string, std::unique_ptr<gui::AppWindow>>::const_iterator begin() const;
-        std::map<std::string, std::unique_ptr<gui::AppWindow>>::const_iterator end() const;
+        [[nodiscard]] std::map<std::string, std::unique_ptr<gui::AppWindow>>::const_iterator begin() const;
+        [[nodiscard]] std::map<std::string, std::unique_ptr<gui::AppWindow>>::const_iterator end() const;
         [[nodiscard]] bool isEmpty() const noexcept;
         [[nodiscard]] std::size_t getSize() const noexcept;
 
@@ -59,9 +58,9 @@ namespace app
                   const gui::popup::Disposition &disposition = gui::popup::WindowDisposition);
 
         /// window getters
-        gui::AppWindow *get(const std::string &name) const;
-        std::optional<std::string> get(uint32_t depth = 0) const;
-        std::optional<WindowData> getWindowData(uint32_t depth = 0) const;
+        [[nodiscard]] gui::AppWindow *get(const std::string &name) const;
+        [[nodiscard]] std::optional<std::string> get(std::uint32_t depth = 0) const;
+        [[nodiscard]] std::optional<WindowData> getWindowData(std::uint32_t depth = 0) const;
 
         /// functions removing windows from stack
         /// `pop`  functions - handle last, latest window
@@ -78,5 +77,4 @@ namespace app
 
         bool rebuildWindows(app::WindowsFactory &windowsFactory, ApplicationCommon *app);
     };
-
 } // namespace app

@@ -7,15 +7,25 @@
 #include "FocusTimerWindow.hpp"
 
 #include <common/options/OptionBellMenu.hpp>
+#include <common/data/BatteryStatusSwitchData.hpp>
 
 namespace app::focus
 {
     using namespace gui;
-    FocusMainWindow::FocusMainWindow(app::ApplicationCommon *app, const std::string name)
-        : BellOptionWindow(app, std::move(name))
+
+    FocusMainWindow::FocusMainWindow(app::ApplicationCommon *app,
+                                     std::unique_ptr<app::focus::FocusMainContract::Presenter> &&presenter,
+                                     const std::string &name)
+        : BellOptionWindow(app, name), presenter(std::move(presenter))
     {
         addOptions(settingsOptionsList());
         setListTitle(utils::translate("app_bellmain_focus_timer"));
+    }
+
+    void FocusMainWindow::onBeforeShow(ShowMode mode, SwitchData *data)
+    {
+        BellOptionWindow::onBeforeShow(mode, data);
+        static_cast<app::Application *>(application)->resumeIdleTimer();
     }
 
     std::list<Option> FocusMainWindow::settingsOptionsList()
@@ -33,6 +43,32 @@ namespace app::focus
             };
         };
 
+        auto startFocusCallback = [this](const std::string &window) {
+            startFocus = [window, this]() {
+                if (window.empty()) {
+                    return;
+                }
+                application->switchWindow(window);
+            };
+            return [window, this](gui::Item &) {
+                const auto batteryState = presenter->getBatteryState();
+                const auto soc          = batteryState.level;
+                const auto isCharging   = presenter->isBatteryCharging(batteryState.state);
+                if (!presenter->isLowBatteryWindowHandled() && !isCharging &&
+                    presenter->isBatteryBelowLowLevelThreshold(soc)) {
+                    auto lowBatterySwitchData =
+                        std::make_unique<AppsBatteryStatusSwitchData>(soc, isCharging, startFocus);
+                    application->switchWindow(focus::window::name::focusTimerLowBattery,
+                                              std::move(lowBatterySwitchData));
+                    presenter->handleLowBatteryWindow();
+                }
+                else {
+                    startFocus();
+                }
+                return true;
+            };
+        };
+
         std::list<gui::Option> settingsOptionList;
         auto addWinSettings = [&](const UTF8 &name, const std::string &window, Callback &&callback) {
             settingsOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
@@ -45,7 +81,7 @@ namespace app::focus
                 this));
         };
 
-        addWinSettings(utils::translate("app_bell_focus_start"), window::name::timer, defaultCallback);
+        addWinSettings(utils::translate("app_bell_focus_start"), window::name::timer, startFocusCallback);
         addWinSettings(utils::translate("app_bell_focus_settings"), window::name::settings, defaultCallback);
 
         return settingsOptionList;
