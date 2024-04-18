@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WindowsStack.hpp"
@@ -25,7 +25,7 @@ namespace app
     {
         /// Note: this is the place which will destroy old window if there was one
         windows[name] = std::move(window);
-        stack.push_back(WindowData(name, disposition));
+        stack.emplace_back(name, disposition);
     }
 
     gui::AppWindow *WindowsStack::get(const std::string &name) const
@@ -34,7 +34,7 @@ namespace app
         return ret == std::end(windows) ? nullptr : ret->second.get();
     }
 
-    std::optional<WindowData> WindowsStack::getWindowData(uint32_t depth) const
+    std::optional<WindowData> WindowsStack::getWindowData(std::uint32_t depth) const
     {
         if (depth >= stack.size()) {
             return std::nullopt;
@@ -42,7 +42,7 @@ namespace app
         return {*std::prev(stack.end(), depth + 1)};
     }
 
-    std::optional<std::string> WindowsStack::get(uint32_t depth) const
+    std::optional<std::string> WindowsStack::get(std::uint32_t depth) const
     {
         if (auto windowData = getWindowData(depth)) {
             return {windowData->name};
@@ -135,9 +135,9 @@ namespace app
             std::advance(it, 1);
         }
     }
+
     std::size_t WindowsStack::getSize() const noexcept
     {
         return stack.size();
     }
-
 } // namespace app

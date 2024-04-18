@@ -7,17 +7,12 @@
 #include <Service/Message.hpp>
 #include <Timers/TimerHandle.hpp>
 
-#include <chrono>
-
 namespace app::manager
 {
-    constexpr auto idleReturnTimeout = std::chrono::seconds{180};
-    using connectFunction            = std::function<bool(const std::type_info &, sys::MessageHandler)>;
-
     class IdleHandler
     {
       public:
-        IdleHandler(sys::Service *serv);
+        explicit IdleHandler(sys::Service *serv);
 
       protected:
         void handleStartIdleTimer(sys::Message *request);
