@@ -14,5 +14,4 @@ namespace app
     {
         lowBatteryInfoHandled = true;
     }
-
 } // namespace app

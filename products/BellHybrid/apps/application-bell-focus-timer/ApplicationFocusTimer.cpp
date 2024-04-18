@@ -8,15 +8,16 @@
 #include "windows/FocusSettingsWindow.hpp"
 #include "windows/FocusTimerWindow.hpp"
 
+#include "presenter/FocusMainPresenter.hpp"
 #include "presenter/FocusSettingsPresenter.hpp"
 #include "presenter/FocusTimerPresenter.hpp"
 
 #include "models/FocusSettingsModel.hpp"
-
 #include "common/models/TimeModel.hpp"
 #include <common/models/AudioModel.hpp>
 #include <common/windows/SessionPausedWindow.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
+#include <common/windows/AppsBatteryStatusWindow.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 
 namespace app
@@ -66,7 +67,8 @@ namespace app
     void ApplicationFocusTimer::createUserInterface()
     {
         windowsFactory.attach(focus::window::name::main, [this](ApplicationCommon *app, const std::string &name) {
-            return std::make_unique<focus::FocusMainWindow>(app);
+            auto presenter = std::make_unique<app::focus::FocusMainPresenter>(*batteryModel, *lowBatteryInfoModel);
+            return std::make_unique<focus::FocusMainWindow>(app, std::move(presenter));
         });
 
         windowsFactory.attach(focus::window::name::settings, [this](ApplicationCommon *app, const std::string &name) {
@@ -95,6 +97,11 @@ namespace app
         windowsFactory.attach(gui::window::bell_finished::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::BellFinishedWindow>(app, name);
+                              });
+
+        windowsFactory.attach(focus::window::name::focusTimerLowBattery,
+                              [](ApplicationCommon *app, const std::string &name) {
+                                  return std::make_unique<gui::AppsBatteryStatusWindow>(app, name);
                               });
 
         attachPopups({gui::popup::ID::AlarmActivated,

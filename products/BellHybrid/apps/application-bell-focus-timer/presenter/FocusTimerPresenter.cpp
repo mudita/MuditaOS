@@ -10,10 +10,13 @@
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/LanguageUtils.hpp>
 
+#include <audio/AudioMessage.hpp>
+
 namespace
 {
-    constexpr std::chrono::seconds delayBetweenSessions{5};
-    constexpr std::chrono::seconds summaryWindowTimeout{5};
+    constexpr auto delayBetweenSessions{std::chrono::seconds{5}};
+    constexpr auto delayBetweenSessionsTimerName{"betweenSessionTimer"};
+    constexpr auto summaryWindowTimeout{std::chrono::seconds{5}};
 
     std::string createSummaryText(const std::string &str, const std::string &minutesOfFocus)
     {
@@ -26,7 +29,6 @@ namespace
 
 namespace app::focus
 {
-
     FocusTimerPresenter::FocusTimerPresenter(app::ApplicationCommon *app,
                                              models::FocusSettingsModel &focusTimeModel,
                                              models::FocusSettingsModel &focusRepeatsModel,
@@ -44,7 +46,9 @@ namespace app::focus
         focusSessionsLeft     = allFocusSessionsCount;
 
         betweenSessionTimer = sys::TimerFactory::createSingleShotTimer(
-            app, "betweenSessionTimer", delayBetweenSessions, [this](sys::Timer &) { executeNextStep(); });
+            app, delayBetweenSessionsTimerName, delayBetweenSessions, [this]([[maybe_unused]] sys::Timer &t) {
+                executeNextStep();
+            });
     }
 
     void FocusTimerPresenter::setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer)
@@ -105,10 +109,10 @@ namespace app::focus
         const auto elapsed        = std::chrono::duration_cast<std::chrono::minutes>(timer->getElapsed());
         const auto minutesInFocus = ((currentTimerPhase == FocusTimerPhase::FocusTime) ? elapsed.count() : 0) +
                                     (allFocusSessionsCount - focusSessionsLeft) * focusSessionDuration.count();
-        const auto sumOfFocusTime =
+        const auto &sumOfFocusTime =
             std::to_string(minutesInFocus) + " " + utils::language::getCorrectMinutesAccusativeForm(minutesInFocus);
-        const auto textToComplete = utils::translate("app_bell_focus_timer_summary");
-        const auto summaryText    = createSummaryText(textToComplete, sumOfFocusTime);
+        const auto &textToComplete = utils::translate("app_bell_focus_timer_summary");
+        const auto &summaryText    = createSummaryText(textToComplete, sumOfFocusTime);
 
         app->switchWindow(
             gui::window::bell_finished::defaultName,
@@ -154,6 +158,13 @@ namespace app::focus
     void FocusTimerPresenter::onBeforeShow()
     {
         getView()->setTimeFormat(timeModel->getTimeFormat());
+    }
+
+    void FocusTimerPresenter::playGong()
+    {
+        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(app::focus::getFocusTimeAudioPath(),
+                                                                        audio::PlaybackType::Meditation);
+        app->bus.sendUnicast(std::move(msg), service::audioServiceName);
     }
 
     void FocusTimerPresenter::startTime()
@@ -212,5 +223,4 @@ namespace app::focus
         getView()->showFocusSessionCountdown();
         return FocusTimerPhase::FocusTime;
     }
-
 } // namespace app::focus

@@ -5,16 +5,24 @@
 
 #include "FocusCommon.hpp"
 #include <common/options/BellOptionWindow.hpp>
+#include <presenter/FocusMainPresenter.hpp>
 
 namespace app::focus
 {
-    class FocusMainWindow : public gui::BellOptionWindow
+    using namespace gui;
+
+    class FocusMainWindow : public BellOptionWindow, public app::focus::FocusMainContract::View
     {
       public:
-        explicit FocusMainWindow(app::ApplicationCommon *app, const std::string name = window::name::main);
+        FocusMainWindow(app::ApplicationCommon *app,
+                        std::unique_ptr<app::focus::FocusMainContract::Presenter> &&presenter,
+                        const std::string &name = window::name::main);
+
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
 
       private:
-        std::list<gui::Option> settingsOptionsList();
+        std::unique_ptr<app::focus::FocusMainContract::Presenter> presenter;
+        std::list<Option> settingsOptionsList();
+        std::function<void()> startFocus;
     };
-
 } // namespace app::focus

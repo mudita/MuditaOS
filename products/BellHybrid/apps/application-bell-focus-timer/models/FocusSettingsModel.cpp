@@ -14,6 +14,7 @@ namespace app::focus::models
     {
         settings.setValue(name, std::to_string(value));
     }
+
     std::uint8_t FocusSettingsModel::getValue() const
     {
         const auto &value = settings.getValue(name);
