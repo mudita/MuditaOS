@@ -12,9 +12,10 @@ namespace app::focus
 {
     namespace window::name
     {
-        inline constexpr auto main     = gui::name::window::main_window;
-        inline constexpr auto settings = "FocusTimerSettingsWindow";
-        inline constexpr auto timer    = "FocusTimerSessionWindow";
+        inline constexpr auto main                 = gui::name::window::main_window;
+        inline constexpr auto settings             = "FocusTimerSettingsWindow";
+        inline constexpr auto timer                = "FocusTimerSessionWindow";
+        inline constexpr auto focusTimerLowBattery = "FocusTimerLowBatteryWindow";
     } // namespace window::name
 
     inline std::filesystem::path getFocusTimeAudioPath()

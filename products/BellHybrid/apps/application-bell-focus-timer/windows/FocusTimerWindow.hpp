@@ -49,7 +49,5 @@ namespace app::focus
 
         void buildLayout();
         void configureTimer();
-
-        void playGong();
     };
 } // namespace app::focus

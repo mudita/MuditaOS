@@ -29,7 +29,8 @@ namespace app
                              StartInBackground startInBackground,
                              uint32_t stackDepth,
                              sys::ServicePriority priority)
-        : ApplicationCommon(name, parent, statusIndicators, startInBackground, stackDepth, priority)
+        : ApplicationCommon(
+              std::move(name), std::move(parent), statusIndicators, startInBackground, stackDepth, priority)
     {
         getPopupFilter().addAppDependentFilter([&](const gui::PopupRequestParams &popupParams) {
             bool val = ((isCurrentWindow(gui::popup::resolveWindowName(gui::popup::ID::Reboot))) ||

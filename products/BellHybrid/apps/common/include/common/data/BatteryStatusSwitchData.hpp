@@ -40,8 +40,10 @@ namespace gui
     class AppsBatteryStatusSwitchData : public BatteryStatusSwitchData
     {
       public:
-        AppsBatteryStatusSwitchData(const units::SOC soc, bool chargeState, std::function<void()> returnCallback)
-            : BatteryStatusSwitchData{soc, chargeState, true}, returnCallback{returnCallback}
+        AppsBatteryStatusSwitchData(const units::SOC soc,
+                                    bool chargeState,
+                                    std::function<void()> returnCallback = nullptr)
+            : BatteryStatusSwitchData{soc, chargeState, true}, returnCallback{std::move(returnCallback)}
         {}
 
         [[nodiscard]] auto getReturnCallback() const noexcept -> std::function<void()>

@@ -5,7 +5,6 @@
 #include <data/FocusTimerStyle.hpp>
 
 #include <Application.hpp>
-#include <products/BellHybrid/services/audio/include/audio/AudioMessage.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
@@ -13,9 +12,9 @@
 
 namespace
 {
-    constexpr auto focusTimerProgressTimerName{"FocusProgressTimer"};
-    constexpr std::chrono::seconds focusTimerProgressTimerPeriod{1};
-    constexpr auto focusTimerProgressMode{app::ProgressCountdownMode::Increasing};
+    constexpr auto progressTimerName{"FocusProgressTimer"};
+    constexpr auto progressTimerPeriod{std::chrono::seconds{1}};
+    constexpr auto progressMode{app::ProgressCountdownMode::Increasing};
     constexpr auto focusTimerText{"Focus timer"};
     constexpr auto timeToFocusText{"Time to focus"};
     constexpr auto shortBreakTimeText{"Short break"};
@@ -122,7 +121,7 @@ namespace app::focus
         presenter->onBeforeShow();
         updateTime();
         if (mode == gui::ShowMode::GUI_SHOW_INIT) {
-            playGong();
+            presenter->playGong();
             presenter->start();
         }
     }
@@ -158,7 +157,7 @@ namespace app::focus
         bottomDescription->setVisible(true);
         bottomDescription->setText(endOfAllSessionText);
         mainVBox->resizeItems();
-        playGong();
+        presenter->playGong();
     }
 
     void FocusTimerWindow::showFocusSessionCountdown()
@@ -179,7 +178,7 @@ namespace app::focus
         bottomDescription->setVisible(true);
         bottomDescription->setText(timeForBreakText);
         mainVBox->resizeItems();
-        playGong();
+        presenter->playGong();
     }
 
     void FocusTimerWindow::showShortBreakCountdown()
@@ -200,7 +199,7 @@ namespace app::focus
         bottomDescription->setVisible(true);
         bottomDescription->setText(timeToFocusText);
         mainVBox->resizeItems();
-        playGong();
+        presenter->playGong();
     }
 
     void FocusTimerWindow::pause()
@@ -222,7 +221,7 @@ namespace app::focus
     void FocusTimerWindow::configureTimer()
     {
         auto progressTimer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
-            application, *this, focusTimerProgressTimerName, focusTimerProgressTimerPeriod, focusTimerProgressMode);
+            application, *this, progressTimerName, progressTimerPeriod, progressMode);
         progressTimer->attach(progress);
         progressTimer->attach(timer);
         presenter->setTimer(std::move(progressTimer));
@@ -245,12 +244,5 @@ namespace app::focus
             presenter->handleUpdateTimeEvent();
         }
         return gui::RefreshModes::GUI_REFRESH_FAST;
-    }
-
-    void FocusTimerWindow::playGong()
-    {
-        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(app::focus::getFocusTimeAudioPath(),
-                                                                        audio::PlaybackType::Meditation);
-        application->bus.sendUnicast(std::move(msg), service::audioServiceName);
     }
 } // namespace app::focus
