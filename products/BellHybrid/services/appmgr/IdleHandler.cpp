@@ -1,33 +1,40 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <appmgr/IdleHandler.hpp>
-#include <appmgr/messages/IdleTimerMessage.hpp>
-
 #include <service-appmgr/Controller.hpp>
 #include <Timers/TimerFactory.hpp>
+#include <chrono>
+
+namespace
+{
+    constexpr auto idleReturnTimerTimeout{std::chrono::minutes{3}};
+    constexpr auto idleReturnTimerName{"IdleReturn"};
+} // namespace
 
 namespace app::manager
 {
     IdleHandler::IdleHandler(sys::Service *serv) : serv{serv}
     {
         idleTimer = sys::TimerFactory::createPeriodicTimer(
-            serv, "IdleReturn", idleReturnTimeout, [this](sys::Timer &) { idleTimerCallback(); });
+            serv, idleReturnTimerName, idleReturnTimerTimeout, [this]([[maybe_unused]] sys::Timer &timer) {
+                idleTimerCallback();
+            });
     }
 
-    void IdleHandler::handleStartIdleTimer(sys::Message *request)
+    void IdleHandler::handleStartIdleTimer([[maybe_unused]] sys::Message *request)
     {
-        idleTimer.restart(idleReturnTimeout);
+        idleTimer.restart(idleReturnTimerTimeout);
     }
 
-    void IdleHandler::handleRestartIdleTimer(sys::Message *request)
+    void IdleHandler::handleRestartIdleTimer([[maybe_unused]] sys::Message *request)
     {
         if (idleTimer.isActive()) {
-            idleTimer.restart(idleReturnTimeout);
+            idleTimer.restart(idleReturnTimerTimeout);
         }
     }
 
-    void IdleHandler::handleStopIdleTimer(sys::Message *request)
+    void IdleHandler::handleStopIdleTimer([[maybe_unused]] sys::Message *request)
     {
         idleTimer.stop();
     }
