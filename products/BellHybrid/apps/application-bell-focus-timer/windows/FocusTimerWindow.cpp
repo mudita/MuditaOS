@@ -191,6 +191,16 @@ namespace app::focus
         mainVBox->resizeItems();
     }
 
+    void FocusTimerWindow::showLongBreakCountdown()
+    {
+        timer->setVisible(true);
+        iconPause->setVisible(false);
+        iconRing->setVisible(false);
+        bottomDescription->setVisible(true);
+        bottomDescription->setText(utils::translate("app_bell_focus_long_break"));
+        mainVBox->resizeItems();
+    }
+
     void FocusTimerWindow::showTimeForFocusInfo()
     {
         timer->setVisible(false);

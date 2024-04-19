@@ -33,17 +33,17 @@ namespace app::focus
                                              models::FocusSettingsModel &focusTimeModel,
                                              models::FocusSettingsModel &focusRepeatsModel,
                                              models::FocusSettingsModel &shortBreakTimeModel,
-                                             std::unique_ptr<AbstractTimeModel> timeModel,
-                                             AbstractBatteryModel &batteryModel,
-                                             AbstractLowBatteryInfoModel &lowBatteryInfoModel)
-        : app{app}, focusTimeModel{focusTimeModel}, focusRepeatsModel{focusRepeatsModel},
-          shortBreakTimeModel{shortBreakTimeModel}, batteryModel{batteryModel},
-          lowBatteryInfoModel{lowBatteryInfoModel}, timeModel{std::move(timeModel)}
+                                             models::FocusSettingsModel &longBreakTimeModel,
+                                             models::FocusSettingsModel &longBreakOccurrenceModel,
+                                             std::unique_ptr<AbstractTimeModel> timeModel)
+        : app{app}, timeModel{std::move(timeModel)}
     {
         focusSessionDuration  = std::chrono::minutes{focusTimeModel.getValue()};
         shortBreakDuration    = std::chrono::minutes{shortBreakTimeModel.getValue()};
         allFocusSessionsCount = focusRepeatsModel.getValue();
         focusSessionsLeft     = allFocusSessionsCount;
+        longBreakDuration     = std::chrono::minutes{longBreakTimeModel.getValue()};
+        longBreakOccurrence   = longBreakOccurrenceModel.getValue();
 
         betweenSessionTimer = sys::TimerFactory::createSingleShotTimer(
             app, delayBetweenSessionsTimerName, delayBetweenSessions, [this]([[maybe_unused]] sys::Timer &t) {
@@ -138,12 +138,13 @@ namespace app::focus
             break;
 
         case FocusTimerPhase::ShortBreakTime:
-            currentTimerPhase = FocusTimerPhase::ShortBreakTimeEnded;
+        case FocusTimerPhase::LongBreakTime:
+            currentTimerPhase = FocusTimerPhase::BreakTimeEnded;
             getView()->showTimeForFocusInfo();
             startTime();
             break;
 
-        case FocusTimerPhase::ShortBreakTimeEnded:
+        case FocusTimerPhase::BreakTimeEnded:
             currentTimerPhase = FocusTimerPhase::FocusTime;
             getView()->showFocusSessionCountdown();
             startTime();
@@ -180,8 +181,13 @@ namespace app::focus
             timer->start();
             break;
 
+        case FocusTimerPhase::LongBreakTime:
+            timer->reset(longBreakDuration);
+            timer->start();
+            break;
+
         case FocusTimerPhase::FocusTimeEnded:
-        case FocusTimerPhase::ShortBreakTimeEnded:
+        case FocusTimerPhase::BreakTimeEnded:
         case FocusTimerPhase::AllFocusSessionsEnded:
             betweenSessionTimer.start();
             break;
@@ -192,11 +198,17 @@ namespace app::focus
     {
         switch (currentTimerPhase) {
         case FocusTimerPhase::FocusTimeEnded:
-        case FocusTimerPhase::ShortBreakTimeEnded:
+        case FocusTimerPhase::BreakTimeEnded:
             return true;
         default:
             return false;
         }
+    }
+
+    bool FocusTimerPresenter::isTimeForLongBreak()
+    {
+        const auto focusSessionsElapsed = allFocusSessionsCount - focusSessionsLeft;
+        return (longBreakDuration.count() > 0) && ((focusSessionsElapsed % longBreakOccurrence) == 0);
     }
 
     FocusTimerPresenter::FocusTimerPhase FocusTimerPresenter::handleInfoAfterFocusPhase()
@@ -205,7 +217,7 @@ namespace app::focus
             getView()->showEndOfAllSessionsInfo();
             return FocusTimerPhase::AllFocusSessionsEnded;
         }
-        if (shortBreakDuration.count() > 0) {
+        if (shortBreakDuration.count() > 0 || isTimeForLongBreak()) {
             getView()->showTimeForBreakInfo();
         }
         else {
@@ -216,6 +228,10 @@ namespace app::focus
 
     FocusTimerPresenter::FocusTimerPhase FocusTimerPresenter::handleCountdownAfterFocusPhase()
     {
+        if (isTimeForLongBreak()) {
+            getView()->showLongBreakCountdown();
+            return FocusTimerPhase::LongBreakTime;
+        }
         if (shortBreakDuration.count() > 0) {
             getView()->showShortBreakCountdown();
             return FocusTimerPhase::ShortBreakTime;
