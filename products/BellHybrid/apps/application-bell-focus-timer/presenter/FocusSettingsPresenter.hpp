@@ -26,6 +26,7 @@ namespace app::focus
         {
           public:
             virtual ~View() noexcept = default;
+            virtual void exit()      = 0;
         };
 
         class Presenter : public BasePresenter<View>
@@ -46,7 +47,9 @@ namespace app::focus
       public:
         SettingsPresenter(models::FocusSettingsModel &focusTimeModel,
                           models::FocusSettingsModel &focusRepeatsModel,
-                          models::FocusSettingsModel &shortBreakTimeModel);
+                          models::FocusSettingsModel &shortBreakTimeModel,
+                          models::FocusSettingsModel &longBreakTimeModel,
+                          models::FocusSettingsModel &longBreakOccurrenceModel);
 
         void loadData() override;
         void saveData() override;
@@ -59,6 +62,8 @@ namespace app::focus
         models::FocusSettingsModel &focusTimeModel;
         models::FocusSettingsModel &focusRepeatsModel;
         models::FocusSettingsModel &shortBreakTimeModel;
+        models::FocusSettingsModel &longBreakTimeModel;
+        models::FocusSettingsModel &longBreakOccurrenceModel;
         std::shared_ptr<BellListItemProvider> listItemsProvider;
     };
 } // namespace app::focus

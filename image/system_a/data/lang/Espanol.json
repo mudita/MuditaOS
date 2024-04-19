@@ -28,6 +28,10 @@
     "app_bell_focus_time": "T. de concentración",
     "app_bell_focus_repeats": "-",
     "app_bell_focus_short_break": "Descanso pequeño",
+    "app_bell_focus_long_break": "Descanso largo",
+    "app_bell_focus_long_break_after": "-",
+    "app_bell_focus_time_once": "-",
+    "app_bell_focus_time_many": "-",
     "app_bell_goodbye": "Adi\u00f3s",
     "app_bell_greeting_msg": [
         "\u00a1Hola! Lev\u00e1ntate y brilla"

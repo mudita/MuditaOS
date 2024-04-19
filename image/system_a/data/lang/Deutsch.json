@@ -29,6 +29,10 @@
     "app_bell_focus_time": "Konzent.-Timer",
     "app_bell_focus_repeats": "-",
     "app_bell_focus_short_break": "Kurze Pause",
+    "app_bell_focus_long_break": "Lange Pause",
+    "app_bell_focus_long_break_after": "-",
+    "app_bell_focus_time_once": "-",
+    "app_bell_focus_time_many": "-",
     "app_bell_goodbye": "Auf Wiedersehen",
     "app_bell_greeting_msg": [
         "Guten Morgen! Stehen Sie auf"

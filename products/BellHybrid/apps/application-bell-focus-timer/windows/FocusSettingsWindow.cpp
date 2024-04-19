@@ -55,8 +55,7 @@ namespace app::focus
             return true;
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
-            isSaveNeeded = true;
-            switchToExitWindow();
+            exit();
             return true;
         }
         if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
@@ -81,5 +80,11 @@ namespace app::focus
                 presenter->exitWithoutSave();
             }
         }
+    }
+
+    void SettingsWindow::exit()
+    {
+        isSaveNeeded = true;
+        switchToExitWindow();
     }
 } // namespace app::focus

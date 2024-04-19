@@ -33,6 +33,7 @@ namespace app::focus
 
             virtual void showFocusSessionCountdown()                        = 0;
             virtual void showShortBreakCountdown()                          = 0;
+            virtual void showLongBreakCountdown()                           = 0;
             virtual void showTimeForFocusInfo()                             = 0;
             virtual void showTimeForBreakInfo()                             = 0;
             virtual void showEndOfAllSessionsInfo()                         = 0;
@@ -68,9 +69,9 @@ namespace app::focus
                             models::FocusSettingsModel &focusTimeModel,
                             models::FocusSettingsModel &focusRepeatsModel,
                             models::FocusSettingsModel &shortBreakTimeModel,
-                            std::unique_ptr<AbstractTimeModel> timeModel,
-                            AbstractBatteryModel &batteryModel,
-                            AbstractLowBatteryInfoModel &lowBatteryInfoModel);
+                            models::FocusSettingsModel &longBreakTimeModel,
+                            models::FocusSettingsModel &longBreakOccurrenceModel,
+                            std::unique_ptr<AbstractTimeModel> timeModel);
 
         void setTimer(std::unique_ptr<app::TimerWithCallbacks> &&_timer) override;
         void handleUpdateTimeEvent() override;
@@ -92,28 +93,28 @@ namespace app::focus
             FocusTime,
             FocusTimeEnded,
             ShortBreakTime,
-            ShortBreakTimeEnded,
+            LongBreakTime,
+            BreakTimeEnded,
             AllFocusSessionsEnded
         };
 
         app::ApplicationCommon *app{nullptr};
-        models::FocusSettingsModel &focusTimeModel;
-        models::FocusSettingsModel &focusRepeatsModel;
-        models::FocusSettingsModel &shortBreakTimeModel;
-        AbstractBatteryModel &batteryModel;
-        AbstractLowBatteryInfoModel &lowBatteryInfoModel;
 
         std::unique_ptr<app::TimerWithCallbacks> timer;
         sys::TimerHandle betweenSessionTimer;
         std::unique_ptr<AbstractTimeModel> timeModel;
+
         std::chrono::minutes focusSessionDuration;
         std::chrono::minutes shortBreakDuration;
+        std::chrono::minutes longBreakDuration;
         std::uint32_t allFocusSessionsCount;
         std::uint32_t focusSessionsLeft;
-        FocusTimerPhase currentTimerPhase = FocusTimerPhase::FocusTime;
+        std::uint32_t longBreakOccurrence;
+        FocusTimerPhase currentTimerPhase{FocusTimerPhase::FocusTime};
 
         void executeNextStep();
         bool isMiddleTimeBetweenBreakAndFocus();
+        bool isTimeForLongBreak();
         FocusTimerPhase handleInfoAfterFocusPhase();
         FocusTimerPhase handleCountdownAfterFocusPhase();
     };
