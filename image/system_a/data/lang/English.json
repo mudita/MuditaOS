@@ -30,6 +30,10 @@
     "app_bell_focus_time": "Focus timer",
     "app_bell_focus_repeats": "Focus timer repeats",
     "app_bell_focus_short_break": "Short break",
+    "app_bell_focus_long_break": "Long break",
+    "app_bell_focus_long_break_after": "Long break after",
+    "app_bell_focus_time_once": "focus time",
+    "app_bell_focus_time_many": "focus times",
     "app_bell_goodbye": "Goodbye",
     "app_bell_greeting_msg": [
         "<text>Good Morning!<br />It's a Beautiful Day!</text>",

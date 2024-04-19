@@ -42,5 +42,17 @@ namespace app::focus
         inline constexpr auto shortBreakTimeStep    = 1U;
         inline constexpr auto shortBreakTimeDefault = 15U;
         inline constexpr auto shortBreakTimeName    = "short_break";
+
+        inline constexpr auto longBreakTimeMin     = 0U;
+        inline constexpr auto longBreakTimeMax     = 30U;
+        inline constexpr auto longBreakTimeStep    = 1U;
+        inline constexpr auto longBreakTimeDefault = 15U;
+        inline constexpr auto longBreakTimeName    = "long_break_time";
+
+        inline constexpr auto longBreakOccurrenceMin     = 1U;
+        inline constexpr auto longBreakOccurrenceMax     = 19U;
+        inline constexpr auto longBreakOccurrenceStep    = 1U;
+        inline constexpr auto longBreakOccurrenceDefault = 4U;
+        inline constexpr auto longBreakOccurrenceName    = "long_break_occurrence";
     } // namespace models::settings
 } // namespace app::focus
