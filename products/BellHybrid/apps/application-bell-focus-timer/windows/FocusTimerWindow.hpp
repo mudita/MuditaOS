@@ -27,6 +27,7 @@ namespace app::focus
         bool onInput(const gui::InputEvent &inputEvent) override;
         void showFocusSessionCountdown() override;
         void showShortBreakCountdown() override;
+        void showLongBreakCountdown() override;
         void showTimeForFocusInfo() override;
         void showTimeForBreakInfo() override;
         void showEndOfAllSessionsInfo() override;

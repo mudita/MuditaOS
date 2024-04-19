@@ -44,6 +44,8 @@ namespace app
         std::unique_ptr<focus::models::FocusSettingsModel> focusTimeModel;
         std::unique_ptr<focus::models::FocusSettingsModel> focusRepeatsModel;
         std::unique_ptr<focus::models::FocusSettingsModel> shortBreakTimeModel;
+        std::unique_ptr<focus::models::FocusSettingsModel> longBreakTimeModel;
+        std::unique_ptr<focus::models::FocusSettingsModel> longBreakOccurrenceModel;
 
         std::unique_ptr<AbstractAudioModel> audioModel;
         std::unique_ptr<AbstractBatteryModel> batteryModel;

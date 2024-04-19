@@ -27,6 +27,7 @@ namespace app::focus
         void onClose(CloseReason reason) override;
         bool onInput(const gui::InputEvent &inputEvent) override;
         void rebuild() override;
+        void exit() override;
 
       private:
         void switchToExitWindow();
