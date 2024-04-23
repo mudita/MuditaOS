@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,7 +7,7 @@
 #include <AppWindow.hpp>
 #include <InputEvent.hpp>
 #include <Text.hpp>
-#include <apps-common/widgets/TimeFixedWidget.hpp>
+#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
 
 #include "MeditationCountdownPresenter.hpp"
 
@@ -29,10 +29,10 @@ namespace gui
 
       private:
         std::unique_ptr<app::meditation::MeditationCountdownContract::Presenter> presenter;
-        VBox *mainVBox         = nullptr;
-        Arc *progress          = nullptr;
-        TimeFixedWidget *timer = nullptr;
-        Text *description      = nullptr;
+        VBox *mainVBox                = nullptr;
+        Arc *progress                 = nullptr;
+        TimeMinuteSecondWidget *timer = nullptr;
+        Text *description             = nullptr;
 
         void buildLayout();
         void configureTimer();

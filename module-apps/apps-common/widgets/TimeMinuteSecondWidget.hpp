@@ -15,7 +15,8 @@ namespace gui
         enum class DisplayType
         {
             MinutesThenSeconds,
-            OnlyMinutes
+            OnlyMinutes,
+            OnlySeconds,
         };
 
         TimeMinuteSecondWidget(Item *parent,
