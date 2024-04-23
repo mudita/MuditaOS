@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -19,7 +19,6 @@ namespace app::meditationStyle
         namespace timer
         {
             constexpr inline auto marginTop = 39;
-            constexpr inline auto font      = style::window::font::supersizeme;
             constexpr inline auto maxSizeX  = 340;
             constexpr inline auto maxSizeY  = 198;
         } // namespace timer
@@ -51,9 +50,7 @@ namespace app::meditationStyle
 
         namespace timer
         {
-            constexpr inline auto marginTop  = 23;
-            constexpr inline auto marginLeft = 43;
-            constexpr inline auto font       = runningStyle::timer::font;
+            constexpr inline auto marginTop = 24;
             constexpr inline auto maxSizeX  = runningStyle::timer::maxSizeX;
             constexpr inline auto maxSizeY  = runningStyle::timer::maxSizeY;
         } // namespace timer

@@ -12,6 +12,7 @@
 
 ### Changed / Improved
 * Updated button handling during pre-wake up
+* Updated the countdown timer in Meditation app according to the new design
 
 ## [2.6.1 2024-04-02]
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Arc.hpp>
@@ -69,17 +69,14 @@ namespace gui
         description->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         description->setMargins(gui::Margins(0, countdownStyle::description::marginTop, 0, 0));
 
-        timer = new gui::TimeFixedWidget(mainVBox,
-                                         0,
-                                         0,
-                                         runningStyle::timer::maxSizeX,
-                                         runningStyle::timer::maxSizeY,
-                                         false,
-                                         leftBoxSize,
-                                         TimeFixedWidget::RightBox::defaultSize);
-        timer->setFontAndDimensions(countdownStyle::timer::font);
+        timer = new gui::TimeMinuteSecondWidget(mainVBox,
+                                                0,
+                                                0,
+                                                countdownStyle::timer::maxSizeX,
+                                                countdownStyle::timer::maxSizeY,
+                                                gui::TimeMinuteSecondWidget::DisplayType::OnlySeconds);
         timer->setMinimumSize(countdownStyle::timer::maxSizeX, countdownStyle::timer::maxSizeY);
-        timer->setMargins(gui::Margins(countdownStyle::timer::marginLeft, countdownStyle::timer::marginTop, 0, 0));
+        timer->setMargins(gui::Margins(0, countdownStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         mainVBox->resizeItems();

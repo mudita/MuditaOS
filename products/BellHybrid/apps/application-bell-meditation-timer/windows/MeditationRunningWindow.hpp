@@ -5,6 +5,8 @@
 
 #include <Application.hpp>
 #include <AppWindow.hpp>
+#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
+
 #include "MeditationProgressPresenter.hpp"
 
 namespace gui
@@ -33,7 +35,7 @@ namespace gui
         std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> presenter;
         VBox *mainVBox{nullptr};
         ArcProgressBar *progress{nullptr};
-        TimeFixedWidget *timer{nullptr};
+        TimeMinuteSecondWidget *timer{nullptr};
         Icon *icon{nullptr};
         gui::BellStatusClock *clock{nullptr};
 
