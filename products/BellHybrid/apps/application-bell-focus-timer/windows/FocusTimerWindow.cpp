@@ -15,11 +15,6 @@ namespace
     constexpr auto progressTimerName{"FocusProgressTimer"};
     constexpr auto progressTimerPeriod{std::chrono::seconds{1}};
     constexpr auto progressMode{app::ProgressCountdownMode::Increasing};
-    constexpr auto focusTimerText{"Focus timer"};
-    constexpr auto timeToFocusText{"Time to focus"};
-    constexpr auto shortBreakTimeText{"Short break"};
-    constexpr auto timeForBreakText{"Time for a break"};
-    constexpr auto endOfAllSessionText{"Well done!"};
 } // namespace
 
 namespace app::focus
@@ -100,7 +95,8 @@ namespace app::focus
         iconRing->image->set(runningStyle::ringIcon::image, gui::ImageTypeSpecifier::W_G);
         iconRing->setVisible(false);
 
-        bottomDescription = new gui::TextFixedSize(mainVBox, 0, 0, 250, 80);
+        bottomDescription = new gui::TextFixedSize(
+            mainVBox, 0, 0, runningStyle::bottomDescription::maxSizeX, runningStyle::bottomDescription::maxSizeY);
         bottomDescription->setMaximumSize(runningStyle::bottomDescription::maxSizeX,
                                           runningStyle::bottomDescription::maxSizeY);
         bottomDescription->setFont(runningStyle::bottomDescription::font);
@@ -108,7 +104,7 @@ namespace app::focus
         bottomDescription->activeItem = false;
         bottomDescription->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        bottomDescription->setRichText(focusTimerText);
+        bottomDescription->setRichText(utils::translate("app_bell_focus_time"));
         bottomDescription->drawUnderline(false);
         bottomDescription->setVisible(true);
 
@@ -155,7 +151,7 @@ namespace app::focus
         iconPause->setVisible(false);
         iconRing->setVisible(true);
         bottomDescription->setVisible(true);
-        bottomDescription->setText(endOfAllSessionText);
+        bottomDescription->setText(utils::translate("app_bell_focus_well_done"));
         mainVBox->resizeItems();
         presenter->playGong();
     }
@@ -166,7 +162,7 @@ namespace app::focus
         iconPause->setVisible(false);
         iconRing->setVisible(false);
         bottomDescription->setVisible(true);
-        bottomDescription->setText(focusTimerText);
+        bottomDescription->setText(utils::translate("app_bell_focus_time"));
         mainVBox->resizeItems();
     }
 
@@ -176,7 +172,7 @@ namespace app::focus
         iconPause->setVisible(false);
         iconRing->setVisible(true);
         bottomDescription->setVisible(true);
-        bottomDescription->setText(timeForBreakText);
+        bottomDescription->setText(utils::translate("app_bell_focus_time_for_break"));
         mainVBox->resizeItems();
         presenter->playGong();
     }
@@ -187,7 +183,7 @@ namespace app::focus
         iconPause->setVisible(false);
         iconRing->setVisible(false);
         bottomDescription->setVisible(true);
-        bottomDescription->setText(shortBreakTimeText);
+        bottomDescription->setText(utils::translate("app_bell_focus_short_break"));
         mainVBox->resizeItems();
     }
 
@@ -207,7 +203,7 @@ namespace app::focus
         iconPause->setVisible(false);
         iconRing->setVisible(true);
         bottomDescription->setVisible(true);
-        bottomDescription->setText(timeToFocusText);
+        bottomDescription->setText(utils::translate("app_bell_focus_time_for_focus"));
         mainVBox->resizeItems();
         presenter->playGong();
     }
