@@ -100,7 +100,8 @@ namespace gui
 
     void TimeMinuteSecondWidget::updateTime(std::uint32_t seconds)
     {
-        if (seconds >= utils::time::secondsInMinute || displayType == DisplayType::OnlyMinutes) {
+        if (displayType != DisplayType::OnlySeconds &&
+            (seconds >= utils::time::secondsInMinute || displayType == DisplayType::OnlyMinutes)) {
             const auto minutes = (seconds + utils::time::secondsInMinute - 1) / utils::time::secondsInMinute;
             setText(minutes);
             description->setText(utils::language::getCorrectMinutesNumeralForm(minutes));

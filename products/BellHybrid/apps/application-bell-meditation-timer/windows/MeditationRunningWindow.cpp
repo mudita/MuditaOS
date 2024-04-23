@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -48,8 +48,8 @@ namespace gui
         const auto progressArcWidth  = runningStyle::progress::penWidth;
         const auto arcStartAngle =
             -90 - runningStyle::progress::verticalDeviationDegrees; // -90 to start drawing the circle from top
-        const auto arcSweepAngle     = 360 - (2 * runningStyle::progress::verticalDeviationDegrees);
-        const auto arcProgressSteps  = 1000;
+        const auto arcSweepAngle    = 360 - (2 * runningStyle::progress::verticalDeviationDegrees);
+        const auto arcProgressSteps = 1000;
 
         Arc::ShapeParams arcParams;
         arcParams.setCenterPoint(Point(getWidth() / 2, getHeight() / 2))
@@ -72,8 +72,12 @@ namespace gui
         clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         clock->setMargins(gui::Margins(0, runningStyle::clock::marginTop, 0, 0));
 
-        timer = new gui::TimeFixedWidget(mainVBox, 0, 0, runningStyle::timer::maxSizeX, runningStyle::timer::maxSizeY);
-        timer->setFontAndDimensions(runningStyle::timer::font);
+        timer = new gui::TimeMinuteSecondWidget(mainVBox,
+                                                0,
+                                                0,
+                                                runningStyle::timer::maxSizeX,
+                                                runningStyle::timer::maxSizeY,
+                                                gui::TimeMinuteSecondWidget::DisplayType::OnlyMinutes);
         timer->setMinimumSize(runningStyle::timer::maxSizeX, runningStyle::timer::maxSizeY);
         timer->setMargins(gui::Margins(0, runningStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
