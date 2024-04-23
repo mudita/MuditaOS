@@ -111,7 +111,7 @@ namespace app::focus
                                     (allFocusSessionsCount - focusSessionsLeft) * focusSessionDuration.count();
         const auto &sumOfFocusTime =
             std::to_string(minutesInFocus) + " " + utils::language::getCorrectMinutesAccusativeForm(minutesInFocus);
-        const auto &textToComplete = utils::translate("app_bell_focus_timer_summary");
+        const auto &textToComplete = utils::translate("app_bell_focus_summary");
         const auto &summaryText    = createSummaryText(textToComplete, sumOfFocusTime);
 
         app->switchWindow(

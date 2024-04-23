@@ -44,8 +44,8 @@ namespace app::focusTimerStyle
         namespace bottomDescription
         {
             inline constexpr auto marginTop = 38u;
-            inline constexpr auto maxSizeX  = style::bell_base_layout::w;
-            inline constexpr auto maxSizeY  = 42u;
+            inline constexpr auto maxSizeX  = 340u;
+            inline constexpr auto maxSizeY  = 80u;
             inline constexpr auto font      = style::window::font::verybig;
         } // namespace bottomDescription
 
