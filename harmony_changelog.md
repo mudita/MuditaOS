@@ -4,6 +4,7 @@
 
 ### Fixed
 * Fixed the backlight blink in pre-wake up
+* Fixed missing tooltip text in Onboarding in French
 
 ### Added
 * Added custom alarms functionality

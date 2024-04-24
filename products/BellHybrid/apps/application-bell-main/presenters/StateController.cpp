@@ -225,7 +225,7 @@ namespace app::home_screen
         {
             auto entry = [](AbstractView &view, AbstractPresenter &presenter, AbstractTimeModel &timeModel) {
                 presenter.spawnTimer();
-                view.setTextDescription(utils::translate("app_bell_alarm_lowBattery_info"));
+                view.setTextDescription(utils::translate("app_bell_alarm_low_battery_info"));
                 view.setViewState(ViewState::ActivatedLowBattery);
             };
             auto exit = [](AbstractView &view, AbstractPresenter &presenter) { presenter.detachTimer(); };
