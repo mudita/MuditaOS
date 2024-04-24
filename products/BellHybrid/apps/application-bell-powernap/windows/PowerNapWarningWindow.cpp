@@ -48,7 +48,7 @@ namespace gui
         icon->image->setMargins({0, gui::bell_style::warning_icon_top_margin, 0, 0});
         icon->text->setMaximumWidth(gui::bell_style::warning_text_width);
         icon->text->setFont(style::window::font::verybiglight);
-        icon->text->setRichText(utils::translate("app_bell_alarm_lowBattery_info"));
+        icon->text->setRichText(utils::translate("app_bell_alarm_low_battery_info"));
     }
 
     bool PowerNapWarningWindow::onInput(const InputEvent &inputEvent)
