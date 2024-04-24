@@ -4,6 +4,7 @@
 #include "FocusSettingsWindow.hpp"
 
 #include <common/data/StyleCommon.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 #include <apps-common/ApplicationCommon.hpp>
 #include <module-gui/gui/input/InputEvent.hpp>
 #include <module-gui/gui/widgets/SideListView.hpp>
@@ -67,7 +68,8 @@ namespace app::focus
 
     void SettingsWindow::switchToExitWindow()
     {
-        application->switchWindow(window::name::main);
+        application->switchWindow(gui::window::bell_finished::defaultName,
+                                  BellFinishedWindowData::Factory::create("circle_success_big", window::name::main));
     }
 
     void SettingsWindow::onClose(const CloseReason reason)

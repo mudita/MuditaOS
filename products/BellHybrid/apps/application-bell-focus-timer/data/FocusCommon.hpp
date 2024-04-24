@@ -40,7 +40,7 @@ namespace app::focus
         inline constexpr auto shortBreakTimeMin     = 0U;
         inline constexpr auto shortBreakTimeMax     = 15U;
         inline constexpr auto shortBreakTimeStep    = 1U;
-        inline constexpr auto shortBreakTimeDefault = 15U;
+        inline constexpr auto shortBreakTimeDefault = 5U;
         inline constexpr auto shortBreakTimeName    = "short_break";
 
         inline constexpr auto longBreakTimeMin     = 0U;
