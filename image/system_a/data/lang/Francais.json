@@ -38,7 +38,7 @@
     "app_bell_meditation_start_delay": "Retard de lancement",
     "app_bell_meditation_statistics": "Statistiques",
     "app_bell_meditation_timer": "M\u00e9ditation",
-    "app_bell_onboarding_info_deep_click_correction": "<text>Soyez plus doux,<br />essayez de cliquer plus l\u00e9g\u00e8rement cette fois</text>",
+    "app_bell_onboarding_info_deep_click_correction": "Soyez plus doux, essayez de cliquer l\u00e9g\u00e8rement",
     "app_bell_onboarding_info_deep_click_warning": "Vous avez appuy\u00e9 fort",
     "app_bell_onboarding_info_light_click": "Cliquer doucement pour continuer",
     "app_bell_onboarding_info_rotate": "<text>Tourner pour<br />s\u00e9lectionner</text>",
@@ -524,6 +524,8 @@
     "app_settings_volume_focused": "Volume",
     "app_sms_offline": "Vous \u00eates hors ligne.\n\nPour envoyer un SMS,\npassez en mode Connect\u00e9.",
     "app_special_input_window": "Caract\u00e8res sp\u00e9ciaux",
+    "battery_low": "Batterie faible",
+    "battery_remaining": "<text><token>$BATTERY</token>% de batterie restant</text>",
     "bluetooth_info_popup_error": "<text>Le processus de jumelage avec </text><text weight='bold'><token>$DEVICE</token></text><br></br><text> a \u00e9chou\u00e9. Code d'erreur: <token>$ERROR</token></text>",
     "bluetooth_info_popup_success": "<text>Votre t\u00e9l\u00e9phone est coupl\u00e9 avec: <br></br></text><text weight='bold'><token>$DEVICE</token></text>",
     "bluetooth_popup": "Bluetooth",
@@ -706,7 +708,5 @@
     "tethering_menu_access_decline": "<text>Le partage de connexion est activ\u00e9.<br /><br />Pour acc\u00e9der au menu, veuillez<br />d\u00e9sactiver le partage de connextion.</text>",
     "tethering_phone_mode_change_prohibited": "<text>Le partage de connexion est activ\u00e9.<br /><br />Ce mode-ci remplace et d\u00e9sactive les autres modes<br />(Connect\u00e9, NPD, Hors ligne)</text>",
     "tethering_turn_off_question": "Voulez-vous d\u00e9sactiver le partage de connexion?",
-    "unsaved_changes": "Modifications non enregistr\u00e9es",
-    "battery_low": "Batterie faible",
-    "battery_remaining": "<text><token>$BATTERY</token>% de batterie restant</text>"
+    "unsaved_changes": "Modifications non enregistr\u00e9es"
 }

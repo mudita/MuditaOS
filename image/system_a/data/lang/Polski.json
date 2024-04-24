@@ -551,6 +551,8 @@
     "app_settings_volume_focused": "G\u0142o\u015bno\u015b\u0107",
     "app_sms_offline": "Jeste\u015b w trybie offline.\n\nAby wys\u0142a\u0107 SMS,\n przejd\u017a w tryb Po\u0142\u0105czony.",
     "app_special_input_window": "Znaki specjalne",
+    "battery_low": "Niski poziom baterii",
+    "battery_remaining": "<text>Pozosta\u0142o <token>$BATTERY</token>% baterii</text>",
     "bluetooth_info_popup_error": "<text>Proces parowania z </text><text weight='bold'><token>$DEVICE</token></text><br></br><text> nie powi\u00f3d\u0142 si\u0119. Kod b\u0142\u0119du: <token>$ERROR</token></text>",
     "bluetooth_info_popup_success": "<text>Tw\u00f3j telefon jest sparowany z: <br></br></text><text weight='bold'><token>$DEVICE</token></text>",
     "bluetooth_popup": "Bluetooth",
@@ -734,7 +736,5 @@
     "tethering_menu_access_decline": "<text>Tethering w\u0142\u0105czony.<br /><br />Aby przej\u015b\u0107 do menu,<br />wy\u0142\u0105cz tethering.</text>",
     "tethering_phone_mode_change_prohibited": "<text>Tethering w\u0142\u0105czony.<br /><br />Ten tryb powoduje, \u017ce inne tryby (Po\u0142\u0105czony, Nie przeszkadza\u0107,<br />Offline) nie dzia\u0142aj\u0105.</text>",
     "tethering_turn_off_question": "Wy\u0142\u0105czy\u0107 tethering?",
-    "unsaved_changes": "Niezapisane zmiany",
-    "battery_low": "Niski poziom baterii",
-    "battery_remaining": "<text>Pozosta\u0142o <token>$BATTERY</token>% baterii</text>"
+    "unsaved_changes": "Niezapisane zmiany"
 }

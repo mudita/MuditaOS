@@ -126,7 +126,7 @@ namespace gui
         lowBatteryWarning->image->setMargins({0, gui::bell_style::warning_icon_top_margin, 0, 0});
         lowBatteryWarning->text->setMaximumWidth(gui::bell_style::warning_text_width);
         lowBatteryWarning->text->setFont(style::window::font::verybiglight);
-        lowBatteryWarning->text->setRichText(utils::translate("app_bell_alarm_lowBattery_info"));
+        lowBatteryWarning->text->setRichText(utils::translate("app_bell_alarm_low_battery_info"));
         lowBatteryWarning->setVisible(false);
 
         resizeItems();

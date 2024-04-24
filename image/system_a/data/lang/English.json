@@ -559,6 +559,8 @@
     "app_settings_volume_focused": "Volume",
     "app_sms_offline": "You're Offline.\n\nTo send message,\n switch the mode.",
     "app_special_input_window": "Special characters",
+    "battery_low": "Low battery",
+    "battery_remaining": "<text><token>$BATTERY</token>% battery remaining</text>",
     "bluetooth_info_popup_error": "<text>Pairing process with </text><text weight='bold'><token>$DEVICE</token></text><br></br><text> has failed. Error code: <token>$ERROR</token></text>",
     "bluetooth_info_popup_success": "<text>Your phone is paired with: <br></br></text><text weight='bold'><token>$DEVICE</token></text>",
     "bluetooth_popup": "Bluetooth",
@@ -746,7 +748,5 @@
     "tethering_menu_access_decline": "<text>Tethering is on.<br /><br />To access menu,<br />turn tethering off.</text>",
     "tethering_phone_mode_change_prohibited": "<text>Tethering is on.<br /><br />Other modes (Connected, DND,<br />Offline) are overriden by this mode<br />and are not working.</text>",
     "tethering_turn_off_question": "Turn tethering off?",
-    "unsaved_changes": "Unsaved4 changes",
-    "battery_low": "Low battery",
-    "battery_remaining": "<text><token>$BATTERY</token>% battery remaining</text>"
+    "unsaved_changes": "Unsaved changes"
 }

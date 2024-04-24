@@ -557,6 +557,8 @@
     "app_settings_volume_focused": "Volumen",
     "app_sms_offline": "No tienes conexi\u00f3n.\n\nPara enviar un SMS,\n cambia al modo Conectado.",
     "app_special_input_window": "Caracteres especiales",
+    "battery_low": "Bater\u00eda baja",
+    "battery_remaining": "<text>Queda un <token>$BATTERY</token>% de bater\u00eda</text>",
     "bluetooth_info_popup_error": "<text>Proceso de vinculaci\u00f3n con </text><text weight='bold'><token>$DEVICE</token></text><br></br><text> ha fallado. C\u00f3digo de error: <token>$ERROR</token></text>",
     "bluetooth_info_popup_success": "<text>Su tel\u00e9fono est\u00e1 emparejado con: <br></br></text><text weight='bold'><token>$DEVICE</token></text>",
     "bluetooth_popup": "Bluetooth",
@@ -735,7 +737,5 @@
     "tethering_menu_access_decline": "<text>El anclaje de red est\u00e1 activado.<br /><br />Para acceder al men\u00fa,<br />desactiva el tethering.</text>",
     "tethering_phone_mode_change_prohibited": "<text>El anclaje de red est\u00e1 activado.<br /><br />Este modo anula otros modos (Conectado, No molestar,<br />Desconectado) <br />y hace que dejen de funcionar.</text>",
     "tethering_turn_off_question": "\u00bfDesactivar el anclaje de red?",
-    "unsaved_changes": "Cambios no guardados",
-    "battery_low": "Bater\u00EDa baja",
-    "battery_remaining": "<text>Queda un <token>$BATTERY</token>% de bater\u00EDa</text>"
+    "unsaved_changes": "Cambios no guardados"
 }

@@ -4,6 +4,7 @@
 
 ### Fixed
 * Fixed the backlight blink in pre-wake up
+* Fixed missing tooltip text in Onboarding in French
 
 ### Added
 * Added unique sound to indicate the meditation session has ended
