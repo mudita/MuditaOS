@@ -219,12 +219,7 @@ namespace sys
                              ? lowestLevelName
                              : (currentFreq == bsp::CpuFrequencyMHz::Level_6 ? highestLevelName : middleLevelName);
 
-        for (auto &level : cpuFrequencyMonitors) {
-            if (level.GetName() == levelName) {
-                level.IncreaseTicks(ticks - lastCpuFrequencyChangeTimestamp);
-            }
-        }
-
+        UpdateCpuFrequencyMonitor(levelName, ticks - lastCpuFrequencyChangeTimestamp);
         lastCpuFrequencyChangeTimestamp = ticks;
     }
 
@@ -235,6 +230,11 @@ namespace sys
                 level.IncreaseTicks(tickIncrease);
             }
         }
+    }
+
+    void PowerManager::UpdateCpuFrequencyMonitorTimestamp()
+    {
+        lastCpuFrequencyChangeTimestamp = xTaskGetTickCount();
     }
 
     void PowerManager::EnterWfiIfReady()
@@ -254,6 +254,7 @@ namespace sys
             lowPowerControl->EnableSysTick();
             portEXIT_CRITICAL();
             UpdateCpuFrequencyMonitor(WfiName, timeSpentInWFI);
+            UpdateCpuFrequencyMonitorTimestamp();
         }
     }
 
