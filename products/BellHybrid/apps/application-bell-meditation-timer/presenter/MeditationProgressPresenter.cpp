@@ -7,11 +7,11 @@
 #include "models/ChimeInterval.hpp"
 #include "models/Statistics.hpp"
 
-#include <common/LanguageUtils.hpp>
 #include <common/models/TimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <audio/AudioMessage.hpp>
 #include <service-db/Settings.hpp>
+#include <LanguageUtils.hpp>
 
 namespace
 {

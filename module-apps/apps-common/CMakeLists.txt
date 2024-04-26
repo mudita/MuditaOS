@@ -13,13 +13,19 @@ target_sources(apps-common
         CallbackStorage.cpp
         DOMResponder.cpp
         GuiTimer.cpp
+        PopupBlueprintFactory.cpp
         StatusBarManager.cpp
         WindowsFactory.cpp
         WindowsStack.cpp
+        WindowsPopupQueue.cpp
+        WindowsPopupFilter.cpp
+        WindowsPopupRequest.cpp
+
         audio/SoundsPlayer.cpp
+
         models/SongContext.cpp
         models/SongsRepository.cpp
-        audio/SoundsPlayer.cpp
+
         notifications/NotificationData.cpp
         notifications/NotificationListItem.cpp
         notifications/NotificationProvider.cpp
@@ -32,6 +38,7 @@ target_sources(apps-common
         notifications/policies/CallNotificationPolicy.cpp
         notifications/policies/SMSNotificationPolicy.cpp
         notifications/policies/NotificationsListPolicy.cpp
+
         options/OptionsModel.cpp
         options/OptionsList.cpp
         options/type/OptionCall.cpp
@@ -39,6 +46,7 @@ target_sources(apps-common
         options/type/OptionSetting.cpp
         options/type/OptionSimple.cpp
         options/type/OptionWithActiveIcons.cpp
+
         widgets/ActiveIconFactory.cpp
         widgets/BarGraph.cpp
         widgets/BrightnessBox.cpp
@@ -64,18 +72,15 @@ target_sources(apps-common
         widgets/WidgetsUtils.cpp
         widgets/ProgressTimer.cpp
         widgets/ProgressTimerWithBarGraphAndCounter.cpp
+
         windows/AppWindow.cpp
         windows/BrightnessWindow.cpp
         windows/Dialog.cpp
         windows/OptionWindow.cpp
-        PopupBlueprintFactory.cpp
-        WindowsPopupQueue.cpp
-        WindowsPopupFilter.cpp
-        WindowsPopupRequest.cpp
 
     PUBLIC
         ApplicationCommon.hpp
-        widgets/TimeSetFmtSpinner.hpp
+
         actions/AlarmRingingData.hpp
         actions/AlarmTriggeredAction.hpp
 
@@ -83,6 +88,7 @@ target_sources(apps-common
         models/SongsRepository.hpp
         models/SongsModelInterface.hpp
 
+        widgets/TimeSetFmtSpinner.hpp
         widgets/spinners/ItemSpinner.hpp
         widgets/spinners/Spinners.hpp
 )
@@ -110,8 +116,8 @@ target_link_libraries(apps-common
         module-os
         module-services
         module-sys
-        module-utils
         utils-time
+        utils-language
         utf8
         version-header
 )
@@ -122,9 +128,7 @@ target_compile_definitions(apps-common PUBLIC ${PROJECT_TARGET})
 target_include_directories(apps-common PUBLIC ${PROJECT_INCLUDES})
 
 target_include_directories(apps-common
-
         PUBLIC
-
         ${CMAKE_CURRENT_SOURCE_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}/messages
         ${CMAKE_CURRENT_SOURCE_DIR}/windows
@@ -133,14 +137,11 @@ target_include_directories(apps-common
 )
 
 target_compile_options(apps-common
-
         PUBLIC
-
         -Wall
 
         $<$<COMPILE_LANGUAGE:C>:-std=gnu11>
         $<$<COMPILE_LANGUAGE:C>:-Wno-discarded-qualifiers>
 
         $<$<COMPILE_LANGUAGE:CXX>:-Wno-literal-suffix>
-
 )

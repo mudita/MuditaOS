@@ -8,7 +8,7 @@
 #include <common/widgets/list_items/NumericWithBar.hpp>
 #include <common/widgets/list_items/Text.hpp>
 #include <common/widgets/ListItems.hpp>
-#include <common/LanguageUtils.hpp>
+#include <LanguageUtils.hpp>
 
 #include <apps-common/ApplicationCommon.hpp>
 #include <utility>
