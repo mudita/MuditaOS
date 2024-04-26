@@ -1,0 +1,10 @@
+add_gtest_executable(
+    NAME
+        utils-language-test
+    SRCS
+        unittest_languageutils.cpp
+    LIBS
+        utils-language
+        module-vfs
+    USE_FS
+)

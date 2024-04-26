@@ -2,7 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "TimeMinuteSecondWidget.hpp"
-#include <common/LanguageUtils.hpp>
+#include <LanguageUtils.hpp>
 
 namespace
 {
@@ -113,7 +113,7 @@ namespace gui
 
     void TimeMinuteSecondWidget::setText(std::uint32_t value)
     {
-        const auto digits      = valueToDigits(value);
+        const auto &digits     = valueToDigits(value);
         const auto totalDigits = digits.size();
 
         for (auto i = 0U; i < maxDigits; i++) {

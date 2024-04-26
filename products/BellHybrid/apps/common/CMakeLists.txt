@@ -16,7 +16,6 @@ target_sources(application-bell-common
         src/BellFactoryResetPresenter.cpp
         src/AlarmModel.cpp
         src/AudioModel.cpp
-        src/LanguageUtils.cpp
         src/TimeModel.cpp
         src/UserSessionModel.cpp
         src/BatteryModel.cpp
@@ -91,7 +90,6 @@ target_sources(application-bell-common
 
     PUBLIC
         include/common/BellListItemProvider.hpp
-        include/common/LanguageUtils.hpp
         include/common/SoundsRepository.hpp
         include/common/BellPowerOffPresenter.hpp
         include/common/BellFactoryResetPresenter.hpp
@@ -182,16 +180,13 @@ target_link_libraries(application-bell-common
         apps-common
         service-db
         service-time
+        utils-language
 
     PRIVATE
         bell::app-main
         bell::app-alarm
         bell::audio
-        module-gui
         bell::db
+        module-gui
         Microsoft.GSL::GSL
-        )
-
-if (${ENABLE_TESTS})
-    add_subdirectory(tests)
-endif()
+)

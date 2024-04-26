@@ -2,10 +2,10 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapListItem.hpp"
-#include <i18n/i18n.hpp>
 #include "data/PowerNapStyle.hpp"
 
-#include <common/LanguageUtils.hpp>
+#include <i18n/i18n.hpp>
+#include <LanguageUtils.hpp>
 
 namespace
 {

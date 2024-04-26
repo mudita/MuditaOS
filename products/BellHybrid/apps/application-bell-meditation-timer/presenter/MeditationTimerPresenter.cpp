@@ -4,10 +4,10 @@
 #include "MeditationCommon.hpp"
 #include "MeditationTimerPresenter.hpp"
 
-#include <common/LanguageUtils.hpp>
 #include <common/data/BatteryStatusSwitchData.hpp>
 #include <service-db/Settings.hpp>
 #include <Units.hpp>
+#include <LanguageUtils.hpp>
 
 namespace
 {

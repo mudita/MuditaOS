@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Numeric.hpp"
-#include <common/LanguageUtils.hpp>
+#include <LanguageUtils.hpp>
 
 namespace app::list_items
 {
