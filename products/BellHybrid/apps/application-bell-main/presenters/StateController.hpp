@@ -14,11 +14,12 @@ namespace app
 {
     class AbstractTimeModel;
     class AbstractBatteryModel;
-}
+    class AbstractDemoModel;
+} // namespace app
 
 namespace app::home_screen
 {
-    inline constexpr auto defaultAlarmSetTime     = std::chrono::seconds{10};
+    inline constexpr auto defaultAlarmSetTime = std::chrono::seconds{10};
 
     class AbstractView;
     class AbstractPresenter;
@@ -35,6 +36,8 @@ namespace app::home_screen
         virtual bool handleAlarmRingingEvent()                           = 0;
         virtual bool handleAlarmModelReady()                             = 0;
         virtual bool handleBatteryStatus()                               = 0;
+        virtual void handleDemoMode()                                    = 0;
+        virtual void handleEndDemoMode()                                 = 0;
         virtual bool isSnoozeAllowed()                                   = 0;
         virtual void snooze(bool ctrl)                                   = 0;
     };
@@ -48,7 +51,8 @@ namespace app::home_screen
                         AbstractTemperatureModel &temperatureModel,
                         AbstractAlarmModel &alarmModel,
                         AbstractTimeModel &timeModel,
-                        AbstractUserSessionModel &userSessionModel);
+                        AbstractUserSessionModel &userSessionModel,
+                        AbstractDemoModel &demoModel);
         ~StateController();
 
         void resetStateMachine() override;
@@ -58,6 +62,8 @@ namespace app::home_screen
         bool handleAlarmRingingEvent() override;
         bool handleAlarmModelReady() override;
         bool handleBatteryStatus() override;
+        void handleDemoMode() override;
+        void handleEndDemoMode() override;
         bool isSnoozeAllowed() override;
         void snooze(bool ctrl) override;
 

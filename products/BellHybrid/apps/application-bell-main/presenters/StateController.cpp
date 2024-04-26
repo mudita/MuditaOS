@@ -4,6 +4,7 @@
 #include "StateController.hpp"
 #include "BellAlarmConstants.hpp"
 #include "models/TemperatureModel.hpp"
+#include "models/DemoModel.hpp"
 #include "application-bell-main/presenters/HomeScreenPresenter.hpp"
 
 #include <common/TimeUtils.hpp>
@@ -92,6 +93,7 @@ namespace app::home_screen
             };
             auto switchToBatteryStatus = [](AbstractPresenter &presenter) { presenter.switchToBatteryStatus(); };
             auto isLowBatteryLevel     = [](AbstractPresenter &presenter) { return presenter.isLowBatteryLevel(); };
+            auto showVolumeScreen      = [](AbstractPresenter &presenter) { presenter.showVolumeScreen(); };
 
         } // namespace Helpers
 
@@ -127,6 +129,10 @@ namespace app::home_screen
             {};
             struct LowBatteryAlarmWarning
             {};
+            struct DemoModeStart
+            {};
+            struct DemoModeStop
+            {};
         } // namespace Events
 
         namespace Init
@@ -148,12 +154,17 @@ namespace app::home_screen
                             AbstractView &view,
                             AbstractTemperatureModel &temperatureModel,
                             AbstractBatteryModel &batteryModel,
-                            AbstractUserSessionModel &userSession) {
+                            AbstractUserSessionModel &userSession,
+                            AbstractPresenter &presenter,
+                            AbstractDemoModel &demoModel) {
                 controller.snooze(false);
                 view.setViewState(ViewState::Deactivated);
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setBatteryLevelState(batteryModel.getLevelState());
                 userSession.deactivateUserSessionWithDelay();
+                if (demoModel.IsActivated()) {
+                    presenter.handleDemoMode();
+                }
             };
         } // namespace Deactivated
 
@@ -238,24 +249,32 @@ namespace app::home_screen
                             AbstractAlarmModel &alarmModel,
                             AbstractTemperatureModel &temperatureModel,
                             AbstractBatteryModel &batteryModel,
-                            AbstractUserSessionModel &userSession) {
+                            AbstractUserSessionModel &userSession,
+                            AbstractPresenter &presenter,
+                            AbstractDemoModel &demoModel) {
                 controller.snooze(false);
                 view.setTemperature(temperatureModel.getTemperature());
                 view.setViewState(ViewState::Activated);
                 view.setAlarmTime(alarmModel.getAlarmTime());
                 view.setBatteryLevelState(batteryModel.getLevelState());
                 userSession.deactivateUserSessionWithDelay();
+                if (demoModel.IsActivated()) {
+                    presenter.handleDemoMode();
+                }
             };
         } // namespace Activated
 
         namespace AlarmRinging
         {
-            auto entry =
-                [](AbstractView &view, AbstractTemperatureModel &temperatureModel, AbstractPresenter &presenter) {
-                    presenter.spawnTimer(alarms::defaultAlarmRingingTime);
-                    view.setViewState(ViewState::AlarmRinging);
-                    view.setTemperature(temperatureModel.getTemperature());
-                };
+            auto entry = [](AbstractView &view,
+                            AbstractTemperatureModel &temperatureModel,
+                            AbstractDemoModel &demoModel,
+                            AbstractPresenter &presenter) {
+                demoModel.Stop();
+                presenter.spawnTimer(alarms::defaultAlarmRingingTime);
+                view.setViewState(ViewState::AlarmRinging);
+                view.setTemperature(temperatureModel.getTemperature());
+            };
             auto exit = [](AbstractPresenter &presenter) { presenter.detachTimer(); };
         } // namespace AlarmRinging
 
@@ -300,6 +319,16 @@ namespace app::home_screen
             auto exit = [](AbstractPresenter &presenter) { presenter.stopSnoozeTimer(); };
         } // namespace AlarmSnoozed
 
+        namespace DemoMode
+        {
+            auto entry = [](AbstractDemoModel &demoModel) {
+                if (!demoModel.IsActivated()) {
+                    demoModel.Start();
+                }
+            };
+            auto exit = [](AbstractDemoModel &demoModel) { demoModel.Stop(); };
+        } // namespace DemoMode
+
         class StateMachine
         {
           public:
@@ -324,6 +353,7 @@ namespace app::home_screen
                                              "Deactivated"_s + event<Events::LongBackPress> [not Helpers::isLowBatteryWarningToShow]  / Helpers::switchToBatteryStatus,
                                              "Deactivated"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
                                              "Deactivated"_s + event<Events::LowBatterySessionWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning,
+                                             "Deactivated"_s + event<Events::DemoModeStart> = "DemoMode"_s,
 
                                              "DeactivatedWait"_s + sml::on_entry<_> / DeactivatedWait::entry,
                                              "DeactivatedWait"_s + sml::on_exit<_> / DeactivatedWait::exit,
@@ -389,6 +419,7 @@ namespace app::home_screen
                                              "Activated"_s + event<Events::LongBackPress> [not Helpers::isLowBatteryWarningToShow]  / Helpers::switchToBatteryStatus,
                                              "Activated"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus,
                                              "Activated"_s + event<Events::LowBatterySessionWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning,
+                                             "Activated"_s + event<Events::DemoModeStart> = "DemoMode"_s,
 
                                              "ActivatedEdit"_s + sml::on_entry<_> / AlarmEdit::entry,
                                              "ActivatedEdit"_s + sml::on_exit<_> / AlarmEdit::exit,
@@ -442,7 +473,16 @@ namespace app::home_screen
                                              "AlarmSnoozed"_s + event<Events::TimeUpdate> / Helpers::updateTemperature,
                                              "AlarmSnoozed"_s + event<Events::BatteryUpdate> / Helpers::updateBatteryStatus,
                                              "AlarmSnoozed"_s + event<Events::LongBackPress> [not Helpers::isLowBatteryWarningToShow]  / Helpers::switchToBatteryStatus,
-                                             "AlarmSnoozed"_s + event<Events::LowBatterySessionWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning
+                                             "AlarmSnoozed"_s + event<Events::LowBatterySessionWarning> [Helpers::isLowBatteryWarningToShow] / Helpers::showLowBatteryWarning,
+
+                                             "DemoMode"_s + sml::on_entry<_> / DemoMode::entry,
+                                             "DemoMode"_s + sml::on_exit<_> / DemoMode::exit,
+                                             "DemoMode"_s + event<Events::DemoModeStop> [Helpers::shouldSwitchToDeactivated] = "Deactivated"_s,
+                                             "DemoMode"_s + event<Events::DemoModeStop> [Helpers::shouldSwitchToActivated] = "Activated"_s,
+                                             "DemoMode"_s + event<Events::RotateLeftPress> / Helpers::showVolumeScreen,
+                                             "DemoMode"_s + event<Events::RotateRightPress> / Helpers::showVolumeScreen,
+                                             "DemoMode"_s + event<Events::AlarmRinging> = "AlarmRinging"_s,
+                                             "DemoMode"_s + event<Events::BatteryUpdate>  / Helpers::updateBatteryStatus
                     );
                 // clang-format on
             }
@@ -466,10 +506,11 @@ namespace app::home_screen
              AbstractTemperatureModel &temperatureModel,
              AbstractAlarmModel &alarmModel,
              AbstractTimeModel &timeModel,
-             AbstractUserSessionModel &userSessionModel)
+             AbstractUserSessionModel &userSessionModel,
+             AbstractDemoModel &demoModel)
             : controller{controller}, view{view}, presenter{presenter}, batteryModel{batteryModel},
-              temperatureModel{temperatureModel}, alarmModel{alarmModel}, timeModel{timeModel}, userSessionModel{
-                                                                                                    userSessionModel}
+              temperatureModel{temperatureModel}, alarmModel{alarmModel}, timeModel{timeModel},
+              userSessionModel{userSessionModel}, demoModel{demoModel}
         {
             resetSM();
         }
@@ -497,7 +538,8 @@ namespace app::home_screen
                 temperatureModel,
                 alarmModel,
                 timeModel,
-                userSessionModel};
+                userSessionModel,
+                demoModel};
         }
 
         AbstractController &controller;
@@ -508,6 +550,7 @@ namespace app::home_screen
         AbstractAlarmModel &alarmModel;
         AbstractTimeModel &timeModel;
         AbstractUserSessionModel &userSessionModel;
+        AbstractDemoModel &demoModel;
     };
 
     StateController::StateController(AbstractView &view,
@@ -516,9 +559,17 @@ namespace app::home_screen
                                      AbstractTemperatureModel &temperatureModel,
                                      AbstractAlarmModel &alarmModel,
                                      AbstractTimeModel &timeModel,
-                                     AbstractUserSessionModel &userSessionModel)
-        : pimpl{std::make_unique<StateController::Impl>(
-              *this, view, presenter, batteryModel, temperatureModel, alarmModel, timeModel, userSessionModel)},
+                                     AbstractUserSessionModel &userSessionModel,
+                                     AbstractDemoModel &demoModel)
+        : pimpl{std::make_unique<StateController::Impl>(*this,
+                                                        view,
+                                                        presenter,
+                                                        batteryModel,
+                                                        temperatureModel,
+                                                        alarmModel,
+                                                        timeModel,
+                                                        userSessionModel,
+                                                        demoModel)},
           presenter{presenter}
     {}
 
@@ -531,6 +582,10 @@ namespace app::home_screen
 
         presenter.refreshUserSession();
         presenter.updateBatteryLevelInterval();
+
+        if (key != KeyMap::RotateRight && key != KeyMap::RotateLeft) {
+            pimpl->sm->process_event(Events::DemoModeStop{});
+        }
 
         switch (key) {
         case KeyMap::Back:
@@ -621,6 +676,16 @@ namespace app::home_screen
     {
         pimpl->sm->process_event(Events::BatteryUpdate{});
         return true;
+    }
+
+    void StateController::handleDemoMode()
+    {
+        pimpl->sm->process_event(Events::DemoModeStart{});
+    }
+
+    void StateController::handleEndDemoMode()
+    {
+        pimpl->sm->process_event(Events::DemoModeStop{});
     }
 
 } // namespace app::home_screen

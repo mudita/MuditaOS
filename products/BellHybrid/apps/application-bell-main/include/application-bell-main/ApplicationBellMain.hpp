@@ -7,6 +7,7 @@
 
 #include <Application.hpp>
 #include <common/models/BedtimeModel.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 
 namespace gui::window::name
 {
@@ -14,6 +15,12 @@ namespace gui::window::name
     inline constexpr auto bell_main_menu_dialog = "BellMainMenuDialog";
     inline constexpr auto bell_battery_shutdown = "BellBatteryShutdown";
 } // namespace gui::window::name
+
+namespace app
+{
+    class AbstractDemoModel;
+    class AbstractFrontlightModel;
+}
 
 namespace app
 {
@@ -55,6 +62,9 @@ namespace app
         std::unique_ptr<AbstractBatteryLevelNotificationModel> batteryLevelNotificationModel;
         std::unique_ptr<AbstractUsbStatusModel> usbStatusModel;
         std::unique_ptr<AbstractQuoteModel> quoteModel;
+        std::unique_ptr<AbstractAudioModel> audioModel;
+        std::unique_ptr<AbstractFrontlightModel> frontlightModel;
+        std::unique_ptr<AbstractDemoModel> demoModel;
         std::shared_ptr<app::home_screen::HomeScreenPresenter> homeScreenPresenter;
     };
 

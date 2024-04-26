@@ -23,6 +23,7 @@ namespace app
         virtual void restartUserSession()             = 0;
         virtual void deactivateUserSessionWithDelay() = 0;
         virtual void setCurrentUserSessionAsHandled() = 0;
+        virtual void restartLongUserInactivity()      = 0;
 
         virtual bool isUserSessionActive()        = 0;
         virtual bool isActiveUserSessionHandled() = 0;
@@ -30,6 +31,8 @@ namespace app
 
     class UserSessionModel : public AbstractUserSessionModel
     {
+        using OnLongUserInactivityCallback = std::function<void()>;
+
         enum class SessionState
         {
             Inactive = 0,
@@ -38,12 +41,13 @@ namespace app
         };
 
       public:
-        explicit UserSessionModel(sys::Service *serv);
+        UserSessionModel(sys::Service *serv, OnLongUserInactivityCallback callback);
 
         void activateUserSession() override;
         void restartUserSession() override;
         void deactivateUserSessionWithDelay() override;
         void setCurrentUserSessionAsHandled() override;
+        void restartLongUserInactivity() override;
 
         bool isUserSessionActive() override;
         bool isActiveUserSessionHandled() override;
@@ -55,6 +59,8 @@ namespace app
         SessionState sessionState = SessionState::Inactive;
         sys::Service *serv;
         sys::TimerHandle endSessionDelayTimer;
+        sys::TimerHandle longUserInactivityTimer;
+        OnLongUserInactivityCallback longUserInactivityCallback;
         bool isCurrentUserSessionHandled = true;
     };
 } // namespace app

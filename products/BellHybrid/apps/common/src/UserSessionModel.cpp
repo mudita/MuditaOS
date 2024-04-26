@@ -4,14 +4,27 @@
 #include "models/UserSessionModel.hpp"
 #include <log/log.hpp>
 
+namespace
+{
+    constexpr auto longUserInactivityTimeout{std::chrono::minutes(15)};
+} // namespace
+
 namespace app
 {
 
-    UserSessionModel::UserSessionModel(sys::Service *serv) : serv{serv}
+    UserSessionModel::UserSessionModel(sys::Service *serv, OnLongUserInactivityCallback callback)
+        : serv{serv}, longUserInactivityCallback{callback}
     {
         endSessionDelayTimer = sys::TimerFactory::createPeriodicTimer(
             serv, "EndOfUserSessionDelay", endOfUserSessionTimeout, [this](sys::Timer &) {
                 endOfSessionTimerCallback();
+            });
+
+        longUserInactivityTimer = sys::TimerFactory::createSingleShotTimer(
+            serv, "longUserInactivity", longUserInactivityTimeout, [this](sys::Timer &) {
+                if (longUserInactivityCallback != nullptr) {
+                    longUserInactivityCallback();
+                }
             });
     }
 
@@ -23,6 +36,7 @@ namespace app
         }
         sessionState = SessionState::Active;
         endSessionDelayTimer.stop();
+        longUserInactivityTimer.stop();
     }
 
     void UserSessionModel::restartUserSession()
@@ -31,6 +45,7 @@ namespace app
         isCurrentUserSessionHandled = false;
         sessionState                = SessionState::Active;
         endSessionDelayTimer.stop();
+        longUserInactivityTimer.stop();
     }
 
     void UserSessionModel::deactivateUserSessionWithDelay()
@@ -59,6 +74,12 @@ namespace app
         LOG_INFO("User session is ended");
         endSessionDelayTimer.stop();
         sessionState = SessionState::Inactive;
+        restartLongUserInactivity();
+    }
+
+    void UserSessionModel::restartLongUserInactivity()
+    {
+        longUserInactivityTimer.restart(longUserInactivityTimeout);
     }
 
 } // namespace app

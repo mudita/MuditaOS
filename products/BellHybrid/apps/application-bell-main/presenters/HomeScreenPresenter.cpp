@@ -5,6 +5,7 @@
 #include "StateController.hpp"
 #include "models/TemperatureModel.hpp"
 #include "models/UsbStatusModel.hpp"
+#include "models/DemoModel.hpp"
 
 #include <windows/BellHomeScreenWindow.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
@@ -82,11 +83,13 @@ namespace app::home_screen
                                              AbstractUserSessionModel &userSessionModel,
                                              AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel,
                                              AbstractUsbStatusModel &usbStatusModel,
-                                             AbstractQuoteModel &quoteModel)
+                                             AbstractQuoteModel &quoteModel,
+                                             AbstractDemoModel &demoModel)
         : app{app}, alarmModel{alarmModel}, batteryModel{batteryModel},
           temperatureModel{temperatureModel}, timeModel{timeModel}, userSessionModel{userSessionModel},
           batteryLevelNotificationModel{batteryLevelNotificationModel}, usbStatusModel{usbStatusModel},
-          quoteModel{quoteModel}, rngEngine{std::make_unique<std::mt19937>(bsp::trng::getRandomValue())}
+          quoteModel{quoteModel}, demoModel{demoModel}, rngEngine{
+                                                            std::make_unique<std::mt19937>(bsp::trng::getRandomValue())}
     {}
 
     gui::RefreshModes HomeScreenPresenter::handleUpdateTimeEvent()
@@ -144,7 +147,7 @@ namespace app::home_screen
     void HomeScreenPresenter::createData()
     {
         stateController = std::make_unique<StateController>(
-            *getView(), *this, batteryModel, temperatureModel, alarmModel, timeModel, userSessionModel);
+            *getView(), *this, batteryModel, temperatureModel, alarmModel, timeModel, userSessionModel, demoModel);
     }
 
     void HomeScreenPresenter::refreshWindow()
@@ -330,6 +333,21 @@ namespace app::home_screen
         quoteModel.setCallback(
             [this](std::string quote, std::string author) { getView()->setQuoteText(quote, author); });
         quoteModel.sendQuery();
+    }
+
+    void HomeScreenPresenter::handleDemoMode()
+    {
+        stateController->handleDemoMode();
+    }
+
+    void HomeScreenPresenter::endDemoMode()
+    {
+        stateController->handleEndDemoMode();
+    }
+
+    void HomeScreenPresenter::showVolumeScreen()
+    {
+        app->switchWindow(gui::popup::window::volume_window);
     }
 
 } // namespace app::home_screen

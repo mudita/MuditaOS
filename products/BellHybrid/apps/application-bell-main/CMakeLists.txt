@@ -8,21 +8,28 @@ target_sources(application-bell-main
         windows/BellBatteryShutdownWindow.cpp
         windows/BellHomeScreenWindow.cpp
         windows/BellMainMenuWindow.cpp
+        windows/BellMainVolumeWindow.cpp
 
         models/TemperatureModel.cpp
         models/UsbStatusModel.cpp
+        models/DemoModel.cpp
+        models/MainFrontlightModel.cpp
 
         presenters/HomeScreenPresenter.cpp
         presenters/StateController.cpp
+        presenters/BellMainVolumePresenter.cpp
 
         windows/BellBatteryShutdownWindow.hpp
         windows/BellHomeScreenWindow.hpp
         windows/BellMainMenuWindow.hpp
+        windows/BellMainVolumeWindow.hpp
 
         models/TemperatureModel.hpp
         models/UsbStatusModel.hpp
+        models/MainFrontlightModel.hpp
 
         presenters/StateController.hpp
+        presenters/BellMainVolumePresenter.hpp
 
     PUBLIC
         include/application-bell-main/ApplicationBellMain.hpp
@@ -57,6 +64,7 @@ target_link_libraries(application-bell-main
         bell::app-settings
         bell::app-powernap
         bell::keymap
+        bell::paths
         ${TARGET_LIBRARIES}
     PUBLIC
         bell::app-common

@@ -1,0 +1,33 @@
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
+#pragma once
+
+#include "presenters/BellMainVolumePresenter.hpp"
+
+#include <apps-common/popups/WindowWithTimer.hpp>
+#include <apps-common/widgets/spinners/Spinners.hpp>
+#include <apps-common/widgets/BarGraph.hpp>
+#include <common/models/AbstractAudioModel.hpp>
+
+namespace gui
+{
+    class BellBaseLayout;
+
+    class BellMainVolumeWindow : public WindowWithTimer
+    {
+      public:
+        BellMainVolumeWindow(app::ApplicationCommon *app,
+                             std::unique_ptr<app::home_screen::AbstractBellMainVolumePresenter> &&windowPresenter);
+
+      private:
+        std::unique_ptr<app::home_screen::AbstractBellMainVolumePresenter> presenter;
+
+        BellBaseLayout *body          = nullptr;
+        U8IntegerSpinner *spinner     = nullptr;
+        gui::ArcProgressBar *progress = nullptr;
+
+        void buildInterface() override;
+        bool onInput(const gui::InputEvent &inputEvent) override;
+    };
+} // namespace gui

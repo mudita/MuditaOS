@@ -31,6 +31,7 @@ namespace app
     class AbstractUsbStatusModel;
     class AbstractUserSessionModel;
     class ProgressTimerWithSnoozeTimer;
+    class AbstractDemoModel;
 } // namespace app
 
 namespace gui
@@ -66,10 +67,10 @@ namespace app::home_screen
         virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt) = 0;
 
         /// Bottom box related API(descriptionn battery or time)
-        virtual void setTemperature(utils::temperature::Temperature newTemp)    = 0;
-        virtual void setTextDescription(const UTF8 &desc)                       = 0;
-        virtual void setBatteryLevelState(const Store::Battery &batteryContext) = 0;
-        virtual void updateUsbStatus(bool isConnected)                          = 0;
+        virtual void setTemperature(utils::temperature::Temperature newTemp)         = 0;
+        virtual void setTextDescription(const UTF8 &desc)                            = 0;
+        virtual void setBatteryLevelState(const Store::Battery &batteryContext)      = 0;
+        virtual void updateUsbStatus(bool isConnected)                               = 0;
         virtual void setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor) = 0;
 
         /// Various
@@ -113,6 +114,9 @@ namespace app::home_screen
         virtual void refreshUserSession()                                                        = 0;
         virtual bool isLowBatteryLevel() const                                                   = 0;
         virtual void requestQuote() const                                                        = 0;
+        virtual void handleDemoMode()                                                            = 0;
+        virtual void endDemoMode()                                                               = 0;
+        virtual void showVolumeScreen()                                                          = 0;
 
         static constexpr auto defaultTimeout = std::chrono::milliseconds{5000};
     };
@@ -128,7 +132,8 @@ namespace app::home_screen
                             AbstractUserSessionModel &userSessionModel,
                             AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel,
                             AbstractUsbStatusModel &usbStatusModel,
-                            AbstractQuoteModel &quoteModel);
+                            AbstractQuoteModel &quoteModel,
+                            AbstractDemoModel &demoModel);
         virtual ~HomeScreenPresenter();
         HomeScreenPresenter()        = delete;
         HomeScreenPresenter &operator=(const HomeScreenPresenter &oth) = delete;
@@ -170,6 +175,9 @@ namespace app::home_screen
         void refreshUserSession() override;
         bool isLowBatteryLevel() const override;
         void requestQuote() const override;
+        void handleDemoMode() override;
+        void endDemoMode() override;
+        void showVolumeScreen() override;
 
         void setLayout(gui::LayoutGenerator layoutGenerator) override;
 
@@ -184,6 +192,7 @@ namespace app::home_screen
         AbstractBatteryLevelNotificationModel &batteryLevelNotificationModel;
         AbstractUsbStatusModel &usbStatusModel;
         AbstractQuoteModel &quoteModel;
+        AbstractDemoModel &demoModel;
         std::unique_ptr<AbstractController> stateController;
         std::unique_ptr<ProgressTimerWithSnoozeTimer> snoozeTimer;
         std::unique_ptr<std::mt19937> rngEngine;

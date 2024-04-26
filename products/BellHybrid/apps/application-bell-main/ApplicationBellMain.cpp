@@ -4,10 +4,13 @@
 #include "include/application-bell-main/ApplicationBellMain.hpp"
 #include "models/TemperatureModel.hpp"
 #include "models/UsbStatusModel.hpp"
+#include "models/MainFrontlightModel.hpp"
+#include "models/DemoModel.hpp"
 
 #include "windows/BellBatteryShutdownWindow.hpp"
 #include "windows/BellHomeScreenWindow.hpp"
 #include "windows/BellMainMenuWindow.hpp"
+#include "windows/BellMainVolumeWindow.hpp"
 
 #include <apps-common/messages/AppMessage.hpp>
 #include <common/BellPowerOffPresenter.hpp>
@@ -15,6 +18,7 @@
 #include <common/models/TimeModel.hpp>
 #include <common/models/BatteryModel.hpp>
 #include <common/models/LayoutModel.hpp>
+#include <common/models/AudioModel.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <common/windows/BellFactoryReset.hpp>
 #include <common/windows/BellBatteryStatusWindow.hpp>
@@ -29,6 +33,17 @@
 #include <popups/Popups.hpp>
 #include <service-desktop/DesktopMessages.hpp>
 #include <appmgr/messages/AlarmMessage.hpp>
+#include <Paths.hpp>
+
+namespace
+{
+    bool isDemoModeAllowed(std::uint8_t currentHour)
+    {
+        constexpr auto demoModeStartHour{8U};
+        constexpr auto demoModeEndHour{20U};
+        return (currentHour >= demoModeStartHour) && (currentHour < demoModeEndHour);
+    }
+} // namespace
 
 namespace app
 {
@@ -106,14 +121,37 @@ namespace app
             return ret;
         }
 
-        timeModel                     = std::make_unique<app::TimeModel>();
-        batteryModel                  = std::make_unique<app::BatteryModel>(this);
-        temperatureModel              = std::make_unique<app::home_screen::TemperatureModel>(this);
-        userSessionModel              = std::make_unique<app::UserSessionModel>(this);
+        auto endDemoModeCallback = [this]() {
+            homeScreenPresenter->endDemoMode();
+            userSessionModel->restartLongUserInactivity();
+        };
+        auto longUserInactivityCallback = [this]() {
+            const auto currentHour = TimePointToHour24H(TimePointNow());
+            if (isDemoModeAllowed(currentHour)) {
+                homeScreenPresenter->handleDemoMode();
+            }
+            else {
+                userSessionModel->restartLongUserInactivity();
+            }
+        };
+
+        timeModel        = std::make_unique<app::TimeModel>();
+        batteryModel     = std::make_unique<app::BatteryModel>(this);
+        temperatureModel = std::make_unique<app::home_screen::TemperatureModel>(this);
+        userSessionModel = std::make_unique<app::UserSessionModel>(this, std::move(longUserInactivityCallback));
         batteryLevelNotificationModel = std::make_unique<app::BatteryLevelNotificationModel>();
         usbStatusModel                = std::make_unique<app::UsbStatusModel>();
         quoteModel                    = std::make_unique<app::QuoteModel>(this);
-        homeScreenPresenter           = std::make_shared<app::home_screen::HomeScreenPresenter>(this,
+        audioModel                    = std::make_unique<AudioModel>(this);
+        frontlightModel               = std::make_unique<MainFrontlightModel>(this);
+        const auto filesPath =
+            std::vector<std::string>{{paths::audio::proprietary() / paths::audio::relaxation() / "Natures_Harmony.mp3"},
+                                     {paths::audio::proprietary() / paths::audio::alarm() / "Koshi_Dream.mp3"},
+                                     {paths::audio::proprietary() / paths::audio::alarm() / "Morning_Dew.mp3"},
+                                     {paths::audio::proprietary() / paths::audio::relaxation() / "Autumnal_Sea.mp3"}};
+        demoModel = std::make_unique<app::DemoModel>(
+            this, *audioModel, *frontlightModel, filesPath, std::move(endDemoModeCallback));
+        homeScreenPresenter = std::make_shared<app::home_screen::HomeScreenPresenter>(this,
                                                                                       *alarmModel,
                                                                                       *batteryModel,
                                                                                       *temperatureModel,
@@ -121,7 +159,8 @@ namespace app
                                                                                       *userSessionModel,
                                                                                       *batteryLevelNotificationModel,
                                                                                       *usbStatusModel,
-                                                                                      *quoteModel);
+                                                                                      *quoteModel,
+                                                                                      *demoModel);
 
         createUserInterface();
 
@@ -169,6 +208,12 @@ namespace app
         windowsFactory.attach(
             gui::window::name::bell_main_menu_dialog,
             [](ApplicationCommon *app, const std::string &name) { return std::make_unique<gui::Dialog>(app, name); });
+
+        windowsFactory.attach(gui::popup::window::volume_window,
+                              [this](ApplicationCommon *app, const std::string &name) {
+                                  auto presenter = std::make_unique<home_screen::BellMainVolumePresenter>(*audioModel);
+                                  return std::make_unique<gui::BellMainVolumeWindow>(app, std::move(presenter));
+                              });
 
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,
