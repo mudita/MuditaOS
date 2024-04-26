@@ -20,6 +20,7 @@
     "app_alarm_clock_sound": "Ton",
     "app_alarm_clock_title_main": "Wecker",
     "app_bell_alarm_deactivated": "Alarm deaktiviert",
+    "app_bell_alarm_low_battery_info": "Lade deinen Harmony, damit der Wecker auch sicher klingelt",
     "app_bell_alarm_set_not_active": "<text>Alarm eingestellt.<br />Tief dr\u00fccken, um zu aktivieren.</text>",
     "app_bell_bedtime_notification": "Schlafenszeit",
     "app_bell_charging_done_notification": "Vollst\u00e4ndig aufgeladen",

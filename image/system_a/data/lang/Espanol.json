@@ -128,7 +128,7 @@
     "app_bell_turn_off_question": "\u00bfApagar Mudita Harmony?",
     "app_bell_welcome_charge_message": "<text>Carga tu Harmony<br/>y pulsa levemente</text>",
     "app_bell_welcome_message": "<text>Mudita Harmony<br/>est\u00e1 apagado</text>",
-    "app_bell_alarm_lowBattery_info": "Carga tu Harmony para asegurarte de que suene la alarma",
+    "app_bell_alarm_low_battery_info": "Carga tu Harmony para asegurarte de que suene la alarma",
     "app_bellmain_alarm": "Alarma",
     "app_bellmain_bedtime": "Hora de dormir",
     "app_bellmain_focus_timer": "Tempo focus",
