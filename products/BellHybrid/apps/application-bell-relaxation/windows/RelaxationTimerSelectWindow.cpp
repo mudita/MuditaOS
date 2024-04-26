@@ -7,10 +7,10 @@
 
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <common/data/BatteryStatusSwitchData.hpp>
-#include <common/LanguageUtils.hpp>
 #include <i18n/i18n.hpp>
 #include <Utils.hpp>
 #include <Units.hpp>
+#include <LanguageUtils.hpp>
 
 namespace
 {

@@ -4,11 +4,10 @@
 #include <gtest/gtest.h>
 
 #include <i18n/i18n.hpp>
-#include <common/LanguageUtils.hpp>
+#include <LanguageUtils.hpp>
 
 TEST(MinutesGenitive, Polish)
 {
-
     using namespace utils::language;
 
     utils::setDisplayLanguage("Polski");
@@ -35,7 +34,6 @@ TEST(MinutesGenitive, Polish)
 
 TEST(MinutesGenitive, English)
 {
-
     using namespace utils::language;
 
     utils::setDisplayLanguage("English");

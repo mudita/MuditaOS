@@ -9,6 +9,7 @@
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
+#include <apps-common/widgets/TimeFixedWidget.hpp>
 #include <common/widgets/BellStatusClock.hpp>
 #include <gui/widgets/Icon.hpp>
 

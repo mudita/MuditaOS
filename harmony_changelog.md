@@ -10,6 +10,7 @@
 ### Added
 * Added custom alarms functionality
 * Added unique sound to indicate the meditation session has ended.
+* Added Focus Timer application.
 
 ### Changed / Improved
 * Updated button handling during pre-wake up

@@ -8,13 +8,11 @@
 #include "models/ChimeVolume.hpp"
 #include "models/StartDelay.hpp"
 
-#include <ApplicationCommon.hpp>
 #include <common/widgets/list_items/Fraction.hpp>
-#include <common/widgets/list_items/Numeric.hpp>
 #include <common/widgets/list_items/NumericWithBar.hpp>
-#include <common/LanguageUtils.hpp>
 #include <apps-common/InternalModel.hpp>
 #include <apps-common/widgets/spinners/Spinners.hpp>
+#include <LanguageUtils.hpp>
 
 namespace app::list_items
 {
@@ -23,6 +21,7 @@ namespace app::list_items
       public:
         StartDelayFormatter() : none(utils::translate("app_bell_meditation_interval_none"))
         {}
+
         std::string operator()(std::uint8_t value) const
         {
             return value == 0 ? none : std::to_string(value);

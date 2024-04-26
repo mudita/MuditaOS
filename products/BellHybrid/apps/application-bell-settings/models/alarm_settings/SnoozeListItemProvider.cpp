@@ -7,8 +7,8 @@
 #include <common/widgets/list_items/Numeric.hpp>
 #include <common/widgets/list_items/NumericWithBar.hpp>
 #include <common/widgets/ListItems.hpp>
-#include <common/LanguageUtils.hpp>
 #include <SongsListViewItem.hpp>
+#include <LanguageUtils.hpp>
 
 #include <utility>
 

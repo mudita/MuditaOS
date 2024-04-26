@@ -8,9 +8,10 @@
 
 #include <common/models/TimeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
-#include <common/LanguageUtils.hpp>
 
 #include <audio/AudioMessage.hpp>
+
+#include <LanguageUtils.hpp>
 
 namespace
 {
