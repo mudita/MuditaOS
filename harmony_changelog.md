@@ -15,6 +15,8 @@
 ### Changed / Improved
 * Updated button handling during pre-wake up
 * Updated the countdown timer in Meditation app according to the new design
+* Updated the countdown timer in Power nap app according to the new design
+* Updated the countdown timer in Relaxation app according to the new design
 
 ## [2.6.1 2024-04-02]
 

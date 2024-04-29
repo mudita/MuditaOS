@@ -70,8 +70,12 @@ namespace gui
         clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         clock->setMargins(Margins(0, relStyle::clock::marginTop, 0, 0));
 
-        timer = new TimeFixedWidget(mainVBox, 0, 0, relStyle::timer::maxSizeX, relStyle::timer::maxSizeY);
-        timer->setFontAndDimensions(relStyle::timer::font);
+        timer = new TimeMinuteSecondWidget(mainVBox,
+                                           0,
+                                           0,
+                                           relStyle::timer::maxSizeX,
+                                           relStyle::timer::maxSizeY,
+                                           TimeMinuteSecondWidget::DisplayType::OnlyMinutes);
         timer->setMinimumSize(relStyle::timer::maxSizeX, relStyle::timer::maxSizeY);
         timer->setMargins(Margins(0, relStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
