@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapProgressWindow.hpp"
@@ -67,9 +67,12 @@ namespace gui
         clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         clock->setMargins(gui::Margins(0, progressStyle::clock::marginTop, 0, 0));
 
-        timer =
-            new gui::TimeFixedWidget(mainVBox, 0, 0, progressStyle::timer::maxSizeX, progressStyle::timer::maxSizeY);
-        timer->setFontAndDimensions(progressStyle::timer::font);
+        timer = new TimeMinuteSecondWidget(mainVBox,
+                                           0,
+                                           0,
+                                           progressStyle::timer::maxSizeX,
+                                           progressStyle::timer::maxSizeY,
+                                           TimeMinuteSecondWidget::DisplayType::OnlyMinutes);
         timer->setMinimumSize(progressStyle::timer::maxSizeX, progressStyle::timer::maxSizeY);
         timer->setMargins(gui::Margins(0, progressStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));

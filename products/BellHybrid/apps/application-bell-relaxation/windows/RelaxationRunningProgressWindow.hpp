@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,7 +8,7 @@
 
 #include <AppWindow.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
-#include <apps-common/widgets/TimeFixedWidget.hpp>
+#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
 #include <common/widgets/BellStatusClock.hpp>
 #include <gui/widgets/Icon.hpp>
 
@@ -26,11 +26,11 @@ namespace gui
         std::unique_ptr<app::relaxation::RelaxationRunningProgressContract::Presenter> presenter;
         std::unique_ptr<RelaxationAudioContext> audioContext;
 
-        gui::VBox *mainVBox           = nullptr;
-        gui::ArcProgressBar *progress = nullptr;
-        gui::TimeFixedWidget *timer   = nullptr;
-        gui::Icon *icon               = nullptr;
-        gui::BellStatusClock *clock   = nullptr;
+        VBox *mainVBox{nullptr};
+        ArcProgressBar *progress{nullptr};
+        TimeMinuteSecondWidget *timer{nullptr};
+        Icon *icon{nullptr};
+        BellStatusClock *clock{nullptr};
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
