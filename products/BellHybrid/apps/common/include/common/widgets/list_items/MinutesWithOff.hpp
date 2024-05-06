@@ -22,7 +22,7 @@ namespace app::list_items
         void control_bottom_description(const spinner_type::value_type &value) final
         {
             bottomText->setVisible(value != 0);
-            bottomText->setRichText(utils::language::getCorrectMinutesAccusativeForm(value));
+            bottomText->setRichText(utils::language::getCorrectMinutesNumeralForm(value));
         }
     };
 } // namespace app::list_items

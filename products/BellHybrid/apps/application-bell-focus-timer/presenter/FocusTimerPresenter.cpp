@@ -28,7 +28,7 @@ namespace
             focusTimeLengthString += utils::translate("common_minute_lower");
         }
         else {
-            focusTimeLengthString += utils::language::getCorrectMinutesAccusativeForm(focusMinutes);
+            focusTimeLengthString += utils::language::getCorrectMinutesNumeralForm(focusMinutes);
         }
 
         return focusTimeLengthString;
