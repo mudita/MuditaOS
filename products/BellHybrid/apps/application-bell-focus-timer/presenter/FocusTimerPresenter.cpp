@@ -19,10 +19,25 @@ namespace
     constexpr auto delayBetweenSessionsTimerName{"betweenSessionTimer"};
     constexpr auto summaryWindowTimeout{std::chrono::seconds{5}};
 
+    std::string createFocusLengthText(std::time_t focusMinutes)
+    {
+        constexpr auto englishLanguageName = "English";
+
+        auto focusTimeLengthString = std::to_string(focusMinutes) + " ";
+        if (utils::getDisplayLanguage() == englishLanguageName) {
+            focusTimeLengthString += utils::translate("common_minute_lower");
+        }
+        else {
+            focusTimeLengthString += utils::language::getCorrectMinutesAccusativeForm(focusMinutes);
+        }
+
+        return focusTimeLengthString;
+    }
+
     std::string createSummaryText(const std::string &str, const std::string &minutesOfFocus)
     {
         auto parser = gui::text::RichTextParser{};
-        const auto result =
+        const auto &result =
             parser.parse(str, nullptr, gui::text::RichTextParser::TokenMap({{"$VALUE", minutesOfFocus}}));
         return result->getText();
     }
@@ -108,12 +123,12 @@ namespace app::focus
         betweenSessionTimer.stop();
 
         const auto elapsed        = std::chrono::duration_cast<std::chrono::minutes>(timer->getElapsed());
-        const auto minutesInFocus = ((currentTimerPhase == FocusTimerPhase::FocusTime) ? elapsed.count() : 0) +
-                                    (allFocusSessionsCount - focusSessionsLeft) * focusSessionDuration.count();
-        const auto &sumOfFocusTime =
-            std::to_string(minutesInFocus) + " " + utils::language::getCorrectMinutesAccusativeForm(minutesInFocus);
+        const auto focusMinutes   = ((currentTimerPhase == FocusTimerPhase::FocusTime) ? elapsed.count() : 0) +
+                                  (allFocusSessionsCount - focusSessionsLeft) * focusSessionDuration.count();
+
+        const auto &focusTimeLengthText = createFocusLengthText(focusMinutes);
         const auto &textToComplete = utils::translate("app_bell_focus_summary");
-        const auto &summaryText    = createSummaryText(textToComplete, sumOfFocusTime);
+        const auto &summaryText         = createSummaryText(textToComplete, focusTimeLengthText);
 
         app->switchWindow(
             gui::window::bell_finished::defaultName,
