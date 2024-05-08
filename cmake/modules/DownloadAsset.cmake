@@ -25,7 +25,7 @@ function(download_asset_release_json
         target
         json
         install_path
-        asset_repo
+        repository
         version
         cache_dir
         )
@@ -35,7 +35,7 @@ function(download_asset_release_json
             --cache_dir ${cache_dir}
             github
             --owner mudita
-            --repository ${asset_repo}
+            --repository ${repository}
             --install_dir ${install_path}
             download
             --json ${json}
