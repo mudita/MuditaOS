@@ -17,6 +17,21 @@ namespace
         return digits;
     }
 
+    std::uint32_t getRoundedMinutes(std::uint32_t currentSeconds, std::uint32_t totalSeconds)
+    {
+        constexpr auto halfMinute{utils::time::secondsInMinute / 2};
+        const auto totalMin   = totalSeconds / utils::time::secondsInMinute;
+        const auto totalSec   = totalSeconds % utils::time::secondsInMinute;
+        const auto currentMin = currentSeconds / utils::time::secondsInMinute;
+
+        // only at startup, when the number of seconds is less than 30, we round down
+        if (totalMin > 0 && totalMin == currentMin && totalSec < halfMinute) {
+            return currentMin;
+        }
+        // otherwise, we round up
+        return currentMin + 1;
+    }
+
     namespace digit
     {
         constexpr auto width      = 340U;
@@ -100,9 +115,12 @@ namespace gui
 
     void TimeMinuteSecondWidget::updateTime(std::uint32_t seconds)
     {
+        if (!totalSeconds.has_value()) {
+            totalSeconds = seconds;
+        }
         if (displayType != DisplayType::OnlySeconds &&
             (seconds >= utils::time::secondsInMinute || displayType == DisplayType::OnlyMinutes)) {
-            const auto minutes = (seconds + utils::time::secondsInMinute - 1) / utils::time::secondsInMinute;
+            const auto minutes = getRoundedMinutes(seconds, totalSeconds.value());
             setText(minutes);
             description->setText(utils::language::getCorrectMinutesNumeralForm(minutes));
         }

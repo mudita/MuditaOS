@@ -75,7 +75,7 @@ namespace gui
                                            0,
                                            relStyle::timer::maxSizeX,
                                            relStyle::timer::maxSizeY,
-                                           TimeMinuteSecondWidget::DisplayType::OnlyMinutes);
+                                           TimeMinuteSecondWidget::DisplayType::MinutesThenSeconds);
         timer->setMinimumSize(relStyle::timer::maxSizeX, relStyle::timer::maxSizeY);
         timer->setMargins(Margins(0, relStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
