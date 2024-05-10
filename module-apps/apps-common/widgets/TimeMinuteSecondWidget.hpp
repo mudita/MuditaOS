@@ -32,6 +32,7 @@ namespace gui
 
       private:
         DisplayType displayType;
+        std::optional<std::uint32_t> totalSeconds;
 
         static constexpr auto maxDigits{3U};
         VBox *mainBox{nullptr};
