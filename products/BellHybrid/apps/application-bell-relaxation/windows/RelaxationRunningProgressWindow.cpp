@@ -13,7 +13,7 @@
 namespace
 {
     constexpr auto relaxationProgressTimerName{"RelaxationProgressTimer"};
-    constexpr std::chrono::seconds relaxationProgressTimerPeriod{1};
+    constexpr std::chrono::seconds initialInterval{1};
     constexpr auto relaxationProgressMode{app::ProgressCountdownMode::Increasing};
 } // namespace
 
@@ -154,7 +154,7 @@ namespace gui
     void RelaxationRunningProgressWindow::configureTimer()
     {
         auto progressTimer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
-            application, *this, relaxationProgressTimerName, relaxationProgressTimerPeriod, relaxationProgressMode);
+            application, *this, relaxationProgressTimerName, initialInterval, relaxationProgressMode);
         progressTimer->attach(progress);
         progressTimer->attach(timer);
         presenter->setTimer(std::move(progressTimer));

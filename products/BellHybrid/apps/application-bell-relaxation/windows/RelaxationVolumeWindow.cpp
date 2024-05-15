@@ -7,7 +7,6 @@
 
 #include <popups/data/PopupData.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
-#include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 
 namespace gui
 {

@@ -48,6 +48,31 @@ namespace
         constexpr auto topMargin = -2;
         constexpr auto font      = style::window::font::big;
     } // namespace description
+
+    namespace refreshTime
+    {
+        constexpr auto defaultValue{std::chrono::seconds{1}};
+        constexpr auto arraySize{3};
+        constexpr std::array<std::pair<std::uint32_t, std::chrono::seconds>, arraySize> values = {{
+            {10 * utils::time::secondsInMinute, std::chrono::seconds{5}},
+            {5 * utils::time::secondsInMinute, std::chrono::seconds{3}},
+            {3 * utils::time::secondsInMinute, std::chrono::seconds{2}},
+        }};
+        constexpr auto maxValue = std::max_element(values.begin(), values.end(), [](const auto &l, const auto &r) {
+                                      return l.second < r.second;
+                                  }) -> second;
+
+        std::chrono::seconds get(std::uint32_t totalSeconds)
+        {
+            const auto res = std::find_if(
+                values.begin(), values.end(), [totalSeconds](const auto &e) { return e.first <= totalSeconds; });
+            if (res != values.end()) {
+                return res->second;
+            }
+            return defaultValue;
+        }
+
+    } // namespace refreshTime
 } // namespace
 
 namespace gui
@@ -118,6 +143,7 @@ namespace gui
         if (!totalSeconds.has_value()) {
             totalSeconds = seconds;
         }
+        secondsLeft = seconds;
         if (displayType != DisplayType::OnlySeconds &&
             (seconds >= utils::time::secondsInMinute || displayType == DisplayType::OnlyMinutes)) {
             const auto minutes = getRoundedMinutes(seconds, totalSeconds.value());
@@ -128,6 +154,16 @@ namespace gui
             setText(seconds);
             description->setText(utils::language::getCorrectSecondsNumeralForm(seconds));
         }
+    }
+
+    std::chrono::seconds TimeMinuteSecondWidget::getRefreshTime()
+    {
+        if (!totalSeconds.has_value() ||
+            (displayType != DisplayType::OnlyMinutes &&
+             secondsLeft < (utils::time::secondsInMinute + refreshTime::maxValue.count()))) {
+            return refreshTime::defaultValue;
+        }
+        return refreshTime::get(totalSeconds.value());
     }
 
     void TimeMinuteSecondWidget::setText(std::uint32_t value)

@@ -13,7 +13,7 @@
 namespace
 {
     constexpr auto progressTimerName{"FocusProgressTimer"};
-    constexpr auto progressTimerPeriod{std::chrono::seconds{1}};
+    constexpr auto initialInterval{std::chrono::seconds{1}};
     constexpr auto progressMode{app::ProgressCountdownMode::Increasing};
 } // namespace
 
@@ -227,7 +227,7 @@ namespace app::focus
     void FocusTimerWindow::configureTimer()
     {
         auto progressTimer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
-            application, *this, progressTimerName, progressTimerPeriod, progressMode);
+            application, *this, progressTimerName, initialInterval, progressMode);
         progressTimer->attach(progress);
         progressTimer->attach(timer);
         presenter->setTimer(std::move(progressTimer));

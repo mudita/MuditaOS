@@ -11,7 +11,7 @@
 namespace
 {
     constexpr auto powerNapTimerName{"PowerNapTimer"};
-    constexpr auto powerNapTimerPeriod{std::chrono::seconds{1}};
+    constexpr auto initialInterval{std::chrono::seconds{1}};
 } // namespace
 
 namespace gui
@@ -97,7 +97,7 @@ namespace gui
     void PowerNapProgressWindow::configureTimer()
     {
         auto progressTimer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
-            application, *this, powerNapTimerName, powerNapTimerPeriod, app::ProgressCountdownMode::Increasing);
+            application, *this, powerNapTimerName, initialInterval, app::ProgressCountdownMode::Increasing);
         progressTimer->attach(progress);
         progressTimer->attach(timer);
         presenter->setTimer(std::move(progressTimer));
