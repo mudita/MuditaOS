@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationTimer.hpp"
@@ -14,7 +14,7 @@
 namespace
 {
     inline constexpr auto meditationTimerName = "MeditationTimer";
-    inline constexpr std::chrono::seconds timerTick{1};
+    inline constexpr std::chrono::seconds initialInterval{1};
 } // namespace
 namespace gui
 {
@@ -56,7 +56,7 @@ namespace gui
         text->setEditMode(EditMode::Browse);
 
         timer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
-            application, *this, meditationTimerName, timerTick);
+            application, *this, meditationTimerName, initialInterval);
         timer->attach(progressBar);
         timer->attach(text);
         timer->registerOnIntervalCallback(std::bind(&MeditationTimer::playSound, this));

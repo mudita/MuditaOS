@@ -27,12 +27,14 @@ namespace gui
                                DisplayType type = DisplayType::OnlyMinutes);
 
         void updateTime(std::uint32_t sec) override;
+        std::chrono::seconds getRefreshTime() override;
         void buildInterface(std::uint32_t w, std::uint32_t h);
         void setText(std::uint32_t value);
 
       private:
         DisplayType displayType;
         std::optional<std::uint32_t> totalSeconds;
+        std::uint32_t secondsLeft{0};
 
         static constexpr auto maxDigits{3U};
         VBox *mainBox{nullptr};

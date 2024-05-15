@@ -21,6 +21,7 @@ namespace app
         updateProgress();
         updateTimeWidget();
         ProgressTimer::update();
+        updateInterval(timeWidget->getRefreshTime());
     }
 
     void ProgressTimerWithBarGraphAndCounter::updateText()

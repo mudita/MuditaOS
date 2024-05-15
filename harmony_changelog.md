@@ -17,6 +17,7 @@
 * Updated the countdown timer in Meditation app according to the new design
 * Updated the countdown timer in Power nap app according to the new design
 * Updated the countdown timer in Relaxation app according to the new design
+* Changed the refresh rate of the progress bar screen
 
 ## [2.6.1 2024-04-02]
 

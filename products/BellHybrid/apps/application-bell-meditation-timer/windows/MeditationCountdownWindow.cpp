@@ -14,7 +14,7 @@
 namespace
 {
     constexpr auto meditationCountdownTimerName{"MeditationCountdownTimer"};
-    constexpr std::chrono::seconds meditationCountdownTimerPeriod{1};
+    constexpr std::chrono::seconds initialInterval{1};
     constexpr auto meditationCountdownMode{app::ProgressCountdownMode::Increasing};
     constexpr auto leftBoxSize{1};
 } // namespace
@@ -110,7 +110,7 @@ namespace gui
     void MeditationCountdownWindow::configureTimer()
     {
         auto progressTimer = std::make_unique<app::ProgressTimerWithBarGraphAndCounter>(
-            application, *this, meditationCountdownTimerName, meditationCountdownTimerPeriod, meditationCountdownMode);
+            application, *this, meditationCountdownTimerName, initialInterval, meditationCountdownMode);
         progressTimer->attach(timer);
         presenter->setTimer(std::move(progressTimer));
     }
