@@ -17,11 +17,15 @@ namespace
         return digits;
     }
 
-    std::uint32_t getRoundedMinutes(std::uint32_t currentSeconds, std::uint32_t totalSeconds)
+    std::uint32_t getRoundedMinutes(std::uint32_t currentSeconds, std::optional<std::uint32_t> totalSeconds)
     {
+        if (!totalSeconds.has_value()) {
+            return 0;
+        }
+
         constexpr auto halfMinute{utils::time::secondsInMinute / 2};
-        const auto totalMin   = totalSeconds / utils::time::secondsInMinute;
-        const auto totalSec   = totalSeconds % utils::time::secondsInMinute;
+        const auto totalMin   = totalSeconds.value() / utils::time::secondsInMinute;
+        const auto totalSec   = totalSeconds.value() % utils::time::secondsInMinute;
         const auto currentMin = currentSeconds / utils::time::secondsInMinute;
 
         // only at startup, when the number of seconds is less than 30, we round down
@@ -138,19 +142,21 @@ namespace gui
         mainBox->resizeItems();
     }
 
-    void TimeMinuteSecondWidget::updateTime(std::uint32_t seconds)
+    void TimeMinuteSecondWidget::updateTime(std::uint32_t currentSeconds)
     {
-        updateTotalSeconds(seconds);
-        secondsLeft = seconds;
-        if (displayType != DisplayType::OnlySeconds &&
-            (seconds >= utils::time::secondsInMinute || displayType == DisplayType::OnlyMinutes)) {
-            const auto minutes = getRoundedMinutes(seconds, totalSeconds.value());
+        secondsLeft = currentSeconds;
+        updateTotalSeconds(currentSeconds);
+        const auto atOrAboveOneMinute = currentSeconds >= utils::time::secondsInMinute;
+
+        if ((displayType != DisplayType::OnlySeconds) &&
+            (atOrAboveOneMinute || (displayType == DisplayType::OnlyMinutes))) {
+            const auto minutes = getRoundedMinutes(currentSeconds, totalSeconds);
             setText(minutes);
             description->setText(utils::language::getCorrectMinutesNumeralForm(minutes));
         }
         else {
-            setText(seconds);
-            description->setText(utils::language::getCorrectSecondsNumeralForm(seconds));
+            setText(currentSeconds);
+            description->setText(utils::language::getCorrectSecondsNumeralForm(currentSeconds));
         }
     }
 
@@ -181,14 +187,14 @@ namespace gui
         digitsContainer->resizeItems();
     }
 
-    void TimeMinuteSecondWidget::updateTotalSeconds(std::uint32_t seconds)
+    void TimeMinuteSecondWidget::updateTotalSeconds(std::uint32_t currentSeconds)
     {
-        if (seconds == 0) {
+        if (currentSeconds == 0) {
             totalSeconds.reset();
             return;
         }
         if (!totalSeconds.has_value()) {
-            totalSeconds = seconds;
+            totalSeconds = currentSeconds;
         }
     }
 } /* namespace gui */
