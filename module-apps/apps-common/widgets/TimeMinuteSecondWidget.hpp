@@ -43,5 +43,7 @@ namespace gui
         VBox *digitBox[maxDigits]{nullptr};
         Label *digitsText[maxDigits]{nullptr};
         Label *description{nullptr};
+
+        void updateTotalSeconds(std::uint32_t seconds);
     };
 } // namespace gui
