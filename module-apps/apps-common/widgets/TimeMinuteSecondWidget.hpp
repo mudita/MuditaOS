@@ -26,7 +26,7 @@ namespace gui
                                const std::uint32_t &h,
                                DisplayType type = DisplayType::OnlyMinutes);
 
-        void updateTime(std::uint32_t sec) override;
+        void updateTime(std::uint32_t currentSeconds) override;
         void buildInterface(std::uint32_t w, std::uint32_t h);
         void setText(std::uint32_t value);
 
@@ -42,6 +42,6 @@ namespace gui
         Label *digitsText[maxDigits]{nullptr};
         Label *description{nullptr};
 
-        void updateTotalSeconds(std::uint32_t seconds);
+        void updateTotalSeconds(std::uint32_t currentSeconds);
     };
 } // namespace gui

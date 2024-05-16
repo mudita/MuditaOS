@@ -8,11 +8,10 @@
 
 namespace gui
 {
-
     class AbstractProgressTime
     {
       public:
         virtual ~AbstractProgressTime()                = default;
-        virtual void updateTime(std::uint32_t seconds) = 0;
+        virtual void updateTime(std::uint32_t currentSeconds) = 0;
     };
 } // namespace gui

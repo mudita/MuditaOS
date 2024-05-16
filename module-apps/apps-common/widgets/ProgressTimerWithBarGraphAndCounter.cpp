@@ -37,7 +37,7 @@ namespace app
             timerText += increasingModePrefix;
         }
         timerText += remainingDuration.str(displayFormat);
-        text->setText(std::move(timerText));
+        text->setText(timerText);
     }
 
     void ProgressTimerWithBarGraphAndCounter::updateTimeWidget()
