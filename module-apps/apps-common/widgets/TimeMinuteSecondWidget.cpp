@@ -140,9 +140,7 @@ namespace gui
 
     void TimeMinuteSecondWidget::updateTime(std::uint32_t seconds)
     {
-        if (!totalSeconds.has_value()) {
-            totalSeconds = seconds;
-        }
+        updateTotalSeconds(seconds);
         secondsLeft = seconds;
         if (displayType != DisplayType::OnlySeconds &&
             (seconds >= utils::time::secondsInMinute || displayType == DisplayType::OnlyMinutes)) {
@@ -181,5 +179,16 @@ namespace gui
             }
         }
         digitsContainer->resizeItems();
+    }
+
+    void TimeMinuteSecondWidget::updateTotalSeconds(std::uint32_t seconds)
+    {
+        if (seconds == 0) {
+            totalSeconds.reset();
+            return;
+        }
+        if (!totalSeconds.has_value()) {
+            totalSeconds = seconds;
+        }
     }
 } /* namespace gui */
