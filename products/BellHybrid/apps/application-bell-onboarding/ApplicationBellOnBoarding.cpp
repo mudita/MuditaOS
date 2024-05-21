@@ -5,6 +5,7 @@
 
 #include <presenter/OnBoardingLanguageWindowPresenter.hpp>
 #include <presenter/OnBoardingShortcutsWindowPresenter.hpp>
+#include <presenter/OnBoardingUpdateInstructionWindowPresenter.hpp>
 #include <windows/OnBoardingLanguageWindow.hpp>
 #include <windows/OnBoardingFinalizeWindow.hpp>
 #include <windows/OnBoardingOnOffWindow.hpp>
@@ -21,6 +22,7 @@
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <common/windows/ShortcutsWindow.hpp>
+#include <common/windows/UpdateInstructionWindow.hpp>
 #include <common/models/LayoutModel.hpp>
 
 #include <application-bell-settings/models/TemperatureUnitModel.hpp>
@@ -116,6 +118,13 @@ namespace app
             gui::window::name::onBoardingShortcutsWindow, [this](ApplicationCommon *app, const std::string &name) {
                 auto presenter = std::make_unique<OnBoarding::OnBoardingShortcutsWindowPresenter>(this);
                 return std::make_unique<gui::ShortcutsWindow>(app, std::move(presenter), name);
+            });
+
+        windowsFactory.attach(
+            gui::window::name::onBoardingUpdateInstructionWindow,
+            [this](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<OnBoarding::OnBoardingUpdateInstructionWindowPresenter>(this);
+                return std::make_unique<gui::UpdateInstructionWindow>(app, std::move(presenter), name);
             });
 
         windowsFactory.attach(
@@ -289,6 +298,15 @@ namespace app
                         informationState = OnBoarding::InformationStates::LightClickInfo;
                     else
                         informationState = OnBoarding::InformationStates::RotateInfo;
+                }
+                else if (window->getName() == gui::window::name::onBoardingUpdateInstructionWindow) {
+                    const auto updateInstructionWindow = dynamic_cast<gui::UpdateInstructionWindow *>(window);
+                    if (updateInstructionWindow != nullptr && updateInstructionWindow->isLastLayout()) {
+                        informationState = OnBoarding::InformationStates::RotateInfo;
+                    }
+                    else {
+                        informationState = OnBoarding::InformationStates::LightClickInfo;
+                    }
                 }
                 else {
                     informationState = OnBoarding::InformationStates::LightClickInfo;

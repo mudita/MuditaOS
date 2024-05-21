@@ -23,10 +23,12 @@ target_sources(application-bell-onboarding
         presenter/OnBoardingLanguageWindowPresenter.cpp
         presenter/OnBoardingFinalizeWindowPresenter.cpp
         presenter/OnBoardingShortcutsWindowPresenter.cpp
+        presenter/OnBoardingUpdateInstructionWindowPresenter.cpp
 
         presenter/OnBoardingLanguageWindowPresenter.hpp
         presenter/OnBoardingFinalizeWindowPresenter.hpp
         presenter/OnBoardingShortcutsWindowPresenter.hpp
+        presenter/OnBoardingUpdateInstructionWindowPresenter.hpp
         windows/OnBoardingLanguageWindow.hpp
         windows/OnBoardingOnOffWindow.hpp
         windows/OnBoardingSettingsWindow.hpp
