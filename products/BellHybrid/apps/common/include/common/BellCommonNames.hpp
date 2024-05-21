@@ -5,6 +5,7 @@
 
 namespace gui::window::name
 {
-    inline constexpr auto shortcutsWindow = "BellShortcuts";
-    inline constexpr auto audioErrorWindow = "AudioError";
+    inline constexpr auto shortcutsWindow         = "BellShortcuts";
+    inline constexpr auto updateInstructionWindow = "BellUpdateInstruction";
+    inline constexpr auto audioErrorWindow        = "AudioError";
 } // namespace gui::window::name
