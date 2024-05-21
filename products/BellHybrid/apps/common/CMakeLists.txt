@@ -37,6 +37,7 @@ target_sources(application-bell-common
         src/windows/BellBatteryStatusWindow.cpp
         src/windows/AppsBatteryStatusWindow.cpp
         src/windows/AudioErrorWindow.cpp
+        src/windows/UpdateInstructionWindow.cpp
 
         src/models/SettingsModel.cpp
         src/models/BedtimeModel.cpp
@@ -87,6 +88,8 @@ target_sources(application-bell-common
         src/layouts/HomeScreenLayoutVerticalWithDate.cpp
         src/layouts/ShortcutsLayouts.cpp
         src/layouts/ShortcutsLayoutClassic.cpp
+        src/layouts/UpdateInstructionLayouts.cpp
+        src/layouts/UpdateInstructionLayoutClassic.cpp
 
     PUBLIC
         include/common/BellListItemProvider.hpp
@@ -104,6 +107,8 @@ target_sources(application-bell-common
         include/common/windows/BellBatteryStatusWindow.hpp
         include/common/windows/AppsBatteryStatusWindow.hpp
         include/common/windows/AudioErrorWindow.hpp
+        include/common/windows/UpdateInstructionWindowContract.hpp
+        include/common/windows/UpdateInstructionWindow.hpp
         include/common/TimeUtils.hpp
 
         include/common/data/BatteryUtils.hpp
@@ -173,6 +178,9 @@ target_sources(application-bell-common
         include/common/layouts/ShortcutsLayouts.hpp
         include/common/layouts/ShortcutsLayoutProvider.hpp
         include/common/layouts/ShortcutsLayoutClassic.hpp
+        include/common/layouts/UpdateInstructionLayouts.hpp
+        include/common/layouts/UpdateInstructionLayoutProvider.hpp
+        include/common/layouts/UpdateInstructionLayoutClassic.hpp
 )
 
 target_link_libraries(application-bell-common

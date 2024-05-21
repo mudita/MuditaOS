@@ -7,6 +7,7 @@
 
 ### Added
 * Added custom alarms functionality
+* Added update instruction screen at end of onboarding
 
 ### Changed / Improved
 * Changed the refresh rate of the progress bar screen
