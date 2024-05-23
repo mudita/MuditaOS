@@ -3,21 +3,29 @@
 ## Unreleased
 
 ### Fixed
-* Fixed the backlight blink in pre-wake up
-* Fixed missing tooltip text in Onboarding in French
 * Fixed incorrect Power Management statistics in the logs
 
 ### Added
 * Added custom alarms functionality
+
+### Changed / Improved
+* Changed the refresh rate of the progress bar screen
+
+## [2.7.0 2024-05-20]
+
+### Fixed
+* Fixed the backlight blink in pre-wake up
+* Fixed missing tooltip text in Onboarding in French
+
+### Added
 * Added unique sound to indicate the meditation session has ended.
 * Added Focus Timer application.
 
 ### Changed / Improved
 * Updated button handling during pre-wake up
-* Updated the countdown timer in Meditation app according to the new design
-* Updated the countdown timer in Power nap app according to the new design
-* Updated the countdown timer in Relaxation app according to the new design
-* Changed the refresh rate of the progress bar screen
+* Updated countdown timer in Meditation app according to the new design
+* Updated countdown timer in Power Nap app according to the new design
+* Updated countdown timer in Relaxation app according to the new design
 
 ## [2.6.1 2024-04-02]
 
