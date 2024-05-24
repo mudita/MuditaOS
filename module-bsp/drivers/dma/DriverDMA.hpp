@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #ifndef PUREPHONE_DRIVERDMA_HPP
@@ -9,7 +9,6 @@
 
 namespace drivers
 {
-
     enum class DMAInstances
     {
         DMA_0,
@@ -22,6 +21,8 @@ namespace drivers
     class DriverDMAHandle
     {
       public:
+        virtual ~DriverDMAHandle() = default;
+
         virtual void *GetHandle() = 0;
     };
 

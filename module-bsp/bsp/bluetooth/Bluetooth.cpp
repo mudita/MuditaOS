@@ -1,25 +1,18 @@
 #include "Bluetooth.hpp"
 #include <cstdarg>
 
+namespace bsp
+{
+    BTDevice::BTDevice() : logLevel{LogNone}, isOpen{false}, logFunction{nullptr}
+    {}
 
-namespace bsp {
-    BTdev::BTdev() : flog(nullptr)
+    void BTDevice::log(LogLevel level, const char *val, ...)
     {
-        is_open = false;
-    }
-
-    BTdev::~BTdev()
-    {
-    }
-
-    void BTdev::log(LogLvl lvl,const char* val, ...)
-    {
-        if(loglvl>=lvl && flog) {
+        if ((logLevel >= level) && (logFunction != nullptr)) {
             va_list args;
             va_start(args, val);
-            flog(val,args);
+            logFunction(val, args);
             va_end(args);
         }
     }
-
-};
+}

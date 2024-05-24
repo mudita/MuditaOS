@@ -1,7 +1,7 @@
 #pragma once
 
-#include <cstdint>      // uint32
-#include <sys/types.h>  // ssize_t
+#include <cstdint>
+#include <sys/types.h>
 #include <cstdarg>
 #include <FreeRTOS.h>
 #include <thread.hpp>
@@ -13,10 +13,10 @@
 #include "drivers/dma/DriverDMA.hpp"
 #endif
 
-/// c++ low level driver overlay
+/// C++ low level driver overlay
 
-namespace bsp {
-
+namespace bsp
+{
     namespace bluetooth
     {
         enum Message : std::uint8_t
@@ -34,95 +34,101 @@ namespace bsp {
         };
     }
 
-    class BTdev {
-        public:
-            enum Error {
-                Success,
-                ErrorUndefined,
-                ErrorTimeout,
-                ErrorBSP,
-            };
-            enum LogLvl {
-                LogNone,
-                LogError,
-                LogWarning,
-                LogDebug,
-            };
-            typedef int(*LogFoo)(const char*,va_list args);
-        private:
-            LogFoo flog;
-        public:
-            LogLvl loglvl;
-            bool is_open;
-            static const unsigned int default_timeout_ms = 1000;
-            static const unsigned int default_buff_size = 1024;
-            static const unsigned int default_baudrate = 115200;
+    class BTDevice
+    {
+      public:
+        enum Error
+        {
+            Success,
+            ErrorUndefined,
+            ErrorTimeout,
+            ErrorBSP,
+        };
 
-            BTdev();
-            virtual ~BTdev();
+        enum LogLevel
+        {
+            LogNone,
+            LogError,
+            LogWarning,
+            LogDebug,
+        };
 
-            // general
-            virtual void open() = 0;    // enable device -> irq enable
-            virtual void close() = 0;   // disable device -> irq disable
-            virtual BTdev::Error read(uint8_t *buf, size_t nbytes) = 0;
-            void log(LogLvl lvl,const char* val, ...);
-            // uart specific
+        using LogFunction = int (*)(const char *msg, va_list args);
+
+        BTDevice();
+        virtual ~BTDevice() = default;
+
+        virtual void open() = 0;    // enable device -> irq enable
+        virtual void close() = 0;   // disable device -> irq disable
+
+        virtual Error read(std::uint8_t *buf, std::size_t size) = 0;
+
+        void log(LogLevel level, const char *msg, ...);
+
+        LogLevel logLevel;
+        bool isOpen;
+
+      private:
+        LogFunction logFunction;
     };
 
-    class BluetoothCommon : public BTdev
+    class BluetoothCommon : public BTDevice
     {
-        public:
-            static const ssize_t baudrate =115200;
-            static const ssize_t off_threshold =16;
-            static const ssize_t on_threshold =32;
+      public:
+        static constexpr std::uint32_t defaultBaudRate = 115200;
 
-            BluetoothCommon();
-            virtual ~BluetoothCommon();
-            // uart specific Common part
-            virtual void open() override;
-            virtual void close() override;
-            virtual BTdev::Error read(uint8_t *buf, size_t nbytes) override;
-            virtual BTdev::Error write(const uint8_t *buf, size_t nbytes);
-            virtual ssize_t write_blocking(const uint8_t *buf, ssize_t nbytes);
-            Error set_baudrate(uint32_t bd);
-            Error set_reset(bool on);
-            void sleep_ms(ssize_t ms);
-            void set_irq(bool enable);
+        BluetoothCommon();
+        virtual ~BluetoothCommon();
 
-        private:
-            void init_uart();
-            void deinit_uart();
-            void init_uart_dma();
-            void deinit_uart_dma();
+        // uart specific Common part
+        virtual void open() override;
+        virtual void close() override;
+
+        virtual Error read(std::uint8_t *buf, std::size_t size) override;
+        virtual Error write(const std::uint8_t *buf, std::size_t size);
+
+        Error setBaudrate(std::uint32_t baud);
+        Error setReset(bool on);
+        void setIrq(bool enable);
+
+        void sleepMs(std::size_t ms);
+
+      private:
+        void uartInit();
+        void uartDeinit();
+
+        void uartDmaInit();
+        void uartDmaDeinit();
 
 #if defined(TARGET_RT1051)
-            std::shared_ptr<drivers::DriverDMAMux> dmamux;
-            std::shared_ptr<drivers::DriverDMA> dma;
-            std::unique_ptr<drivers::DriverDMAHandle> uartRxDmaHandle;
-            std::unique_ptr<drivers::DriverDMAHandle> uartTxDmaHandle;
-            static AT_NONCACHEABLE_SECTION_INIT(lpuart_edma_handle_t uartDmaHandle);
-            static void uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
+        std::shared_ptr<drivers::DriverDMAMux> dmamux;
+        std::shared_ptr<drivers::DriverDMA> dma;
+        std::unique_ptr<drivers::DriverDMAHandle> uartRxDmaHandle;
+        std::unique_ptr<drivers::DriverDMAHandle> uartTxDmaHandle;
+        static AT_NONCACHEABLE_SECTION_INIT(lpuart_edma_handle_t uartDmaHandle);
+
+        static void uartDmaCallback(LPUART_Type *base, lpuart_edma_handle_t *handle, status_t status, void *userData);
 #endif
     };
 
-    /// definitions needed by BT stack
+    /// Definitions needed by BT stack
+    class BlueKitchen : public BluetoothCommon
+    {
+      public:
+        BlueKitchen();
+        virtual ~BlueKitchen();
+        static BlueKitchen &getInstance();
 
-    class BlueKitchen : public BluetoothCommon {
-        public:
-            BlueKitchen();
-            virtual ~BlueKitchen();
-            static BlueKitchen *getInstance();
+        virtual Error read(uint8_t *buf, size_t size) override;
+        virtual Error write(const uint8_t *buf, size_t size) override;
 
-            virtual BTdev::Error read(uint8_t *buf, size_t nbytes) override;
-            virtual BTdev::Error write(const uint8_t *buf, size_t size) override;
-            uint32_t read_len = 0;
-            uint8_t* read_buff;
+        std::uint32_t readLength = 0;
+        std::uint8_t *readBuffer;
 
-            void set_flowcontrol(int on);
+        void (*readReadyCallback)();
+        void (*writeDoneCallback)();
 
-            void (*read_ready_cb)(void);
-            void (*write_done_cb)(void);
-            /// to be able to trigger events on thread
-            xQueueHandle qHandle = nullptr;
+        /// to be able to trigger events on thread
+        xQueueHandle qHandle = nullptr;
     };
-};
+}

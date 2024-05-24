@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-bluetooth/ServiceBluetooth.hpp>
@@ -6,8 +6,6 @@
 #include "BtCommand.hpp"
 #include <log/log.hpp>
 #include "interface/BluetoothDriverImpl.hpp"
-#include "interface/profiles/A2DP/A2DP.hpp"
-#include "interface/profiles/HSP/HSP.hpp"
 #include "audio/BluetoothAudioDevice.hpp"
 #include "BtKeysStorage.hpp"
 
@@ -26,12 +24,12 @@
 
 namespace queues
 {
-    constexpr inline auto io      = "qBtIO";
-    constexpr inline auto cmd     = "qBtCmds";
-    constexpr inline auto btstack = "qBtStack";
+    constexpr auto io      = "qBtIO";
+    constexpr auto cmd     = "qBtCmds";
+    constexpr auto btstack = "qBtStack";
 
-    constexpr inline auto queueLength        = 10;
-    constexpr inline auto triggerQueueLength = 3;
+    constexpr auto queueLength        = 10;
+    constexpr auto triggerQueueLength = 3;
 } // namespace queues
 
 namespace
@@ -120,7 +118,7 @@ void BluetoothWorker::registerQueues()
 
     dynamic_cast<ServiceBluetooth *>(service)->workerQueue = workerQueue;
     runLoop->setTriggerQueue(Worker::getQueueHandleByName(queues::btstack));
-    bsp::BlueKitchen::getInstance()->qHandle = queues[queueIO_handle]->GetQueueHandle();
+    bsp::BlueKitchen::getInstance().qHandle = queues[queueIO_handle]->GetQueueHandle();
 }
 
 void BluetoothWorker::onLinkKeyAdded(const std::string &deviceAddress)
@@ -212,49 +210,53 @@ auto BluetoothWorker::handleMessage(uint32_t queueID) -> bool
         LOG_ERROR("Queue receive failure!");
         return false;
     }
-    auto bt = bsp::BlueKitchen::getInstance();
+
+    auto &blueKitchen = bsp::BlueKitchen::getInstance();
     switch (notification) {
-    case bluetooth::Message::EvtSending:
+    case bluetooth::Message::EvtSending: {
         logHciComs("[evt] sending");
-        break;
-    case bluetooth::Message::EvtSent:
+    } break;
+
+    case bluetooth::Message::EvtSent: {
         logHciComs("[evt] sent");
-        if (bt->write_done_cb) {
-            bt->write_done_cb();
+        if (blueKitchen.writeDoneCallback) {
+            blueKitchen.writeDoneCallback();
         }
-        break;
-    case bluetooth::Message::EvtReceiving:
+    } break;
+
+    case bluetooth::Message::EvtReceiving: {
         logHciComs("[evt] receiving");
-        break;
+    } break;
+
     case bluetooth::Message::EvtReceived: {
         logHciBytes("[evt] BT DMA received <-- [%ld]>%s<",
-                    bt->read_len,
+                    blueKitchen.readLength,
                     [&]() -> std::string {
                         std::stringstream ss;
-                        for (int i = 0; i < bt->read_len; ++i) {
-                            ss << " 0x" << std::hex << (int)*(bt->read_buff + i);
+                        for (auto i = 0; i < blueKitchen.readLength; ++i) {
+                            ss << " 0x" << std::hex << static_cast<int>(blueKitchen.readBuffer[i]);
                         }
                         return ss.str();
                     }()
                                  .c_str());
 
-        bt->read_len = 0;
+        blueKitchen.readLength = 0;
 
-        if (bt->read_ready_cb) {
-            bt->read_ready_cb();
+        if (blueKitchen.readReadyCallback) {
+            blueKitchen.readReadyCallback();
         }
     } break;
+
     case bluetooth::Message::EvtSendingError:
-        [[fallthrough]];
     case bluetooth::Message::EvtReceivingError:
-        [[fallthrough]];
     case bluetooth::Message::EvtUartError:
-        [[fallthrough]];
     case bluetooth::Message::EvtRecUnwanted:
         LOG_ERROR("Uart error [%d]: %s", notification, bluetooth::MessageCstr(notification));
         break;
+
     default:
         LOG_ERROR("Unknown message: %d", notification);
+        break;
     }
 
     return true;
@@ -265,9 +267,6 @@ void BluetoothWorker::closeWorker()
     controller->handle(bluetooth::event::PowerOff{});
     this->close();
 }
-
-void BluetoothWorker::removeFromBoundDevices(uint8_t *addr)
-{}
 
 void BluetoothWorker::setAudioDevice(std::shared_ptr<bluetooth::BluetoothAudioDevice> device)
 {

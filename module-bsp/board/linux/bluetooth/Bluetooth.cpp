@@ -1,31 +1,35 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/bluetooth/Bluetooth.hpp"
-#include <log/log.hpp>
-
-/// stubs
+#include <memory>
 
 using namespace bsp;
 
 BlueKitchen::BlueKitchen() = default;
+BlueKitchen::~BlueKitchen() = default;
 
-BlueKitchen *BlueKitchen::getInstance()
+BlueKitchen &BlueKitchen::getInstance()
 {
-    static BlueKitchen *k = NULL;
-    if (k == NULL) {
-        k = new BlueKitchen();
+    static std::unique_ptr<BlueKitchen> instance;
+    if (instance == nullptr) {
+        instance = std::make_unique<BlueKitchen>();
     }
-    return k;
+    return *instance;
 }
 
-BluetoothCommon::BluetoothCommon() = default;
+BTDevice::Error BlueKitchen::read(std::uint8_t *buf, std::size_t size)
+{
+    return BTDevice::Error::Success;
+}
 
-BlueKitchen::~BlueKitchen()
-{}
+BTDevice::Error BlueKitchen::write(const std::uint8_t *buf, std::size_t size)
+{
+    return BTDevice::Error::Success;
+}
 
-BluetoothCommon::~BluetoothCommon()
-{}
+BluetoothCommon::BluetoothCommon()  = default;
+BluetoothCommon::~BluetoothCommon() = default;
 
 void BluetoothCommon::open()
 {}
@@ -33,48 +37,33 @@ void BluetoothCommon::open()
 void BluetoothCommon::close()
 {}
 
-void BluetoothCommon::sleep_ms(ssize_t ms)
+void BluetoothCommon::sleepMs(std::size_t ms)
 {
     ulTaskNotifyTake(pdTRUE, ms);
 }
 
-BTdev::Error BlueKitchen::read(uint8_t *buf, size_t nbytes)
+BTDevice::Error BluetoothCommon::read(std::uint8_t *buf, std::size_t size)
 {
-    return Success;
+    return BTDevice::Error::Success;
 }
 
-BTdev::Error BluetoothCommon::read(uint8_t *buf, size_t nbytes)
+BTDevice::Error BluetoothCommon::write(const std::uint8_t *buf, std::size_t size)
 {
-    return Success;
+    return BTDevice::Error::Success;
 }
 
-BTdev::Error BlueKitchen::write(const uint8_t *buf, size_t nbytes)
+BTDevice::Error BluetoothCommon::setBaudrate([[maybe_unused]] std::uint32_t baud)
 {
-    return Success;
+    return BTDevice::Error::Success;
 }
 
-BTdev::Error BluetoothCommon::write(const uint8_t *buf, size_t nbytes)
+BTDevice::Error BluetoothCommon::setReset([[maybe_unused]] bool on)
 {
-    return Success;
+    return BTDevice::Error::Success;
 }
 
-ssize_t BluetoothCommon::write_blocking(const uint8_t *buf, ssize_t nbytes)
-{
-    return 0;
-}
-
-BTdev::Error BluetoothCommon::set_baudrate(uint32_t bd)
-{
-    return Success;
-}
-
-BTdev::Error BluetoothCommon::set_reset(bool on)
-{
-    return Success;
-}
-
-void BluetoothCommon::init_uart()
+void BluetoothCommon::uartInit()
 {}
 
-void BluetoothCommon::set_irq(bool enable)
+void BluetoothCommon::setIrq([[maybe_unused]] bool enable)
 {}
