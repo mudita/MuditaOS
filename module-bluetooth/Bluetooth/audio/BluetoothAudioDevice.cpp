@@ -12,6 +12,7 @@
 #include <Audio/VolumeScaler.hpp>
 
 #include <Utils.hpp>
+#include <ticks.hpp>
 
 #include <chrono>
 #include <cassert>
@@ -311,11 +312,36 @@ void CVSDAudioDevice::setAclHandle(hci_con_handle_t handle)
     aclHandle = handle;
 }
 
+audio::AudioDevice::RetCode A2DPAudioDevice::waitUntilStreamPaused() const
+{
+    /* Wait until A2DP stream is paused before proceeding. This is hacky way to prevent
+     * race condition when music player track automatically changes to the next one.
+     * a2dp_source functions are asynchronous, so in such case sometimes play request is
+     * sent before pause request has been fully processed, what results in A2DP stream
+     * not being restarted. */
+    constexpr auto timeoutMs    = 200;
+    constexpr auto retryDelayMs = 10;
+
+    auto timeoutLoops = timeoutMs / retryDelayMs;
+    while ((AVRCP::playInfo.status == AVRCP_PLAYBACK_STATUS_PLAYING) && (timeoutLoops > 0)) {
+        vTaskDelay(cpp_freertos::Ticks::MsToTicks(retryDelayMs));
+        timeoutLoops--;
+    }
+
+    return (timeoutLoops == 0) ? audio::AudioDevice::RetCode::Failure : audio::AudioDevice::RetCode::Success;
+}
+
 audio::AudioDevice::RetCode A2DPAudioDevice::Start()
 {
-    return (a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid) == 0)
-               ? audio::AudioDevice::RetCode::Success
-               : audio::AudioDevice::RetCode::Failure;
+    const auto retCode = a2dp_source_start_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
+    switch (retCode) {
+    case ERROR_CODE_SUCCESS:
+        return audio::AudioDevice::RetCode::Success;
+    case ERROR_CODE_UNKNOWN_CONNECTION_IDENTIFIER:
+        return audio::AudioDevice::RetCode::Disconnected;
+    default:
+        return audio::AudioDevice::RetCode::Failure;
+    }
 }
 
 audio::AudioDevice::RetCode A2DPAudioDevice::Stop()
@@ -323,7 +349,7 @@ audio::AudioDevice::RetCode A2DPAudioDevice::Stop()
     const auto retCode = a2dp_source_pause_stream(AVRCP::mediaTracker.a2dp_cid, AVRCP::mediaTracker.local_seid);
     switch (retCode) {
     case ERROR_CODE_SUCCESS:
-        return audio::AudioDevice::RetCode::Success;
+        return waitUntilStreamPaused();
     case ERROR_CODE_UNKNOWN_CONNECTION_IDENTIFIER:
         return audio::AudioDevice::RetCode::Disconnected; // Device disconnected during playback, e.g. headphones
                                                           // discharged

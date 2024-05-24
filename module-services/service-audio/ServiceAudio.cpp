@@ -432,7 +432,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStart(const Operation:
         auto input = audioMux.GetPlaybackInput(playbackType);
 
         if (playbackType == audio::PlaybackType::CallRingtone && bluetoothVoiceProfileConnected && input) {
-            // don't play ringtone on HFP connection on Pure, but do vibrate
+            // Don't play ringtone on HFP connection on Pure, but do vibrate
             VibrationUpdate(playbackType, input);
             return std::make_unique<AudioStartPlaybackResponse>(audio::RetCode::Success, retToken);
         }
@@ -513,7 +513,7 @@ std::unique_ptr<AudioResponseMessage> ServiceAudio::HandleStop(const std::vector
 
     // stop by token
     if (const auto tokenInput = audioMux.GetInput(token); token.IsValid() && tokenInput) {
-        retCodes.emplace_back(std::make_pair(token, StopInput(tokenInput.value())));
+        retCodes.emplace_back(token, StopInput(tokenInput.value()));
     }
     else if (token.IsValid()) {
         return std::make_unique<AudioStopResponse>(RetCode::TokenNotFound, Token::MakeBadToken());

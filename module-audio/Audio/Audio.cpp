@@ -9,9 +9,9 @@
 
 namespace audio
 {
-    Audio::Audio(AudioServiceMessage::Callback callback) : currentOperation(), serviceCallback(callback)
+    Audio::Audio(AudioServiceMessage::Callback callback) : currentOperation(), serviceCallback(std::move(callback))
     {
-        auto ret = Operation::Create(Operation::Type::Idle, "", audio::PlaybackType::None, callback);
+        auto ret = Operation::Create(Operation::Type::Idle, "", audio::PlaybackType::None, serviceCallback);
         if (ret) {
             currentOperation = std::move(ret);
         }
@@ -85,7 +85,9 @@ namespace audio
 
     audio::RetCode Audio::Start()
     {
-        currentOperation->Stop();
+        if (currentState != State::Idle) {
+            currentOperation->Stop();
+        }
         return Start(currentOperation->GetOperationType(),
                      currentOperation->GetToken(),
                      currentOperation->GetFilePath(),

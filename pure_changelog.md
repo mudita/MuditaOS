@@ -4,6 +4,7 @@
 
 ### Fixed
 * Fixed crash when deleting all contacts from MC with Phonebook app opened.
+* Fixed sound not being heard in Bluetooth device despite song being played in Music Player.
 
 ### Added
 

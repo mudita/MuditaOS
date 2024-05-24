@@ -31,8 +31,7 @@ namespace audio
             Routing,
         };
 
-        Audio(AudioServiceMessage::Callback callback);
-
+        explicit Audio(AudioServiceMessage::Callback callback);
         virtual ~Audio() = default;
 
         // Events
@@ -70,7 +69,7 @@ namespace audio
         const Operation &GetCurrentOperation() const
         {
             // currentOperation always exists - null pattern design
-            return *(currentOperation.get());
+            return *currentOperation;
         }
 
         virtual audio::PlaybackType GetCurrentOperationPlaybackType() const

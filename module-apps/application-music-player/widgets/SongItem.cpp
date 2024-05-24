@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "module-apps/application-music-player/widgets/SongItem.hpp"
@@ -7,7 +7,6 @@
 
 namespace gui
 {
-
     using namespace musicPlayerStyle;
 
     SongItem::SongItem(const std::string &authorName,

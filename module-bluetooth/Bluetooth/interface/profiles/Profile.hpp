@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -79,6 +79,6 @@ namespace bluetooth
         [[nodiscard]] virtual auto setNetworkRegistrationStatus(bool registered) const noexcept -> Result::Code = 0;
         /// Sets the roaming status in HFP profile
         /// @return Error code that determines, whether operation was successful or not
-        virtual auto setRoamingStatus(bool enabled) const noexcept -> Result::Code = 0;
+        [[nodiscard]] virtual auto setRoamingStatus(bool enabled) const noexcept -> Result::Code = 0;
     };
 } // namespace bluetooth
