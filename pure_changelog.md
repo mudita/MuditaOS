@@ -9,6 +9,7 @@
 
 ### Changed / Improved
 * Increased speed of update process.
+* Changed A2DP volume control scale from linear to exponential.
 
 ## [1.12.0 2024-03-07]
 
