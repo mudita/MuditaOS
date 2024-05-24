@@ -1,11 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "bsp/bluetooth/Bluetooth.hpp"
 #include <log/log.hpp>
 #include "FreeRTOS.h"
-#include "fsl_lpuart.h"
-#include "board.h"
 
 #if DEBUG_BLUETOOTH_HCI_COMS == 1
 #define logHciStack(...) LOG_DEBUG(__VA_ARGS__)
@@ -17,62 +15,57 @@ using namespace bsp;
 
 BlueKitchen::BlueKitchen()
 {
-    read_buff     = NULL;
-    read_ready_cb = NULL;
-    write_done_cb = NULL;
+    readBuffer        = nullptr;
+    readReadyCallback = nullptr;
+    writeDoneCallback = nullptr;
 }
 
 BlueKitchen::~BlueKitchen() = default;
 
-BlueKitchen *BlueKitchen::getInstance()
+BlueKitchen &BlueKitchen::getInstance()
 {
-    static BlueKitchen *k = NULL;
-    if (k == NULL) {
-        /// outcomming & incomming heap allocated buffers sizes
-        /// packet on IP network cna have MTU 1500, so big enough buffers were added to not throttle comms
-        k = new BlueKitchen();
+    static std::unique_ptr<BlueKitchen> instance;
+    if (instance == nullptr) {
+        instance = std::make_unique<BlueKitchen>();
     }
-    return k;
+    return *instance;
 }
 
-BTdev::Error BlueKitchen::read(uint8_t *buf, size_t nbytes)
+BTDevice::Error BlueKitchen::read(uint8_t *buf, size_t nbytes)
 {
     logHciStack("BlueKitchen requested to read %d bytes", nbytes);
 
-    uint8_t val;
+    std::uint8_t val;
 
-    read_buff = buf; // point at the Bt stack read buffer
-    read_len  = nbytes;
+    readBuffer = buf;
+    readLength = nbytes;
 
-    if (BluetoothCommon::read(buf, nbytes) == Success) {
+    if (BluetoothCommon::read(buf, nbytes) == BTDevice::Error::Success) {
         val = bluetooth::Message::EvtReceiving;
         xQueueSend(qHandle, &val, portMAX_DELAY);
-        return BTdev::Success;
+        return BTDevice::Error::Success;
     }
     else {
         val = bluetooth::Message::EvtReceivingError;
         xQueueSend(qHandle, &val, portMAX_DELAY);
-        return BTdev::ErrorBSP;
+        return BTDevice::Error::ErrorBSP;
     }
 }
 
-BTdev::Error BlueKitchen::write(const uint8_t *buf, size_t size)
+BTDevice::Error BlueKitchen::write(const uint8_t *buf, size_t size)
 {
-    uint8_t val;
-
     logHciStack("BlueKitchen sends %d bytes", size);
 
-    if (BluetoothCommon::write(buf, size) == Success) {
+    std::uint8_t val;
+
+    if (BluetoothCommon::write(buf, size) == BTDevice::Error::Success) {
         val = bluetooth::Message::EvtSending;
         xQueueSend(qHandle, &val, portMAX_DELAY);
-        return BTdev::Success;
+        return BTDevice::Error::Success;
     }
     else {
         val = bluetooth::Message::EvtSendingError;
         xQueueSend(qHandle, &val, portMAX_DELAY);
-        return BTdev::ErrorBSP;
+        return BTDevice::Error::ErrorBSP;
     }
 }
-
-void BlueKitchen::set_flowcontrol(int on)
-{}

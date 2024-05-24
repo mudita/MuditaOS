@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -88,7 +88,6 @@ class BluetoothWorker : private sys::Worker
 
     void registerQueues();
     void onLinkKeyAdded(const std::string &deviceAddress);
-    void removeFromBoundDevices(uint8_t *addr);
 
     std::shared_ptr<Mailbox<bluetooth::Command, QueueHandle_t, WorkerLock>> workerQueue;
 

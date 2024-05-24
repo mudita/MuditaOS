@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -20,12 +20,15 @@ namespace bluetooth
       private:
         static hci_transport_config_uart_t config;
         const btstack_run_loop *runLoop;
-        btstack_packet_callback_registration_t hci_event_callback_registration;
+        btstack_packet_callback_registration_t hciEventCallbackRegistration;
         std::unique_ptr<bluetooth::GAP> gap;
         static PowerOnCallback powerOnCallback;
 
-        static void hci_packet_handler(uint8_t packet_type, uint16_t channel, uint8_t *packet, uint16_t size);
-        static void local_version_information_handler(uint8_t *packet);
+        static void hciPacketHandler(std::uint8_t packet_type,
+                                     std::uint16_t channel,
+                                     std::uint8_t *packet,
+                                     std::uint16_t size);
+        static void localVersionInformationHandler(std::uint8_t *packet);
 #ifdef TARGET_RT1051
         [[maybe_unused]] auto runLoopInitTarget(const btstack_run_loop *runLoop) -> const btstack_uart_block_t *;
 #else
