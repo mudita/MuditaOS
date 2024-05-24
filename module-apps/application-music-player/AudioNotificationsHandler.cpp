@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "AudioNotificationsHandler.hpp"
@@ -10,7 +10,7 @@ namespace app::music_player
 
     AudioNotificationsHandler::AudioNotificationsHandler(
         std::shared_ptr<app::music_player::SongsContract::Presenter> presenter)
-        : presenter(presenter)
+        : presenter(std::move(presenter))
     {}
 
     sys::MessagePointer AudioNotificationsHandler::handleAudioStopNotification(

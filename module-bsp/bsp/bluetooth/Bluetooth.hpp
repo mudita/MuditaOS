@@ -119,8 +119,8 @@ namespace bsp
         virtual ~BlueKitchen();
         static BlueKitchen &getInstance();
 
-        virtual Error read(uint8_t *buf, size_t size) override;
-        virtual Error write(const uint8_t *buf, size_t size) override;
+        virtual Error read(std::uint8_t *buf, std::size_t size) override;
+        virtual Error write(const std::uint8_t *buf, std::size_t size) override;
 
         std::uint32_t readLength = 0;
         std::uint8_t *readBuffer;

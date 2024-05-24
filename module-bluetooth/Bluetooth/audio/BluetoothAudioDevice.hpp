@@ -34,8 +34,8 @@ namespace bluetooth
         void disableOutput() override;
 
       protected:
-        auto isInputEnabled() const -> bool;
-        auto isOutputEnabled() const -> bool;
+        [[nodiscard]] auto isInputEnabled() const -> bool;
+        [[nodiscard]] auto isOutputEnabled() const -> bool;
         auto fillSbcAudioBuffer() -> int;
         auto scaleVolume(audio::Stream::Span &dataSpan) const -> void;
 
@@ -59,13 +59,16 @@ namespace bluetooth
         void onDataSend() override;
         void onDataReceive() override;
         auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
-        auto getTraits() const -> Traits override;
+        [[nodiscard]] auto getTraits() const -> Traits override;
         auto getSourceFormat() -> ::audio::AudioFormat override;
 
         audio::AudioDevice::RetCode Start() override;
         audio::AudioDevice::RetCode Stop() override;
         audio::AudioDevice::RetCode Resume() override;
         audio::AudioDevice::RetCode Pause() override;
+
+      private:
+        [[nodiscard]] audio::AudioDevice::RetCode waitUntilStreamPaused() const;
     };
 
     class CVSDAudioDevice : public BluetoothAudioDevice
@@ -82,7 +85,7 @@ namespace bluetooth
         void onDataSend(std::uint16_t scoHandle);
         void onDataReceive() override;
         auto getSupportedFormats() -> std::vector<audio::AudioFormat> override;
-        auto getTraits() const -> Traits override;
+        [[nodiscard]] auto getTraits() const -> Traits override;
         auto getSourceFormat() -> ::audio::AudioFormat override;
         void enableInput() override;
         void setAclHandle(hci_con_handle_t handle);

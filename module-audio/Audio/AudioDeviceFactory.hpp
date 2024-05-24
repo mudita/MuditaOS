@@ -33,4 +33,4 @@ namespace audio
       private:
         Observer *_observer = nullptr;
     };
-}; // namespace audio
+} // namespace audio
