@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BluetoothAudioDevice.hpp"
@@ -10,7 +10,8 @@
 
 #include <Audio/AudioCommon.hpp>
 #include <Audio/VolumeScaler.hpp>
-#include <Audio/Stream.hpp>
+
+#include <Utils.hpp>
 
 #include <chrono>
 #include <cassert>
@@ -215,48 +216,66 @@ void CVSDAudioDevice::enableInput()
 
 auto BluetoothAudioDevice::fillSbcAudioBuffer() -> int
 {
-    // perform sbc encodin
     int totalNumBytesRead                    = 0;
-    unsigned int numAudioSamplesPerSbcBuffer = btstack_sbc_encoder_num_audio_frames();
-    auto context                             = &AVRCP::mediaTracker;
+    const auto audioSamplesPerSbcBuffer      = btstack_sbc_encoder_num_audio_frames();
+    const auto context                       = &AVRCP::mediaTracker;
 
-    assert(context != nullptr);
-
-    while (context->samples_ready >= numAudioSamplesPerSbcBuffer &&
-           (context->max_media_payload_size - context->sbc_storage_count) >= btstack_sbc_encoder_sbc_buffer_length()) {
+    while (
+        (context->samples_ready >= audioSamplesPerSbcBuffer) &&
+        ((context->max_media_payload_size - context->sbc_storage_count) >= btstack_sbc_encoder_sbc_buffer_length())) {
         audio::Stream::Span dataSpan;
-
         Sink::_stream->peek(dataSpan);
 
-        constexpr size_t bytesPerSample =
-            sizeof(std::int16_t) / sizeof(std::uint8_t); // Samples are signed 16-bit, but stored in uint8_t array
-        const float outputVolumeNormalized =
-            outputVolume / static_cast<float>(audio::maxVolume); // Volume in <0;1> range
-
-        std::int16_t *firstSample = reinterpret_cast<std::int16_t *>(dataSpan.data);
-        std::int16_t *lastSample  = firstSample + dataSpan.dataSize / bytesPerSample;
-
-        /* Scale each sample to reduce volume */
-        std::for_each(firstSample, lastSample, [&](std::int16_t &sample) { sample *= outputVolumeNormalized; });
-
-        btstack_sbc_encoder_process_data(firstSample);
+        scaleVolume(dataSpan);
+        btstack_sbc_encoder_process_data(reinterpret_cast<std::int16_t *>(dataSpan.data));
         Sink::_stream->consume();
 
-        uint16_t sbcFrameSize = btstack_sbc_encoder_sbc_buffer_length();
-        uint8_t *sbcFrame     = btstack_sbc_encoder_sbc_buffer();
+        const auto sbcFrameSize = btstack_sbc_encoder_sbc_buffer_length();
+        const auto sbcFrame     = btstack_sbc_encoder_sbc_buffer();
 
-        totalNumBytesRead += numAudioSamplesPerSbcBuffer;
-        memcpy(&context->sbc_storage[context->sbc_storage_count], sbcFrame, sbcFrameSize);
+        totalNumBytesRead += audioSamplesPerSbcBuffer;
+        std::memcpy(&context->sbc_storage[context->sbc_storage_count], sbcFrame, sbcFrameSize);
         context->sbc_storage_count += sbcFrameSize;
-        context->samples_ready -= numAudioSamplesPerSbcBuffer;
+        context->samples_ready -= audioSamplesPerSbcBuffer;
     }
 
     return totalNumBytesRead;
 }
 
+auto BluetoothAudioDevice::scaleVolume(audio::Stream::Span &dataSpan) const -> void
+{
+    constexpr auto bytesPerSample =
+        sizeof(std::int16_t) / sizeof(std::uint8_t); // Samples are signed 16-bit, but stored in uint8_t array
+    constexpr auto volumeLevels   = (audio::maxVolume - audio::minVolume) + 1;
+    constexpr auto volumeScaleLut = utils::makeArray<float, volumeLevels>([](auto index) {
+        /* Return zero when muted */
+        if (index == 0) {
+            return 0.0f;
+        }
+
+        /* Normalize volume to <0;1> range */
+        const auto volumeNormalized = static_cast<float>(index) / audio::maxVolume;
+
+        /* Coefficients for a curve with a dynamic range of 42dB
+         * For 10 available steps this gives ~4dB change between each step, what seems
+         * to be a fair compromise between step size and volume at the lowest level.
+         * For more info check: https://www.dr-lex.be/info-stuff/volumecontrols.html */
+        constexpr auto a = 7.943e-3f;
+        constexpr auto b = 4.835f;
+        return std::clamp(a * std::exp(b * volumeNormalized), 0.0f, 1.0f);
+    });
+
+    auto firstSample = reinterpret_cast<std::int16_t *>(dataSpan.data);
+    auto lastSample  = &firstSample[dataSpan.dataSize / bytesPerSample];
+
+    /* Scale each sample to reduce volume */
+    const auto lutIndex = static_cast<std::size_t>(outputVolume);
+    std::for_each(firstSample, lastSample, [&](std::int16_t &sample) { sample *= volumeScaleLut[lutIndex]; });
+}
+
 auto A2DPAudioDevice::getSupportedFormats() -> std::vector<audio::AudioFormat>
 {
-    constexpr static auto supportedBitWidth = 16U;
+    constexpr auto supportedBitWidth = 16U;
     return std::vector<AudioFormat>{AudioFormat{static_cast<unsigned>(AVDTP::sbcConfig.samplingFrequency),
                                                 supportedBitWidth,
                                                 static_cast<unsigned>(AVDTP::sbcConfig.numChannels)}};
@@ -286,6 +305,7 @@ auto CVSDAudioDevice::getSourceFormat() -> ::audio::AudioFormat
 {
     return AudioFormat{bluetooth::SCO::CVSD_SAMPLE_RATE, supportedBitWidth, supportedChannels};
 }
+
 void CVSDAudioDevice::setAclHandle(hci_con_handle_t handle)
 {
     aclHandle = handle;

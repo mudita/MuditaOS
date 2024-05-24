@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,6 +6,7 @@
 #include <Audio/Endpoint.hpp>
 #include <Audio/AudioDevice.hpp>
 #include <Audio/AudioFormat.hpp>
+#include <Audio/Stream.hpp>
 #include <interface/profiles/A2DP/MediaContext.hpp>
 #include <interface/profiles/AudioProfile.hpp>
 
@@ -16,7 +17,6 @@ extern "C"
 
 namespace bluetooth
 {
-
     class BluetoothAudioDevice : public audio::AudioDevice
     {
       public:
@@ -37,6 +37,8 @@ namespace bluetooth
         auto isInputEnabled() const -> bool;
         auto isOutputEnabled() const -> bool;
         auto fillSbcAudioBuffer() -> int;
+        auto scaleVolume(audio::Stream::Span &dataSpan) const -> void;
+
         float outputVolume;
 
       private:
@@ -95,10 +97,10 @@ namespace bluetooth
         static constexpr auto packetLengthOffset = 2;
         static constexpr auto packetDataOffset   = 3;
 
-        constexpr static auto supportedBitWidth = 16U;
-        constexpr static auto supportedChannels = 1;
+        static constexpr auto supportedBitWidth = 16U;
+        static constexpr auto supportedChannels = 1;
 
-        constexpr static auto allGoodMask = 0x30;
+        static constexpr auto allGoodMask = 0x30;
 
         auto decodeCVSD(audio::AbstractStream::Span dataToDecode) -> audio::AbstractStream::Span;
 
@@ -108,5 +110,4 @@ namespace bluetooth
         btstack_cvsd_plc_state_t cvsdPlcState;
         hci_con_handle_t aclHandle;
     };
-
 } // namespace bluetooth

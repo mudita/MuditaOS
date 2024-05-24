@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -352,6 +352,16 @@ namespace utils
         return ((((toSwap)&0xff000000) >> 24) | (((toSwap)&0x00ff0000) >> 8) | (((toSwap)&0x0000ff00) << 8) |
                 (((toSwap)&0x000000ff) << 24));
 #endif
+    }
+
+    template <typename T, std::size_t N, typename Generator>
+    [[nodiscard]] inline constexpr std::array<T, N> makeArray(Generator g)
+    {
+        std::array<T, N> array{};
+        for (std::size_t i = 0; i < N; ++i) {
+            array[i] = g(i);
+        }
+        return array;
     }
 
     [[nodiscard]] std::string generateRandomId(std::size_t length) noexcept;
