@@ -45,6 +45,7 @@ target_sources(application-bell-settings
         presenter/LanguageWindowPresenter.cpp
         presenter/LayoutWindowPresenter.cpp
         presenter/ShortcutsWindowPresenter.cpp
+        presenter/UpdateInstructionWindowPresenter.cpp
         presenter/alarm_settings/AlarmSettingsPresenter.cpp
         presenter/alarm_settings/PrewakeUpPresenter.cpp
         presenter/alarm_settings/SnoozePresenter.cpp
@@ -91,6 +92,7 @@ target_sources(application-bell-settings
         presenter/LanguageWindowPresenter.hpp
         presenter/LayoutWindowPresenter.hpp
         presenter/ShortcutsWindowPresenter.hpp
+        presenter/UpdateInstructionWindowPresenter.hpp
         presenter/alarm_settings/AlarmSettingsPresenter.hpp
         presenter/alarm_settings/PrewakeUpPresenter.hpp
         presenter/alarm_settings/SnoozePresenter.hpp
