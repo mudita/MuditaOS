@@ -12,6 +12,7 @@
 * Added unique sound to indicate the meditation session has ended.
 * Added Focus Timer application.
 * Added update instruction screen at end of onboarding
+* Added update instruction screen in Settings
 
 ### Changed / Improved
 * Updated button handling during pre-wake up

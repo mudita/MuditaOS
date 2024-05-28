@@ -19,6 +19,7 @@
 #include "presenter/alarm_settings/SnoozePresenter.hpp"
 #include "presenter/FrontlightPresenter.hpp"
 #include "presenter/ShortcutsWindowPresenter.hpp"
+#include "presenter/UpdateInstructionWindowPresenter.hpp"
 #include "windows/AboutYourBellWindow.hpp"
 #include "windows/BellSettingsLanguageWindow.hpp"
 #include "windows/BellSettingsLayoutWindow.hpp"
@@ -41,6 +42,7 @@
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/windows/ShortcutsWindow.hpp>
+#include <common/windows/UpdateInstructionWindow.hpp>
 #include <common/popups/BellTurnOffOptionWindow.hpp>
 #include <common/models/AudioModel.hpp>
 #include <common/models/TimeModel.hpp>
@@ -286,6 +288,12 @@ namespace app
                                   auto presenter = std::make_unique<bell_settings::ShortcutsWindowPresenter>(this);
                                   return std::make_unique<gui::ShortcutsWindow>(app, std::move(presenter), name);
                               });
+
+        windowsFactory.attach(
+            gui::window::name::bellSettingsUpdateInstruction, [&](ApplicationCommon *app, const std::string &name) {
+                auto presenter = std::make_unique<bell_settings::UpdateInstructionWindowPresenter>(this);
+                return std::make_unique<gui::UpdateInstructionWindow>(app, std::move(presenter), name);
+            });
 
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,
