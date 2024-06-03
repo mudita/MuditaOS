@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -31,12 +31,12 @@ namespace sys
             : Queue(maxItems, itemSize), name(name)
         {}
 
-        QueueHandle_t GetQueueHandle() const
+        [[nodiscard]] QueueHandle_t GetQueueHandle() const
         {
             return handle;
         }
 
-        const std::string &GetQueueName() const
+        [[nodiscard]] const std::string &GetQueueName() const
         {
             return name;
         }
@@ -87,22 +87,22 @@ namespace sys
             Invalid
         };
 
-        using Id = unsigned int;
+        using Id = unsigned;
 
         static void taskAdapter(void *taskParam);
         bool handleControlMessage();
         void task();
         void setState(State newState);
         void constructName();
-        std::string getControlQueueName() const;
-        size_t addQueue(const std::string &queueName, UBaseType_t maxItems, UBaseType_t itemSize);
+        [[nodiscard]] std::string getControlQueueName() const;
+        std::size_t addQueue(const std::string &queueName, UBaseType_t maxItems, UBaseType_t itemSize);
 
         std::optional<std::size_t> controlQueueIndex;
         std::optional<std::size_t> serviceQueueIndex;
-        WorkerQueue &getControlQueue() const;
+        [[nodiscard]] WorkerQueue &getControlQueue() const;
 
         static constexpr std::size_t controlMessagesCount = static_cast<std::size_t>(ControlMessage::MessageCount);
-        static constexpr std::size_t defaultStackSize     = 8192;
+        static constexpr std::size_t defaultStackSize     = 8 * 1024;
         static constexpr TickType_t defaultJoinTimeout    = pdMS_TO_TICKS(500);
         static constexpr auto controlQueueNamePrefix      = "wctrl";
 
@@ -117,14 +117,14 @@ namespace sys
       protected:
         virtual bool handleMessage(std::uint32_t queueID) = 0;
 
-        WorkerQueue &getServiceQueue() const;
+        [[nodiscard]] WorkerQueue &getServiceQueue() const;
 
-        xQueueHandle getQueueHandleByName(const std::string &qname) const;
-        std::shared_ptr<WorkerQueue> getQueueByName(const std::string &qname) const;
+        [[nodiscard]] xQueueHandle getQueueHandleByName(const std::string &qname) const;
+        [[nodiscard]] std::shared_ptr<WorkerQueue> getQueueByName(const std::string &qname) const;
 
         bool sendControlMessage(ControlMessage message);
         bool sendCommand(WorkerCommand command);
-        State getState() const;
+        [[nodiscard]] State getState() const;
 
         static constexpr std::uint32_t SERVICE_QUEUE_LENGTH = 10;
         static constexpr std::uint32_t CONTROL_QUEUE_LENGTH = 4;

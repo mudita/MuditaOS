@@ -59,7 +59,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     return initialized;
 }
 
-void WorkerDesktop::closeWorker(void)
+void WorkerDesktop::closeWorker()
 {
     if (!initialized) {
         return;

@@ -121,7 +121,6 @@ static uint32_t SNVS_HP_ConvertDatetimeToSeconds(const snvs_hp_rtc_datetime_t *d
     assert(datetime != NULL);
 
     /* Number of days from begin of the non Leap-year*/
-    /* Number of days from begin of the non Leap-year*/
     uint16_t monthDays[] = {0U, 0U, 31U, 59U, 90U, 120U, 151U, 181U, 212U, 243U, 273U, 304U, 334U};
     uint32_t seconds;
 
@@ -568,8 +567,6 @@ void SNVS_HP_SetLocks(SNVS_Type *base)
  */
 status_t SNVS_HP_RTC_SetAlarmSeconds(SNVS_Type *base, uint32_t alarmSeconds)
 {
-    assert(alarmTime != NULL);
-
     uint32_t currSeconds  = 0U;
     uint32_t tmp          = base->HPCR;
 
