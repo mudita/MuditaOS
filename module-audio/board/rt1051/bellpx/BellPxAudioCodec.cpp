@@ -134,7 +134,7 @@ namespace audio
                                        reinterpret_cast<edma_handle_t *>(audioCfg->rxDMAHandle->GetHandle()));
         /* I2S mode configurations */
         SAI_GetClassicI2SConfig(
-            &saiConfig, static_cast<sai_word_width_t>(saiInFormat.bitWidth), saiInFormat.stereo, 0U);
+            &saiConfig, static_cast<sai_word_width_t>(saiInFormat.bitWidth), saiInFormat.stereo, kSAI_Channel0Mask);
         saiConfig.syncMode    = kSAI_ModeSync;
         saiConfig.masterSlave = kSAI_Slave;
         SAI_TransferRxSetConfigEDMA(BELL_AUDIOCODEC_SAIx, &txHandle, &saiConfig);
@@ -159,7 +159,7 @@ namespace audio
                                        reinterpret_cast<edma_handle_t *>(audioCfg->txDMAHandle->GetHandle()));
         /* I2S mode configurations */
         SAI_GetClassicI2SConfig(
-            &saiConfig, static_cast<sai_word_width_t>(saiOutFormat.bitWidth), saiOutFormat.stereo, 0U);
+            &saiConfig, static_cast<sai_word_width_t>(saiOutFormat.bitWidth), saiOutFormat.stereo, kSAI_Channel0Mask);
         SAI_TransferTxSetConfigEDMA(BELL_AUDIOCODEC_SAIx, &txHandle, &saiConfig);
         const auto channelNumbers = saiOutFormat.stereo == kSAI_Stereo ? 2U : 1U;
         /* set bit clock divider */
@@ -231,5 +231,4 @@ namespace audio
         auto self = static_cast<BellPxAudioCodec *>(userData);
         self->onDataSend();
     }
-
 } // namespace audio

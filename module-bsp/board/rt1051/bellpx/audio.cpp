@@ -1,9 +1,9 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "audio.hpp"
-
 #include "board/BoardDefinitions.hpp"
+#include <cstring>
 
 extern "C"
 {
@@ -63,9 +63,9 @@ void bsp::audio::init(const std::uint32_t sampleRate)
     IOMUXC_GPR->GPR1 |= BELL_AUDIOCODEC_SAIx_MCLK_MASK;
 
     audioConfig.txDMAHandle =
-        audioConfig.dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::AUDIOCODEC_TX_DMA_CHANNEL));
+        audioConfig.dma->CreateHandle(static_cast<std::uint32_t>(BoardDefinitions::AUDIOCODEC_TX_DMA_CHANNEL));
     audioConfig.rxDMAHandle =
-        audioConfig.dma->CreateHandle(static_cast<uint32_t>(BoardDefinitions::AUDIOCODEC_RX_DMA_CHANNEL));
+        audioConfig.dma->CreateHandle(static_cast<std::uint32_t>(BoardDefinitions::AUDIOCODEC_RX_DMA_CHANNEL));
     audioConfig.dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::AUDIOCODEC_TX_DMA_CHANNEL),
                                BSP_AUDIOCODEC_SAIx_DMA_TX_SOURCE);
     audioConfig.dmamux->Enable(static_cast<uint32_t>(BoardDefinitions::AUDIOCODEC_RX_DMA_CHANNEL),
@@ -78,7 +78,7 @@ void bsp::audio::init(const std::uint32_t sampleRate)
 
 void bsp::audio::deinit()
 {
-    memset(&audioConfig.config, 0, sizeof(audioConfig.config));
+    std::memset(&audioConfig.config, 0, sizeof(audioConfig.config));
     SAI_Deinit(BELL_AUDIOCODEC_SAIx);
     if (audioConfig.dmamux) {
         audioConfig.dmamux->Disable(static_cast<uint32_t>(BoardDefinitions::AUDIOCODEC_TX_DMA_CHANNEL));

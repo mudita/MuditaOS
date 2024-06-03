@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <Service/Worker.hpp>
@@ -18,7 +18,7 @@ namespace sys
 
     void Worker::taskAdapter(void *taskParam)
     {
-        Worker *worker = static_cast<Worker *>(taskParam);
+        auto worker = static_cast<Worker *>(taskParam);
         worker->setState(State::Running);
         worker->task();
     }
@@ -100,7 +100,7 @@ namespace sys
         name.append("_w" + std::to_string(id));
     }
 
-    size_t Worker::addQueue(const std::string &qName, UBaseType_t maxItems, UBaseType_t itemSize)
+    std::size_t Worker::addQueue(const std::string &qName, UBaseType_t maxItems, UBaseType_t itemSize)
     {
         auto idx = queues.size();
         queues.push_back(std::make_shared<WorkerQueue>(qName, maxItems, itemSize));
@@ -157,8 +157,8 @@ namespace sys
         };
 
         // iterate over all user queues and add them to set
-        for (std::uint32_t i = 0; i < queues.size(); ++i) {
-            if (xQueueAddToSet(queues[i]->GetQueueHandle(), queueSet) != pdPASS) {
+        for (auto &q : queues) {
+            if (xQueueAddToSet(q->GetQueueHandle(), queueSet) != pdPASS) {
                 state = State::Invalid;
                 deinit();
                 return false;
@@ -195,7 +195,7 @@ namespace sys
         setState(State::Destroyed);
 
         return true;
-    };
+    }
 
     /**
      * This method starts RTOS thread that waits for incoming queue events.
@@ -204,15 +204,12 @@ namespace sys
     {
         assert(getState() == State::Initiated);
 
-        BaseType_t task_error = 0;
-        task_error            = xTaskCreate(
+        const auto taskError = xTaskCreate(
             Worker::taskAdapter, name.c_str(), stackDepth / sizeof(StackType_t), this, priority, &taskHandle);
-
-        if (task_error != pdPASS) {
+        if (taskError != pdPASS) {
             LOG_ERROR("Failed to start the task");
             return false;
         }
-
         return true;
     }
 
@@ -264,10 +261,12 @@ namespace sys
     bool Worker::join(TickType_t timeout)
     {
         assert(getState() == State::Running || getState() == State::Stopped);
+
         if (xSemaphoreTake(joinSemaphore, timeout) != pdTRUE) {
             LOG_ERROR("Failed to take semaphore!");
             return false;
         }
+
         const auto waitDeleteTaskTick = xTaskGetTickCount();
         while (eTaskGetState(taskHandle) != eDeleted) {
             if ((xTaskGetTickCount() - waitDeleteTaskTick) > timeout) {
@@ -275,6 +274,7 @@ namespace sys
                 return false;
             }
         }
+
         return true;
     }
 
