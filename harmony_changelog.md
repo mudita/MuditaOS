@@ -13,6 +13,7 @@
 ### Changed / Improved
 * Changed the refresh rate of the progress bar screen
 * Extended range of supported chargers.
+* Changed order of options in Settings menu.
 
 ## [2.7.0 2024-05-20]
 
