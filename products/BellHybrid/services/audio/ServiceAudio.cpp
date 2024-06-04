@@ -92,11 +92,11 @@ namespace service
                 }
             }
         };
-        volumeFadeIn = std::make_unique<audio::VolumeFadeIn>(this, std::move(callback));
+        volumeFade = std::make_unique<audio::VolumeFade>(this, std::move(callback));
 
         connect(typeid(AudioStartPlaybackRequest), [this](sys::Message *msg) -> sys::MessagePointer {
             auto *msgl = static_cast<AudioStartPlaybackRequest *>(msg);
-            return handleStart(audio::Operation::Type::Playback, msgl->fadeIn, msgl->fileName, msgl->playbackType);
+            return handleStart(audio::Operation::Type::Playback, msgl->fadeParams, msgl->fileName, msgl->playbackType);
         });
 
         connect(typeid(internal::AudioEOFNotificationMessage), [this](sys::Message *msg) -> sys::MessagePointer {
@@ -113,7 +113,7 @@ namespace service
                 });
 
         connect(typeid(AudioStopRequest), [this](sys::Message *msg) -> sys::MessagePointer {
-            volumeFadeIn->Stop();
+            volumeFade->Stop();
             auto *msgl = static_cast<AudioStopRequest *>(msg);
             return handleStop(msgl->stopVec, msgl->token);
         });
@@ -168,7 +168,7 @@ namespace service
     }
 
     auto Audio::handleStart(audio::Operation::Type opType,
-                            audio::FadeIn fadeIn,
+                            std::optional<audio::FadeParams> fadeParams,
                             const std::string &fileName,
                             const audio::PlaybackType &playbackType) -> std::unique_ptr<AudioResponseMessage>
     {
@@ -193,8 +193,8 @@ namespace service
         auto input = audioMux.GetPlaybackInput(playbackType);
         AudioStart(input);
         manageCpuSentinel();
-        if (fadeIn == audio::FadeIn::Enable) {
-            volumeFadeIn->Start(getVolume(playbackType), minVolumeToSet, maxVolumeToSet);
+        if (fadeParams.has_value()) {
+            volumeFade->Start(getVolume(playbackType), minVolumeToSet, maxVolumeToSet, fadeParams.value());
         }
 
         return std::make_unique<AudioStartPlaybackResponse>(retCode, retToken);
@@ -275,8 +275,8 @@ namespace service
         if (const auto input = audioMux.GetInput(token); input) {
             if (shouldLoop((*input)->audio->GetCurrentOperationPlaybackType())) {
                 (*input)->audio->Start();
-                if (volumeFadeIn->IsActive()) {
-                    volumeFadeIn->Restart();
+                if (volumeFade->IsActive()) {
+                    volumeFade->Restart();
                 }
 
                 if ((*input)->audio->IsMuted()) {

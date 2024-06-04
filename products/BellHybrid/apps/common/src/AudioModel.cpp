@@ -87,10 +87,11 @@ namespace app
     void AudioModel::play(const std::string &filePath,
                           PlaybackType type,
                           OnStateChangeCallback &&callback,
-                          audio::FadeIn fadeIn)
+                          std::optional<audio::FadeParams> fadeParams)
     {
         playbackFinishedFlag = false;
-        auto msg  = std::make_unique<service::AudioStartPlaybackRequest>(filePath, convertPlaybackType(type), fadeIn);
+        auto msg =
+            std::make_unique<service::AudioStartPlaybackRequest>(filePath, convertPlaybackType(type), fadeParams);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
 
         auto cb = [_callback = callback, this](auto response) {
