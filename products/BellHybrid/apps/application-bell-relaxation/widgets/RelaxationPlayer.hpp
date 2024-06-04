@@ -26,16 +26,17 @@ namespace app::relaxation
             SingleShot
         };
 
-        virtual ~AbstractRelaxationPlayer()                                                   = default;
+        virtual ~AbstractRelaxationPlayer()                                                     = default;
         virtual void start(const std::string &filePath,
                            PlaybackMode mode,
                            AbstractAudioModel::OnStateChangeCallback &&callback,
-                           AbstractAudioModel::OnPlaybackFinishedCallback &&finishedCallback) = 0;
-        virtual void stop(AbstractAudioModel::OnStateChangeCallback &&callback)               = 0;
-        virtual void pause(AbstractAudioModel::OnStateChangeCallback &&callback)              = 0;
-        virtual void resume(AbstractAudioModel::OnStateChangeCallback &&callback)             = 0;
-        virtual PlaybackMode getCurrentMode() const noexcept                                  = 0;
-        virtual bool isPaused()                                                               = 0;
+                           AbstractAudioModel::OnPlaybackFinishedCallback &&finishedCallback,
+                           std::optional<std::chrono::seconds> playbackDuration = std::nullopt) = 0;
+        virtual void stop(AbstractAudioModel::OnStateChangeCallback &&callback)                 = 0;
+        virtual void pause(AbstractAudioModel::OnStateChangeCallback &&callback)                = 0;
+        virtual void resume(AbstractAudioModel::OnStateChangeCallback &&callback)               = 0;
+        virtual PlaybackMode getCurrentMode() const noexcept                                    = 0;
+        virtual bool isPaused()                                                                 = 0;
     };
 
     class RelaxationPlayer : public AbstractRelaxationPlayer
@@ -47,7 +48,8 @@ namespace app::relaxation
         void start(const std::string &filePath,
                    PlaybackMode mode,
                    AbstractAudioModel::OnStateChangeCallback &&callback,
-                   AbstractAudioModel::OnPlaybackFinishedCallback &&finishedCallback) override;
+                   AbstractAudioModel::OnPlaybackFinishedCallback &&finishedCallback,
+                   std::optional<std::chrono::seconds> playbackDuration = std::nullopt) override;
         void stop(AbstractAudioModel::OnStateChangeCallback &&callback) override;
         void pause(AbstractAudioModel::OnStateChangeCallback &&callback) override;
         void resume(AbstractAudioModel::OnStateChangeCallback &&callback) override;

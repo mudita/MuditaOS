@@ -23,7 +23,7 @@ namespace app
         void play(const std::string &filePath,
                   PlaybackType type,
                   OnStateChangeCallback &&callback,
-                  audio::FadeIn fadeIn = audio::FadeIn::Disable) override;
+                  std::optional<audio::FadeParams> fadeParams = std::nullopt) override;
         void stopAny(OnStateChangeCallback &&callback) override;
         void stopPlayedByThis(OnStateChangeCallback &&callback) override;
         void pause(OnStateChangeCallback &&callback) override;

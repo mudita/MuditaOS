@@ -76,10 +76,17 @@ namespace audio
         Other
     };
 
-    enum class FadeIn
+    enum class Fade
     {
         Disable,
-        Enable
+        In,
+        InOut
+    };
+
+    struct FadeParams
+    {
+        Fade mode;
+        std::optional<std::chrono::seconds> playbackDuration = std::nullopt;
     };
 
     enum class VolumeUpdateType

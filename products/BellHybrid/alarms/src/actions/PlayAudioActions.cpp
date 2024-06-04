@@ -23,13 +23,13 @@ namespace alarms
         if (duration.has_value()) {
             spawnTimer(duration.value());
         }
-        const auto fadeInSettings = utils::getNumericValue<bool>(
+        const auto fadeSettings = utils::getNumericValue<bool>(
             settings.getValue(bell::settings::Alarm::fadeActive, settings::SettingsScope::Global));
-        const auto fadeInEnabled = (fadeInSettings && (playbackType == audio::PlaybackType::Alarm))
-                                       ? audio::FadeIn::Enable
-                                       : audio::FadeIn::Disable;
+        const auto fadeInEnabled =
+            (fadeSettings && (playbackType == audio::PlaybackType::Alarm)) ? audio::Fade::In : audio::Fade::Disable;
 
-        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(path, playbackType, fadeInEnabled);
+        auto msg =
+            std::make_shared<service::AudioStartPlaybackRequest>(path, playbackType, audio::FadeParams{fadeInEnabled});
         return service.bus.sendUnicast(std::move(msg), service::audioServiceName);
     }
 
