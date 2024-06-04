@@ -12,6 +12,7 @@
 * Added volume setting for Focus Timer application
 * Added label with the name of the application on the countdown screens
 * Added What's New section shown after update
+* Added fade in and fade out to relaxation songs
 
 ### Changed / Improved
 * Changed the refresh rate of the progress bar screen

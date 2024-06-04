@@ -4,7 +4,7 @@
 #pragma once
 
 #include "AudioMessage.hpp"
-#include "VolumeFadeIn.hpp"
+#include "VolumeFade.hpp"
 #include <Audio/Audio.hpp>
 #include <Audio/AudioMux.hpp>
 #include <MessageType.hpp>
@@ -42,7 +42,7 @@ namespace service
         };
 
         auto handleStart(audio::Operation::Type opType,
-                         audio::FadeIn fadeIn,
+                         std::optional<audio::FadeParams> fadeParams,
                          const std::string &fileName             = {},
                          const audio::PlaybackType &playbackType = audio::PlaybackType::None)
             -> std::unique_ptr<AudioResponseMessage>;
@@ -75,7 +75,7 @@ namespace service
         mutable audio::AudioMux audioMux;
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
         std::unique_ptr<settings::Settings> settingsProvider;
-        std::unique_ptr<audio::VolumeFadeIn> volumeFadeIn;
+        std::unique_ptr<audio::VolumeFade> volumeFade;
     };
 } // namespace service
 
