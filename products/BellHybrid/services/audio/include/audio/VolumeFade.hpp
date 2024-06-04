@@ -8,27 +8,39 @@
 
 namespace audio
 {
-    class VolumeFadeIn
+    class VolumeFade
     {
       public:
         using SetCallback = std::function<void(float)>;
 
-        VolumeFadeIn(sys::Service *parent, SetCallback callback);
-        ~VolumeFadeIn();
+        VolumeFade(sys::Service *parent, SetCallback callback);
+        ~VolumeFade();
 
-        void Start(float targetVolume, float minVolume, float maxVolume);
+        void Start(float targetVolume, float minVolume, float maxVolume, audio::FadeParams fadeParams);
         void Restart();
         void Stop();
         bool IsActive();
 
       private:
+        enum class State
+        {
+            Disable,
+            FadeIn,
+            FadeOut
+        };
+
+        audio::FadeParams fadeParams;
         sys::TimerHandle timerHandle;
         float targetVolume;
         float minVolume;
         float maxVolume;
         float currentVolume;
         SetCallback setVolumeCallback;
+        State state{State::Disable};
+        std::chrono::time_point<std::chrono::system_clock> timestamp;
 
         void PerformNextFadeStep();
+        void TurnUpVolume();
+        void TurnDownVolume();
     };
 } // namespace audio

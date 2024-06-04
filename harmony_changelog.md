@@ -9,6 +9,7 @@
 * Added What's New section shown after update
 * Added versioning for private assets
 * Added greetings in all languages
+* Added fade in and fade out to relaxation songs
 
 ### Changed / Improved
 

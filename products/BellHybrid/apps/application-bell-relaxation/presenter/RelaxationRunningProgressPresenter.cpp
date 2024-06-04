@@ -41,12 +41,15 @@ namespace app::relaxation
         Expects(timer != nullptr);
 
         AbstractRelaxationPlayer::PlaybackMode mode;
-        const auto value      = settings->getValue(timerValueDBRecordName, settings::SettingsScope::AppLocal);
-        const auto songLength = std::chrono::seconds{song.audioProperties.songLength};
-        if (utils::is_number(value) && (utils::getNumericValue<int>(value) != 0) &&
-            !isSongLengthEqualToPeriod(songLength, std::chrono::minutes{utils::getNumericValue<int>(value)})) {
-            const auto playbackTimeInMinutes = std::chrono::minutes{utils::getNumericValue<int>(value)};
-            timer->reset(playbackTimeInMinutes);
+        const auto settingsValue  = settings->getValue(timerValueDBRecordName, settings::SettingsScope::AppLocal);
+        const auto presetDuration = utils::getNumericValue<int>(settingsValue);
+        const auto songLength     = std::chrono::seconds{song.audioProperties.songLength};
+        auto playbackDuration     = songLength;
+
+        if (utils::is_number(settingsValue) && (presetDuration != 0) &&
+            !isSongLengthEqualToPeriod(songLength, std::chrono::minutes{presetDuration})) {
+            playbackDuration = std::chrono::minutes{presetDuration};
+            timer->reset(playbackDuration);
             mode = AbstractRelaxationPlayer::PlaybackMode::Looped;
         }
         else {
@@ -76,7 +79,8 @@ namespace app::relaxation
             }
         };
 
-        player.start(song.fileInfo.path, mode, std::move(onStartCallback), std::move(onFinishedCallback));
+        player.start(
+            song.fileInfo.path, mode, std::move(onStartCallback), std::move(onFinishedCallback), playbackDuration);
     }
 
     void RelaxationRunningProgressPresenter::stop()
