@@ -13,12 +13,12 @@ target_include_directories(bell-audio
 target_sources(bell-audio
         PRIVATE
         ServiceAudio.cpp
-        VolumeFadeIn.cpp
+        VolumeFade.cpp
 
         PUBLIC
         include/audio/AudioMessage.hpp
         include/audio/ServiceAudio.hpp
-        include/audio/VolumeFadeIn.hpp
+        include/audio/VolumeFade.hpp
 
         )
 
