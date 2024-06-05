@@ -30,6 +30,7 @@ function(add_assets_target)
         # Create 'golden copy' of DBs
         COMMAND mkdir -p ${_ASSETS_SYSTEM_DEST_DIR}/db/factory
         COMMAND rsync -qlptgoDu
+            --exclude '*.db-journal'
             ${_ASSETS_SYSTEM_DEST_DIR}/db/*
             ${_ASSETS_SYSTEM_DEST_DIR}/db/factory
 
