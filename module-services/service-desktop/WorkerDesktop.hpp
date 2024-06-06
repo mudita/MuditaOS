@@ -62,6 +62,8 @@ class WorkerDesktop : public sys::Worker
     sys::Service *ownerService = nullptr;
     sdesktop::endpoints::StateMachine parser;
 
+    static constexpr auto cpuSentinelName = "WorkerDesktop";
     std::shared_ptr<sys::CpuSentinel> cpuSentinel;
+
     std::function<void()> messageProcessedCallback;
 };
