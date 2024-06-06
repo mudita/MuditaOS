@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <service-desktop/ServiceDesktop.hpp>
@@ -27,11 +27,9 @@ ServiceDesktop::ServiceDesktop(const std::filesystem::path &mtpRootPath)
     bus.channels.push_back(sys::BusChannel::USBNotifications);
 }
 
-ServiceDesktop::~ServiceDesktop()
-{
-}
+ServiceDesktop::~ServiceDesktop() = default;
 
-sys::ReturnCodes ServiceDesktop::InitHandler()
+auto ServiceDesktop::InitHandler() -> sys::ReturnCodes
 {
     settings = std::make_unique<settings::Settings>();
     settings->init(service::ServiceProxy(shared_from_this()));
@@ -57,18 +55,19 @@ sys::ReturnCodes ServiceDesktop::InitHandler()
     return sys::ReturnCodes::Success;
 }
 
-sys::ReturnCodes ServiceDesktop::DeinitHandler()
+auto ServiceDesktop::DeinitHandler() -> sys::ReturnCodes
 {
     LOG_INFO("Deinitialized");
     return usbWorkerDeinit();
 }
 
-sys::ReturnCodes ServiceDesktop::SwitchPowerModeHandler(const sys::ServicePowerMode /*mode*/)
+auto ServiceDesktop::SwitchPowerModeHandler([[maybe_unused]] const sys::ServicePowerMode mode) -> sys::ReturnCodes
 {
     return sys::ReturnCodes::Success;
 }
 
-sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage * /*msg*/, sys::ResponseMessage *resp)
+auto ServiceDesktop::DataReceivedHandler([[maybe_unused]] sys::DataMessage *msg, sys::ResponseMessage *resp)
+    -> sys::MessagePointer
 {
     auto response = std::make_shared<sys::ResponseMessage>();
     if (resp == nullptr) {
@@ -92,7 +91,7 @@ sys::MessagePointer ServiceDesktop::DataReceivedHandler(sys::DataMessage * /*msg
     return response;
 }
 
-void ServiceDesktop::prepareSyncData()
+auto ServiceDesktop::prepareSyncData() -> void
 {
     syncStatus.state   = Sync::OperationState::Stopped;
     syncStatus.tempDir = purefs::dir::getTemporaryPath() / "sync";
@@ -102,7 +101,7 @@ auto ServiceDesktop::requestLogsFlush() -> void
 {
     int response = 0;
     auto ret     = bus.sendUnicastSync(
-        std::make_shared<sevm::FlushLogsRequest>(), service::name::evt_manager, DefaultLogFlushTimeoutInMs);
+        std::make_shared<sevm::FlushLogsRequest>(), service::name::evt_manager, defaultLogFlushTimeoutMs);
 
     if (ret.first == sys::ReturnCodes::Success) {
         auto responseMsg = std::dynamic_pointer_cast<sevm::FlushLogsResponse>(ret.second);
@@ -145,7 +144,7 @@ auto ServiceDesktop::getNotificationEntries() const -> std::vector<Outbox::Notif
     return outboxNotifications.getNotificationEntries();
 }
 
-void ServiceDesktop::removeNotificationEntries(const std::vector<std::uint32_t> &uidsOfNotificationsToBeRemoved)
+auto ServiceDesktop::removeNotificationEntries(const std::vector<std::uint32_t> &uidsOfNotificationsToBeRemoved) -> void
 {
     outboxNotifications.removeNotificationEntries(uidsOfNotificationsToBeRemoved);
 }
@@ -217,12 +216,12 @@ auto ServiceDesktop::usbWorkerDeinit() -> sys::ReturnCodes
     return sys::ReturnCodes::Success;
 }
 
-void ServiceDesktop::restartConnectionActiveTimer()
+auto ServiceDesktop::restartConnectionActiveTimer() -> void
 {
     connectionActiveTimer.restart(sdesktop::connectionActiveTimerDelayMs);
 }
 
-void ServiceDesktop::checkChargingCondition()
+auto ServiceDesktop::checkChargingCondition() -> void
 {
     if (Store::Battery::get().state == Store::Battery::State::Discharging) {
         usbWorkerDeinit();
@@ -243,7 +242,7 @@ auto ServiceDesktop::handle(db::NotificationMessage *msg) -> std::shared_ptr<sys
     return sys::MessageNone{};
 }
 
-auto ServiceDesktop::handle(locks::UnlockedPhone * /*msg*/) -> std::shared_ptr<sys::Message>
+auto ServiceDesktop::handle([[maybe_unused]] locks::UnlockedPhone *msg) -> std::shared_ptr<sys::Message>
 {
     LOG_INFO("Phone unlocked.");
     usbSecurityModel->setPhoneUnlocked();
@@ -252,13 +251,15 @@ auto ServiceDesktop::handle(locks::UnlockedPhone * /*msg*/) -> std::shared_ptr<s
         bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
                         service::name::system_manager);
         isPlugEventUnhandled = false;
-        desktopWorker->notify(WorkerDesktop::Signal::unlockMTP);
+        if (desktopWorker != nullptr) {
+            desktopWorker->notify(WorkerDesktop::Signal::unlockMTP);
+        }
     }
 
     return sys::MessageNone{};
 }
 
-auto ServiceDesktop::handle(locks::LockedPhone * /*msg*/) -> std::shared_ptr<sys::Message>
+auto ServiceDesktop::handle([[maybe_unused]] locks::LockedPhone *msg) -> std::shared_ptr<sys::Message>
 {
     LOG_INFO("Phone locked.");
     usbSecurityModel->setPhoneLocked();
@@ -300,7 +301,7 @@ auto ServiceDesktop::handle(sdesktop::developerMode::DeveloperModeRequest *msg) 
     return sys::MessageNone{};
 }
 
-auto ServiceDesktop::handle(sdesktop::SyncMessage * /*msg*/) -> std::shared_ptr<sys::Message>
+auto ServiceDesktop::handle([[maybe_unused]] sdesktop::SyncMessage *msg) -> std::shared_ptr<sys::Message>
 {
     syncStatus.state          = Sync::OperationState::Running;
     syncStatus.completionCode = Sync::PrepareSyncPackage(this, syncStatus.tempDir);
@@ -317,7 +318,7 @@ auto ServiceDesktop::handle(sdesktop::SyncMessage * /*msg*/) -> std::shared_ptr<
     return sys::MessageNone{};
 }
 
-auto ServiceDesktop::handle(sdesktop::FactoryMessage * /*msg*/) -> std::shared_ptr<sys::Message>
+auto ServiceDesktop::handle([[maybe_unused]] sdesktop::FactoryMessage *msg) -> std::shared_ptr<sys::Message>
 {
     LOG_DEBUG("ServiceDesktop: FactoryMessage received");
     sys::SystemManagerCommon::FactoryReset(this);
@@ -325,7 +326,7 @@ auto ServiceDesktop::handle(sdesktop::FactoryMessage * /*msg*/) -> std::shared_p
     return sys::MessageNone{};
 }
 
-auto ServiceDesktop::handle(sdesktop::usb::USBConfigured *msg) -> std::shared_ptr<sys::Message>
+auto ServiceDesktop::handle([[maybe_unused]] sdesktop::usb::USBConfigured *msg) -> std::shared_ptr<sys::Message>
 {
     isUsbConfigured = true;
     if (usbSecurityModel->isSecurityEnabled()) {
@@ -336,13 +337,15 @@ auto ServiceDesktop::handle(sdesktop::usb::USBConfigured *msg) -> std::shared_pt
         bus.sendUnicast(std::make_shared<sys::TetheringStateRequest>(sys::phone_modes::Tethering::On),
                         service::name::system_manager);
         isPlugEventUnhandled = false;
-        desktopWorker->notify(WorkerDesktop::Signal::unlockMTP);
+        if (desktopWorker != nullptr) {
+            desktopWorker->notify(WorkerDesktop::Signal::unlockMTP);
+        }
     }
 
     return sys::MessageNone{};
 }
 
-auto ServiceDesktop::handle(sdesktop::usb::USBDisconnected * /*msg*/) -> std::shared_ptr<sys::Message>
+auto ServiceDesktop::handle([[maybe_unused]] sdesktop::usb::USBDisconnected *msg) -> std::shared_ptr<sys::Message>
 {
     LOG_INFO("USB disconnected");
     if (usbSecurityModel->isSecurityEnabled()) {
@@ -378,7 +381,7 @@ auto ServiceDesktop::getOnboardingState() const -> sdesktop::endpoints::Onboardi
         settings->getValue(settings::SystemProperties::onboardingDone, settings::SettingsScope::Global)));
 }
 
-void ServiceDesktop::cleanFileSystemEndpointUndeliveredTransfers()
+auto ServiceDesktop::cleanFileSystemEndpointUndeliveredTransfers() -> void
 {
     FileOperations::instance().cleanUpUndeliveredTransfers();
 }

@@ -41,7 +41,7 @@ bool WorkerDesktop::init(std::list<sys::WorkerQueueInfo> queues)
     receiveQueue = Worker::getQueueHandleByName(sdesktop::cdcReceiveQueueName);
     sdesktop::endpoints::sender::setSendQueueHandle(Worker::getQueueHandleByName(sdesktop::cdcSendQueueName));
 
-    cpuSentinel                  = std::make_shared<sys::CpuSentinel>("WorkerDesktop", ownerService);
+    cpuSentinel                  = std::make_shared<sys::CpuSentinel>(cpuSentinelName, ownerService);
     auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
     ownerService->bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
 
@@ -79,8 +79,8 @@ void WorkerDesktop::closeWorker()
     close();
 
     cpuSentinel->ReleaseMinimumFrequency();
-    auto sentinelRemoveMsg = std::make_shared<sys::SentinelRemovalMessage>("WorkerDesktop");
-    auto result            = ownerService->bus.sendUnicastSync(sentinelRemoveMsg, service::name::system_manager, 1000);
+    auto sentinelRemoveMsg = std::make_shared<sys::SentinelRemovalMessage>(cpuSentinelName);
+    auto result = ownerService->bus.sendUnicastSync(std::move(sentinelRemoveMsg), service::name::system_manager, 1000);
     if (result.first != sys::ReturnCodes::Success) {
         LOG_ERROR("Sentinel %s could not be removed!", cpuSentinel->GetName().c_str());
     }

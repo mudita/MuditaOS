@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -71,17 +71,17 @@ class ServiceDesktop : public sys::Service
     std::unique_ptr<WorkerDesktop> desktopWorker;
     Sync::OperationStatus syncStatus;
 
-    sys::ReturnCodes InitHandler() override;
-    sys::ReturnCodes DeinitHandler() override;
-    sys::ReturnCodes SwitchPowerModeHandler(sys::ServicePowerMode mode) override;
-    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) override;
+    auto InitHandler() -> sys::ReturnCodes override;
+    auto DeinitHandler() -> sys::ReturnCodes override;
+    auto SwitchPowerModeHandler(sys::ServicePowerMode mode) -> sys::ReturnCodes override;
+    auto DataReceivedHandler(sys::DataMessage *msg, sys::ResponseMessage *resp) -> sys::MessagePointer override;
 
-    void prepareSyncData();
-    const Sync::OperationStatus getSyncStatus()
+    auto prepareSyncData() -> void;
+    auto getSyncStatus() const -> Sync::OperationStatus
     {
         return syncStatus;
     }
-    const sdesktop::USBSecurityModel *getSecurity()
+    auto getSecurity() const -> const sdesktop::USBSecurityModel *
     {
         return usbSecurityModel.get();
     }
@@ -93,7 +93,7 @@ class ServiceDesktop : public sys::Service
     auto getDeviceToken() -> std::string;
 
     auto getNotificationEntries() const -> std::vector<Outbox::NotificationEntry>;
-    void removeNotificationEntries(const std::vector<std::uint32_t> &);
+    auto removeNotificationEntries(const std::vector<std::uint32_t> &uidsOfNotificationsToBeRemoved) -> void;
     auto getMtpPath() const noexcept -> std::filesystem::path;
     auto getOnboardingState() const -> sdesktop::endpoints::OnboardingState;
 
@@ -103,24 +103,24 @@ class ServiceDesktop : public sys::Service
     std::unique_ptr<sdesktop::bluetooth::BluetoothMessagesHandler> btMsgHandler;
     OutboxNotifications outboxNotifications;
     sys::TimerHandle connectionActiveTimer;
-    static constexpr unsigned int DefaultLogFlushTimeoutInMs = 1000U;
+    static constexpr unsigned int defaultLogFlushTimeoutMs   = 1000U;
     bool initialized                                         = false;
     bool isPlugEventUnhandled                                = false;
     bool isUsbConfigured                                     = false;
     std::filesystem::path mtpRootPath;
 
-    void generateDeviceUniqueId();
+    auto generateDeviceUniqueId() -> void;
     auto getDeviceUniqueId() const -> std::string;
-    void setDeviceUniqueId(const std::string &token);
+    auto setDeviceUniqueId(const std::string &token) -> void;
 
     auto usbWorkerInit() -> sys::ReturnCodes;
     auto usbWorkerDeinit() -> sys::ReturnCodes;
 
-    void restartConnectionActiveTimer();
+    auto restartConnectionActiveTimer() -> void;
 
-    void checkChargingCondition();
+    auto checkChargingCondition() -> void;
 
-    void cleanFileSystemEndpointUndeliveredTransfers();
+    auto cleanFileSystemEndpointUndeliveredTransfers() -> void;
 
     template <typename T>
     auto connectHandler() -> bool
