@@ -32,6 +32,7 @@ namespace
             {DbPathElement{Setting::Volume, PlaybackType::Bedtime, Profile::Type::PlaybackLoudspeaker}, defaultBedtimeVolume},
             {DbPathElement{Setting::Volume, PlaybackType::PreWakeUp, Profile::Type::PlaybackLoudspeaker}, defaultSnoozeVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Snooze, Profile::Type::PlaybackLoudspeaker}, defaultSnoozeVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::FocusTimer, Profile::Type::PlaybackLoudspeaker}, defaultVolume},
 
             /// Profiles below are not used but unfortunately, must exist in order to satisfy audio module requirements
             {DbPathElement{Setting::Volume, PlaybackType::Meditation, Profile::Type::PlaybackHeadphones}, defaultVolume},
@@ -46,6 +47,8 @@ namespace
             {DbPathElement{Setting::Volume, PlaybackType::PreWakeUp, Profile::Type::PlaybackBluetoothA2DP},defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Snooze, Profile::Type::PlaybackHeadphones}, defaultVolume},
             {DbPathElement{Setting::Volume, PlaybackType::Snooze, Profile::Type::PlaybackBluetoothA2DP}, defaultVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::FocusTimer, Profile::Type::PlaybackHeadphones}, defaultVolume},
+            {DbPathElement{Setting::Volume, PlaybackType::FocusTimer, Profile::Type::PlaybackBluetoothA2DP}, defaultVolume},
         };
         // clang-format on
     } // namespace initializer

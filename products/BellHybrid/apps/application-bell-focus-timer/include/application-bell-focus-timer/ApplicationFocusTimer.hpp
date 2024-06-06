@@ -11,6 +11,7 @@
 namespace app::focus::models
 {
     class FocusSettingsModel;
+    class NotificationVolumeModel;
 } // namespace app::focus::models
 
 namespace app
@@ -46,6 +47,7 @@ namespace app
         std::unique_ptr<focus::models::FocusSettingsModel> shortBreakTimeModel;
         std::unique_ptr<focus::models::FocusSettingsModel> longBreakTimeModel;
         std::unique_ptr<focus::models::FocusSettingsModel> longBreakOccurrenceModel;
+        std::unique_ptr<focus::models::NotificationVolumeModel> notificationVolumeModel;
 
         std::unique_ptr<AbstractAudioModel> audioModel;
         std::unique_ptr<AbstractBatteryModel> batteryModel;

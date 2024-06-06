@@ -5,6 +5,7 @@
 
 #include <apps-common/BasePresenter.hpp>
 #include <common/BellListItemProvider.hpp>
+#include <common/models/AbstractAudioModel.hpp>
 #include <memory>
 
 namespace app
@@ -17,6 +18,7 @@ namespace app::focus
     namespace models
     {
         class FocusSettingsModel;
+        class NotificationVolumeModel;
     } // namespace models
 
     class SettingsContract
@@ -49,7 +51,9 @@ namespace app::focus
                           models::FocusSettingsModel &focusRepeatsModel,
                           models::FocusSettingsModel &shortBreakTimeModel,
                           models::FocusSettingsModel &longBreakTimeModel,
-                          models::FocusSettingsModel &longBreakOccurrenceModel);
+                          models::FocusSettingsModel &longBreakOccurrenceModel,
+                          models::NotificationVolumeModel &notificationVolumeModel,
+                          AbstractAudioModel &audioModel);
 
         void loadData() override;
         void saveData() override;
@@ -59,11 +63,15 @@ namespace app::focus
         void exitWithoutSave() override;
 
       private:
+        void stopSound();
+
         models::FocusSettingsModel &focusTimeModel;
         models::FocusSettingsModel &focusRepeatsModel;
         models::FocusSettingsModel &shortBreakTimeModel;
         models::FocusSettingsModel &longBreakTimeModel;
         models::FocusSettingsModel &longBreakOccurrenceModel;
+        models::NotificationVolumeModel &notificationVolumeModel;
+        AbstractAudioModel &audioModel;
         std::shared_ptr<BellListItemProvider> listItemsProvider;
     };
 } // namespace app::focus

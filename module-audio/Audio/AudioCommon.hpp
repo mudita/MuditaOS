@@ -64,6 +64,7 @@ namespace audio
         Alarm,
         PreWakeUp,
         Snooze,
+        FocusTimer,
         Bedtime,
         Last = Bedtime,
     };
