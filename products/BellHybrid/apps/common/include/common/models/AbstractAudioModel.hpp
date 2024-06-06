@@ -21,7 +21,8 @@ namespace app
             Alarm,
             PreWakeup,
             Bedtime,
-            Meditation
+            Meditation,
+            FocusTimer
         };
 
         enum class PlaybackFinishStatus

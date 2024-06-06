@@ -18,7 +18,7 @@ namespace app::focus
         inline constexpr auto focusTimerLowBattery = "FocusTimerLowBatteryWindow";
     } // namespace window::name
 
-    inline std::filesystem::path getFocusTimeAudioPath()
+    inline std::filesystem::path getFocusTimerAudioPath()
     {
         return paths::audio::proprietary() / paths::audio::focusTimer() / "FocusTimer_Gong.mp3";
     }

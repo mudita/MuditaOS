@@ -174,6 +174,7 @@ namespace audio
         case PlaybackType::Bedtime:
         case PlaybackType::PreWakeUp:
         case PlaybackType::Snooze:
+        case PlaybackType::FocusTimer:
             return false;
         }
         return false;

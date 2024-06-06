@@ -31,6 +31,7 @@ target_sources(application-bell-focus-timer
         presenter/FocusTimerPresenter.cpp
 
         models/FocusSettingsModel.cpp
+        models/NotificationVolumeModel.cpp
 
     PUBLIC
         include/application-bell-focus-timer/ApplicationFocusTimer.hpp

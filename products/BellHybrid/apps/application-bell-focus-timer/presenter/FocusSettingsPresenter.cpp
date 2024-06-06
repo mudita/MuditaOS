@@ -5,15 +5,28 @@
 #include "data/FocusCommon.hpp"
 
 #include "models/FocusSettingsModel.hpp"
+#include "models/NotificationVolumeModel.hpp"
 
 #include <ApplicationCommon.hpp>
 #include <apps-common/InternalModel.hpp>
 #include <common/widgets/list_items/Numeric.hpp>
+#include <common/widgets/list_items/NumericWithBar.hpp>
 #include <common/widgets/list_items/MinutesWithOff.hpp>
 #include <common/widgets/list_items/Multiplicity.hpp>
+#include <gui/widgets/ListViewEngine.hpp>
 
 namespace
 {
+    enum class ListIndex
+    {
+        FocusTime = 0,
+        FocusRepeats,
+        ShortBreakTime,
+        LongBreakTime,
+        LongBreakOccurrence,
+        NotificationVolume
+    };
+
     class FocusTimeMultiplicity : public app::list_items::Numeric
     {
       public:
@@ -45,10 +58,13 @@ namespace app::focus
                                          models::FocusSettingsModel &focusRepeatsModel,
                                          models::FocusSettingsModel &shortBreakTimeModel,
                                          models::FocusSettingsModel &longBreakTimeModel,
-                                         models::FocusSettingsModel &longBreakOccurrenceModel)
+                                         models::FocusSettingsModel &longBreakOccurrenceModel,
+                                         models::NotificationVolumeModel &notificationVolumeModel,
+                                         AbstractAudioModel &audioModel)
         : focusTimeModel{focusTimeModel}, focusRepeatsModel{focusRepeatsModel},
           shortBreakTimeModel{shortBreakTimeModel}, longBreakTimeModel{longBreakTimeModel},
-          longBreakOccurrenceModel{longBreakOccurrenceModel}
+          longBreakOccurrenceModel{longBreakOccurrenceModel}, notificationVolumeModel{notificationVolumeModel},
+          audioModel{audioModel}
     {
         auto focusTime = new list_items::Numeric{
             list_items::Numeric::spinner_type::range{
@@ -89,8 +105,15 @@ namespace app::focus
             utils::translate("app_bell_focus_long_break_after"),
             utils::translate("app_bell_focus_time_many")};
 
-        listItemsProvider = std::make_shared<BellListItemProvider>(
-            BellListItemProvider::Items{focusTime, focusRepeats, shortBreakTime, longBreakTime, longBreakOccurrence});
+        auto notificationVolume =
+            new list_items::NumericWithBar{list_items::NumericWithBar::spinner_type::range{
+                                               AbstractAudioModel::minVolume, AbstractAudioModel::maxVolume, 1},
+                                           notificationVolumeModel,
+                                           AbstractAudioModel::maxVolume,
+                                           utils::translate("app_bell_focus_notification_volume")};
+
+        listItemsProvider = std::make_shared<BellListItemProvider>(BellListItemProvider::Items{
+            focusTime, focusRepeats, shortBreakTime, longBreakTime, longBreakOccurrence, notificationVolume});
 
         focusRepeats->onExit = [this, focusRepeats, longBreakOccurrence]() {
             const auto currentValue = longBreakOccurrence->value();
@@ -101,18 +124,54 @@ namespace app::focus
             longBreakOccurrence->set_value(std::min(currentValue, maxValue));
         };
 
-        shortBreakTime->onEnter = [this, focusRepeats]() {
+        focusRepeats->onProceed = [focusRepeats, this]() {
             if (focusRepeats->value() == 1) {
                 // when the user sets only one focus session, the break settings does not matter because we do not
                 // display any break after the last focus session
-                getView()->exit();
+                listItemsProvider->list->rebuildList(gui::listview::RebuildType::OnOffset,
+                                                     static_cast<unsigned int>(ListIndex::NotificationVolume));
+                return true;
             }
+            return false;
         };
 
-        longBreakOccurrence->onEnter = [this, longBreakTime]() {
+        longBreakTime->onProceed = [longBreakTime, this]() {
             if (longBreakTime->value() == 0) {
-                getView()->exit();
+                listItemsProvider->list->rebuildList(gui::listview::RebuildType::OnOffset,
+                                                     static_cast<unsigned int>(ListIndex::NotificationVolume));
+                return true;
             }
+            return false;
+        };
+
+        auto playSound = [this, notificationVolume]() {
+            this->audioModel.setVolume(notificationVolume->value(), AbstractAudioModel::PlaybackType::FocusTimer);
+            this->audioModel.play(getFocusTimerAudioPath(), AbstractAudioModel::PlaybackType::FocusTimer, {});
+        };
+
+        notificationVolume->onEnter = playSound;
+        notificationVolume->onExit  = [this]() { stopSound(); };
+
+        notificationVolume->set_on_value_change_cb([this, playSound](const auto &val) {
+            this->audioModel.setVolume(
+                val, AbstractAudioModel::PlaybackType::FocusTimer, audio::VolumeUpdateType::SkipUpdateDB);
+            if (this->audioModel.hasPlaybackFinished()) {
+                playSound();
+            }
+        });
+
+        notificationVolume->onReturn = [this, focusRepeats, longBreakTime]() {
+            if (focusRepeats->value() == 1) {
+                listItemsProvider->list->rebuildList(gui::listview::RebuildType::OnOffset,
+                                                     static_cast<unsigned int>(ListIndex::FocusRepeats));
+                return true;
+            }
+            else if (longBreakTime->value() == 0) {
+                listItemsProvider->list->rebuildList(gui::listview::RebuildType::OnOffset,
+                                                     static_cast<unsigned int>(ListIndex::LongBreakTime));
+                return true;
+            }
+            return false;
         };
 
         for (auto &item : listItemsProvider->getListItems()) {
@@ -152,6 +211,13 @@ namespace app::focus
 
     void SettingsPresenter::exitWithoutSave()
     {
+        stopSound();
+        notificationVolumeModel.restoreDefault();
         eraseProviderData();
+    }
+
+    void SettingsPresenter::stopSound()
+    {
+        audioModel.stopPlayedByThis({});
     }
 } // namespace app::focus

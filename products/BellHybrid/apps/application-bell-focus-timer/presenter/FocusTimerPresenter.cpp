@@ -179,8 +179,8 @@ namespace app::focus
 
     void FocusTimerPresenter::playGong()
     {
-        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(app::focus::getFocusTimeAudioPath(),
-                                                                        audio::PlaybackType::Meditation);
+        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(app::focus::getFocusTimerAudioPath(),
+                                                                        audio::PlaybackType::FocusTimer);
         app->bus.sendUnicast(std::move(msg), service::audioServiceName);
     }
 

@@ -24,6 +24,8 @@ namespace
             return audio::PlaybackType::Bedtime;
         case Type::Meditation:
             return audio::PlaybackType::Meditation;
+        case Type::FocusTimer:
+            return audio::PlaybackType::FocusTimer;
         default:
             return audio::PlaybackType::Alarm;
         }

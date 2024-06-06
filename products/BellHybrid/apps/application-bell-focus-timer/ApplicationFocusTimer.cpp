@@ -13,6 +13,7 @@
 #include "presenter/FocusTimerPresenter.hpp"
 
 #include "models/FocusSettingsModel.hpp"
+#include "models/NotificationVolumeModel.hpp"
 #include "common/models/TimeModel.hpp"
 #include <common/models/AudioModel.hpp>
 #include <common/windows/SessionPausedWindow.hpp>
@@ -57,6 +58,7 @@ namespace app
             std::make_unique<focus::models::FocusSettingsModel>(this,
                                                                 focus::models::settings::longBreakOccurrenceName,
                                                                 focus::models::settings::longBreakOccurrenceDefault);
+        notificationVolumeModel = std::make_unique<focus::models::NotificationVolumeModel>(*audioModel);
 
         batteryModel                 = std::make_unique<app::BatteryModel>(this);
         lowBatteryInfoModel          = std::make_unique<app::LowBatteryInfoModel>();
@@ -82,7 +84,9 @@ namespace app
                                                                              *focusRepeatsModel,
                                                                              *shortBreakTimeModel,
                                                                              *longBreakTimeModel,
-                                                                             *longBreakOccurrenceModel);
+                                                                             *longBreakOccurrenceModel,
+                                                                             *notificationVolumeModel,
+                                                                             *audioModel);
             return std::make_unique<focus::SettingsWindow>(app, std::move(presenter));
         });
 
