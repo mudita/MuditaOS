@@ -25,6 +25,7 @@ target_link_libraries(appmgr
         module-apps
         application-bell-main
         application-bell-onboarding
+        application-bell-whats-new
         service-appmgr
    PUBLIC
         alarms
