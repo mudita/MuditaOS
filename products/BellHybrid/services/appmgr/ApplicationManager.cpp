@@ -7,12 +7,15 @@
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 #include <application-bell-main/ApplicationBellMain.hpp>
 #include <application-bell-onboarding/BellOnBoardingNames.hpp>
+#include <application-bell-whats-new/ApplicationWhatsNew.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
 #include <common/windows/BellWelcomeWindow.hpp>
 #include <service-evtmgr/BatteryMessages.hpp>
-#include "service-appmgr/Controller.hpp"
+#include <service-db/agents/settings/SystemSettings.hpp>
+#include <service-appmgr/Controller.hpp>
 #include <popups/ChargingNotificationPopupRequestParams.hpp>
 #include <popups/ChargingDoneNotificationPopupRequestParams.hpp>
+#include <product/version.hpp>
 
 namespace app::manager
 {
@@ -37,6 +40,9 @@ namespace app::manager
     {
         if (checkOnBoarding()) {
             return app::applicationBellOnBoardingName;
+        }
+        else if (isWhatsNewAvailable()) {
+            return app::applicationWhatsNewName;
         }
         return rootApplicationName;
     }
@@ -118,4 +124,12 @@ namespace app::manager
         connect(typeid(BedtimeNotification), convertibleToActionHandler);
         connect(typeid(ChangeHomescreenLayoutMessage), convertibleToActionHandler);
     }
+
+    auto ApplicationManager::isWhatsNewAvailable() -> bool
+    {
+        const auto lastVersionNumber =
+            settings->getValue(settings::SystemProperties::osCurrentVersion, settings::SettingsScope::Global);
+        return lastVersionNumber != VERSION;
+    }
+
 } // namespace app::manager

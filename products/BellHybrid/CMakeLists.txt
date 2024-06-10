@@ -56,6 +56,7 @@ target_link_libraries(BellHybrid
         bell::app-focus-timer
         bell::app-powernap
         bell::app-settings
+        bell::app-whats-new
         bell::db
         bell::audio
         bell::evtmgr
