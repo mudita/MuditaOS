@@ -24,6 +24,7 @@
 #include <service-eink/ServiceEink.hpp>
 #include <service-evtmgr/EventManagerCommon.hpp>
 #include <AppWindowConstants.hpp>
+#include <product/version.hpp>
 
 #include <algorithm>
 #include <utility>
@@ -485,6 +486,7 @@ namespace app::manager
     {
         settings->setValue(
             settings::SystemProperties::onboardingDone, utils::to_string(true), settings::SettingsScope::Global);
+        settings->setValue(settings::SystemProperties::osCurrentVersion, VERSION, settings::SettingsScope::Global);
         app::manager::Controller::sendAction(this, app::manager::actions::Home);
         return sys::msgHandled();
     }
