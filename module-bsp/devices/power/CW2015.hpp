@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,7 +10,7 @@
 
 namespace bsp::devices::power
 {
-    /// MP2639B fuel gauge driver
+    /// CW2015 fuel gauge driver
     /// To enable interrupts support call \ref init_irq_pin and then invoke \ref handle_irq in the corresponding IRQ
     /// routine.
     class CW2015
@@ -33,7 +33,7 @@ namespace bsp::devices::power
         CW2015 &operator=(CW2015 &&) noexcept = delete;
 
         /// Returns the result of the chip initialization
-        RetCodes poll() const;
+        [[nodiscard]] RetCodes poll() const;
         /// Returns true if the chip initialization success, otherwise false
         explicit operator bool() const;
         /// Explicitly triggers chip initialization procedure. The result can be polled by \ref poll or using bool
@@ -79,5 +79,4 @@ namespace bsp::devices::power
         RetCodes status{};
         units::SOC alert_threshold;
     };
-
 } // namespace bsp::devices::power

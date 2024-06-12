@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,7 @@ namespace hal::battery
       public:
         using SOC     = units::SOC;
         using Voltage = units::Voltage;
+
         enum class ChargingStatus
         {
             Discharging,
@@ -50,16 +51,16 @@ namespace hal::battery
 
         struct Factory
         {
-            static std::unique_ptr<AbstractBatteryCharger> create(xQueueHandle);
+            static std::unique_ptr<AbstractBatteryCharger> create(xQueueHandle irqQueueHandle);
         };
 
         virtual ~AbstractBatteryCharger() = default;
 
-        virtual std::optional<Voltage> getBatteryVoltage() const = 0;
-        virtual std::optional<SOC> getSOC() const                = 0;
-        virtual ChargingStatus getChargingStatus() const         = 0;
-        virtual ChargerPresence getChargerPresence() const       = 0;
-        virtual TemperatureState getTemperatureState() const     = 0;
+        [[nodiscard]] virtual std::optional<Voltage> getBatteryVoltage() const = 0;
+        [[nodiscard]] virtual std::optional<SOC> getSOC() const                = 0;
+        [[nodiscard]] virtual ChargingStatus getChargingStatus() const         = 0;
+        [[nodiscard]] virtual ChargerPresence getChargerPresence() const       = 0;
+        [[nodiscard]] virtual TemperatureState getTemperatureState() const     = 0;
 
         static_assert(sizeof(Events) == sizeof(std::uint8_t),
                       "All events processed by event manager ought to have size of std::uint8_t");
