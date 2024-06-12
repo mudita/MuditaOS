@@ -10,8 +10,10 @@ target_sources(databases
         agents/MeditationStatsAgent.cpp
         agents/QuotesAgent.cpp
         agents/ShuffleQuoteModel.cpp
+        agents/WhatsNewAgent.cpp
         agents/QuotesAgent.hpp
         agents/ShuffleQuoteModel.hpp
+        agents/WhatsNewAgent.hpp
     PUBLIC
         include/db/ServiceDB.hpp
         include/db/SystemSettings.hpp
