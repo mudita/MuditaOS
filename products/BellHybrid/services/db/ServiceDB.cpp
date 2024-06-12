@@ -1,10 +1,11 @@
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <db/ServiceDB.hpp>
+#include "include/db/ServiceDB.hpp"
 #include <db/BellFactorySettings.hpp>
 
 #include "agents/MeditationStatsAgent.hpp"
+#include "agents/WhatsNewAgent.hpp"
 
 #include <module-db/databases/EventsDB.hpp>
 #include <module-db/databases/MultimediaFilesDB.hpp>
@@ -20,6 +21,16 @@
 #include <purefs/filesystem_paths.hpp>
 #include <CrashdumpMetadataStore.hpp>
 #include <product/version.hpp>
+
+namespace
+{
+    constexpr auto eventsDatabaseName{"events.db"};
+    constexpr auto quotesDatabaseName{"quotes.db"};
+    constexpr auto multimediaDatabaseName{"multimedia.db"};
+    constexpr auto settingsDatabaseName{"settings_bell.db"};
+    constexpr auto meditationStatsDatabaseName{"meditation_stats.db"};
+    constexpr auto whatsNewDatabaseName{"whats-new.db"};
+} // namespace
 
 ServiceDB::~ServiceDB()
 {
@@ -52,10 +63,10 @@ sys::ReturnCodes ServiceDB::InitHandler()
     }
 
     // Create databases
-    eventsDB          = std::make_unique<EventsDB>((purefs::dir::getDatabasesPath() / "events.db").c_str());
-    quotesDB          = std::make_unique<Database>((purefs::dir::getDatabasesPath() / "quotes.db").c_str());
+    eventsDB          = std::make_unique<EventsDB>((purefs::dir::getDatabasesPath() / eventsDatabaseName).c_str());
+    quotesDB          = std::make_unique<Database>((purefs::dir::getDatabasesPath() / quotesDatabaseName).c_str());
     multimediaFilesDB = std::make_unique<db::multimedia_files::MultimediaFilesDB>(
-        (purefs::dir::getDatabasesPath() / "multimedia.db").c_str());
+        (purefs::dir::getDatabasesPath() / multimediaDatabaseName).c_str());
 
     // Create record interfaces
     alarmEventRecordInterface = std::make_unique<AlarmEventRecordInterface>(eventsDB.get());
@@ -63,8 +74,9 @@ sys::ReturnCodes ServiceDB::InitHandler()
         std::make_unique<db::multimedia_files::MultimediaFilesRecordInterface>(multimediaFilesDB.get());
 
     const auto factorySettings = std::make_unique<settings::BellFactorySettings>();
-    databaseAgents.emplace(std::make_unique<SettingsAgent>(this, "settings_bell.db", factorySettings.get()));
-    databaseAgents.emplace(std::make_unique<service::db::agents::MeditationStats>(this, "meditation_stats.db"));
+    databaseAgents.emplace(std::make_unique<SettingsAgent>(this, settingsDatabaseName, factorySettings.get()));
+    databaseAgents.emplace(std::make_unique<service::db::agents::MeditationStats>(this, meditationStatsDatabaseName));
+    databaseAgents.emplace(std::make_unique<service::db::agents::WhatsNew>(this, whatsNewDatabaseName));
 
     for (auto &dbAgent : databaseAgents) {
         dbAgent->registerMessages();
