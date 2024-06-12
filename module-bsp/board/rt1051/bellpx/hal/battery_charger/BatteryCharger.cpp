@@ -10,7 +10,7 @@
 #include "timers.h"
 
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
-#include <devices/power/MP2639B.hpp>
+#include <devices/power/MP2615GQ.hpp>
 #include <devices/power/CW2015.hpp>
 #include <board/BoardDefinitions.hpp>
 #include <log/log.hpp>
@@ -74,7 +74,7 @@ namespace hal::battery
         using BatteryWorkerQueue = WorkerQueue<IrqEvents>;
 
         explicit BellBatteryCharger(xQueueHandle irqQueueHandle);
-        ~BellBatteryCharger();
+        ~BellBatteryCharger() override;
 
         std::optional<Voltage> getBatteryVoltage() const final;
         std::optional<SOC> getSOC() const final;
@@ -92,7 +92,7 @@ namespace hal::battery
         void pollFuelGauge();
 
         void handleIrqEvents(IrqEvents event);
-        void handleChargerEvents(MP2639B::ChargingStatus status);
+        void handleChargerEvents(MP2615GQ::ChargingStatus status);
 
         xTimerHandle reinit_timer;
         xQueueHandle notification_channel;
@@ -102,7 +102,7 @@ namespace hal::battery
         std::shared_ptr<drivers::DriverI2C> i2c;
         std::shared_ptr<drivers::DriverGPIO> charger_gpio_chgok;
         std::shared_ptr<drivers::DriverGPIO> charger_gpio;
-        mutable bsp::devices::power::MP2639B charger;
+        mutable bsp::devices::power::MP2615GQ charger;
 
         std::shared_ptr<drivers::DriverGPIO> fuel_gauge_gpio;
         mutable bsp::devices::power::CW2015 fuel_gauge;
@@ -111,7 +111,7 @@ namespace hal::battery
     BellBatteryCharger::BellBatteryCharger(xQueueHandle irqQueueHandle)
         : notification_channel{irqQueueHandle}, i2c{drivers::DriverI2C::Create(i2c_instance, i2c_params)},
           charger_gpio_chgok{drivers::DriverGPIO::Create(charger_irq_gpio_chgok, {})},
-          charger_gpio{drivers::DriverGPIO::Create(charger_irq_gpio, {})}, charger{MP2639B::Configuration{
+          charger_gpio{drivers::DriverGPIO::Create(charger_irq_gpio, {})}, charger{MP2615GQ::Configuration{
                                                                                charger_gpio,
                                                                                charger_irq_pin_mode,
                                                                                charger_gpio,
@@ -127,7 +127,7 @@ namespace hal::battery
     {
 
         reinit_timer = xTimerCreate("reinit_timer", reinit_poll_time, pdFALSE, this, [](TimerHandle_t xTimer) {
-            BellBatteryCharger *inst = static_cast<BellBatteryCharger *>(pvTimerGetTimerID(xTimer));
+            auto inst = static_cast<BellBatteryCharger *>(pvTimerGetTimerID(xTimer));
             inst->fuel_gauge.reinit();
             inst->pollFuelGauge();
         });
@@ -169,26 +169,26 @@ namespace hal::battery
 
     AbstractBatteryCharger::ChargingStatus BellBatteryCharger::getChargingStatus() const
     {
-        /// Charger status fetched from MP2639B alone is not enough to be 100% sure what state we are currently in. For
-        /// more info check the Table 2 (page 26) from the MP2639B datasheet. It is required to also take into account
+        /// Charger status fetched from MP2615GQ alone is not enough to be 100% sure what state we are currently in. For
+        /// more info check the Table 2 (page 26) from the MP2615GQ datasheet. It is required to also take into account
         /// the current state of SOC.
 
         const auto charger_status = charger.get_charge_status();
         const auto current_soc    = getSOC();
 
-        if (charger_status == MP2639B::ChargingStatus::Complete && current_soc >= 100) {
+        if (charger_status == MP2615GQ::ChargingStatus::Complete && current_soc >= 100) {
             return ChargingStatus::ChargingDone;
         }
-        else if (charger_status == MP2639B::ChargingStatus::Discharging) {
+        else if (charger_status == MP2615GQ::ChargingStatus::Discharging) {
             return ChargingStatus::Discharging;
         }
-        else if (charger_status == MP2639B::ChargingStatus::Charging && current_soc < 100) {
+        else if (charger_status == MP2615GQ::ChargingStatus::Charging && current_soc < 100) {
             return ChargingStatus::Charging;
         }
-        else if (charger_status == MP2639B::ChargingStatus::Complete && current_soc < 100) {
+        else if (charger_status == MP2615GQ::ChargingStatus::Complete && current_soc < 100) {
             return ChargingStatus::PluggedNotCharging;
         }
-        else if (charger_status == MP2639B::ChargingStatus::Charging && current_soc >= 100) {
+        else if (charger_status == MP2615GQ::ChargingStatus::Charging && current_soc >= 100) {
             LOG_INFO("The charger reports 'Charging state', but the battery SOC is 100");
             return ChargingStatus::ChargingDone;
         }
@@ -261,7 +261,7 @@ namespace hal::battery
                               }},
                    event);
     }
-    void BellBatteryCharger::handleChargerEvents(const MP2639B::ChargingStatus)
+    void BellBatteryCharger::handleChargerEvents([[maybe_unused]] MP2615GQ::ChargingStatus status)
     {
         sendNotification(Events::Charger);
     }

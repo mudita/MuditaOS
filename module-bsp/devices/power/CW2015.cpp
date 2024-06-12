@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "CW2015.hpp"
@@ -19,7 +19,6 @@
 namespace
 {
     constexpr std::uint32_t i2c_subaddr_size = 1;
-
 } // namespace
 
 namespace bsp::devices::power
@@ -30,10 +29,12 @@ namespace bsp::devices::power
     {
         status = init_chip();
     }
+
     CW2015::~CW2015()
     {
         sleep();
     }
+
     std::optional<units::SOC> CW2015::get_battery_soc()
     {
         // Only higher byte of SOC register pair is needed here. Accuracy will be enough
@@ -44,6 +45,7 @@ namespace bsp::devices::power
             return std::nullopt;
         }
     }
+
     std::optional<units::Voltage> CW2015::get_battery_voltage()
     {
         constexpr auto median_samples          = 3;
@@ -83,6 +85,7 @@ namespace bsp::devices::power
 
         return ADResult * adc_conversion_constant / micro_to_milli_ratio; // mV
     }
+
     CW2015::RetCodes CW2015::clear_irq()
     {
         const auto lsb = read(RRT_ALERT::ADDRESS_L);
@@ -154,6 +157,7 @@ namespace bsp::devices::power
 
         return RetCodes::Ok;
     }
+
     CW2015::RetCodes CW2015::reset_chip()
     {
         if (not write(Mode::ADDRESS, Mode{}.set_power_on_reset().get_raw())) {
@@ -165,12 +169,14 @@ namespace bsp::devices::power
         }
         return RetCodes::Ok;
     }
+
     void CW2015::irq_handler()
     {
         if (const auto result = clear_irq(); result != RetCodes::Ok) {
             LOG_ERROR("Error during handling irq, %s", magic_enum::enum_name(result).data());
         }
     }
+
     void CW2015::init_irq_pin(std::shared_ptr<drivers::DriverGPIO> gpio, uint32_t pin)
     {
         drivers::DriverGPIOPinParams ALRTPinConfig{};
@@ -182,6 +188,7 @@ namespace bsp::devices::power
 
         gpio->EnableInterrupt(1 << pin);
     }
+
     CW2015::RetCodes CW2015::quick_start()
     {
         if (not write(Mode::ADDRESS, Mode{}.set_quick_start().get_raw())) {
@@ -193,6 +200,7 @@ namespace bsp::devices::power
         }
         return RetCodes::Ok;
     }
+
     CW2015::RetCodes CW2015::poll() const
     {
         return status;
@@ -333,13 +341,14 @@ namespace bsp::devices::power
         }
         return false;
     }
+
     CW2015::operator bool() const
     {
         return status == RetCodes::Ok;
     }
+
     CW2015::RetCodes CW2015::calibrate()
     {
         return quick_start();
     }
-
 } // namespace bsp::devices::power
