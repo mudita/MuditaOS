@@ -10,6 +10,10 @@ namespace app
 {
     class ApplicationCommon;
 }
+namespace settings
+{
+    class Settings;
+}
 
 namespace app::whatsNew::models
 {
@@ -22,10 +26,11 @@ namespace app::whatsNew::models
     class WhatsNewModel
     {
       public:
-        explicit WhatsNewModel(app::ApplicationCommon *app);
+        explicit WhatsNewModel(app::ApplicationCommon *app, settings::Settings *settings);
 
       private:
         app::ApplicationCommon *app{nullptr};
+        settings::Settings *settings{nullptr};
         std::vector<Feature> features;
     };
 } // namespace app::whatsNew::models

@@ -33,7 +33,7 @@ namespace app
             return ret;
         }
 
-        whatsNewModel = std::make_unique<whatsNew::models::WhatsNewModel>(this);
+        whatsNewModel = std::make_unique<whatsNew::models::WhatsNewModel>(this, settings.get());
 
         batteryModel                 = std::make_unique<app::BatteryModel>(this);
         lowBatteryInfoModel          = std::make_unique<app::LowBatteryInfoModel>();

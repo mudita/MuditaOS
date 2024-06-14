@@ -5,6 +5,8 @@
 #include <ApplicationCommon.hpp>
 #include <db/ServiceDB.hpp>
 #include <db/WhatsNewMessages.hpp>
+#include <service-db/Settings.hpp>
+#include <service-db/agents/settings/SystemSettings.hpp>
 #include <product/version.hpp>
 #include <Utils.hpp>
 
@@ -46,9 +48,12 @@ namespace
 
 namespace app::whatsNew::models
 {
-    WhatsNewModel::WhatsNewModel(app::ApplicationCommon *app) : app{app}
+    WhatsNewModel::WhatsNewModel(app::ApplicationCommon *app, settings::Settings *settings)
+        : app{app}, settings{settings}
     {
-        const auto version = getVersionNumber(VERSION);
+        const auto lastVersion =
+            settings->getValue(settings::SystemProperties::osCurrentVersion, settings::SettingsScope::Global);
+        const auto version = getVersionNumber(lastVersion);
         if (!version.has_value()) {
             return;
         }
