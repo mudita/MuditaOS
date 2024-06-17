@@ -117,3 +117,4 @@ INSERT OR IGNORE INTO settings_tab (path, value) VALUES
    ('prewake_up_tone_path_default', '/system/assets/audio/prewakeup/Joyful_Awakening.mp3'),
    ('alarm_tone_path_default', '/system/assets/audio/alarm/Morning_Dew.mp3'),
    ('bedtime_tone_path_default', '/system/assets/audio/evening_reminder/Evening_Horizon.mp3');
+

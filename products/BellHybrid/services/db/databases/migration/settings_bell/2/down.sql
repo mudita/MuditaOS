@@ -116,3 +116,4 @@ DELETE FROM settings_tab WHERE path = 'snooze_tone_path_default';
 DELETE FROM settings_tab WHERE path = 'prewake_up_tone_path_default';
 DELETE FROM settings_tab WHERE path = 'alarm_tone_path_default';
 DELETE FROM settings_tab WHERE path = 'bedtime_tone_path_default';
+
