@@ -31,7 +31,7 @@ namespace app::whatsnew::models
         WhatsNewFeaturesModel(app::ApplicationCommon *app, settings::Settings *settings);
 
         auto getFeatures() -> std::vector<Feature>;
-        auto setCurrentOsVersion(const std::string &version) -> void;
+        auto setCurrentOsVersion() -> void;
 
       private:
         app::ApplicationCommon *app{nullptr};

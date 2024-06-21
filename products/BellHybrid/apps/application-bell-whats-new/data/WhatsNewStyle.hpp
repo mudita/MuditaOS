@@ -4,15 +4,15 @@
 #pragma once
 
 #include <Style.hpp>
-#include "widgets/BellBaseLayout.hpp"
+#include <widgets/BellBaseLayout.hpp>
 
 namespace gui::whats_new_style
 {
     namespace main_window
     {
         inline constexpr auto list_title_font    = style::window::font::large;
-        inline constexpr auto description_font   = style::window::font::mediumbigbold;
-        inline constexpr auto description_height = 136U;
+        inline constexpr auto description_font   = style::window::font::mediumbig;
+        inline constexpr auto description_height = 142U;
     } // namespace main_window
 
     namespace features_window
@@ -53,7 +53,7 @@ namespace gui::whats_new_style
         namespace description
         {
             inline constexpr auto font       = style::window::font::verybiglight;
-            inline constexpr auto width      = center_box::width;
+            inline constexpr auto width      = center_box::width - 36U; // Additional spacing to separate from arrows
             inline constexpr auto height     = 168U;
             inline constexpr auto margin_top = 40U;
         } // namespace description

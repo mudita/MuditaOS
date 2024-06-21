@@ -3,12 +3,10 @@
 
 #include "WhatsNewFeaturesPresenter.hpp"
 #include "WhatsNewFeaturesLayout.hpp"
-#include <product/version.hpp>
 
 namespace app::whatsnew
 {
-    WhatsNewFeaturesPresenter::WhatsNewFeaturesPresenter(std::unique_ptr<models::WhatsNewFeaturesModel> &&model)
-        : model{std::move(model)}
+    WhatsNewFeaturesPresenter::WhatsNewFeaturesPresenter(models::WhatsNewFeaturesModel &model) : model{model}
     {
         createLayouts();
     }
@@ -30,7 +28,7 @@ namespace app::whatsnew
 
     auto WhatsNewFeaturesPresenter::createLayouts() -> void
     {
-        const auto &features = model->getFeatures();
+        const auto &features = model.getFeatures();
         layouts.reserve(features.size());
 
         for (auto it = features.begin(); it != features.end(); ++it) {
@@ -44,6 +42,6 @@ namespace app::whatsnew
 
     auto WhatsNewFeaturesPresenter::setCurrentOsVersion() -> void
     {
-        model->setCurrentOsVersion(VERSION);
+        model.setCurrentOsVersion();
     }
 } // namespace app::whatsnew

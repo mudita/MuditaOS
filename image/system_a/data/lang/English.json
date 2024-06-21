@@ -106,7 +106,7 @@
     "app_bell_whatsnew_version": "<text>OS version: <token>$VERSION</token></text>",
     "app_bell_whatsnew_continue": "Continue",
     "app_bell_whatsnew_skip": "Skip",
-    "app_bell_whatsnew_end_screen_text": "<text>We'd love to hear your feedback about this update at<br/><b>mudita.com/forum</b></text>",
+    "app_bell_whatsnew_end_screen_text": "<text>We'd love to hear your<br/>feedback about this update at<br/><b>mudita.com/forum</b></text>",
     "app_bell_relaxation_loop": "loop",
     "app_bell_relaxation_loop_description": "the song will play until you turn it off",
     "app_bell_relaxation_looped": "looped",

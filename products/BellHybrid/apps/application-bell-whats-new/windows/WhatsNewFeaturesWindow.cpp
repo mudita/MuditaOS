@@ -74,6 +74,8 @@ namespace app::whatsnew
     auto WhatsNewFeaturesWindow::switchToEndWindow() -> void
     {
         using ExitBehaviour = gui::BellFinishedWindowData::ExitBehaviour;
+
+        static_cast<Application *>(application)->resumeIdleTimer();
         application->switchWindow(
             gui::window::bell_finished::defaultName,
             gui::BellFinishedWindowData::Factory::create("big_namaste_W_G",

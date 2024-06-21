@@ -34,6 +34,5 @@ namespace bellMainStyle
             inline constexpr auto margin_w      = 5U;
             inline constexpr auto time_margin_w = layout_w + margin_w;
         } // namespace ampm
-
     } // namespace mainWindow
 } // namespace bellMainStyle
