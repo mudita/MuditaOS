@@ -67,6 +67,9 @@
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/big_bell_battery_charging_W_G.vpi", "output": "assets/images/big_bell_battery_charging_W_G.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_quote_W_M.vpi", "output": "assets/images/bell_quote_W_M.vpi"},
         {"name": "release.tgz", "tarfile" :"image/assets/images/bell/bell_small_tick_W_M.vpi", "output": "assets/images/bell_small_tick_W_M.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/whatsnew_alarm_W_M.vpi", "output": "assets/images/whatsnew_alarm_W_M.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/whatsnew_clock_W_M.vpi", "output": "assets/images/whatsnew_clock_W_M.vpi"},
+        {"name": "release.tgz", "tarfile" :"image/assets/images/bell/whatsnew_quote_W_M.vpi", "output": "assets/images/whatsnew_quote_W_M.vpi"},
 
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/chimes/Blissful_Dream.mp3", "output": "assets/audio/chimes/Blissful_Dream.mp3"},
         {"name": "release_audio.tgz", "tarfile" :"./image/assets/audio/bell/chimes/Gentle_Chime.mp3", "output": "assets/audio/chimes/Gentle_Chime.mp3"},

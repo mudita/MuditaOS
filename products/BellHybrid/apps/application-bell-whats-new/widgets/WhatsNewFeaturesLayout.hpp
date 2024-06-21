@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <ThreeBox.hpp>
+#include <BoxLayout.hpp>
 
 namespace gui
 {

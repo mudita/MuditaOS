@@ -38,8 +38,7 @@ namespace app::whatsnew
             return true;
         });
         addWinSettings(utils::translate("app_bell_whatsnew_skip"), [this]([[maybe_unused]] Item &item) {
-            presenter->setCurrentOsVersion();
-            app::manager::Controller::sendAction(application, app::manager::actions::Home);
+            skipFeatures();
             return true;
         });
 
@@ -47,5 +46,20 @@ namespace app::whatsnew
     }
 
     auto WhatsNewMainWindow::onBeforeShow([[maybe_unused]] ShowMode mode, [[maybe_unused]] SwitchData *data) -> void
-    {}
+    {
+        static_cast<Application *>(application)->suspendIdleTimer();
+
+        if (presenter->getFeaturesCount() == 0) {
+            LOG_INFO("Skipping What's New due to lack of new features");
+            skipFeatures();
+        }
+    }
+
+    auto WhatsNewMainWindow::skipFeatures() -> void
+    {
+        static_cast<Application *>(application)->resumeIdleTimer();
+
+        presenter->setCurrentOsVersion();
+        app::manager::Controller::sendAction(application, app::manager::actions::Home);
+    }
 } // namespace app::whatsnew
