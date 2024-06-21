@@ -3,6 +3,7 @@
 
 #include "WhatsNewFeaturesLayout.hpp"
 #include "WhatsNewStyle.hpp"
+#include <ThreeBox.hpp>
 #include <TextFixedSize.hpp>
 
 namespace gui
@@ -92,7 +93,7 @@ namespace gui
         mainContainer->centerBox->addWidget(titleText);
         mainContainer->centerBox->addWidget(descriptionText);
 
-        /* Right box */
+        /* Right box - with arrow */
         mainContainer->lastBox = new HBox(mainContainer);
         mainContainer->lastBox->setAlignment(Alignment(Alignment::Vertical::Center));
         mainContainer->lastBox->setEdges(RectangleEdge::None);

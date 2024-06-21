@@ -82,7 +82,7 @@ namespace gui
     void BellOptionWithDescriptionWindow::setListDescription(const std::string &title,
                                                              TokenMap tokenMap,
                                                              const std::string &font,
-                                                             const unsigned height)
+                                                             unsigned height)
     {
         auto descriptionBody = new TextFixedSize(body->centerBox);
         descriptionBody->drawUnderline(false);

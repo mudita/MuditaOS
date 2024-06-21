@@ -26,5 +26,3 @@ add_assets_target(
     DEVEL ${WITH_DEVELOPMENT_FEATURES}
     DEPENDS ${ASSETS_DEPENDENCIES}
 )
-
-#multicomp_install(FILES  ${USER_DEST_DIR}/boot.json DESTINATION ./ COMPONENTS Standalone Update)

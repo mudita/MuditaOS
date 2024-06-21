@@ -3,8 +3,8 @@
 
 #pragma once
 
+#include "WhatsNewFeaturesModel.hpp"
 #include <apps-common/BasePresenter.hpp>
-#include <string>
 
 namespace settings
 {
@@ -27,16 +27,19 @@ namespace app::whatsnew
           public:
             virtual ~Presenter()                       = default;
             virtual auto setCurrentOsVersion() -> void = 0;
+            virtual auto getFeaturesCount() -> bool    = 0;
         };
     };
 
     class WhatsNewMainPresenter : public WhatsNewMainContract::Presenter
     {
       public:
-        explicit WhatsNewMainPresenter(settings::Settings *settings);
+        WhatsNewMainPresenter(models::WhatsNewFeaturesModel &model, settings::Settings *settings);
         auto setCurrentOsVersion() -> void override;
+        auto getFeaturesCount() -> bool override;
 
       private:
+        models::WhatsNewFeaturesModel &model;
         settings::Settings *settings{nullptr};
     };
 } // namespace app::whatsnew

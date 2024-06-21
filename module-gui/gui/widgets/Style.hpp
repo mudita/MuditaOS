@@ -95,6 +95,9 @@ namespace style
             /// 32 px (light)
             inline constexpr auto mediumbiglight = "mediumbiglight";
             /// alpha-numeric (with special characters)
+            /// 32 px (regular)
+            inline constexpr auto mediumbig = "mediumbig";
+            /// alpha-numeric (with special characters)
             /// 32 px (bold)
             inline constexpr auto mediumbigbold    = "mediumbigbold";
             /// alpha-numeric (with special characters)
@@ -356,15 +359,14 @@ namespace style
     {
         namespace wallpaperBox
         {
-            constexpr auto y = 110;
-            constexpr auto h = 534;
+            inline constexpr auto y = 110;
+            inline constexpr auto h = 534;
         } // namespace wallpaperBox
 
         namespace notificationTiles
         {
-            constexpr inline auto tileIconHeight  = 45;
-            constexpr inline auto tileIconMarigin = 15;
+            inline constexpr auto tileIconHeight  = 45;
+            inline constexpr auto tileIconMarigin = 15;
         } // namespace notificationTiles
     }     // namespace wallpaper
-
-}; // namespace style
+} // namespace style

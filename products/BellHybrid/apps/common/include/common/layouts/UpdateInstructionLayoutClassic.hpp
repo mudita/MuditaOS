@@ -32,12 +32,12 @@ namespace gui
         };
         std::vector<InstructionPoint> instructionPoints;
 
-        ImageBox *leftArrowBox;
-        ImageBox *rightArrowBox;
+        ImageBox *leftArrowBox{nullptr};
+        ImageBox *rightArrowBox{nullptr};
 
-        Text *titleBox;
-        ImageBox *imageBox;
+        Text *titleBox{nullptr};
+        ImageBox *imageBox{nullptr};
 
-        void buildInterface(const Instruction &instruction);
+        auto buildInterface(const Instruction &instruction) -> void;
     };
 }; // namespace gui
