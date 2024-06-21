@@ -12,6 +12,7 @@ target_include_directories(application-bell-whats-new
             data
             models
             presenter
+            widgets
             windows
         >
     PUBLIC
@@ -21,10 +22,16 @@ target_include_directories(application-bell-whats-new
 target_sources(application-bell-whats-new
     PRIVATE
         ApplicationWhatsNew.cpp
-        
-        windows/WhatsNewWindow.cpp
-        presenter/WhatsNewPresenter.cpp
-        models/WhatsNewModel.cpp
+
+        models/WhatsNewFeaturesModel.cpp
+
+        presenter/WhatsNewFeaturesPresenter.cpp
+        presenter/WhatsNewMainPresenter.cpp
+
+        widgets/WhatsNewFeaturesLayout.cpp
+
+        windows/WhatsNewMainWindow.cpp
+        windows/WhatsNewFeaturesWindow.cpp
 
     PUBLIC
         include/application-bell-whats-new/ApplicationWhatsNew.hpp

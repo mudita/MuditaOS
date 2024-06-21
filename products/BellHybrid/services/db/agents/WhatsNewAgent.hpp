@@ -19,7 +19,7 @@ namespace service::db::agents
     class WhatsNew : public DatabaseAgent
     {
       public:
-        WhatsNew(sys::Service *parentService, std::string dbName);
+        WhatsNew(sys::Service *parentService, const std::string &dbName);
 
         void registerMessages() override;
         void unRegisterMessages() override;
