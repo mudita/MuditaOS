@@ -97,7 +97,6 @@ namespace app
 
     void ApplicationBellOnBoarding::createUserInterface()
     {
-
         windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
             auto powerOffPresenter = std::make_unique<gui::BellPowerOffPresenter>(app);
             return std::make_unique<gui::OnBoardingOnOffWindow>(app, std::move(powerOffPresenter), name);

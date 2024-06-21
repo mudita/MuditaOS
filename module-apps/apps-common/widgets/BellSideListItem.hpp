@@ -17,7 +17,7 @@ namespace gui
         void setBottomDescriptionText(const std::string &description);
 
       protected:
-        BellSideListItem(BellBaseLayout::LayoutType type = BellBaseLayout::LayoutType::WithArrows);
+        explicit BellSideListItem(BellBaseLayout::LayoutType type = BellBaseLayout::LayoutType::WithArrows);
         void setupBottomTextBox(const std::string &description);
         void setupTopTextBox(const std::string &description);
 

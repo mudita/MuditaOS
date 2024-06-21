@@ -5,12 +5,12 @@
 
 #include <AppWindowConstants.hpp>
 
-namespace app::whatsNew
+namespace app::whatsnew
 {
     namespace window::name
     {
         inline constexpr auto main               = gui::name::window::main_window;
-        inline constexpr auto whatsNewLowBattery = "WhatsNewLowBatteryWindow";
+        inline constexpr auto features           = "WhatsNewFeaturesWindow";
+        //        inline constexpr auto whatsNewLowBattery = "WhatsNewLowBatteryWindow";
     } // namespace window::name
-
-} // namespace app::whatsNew
+} // namespace app::whatsnew
