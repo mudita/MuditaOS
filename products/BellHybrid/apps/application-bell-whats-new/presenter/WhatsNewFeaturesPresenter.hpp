@@ -44,7 +44,7 @@ namespace app::whatsnew
     class WhatsNewFeaturesPresenter : public WhatsNewFeaturesContract::Presenter
     {
       public:
-        explicit WhatsNewFeaturesPresenter(std::unique_ptr<models::WhatsNewFeaturesModel> &&model);
+        explicit WhatsNewFeaturesPresenter(models::WhatsNewFeaturesModel &model);
 
         [[nodiscard]] auto getLayouts() const -> std::vector<gui::Item *> override;
         [[nodiscard]] auto isLastLayout(const gui::Item *layout) const -> bool override;
@@ -56,6 +56,6 @@ namespace app::whatsnew
         auto createLayouts() -> void;
 
         std::vector<gui::Item *> layouts;
-        std::unique_ptr<models::WhatsNewFeaturesModel> model;
+        models::WhatsNewFeaturesModel &model;
     };
 } // namespace app::whatsnew

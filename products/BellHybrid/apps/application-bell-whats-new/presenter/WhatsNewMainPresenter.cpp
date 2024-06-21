@@ -8,11 +8,17 @@
 
 namespace app::whatsnew
 {
-    WhatsNewMainPresenter::WhatsNewMainPresenter(settings::Settings *settings) : settings{settings}
+    WhatsNewMainPresenter::WhatsNewMainPresenter(models::WhatsNewFeaturesModel &model, settings::Settings *settings)
+        : model{model}, settings{settings}
     {}
 
     auto WhatsNewMainPresenter::setCurrentOsVersion() -> void
     {
         settings->setValue(settings::SystemProperties::osCurrentVersion, VERSION, settings::SettingsScope::Global);
+    }
+
+    auto WhatsNewMainPresenter::getFeaturesCount() -> bool
+    {
+        return model.getFeatures().size();
     }
 } // namespace app::whatsnew

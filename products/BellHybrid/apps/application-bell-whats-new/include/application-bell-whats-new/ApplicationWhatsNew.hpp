@@ -4,8 +4,6 @@
 #pragma once
 
 #include <Application.hpp>
-#include <common/models/BatteryModel.hpp>
-#include <common/models/LowBatteryInfoModel.hpp>
 
 namespace app::whatsnew::models
 {
@@ -15,7 +13,7 @@ namespace app::whatsnew::models
 namespace app
 {
     inline constexpr auto applicationWhatsNewName      = "ApplicationWhatsNew";
-    inline constexpr auto applicationWhatsNewStackSize = 1024 * 10;
+    inline constexpr auto applicationWhatsNewStackSize = 1024 * 14;
 
     class ApplicationWhatsNew : public Application
     {
@@ -41,11 +39,8 @@ namespace app
         }
 
       private:
-        std::unique_ptr<whatsnew::models::WhatsNewFeaturesModel> whatsNewModel;
-
-        std::unique_ptr<AbstractBatteryModel> batteryModel;
-        std::unique_ptr<AbstractLowBatteryInfoModel> lowBatteryInfoModel;
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
+        std::unique_ptr<whatsnew::models::WhatsNewFeaturesModel> featuresModel;
     };
 
     template <>

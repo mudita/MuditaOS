@@ -23,5 +23,6 @@ namespace app::whatsnew
         std::unique_ptr<WhatsNewMainContract::Presenter> presenter;
 
         auto settingsOptionsList() -> std::list<Option>;
+        auto skipFeatures() -> void;
     };
 } // namespace app::whatsnew

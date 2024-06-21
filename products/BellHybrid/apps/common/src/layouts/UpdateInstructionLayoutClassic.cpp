@@ -55,7 +55,6 @@ namespace
                 constexpr auto font  = style::window::font::verybiglight;
             } // namespace text
         }     // namespace instruction
-
     } // namespace container
 } // namespace
 
@@ -72,9 +71,10 @@ namespace gui
         buildInterface(instruction);
     }
 
-    void UpdateInstructionLayoutClassic::buildInterface(const Instruction &instruction)
+    auto UpdateInstructionLayoutClassic::buildInterface(const Instruction &instruction) -> void
     {
         setAlignment(Alignment::Horizontal::Center);
+        setEdges(rectangle_enums::RectangleEdge::None);
 
         auto containerThreeBox = new HThreeBox<HBox, VBox, HBox>(this);
         containerThreeBox->setMinimumSize(container::width, container::height);
@@ -149,10 +149,9 @@ namespace gui
             textBox->setFont(container::instruction::text::font);
             textBox->setRichText(utils::translate(point.second));
 
-            InstructionPoint instructionPoint{.container = std::move(instructionContainer),
-                                              .textBox   = std::move(textBox),
-                                              .numberBox = std::move(numberBox)};
-            instructionPoints.push_back(std::move(instructionPoint));
+            InstructionPoint instructionPoint{
+                .container = instructionContainer, .textBox = textBox, .numberBox = numberBox};
+            instructionPoints.push_back(instructionPoint);
         }
 
         for (const auto &point : instructionPoints) {

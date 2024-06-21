@@ -7,6 +7,7 @@
 #include <db/WhatsNewMessages.hpp>
 #include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
+#include <product/version.hpp>
 #include <Utils.hpp>
 
 namespace
@@ -72,8 +73,8 @@ namespace app::whatsnew::models
         return features;
     }
 
-    auto WhatsNewFeaturesModel::setCurrentOsVersion(const std::string &version) -> void
+    auto WhatsNewFeaturesModel::setCurrentOsVersion() -> void
     {
-        settings->setValue(settings::SystemProperties::osCurrentVersion, version, settings::SettingsScope::Global);
+        settings->setValue(settings::SystemProperties::osCurrentVersion, VERSION, settings::SettingsScope::Global);
     }
 } // namespace app::whatsnew::models
