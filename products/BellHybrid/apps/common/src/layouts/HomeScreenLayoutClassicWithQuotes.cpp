@@ -148,5 +148,4 @@ namespace gui
         connectionBox->setVisible(connectionStatus->isVisible());
         widgetBox->informContentChanged();
     }
-
-}; // namespace gui
+} // namespace gui

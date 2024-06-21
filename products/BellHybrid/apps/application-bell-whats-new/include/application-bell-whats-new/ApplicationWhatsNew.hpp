@@ -7,25 +7,26 @@
 #include <common/models/BatteryModel.hpp>
 #include <common/models/LowBatteryInfoModel.hpp>
 
-namespace app::whatsNew::models
+namespace app::whatsnew::models
 {
-    class WhatsNewModel;
-} // namespace app::whatsNew::models
+    class WhatsNewFeaturesModel;
+}
 
 namespace app
 {
     inline constexpr auto applicationWhatsNewName      = "ApplicationWhatsNew";
-    inline constexpr auto applicationWhatsNewStackSize = 1024 * 8;
+    inline constexpr auto applicationWhatsNewStackSize = 1024 * 10;
 
     class ApplicationWhatsNew : public Application
     {
       public:
-        ApplicationWhatsNew(std::string name                    = applicationWhatsNewName,
-                            std::string parent                  = "",
-                            StatusIndicators statusIndicators   = StatusIndicators{},
-                            StartInBackground startInBackground = false,
-                            std::uint32_t stackDepth            = applicationWhatsNewStackSize);
-        ~ApplicationWhatsNew();
+        explicit ApplicationWhatsNew(std::string name                    = applicationWhatsNewName,
+                                     std::string parent                  = "",
+                                     StatusIndicators statusIndicators   = StatusIndicators{},
+                                     StartInBackground startInBackground = false,
+                                     std::uint32_t stackDepth            = applicationWhatsNewStackSize);
+        ~ApplicationWhatsNew() override;
+
         sys::ReturnCodes InitHandler() override;
 
         void createUserInterface() override;
@@ -40,7 +41,7 @@ namespace app
         }
 
       private:
-        std::unique_ptr<whatsNew::models::WhatsNewModel> whatsNewModel;
+        std::unique_ptr<whatsnew::models::WhatsNewFeaturesModel> whatsNewModel;
 
         std::unique_ptr<AbstractBatteryModel> batteryModel;
         std::unique_ptr<AbstractLowBatteryInfoModel> lowBatteryInfoModel;

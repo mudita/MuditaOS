@@ -14,8 +14,7 @@ namespace gui
     {
         constexpr auto one_option_height      = style::bell_options::h + 2U * style::bell_options::option_margin;
         constexpr auto option_layout_height   = 2U * one_option_height;
-        constexpr auto description_height     = 175U;
-        constexpr auto max_description_height = description_height + 16U;
+        constexpr auto max_to_min_difference  = 16U;
         constexpr auto top_center_margin      = -14;
     } // namespace
 
@@ -62,12 +61,12 @@ namespace gui
         setFocusItem(optionsList);
     }
 
-    void BellOptionWithDescriptionWindow::setListTitle(const std::string &title)
+    void BellOptionWithDescriptionWindow::setListTitle(const std::string &title, const std::string &font)
     {
         auto titleBody = new TextFixedSize(body->firstBox);
         titleBody->drawUnderline(false);
         titleBody->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        titleBody->setFont(style::window::font::largelight);
+        titleBody->setFont(font);
         titleBody->setMinimumWidth(style::bell_base_layout::outer_layouts_w);
         titleBody->setEdges(RectangleEdge::None);
         titleBody->setEditMode(EditMode::Browse);
@@ -80,19 +79,27 @@ namespace gui
         body->resizeItems();
     }
 
-    void BellOptionWithDescriptionWindow::setListDescription(const std::string &title)
+    void BellOptionWithDescriptionWindow::setListDescription(const std::string &title,
+                                                             TokenMap tokenMap,
+                                                             const std::string &font,
+                                                             const unsigned height)
     {
         auto descriptionBody = new TextFixedSize(body->centerBox);
         descriptionBody->drawUnderline(false);
         descriptionBody->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        descriptionBody->setFont(style::window::font::verybiglight);
-        descriptionBody->setMinimumSize(style::window_width, description_height);
+        descriptionBody->setFont(font);
+        descriptionBody->setMinimumSize(style::window_width, height);
         descriptionBody->setEditMode(EditMode::Browse);
-        descriptionBody->setRichText(title);
+        if (tokenMap.has_value()) {
+            descriptionBody->setRichText(title, std::move(tokenMap.value()));
+        }
+        else {
+            descriptionBody->setText(title);
+        }
 
         body->centerBox->setMargins(gui::Margins{0, top_center_margin, 0, 0});
-        body->centerBox->setMaximumHeight(max_description_height);
-        body->centerBox->setMinimumHeight(description_height);
+        body->centerBox->setMaximumHeight(height + max_to_min_difference);
+        body->centerBox->setMinimumHeight(height);
         body->centerBox->resizeItems();
         body->resizeItems();
     }

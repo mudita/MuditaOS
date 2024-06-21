@@ -127,9 +127,8 @@ namespace app::manager
 
     auto ApplicationManager::isWhatsNewAvailable() -> bool
     {
-        const auto lastVersionNumber =
+        const auto &lastVersionNumber =
             settings->getValue(settings::SystemProperties::osCurrentVersion, settings::SettingsScope::Global);
         return lastVersionNumber != VERSION;
     }
-
 } // namespace app::manager

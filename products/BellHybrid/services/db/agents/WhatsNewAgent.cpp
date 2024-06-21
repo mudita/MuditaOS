@@ -4,27 +4,43 @@
 #include "WhatsNewAgent.hpp"
 #include "db/WhatsNewMessages.hpp"
 
+#include <i18n/i18n.hpp>
 #include <Service/Service.hpp>
 #include <purefs/filesystem_paths.hpp>
-#include <i18n/i18n.hpp>
 
 namespace
 {
-    using namespace service::db::whatsNew;
+    using namespace service::db::whatsnew;
 
-    constexpr auto query = "SELECT %s, Icon FROM WhatsNew WHERE Major > %d OR (Major = %d AND Minor > %d) OR (Major = "
-                           "%d AND Minor = %d AND Patch > %d)";
-
-    std::vector<Record> getRecordsByVersion(Database *db, VersionNumber version)
+    inline std::string createTitleColumnName(const std::string &language)
     {
-        const auto retQuery = db->query(query,
-                                        utils::getDisplayLanguage().c_str(),
-                                        version.major,
-                                        version.major,
-                                        version.minor,
-                                        version.major,
-                                        version.minor,
-                                        version.patch);
+        constexpr auto titleSuffix = "_title";
+        return language + titleSuffix;
+    }
+
+    inline std::string createDescriptionColumnName(const std::string &language)
+    {
+        constexpr auto descriptionSuffix = "_desc";
+        return language + descriptionSuffix;
+    }
+
+    std::vector<Record> getRecordsByVersion(Database &db, const VersionNumber &version)
+    {
+        constexpr auto query = "SELECT %s, %s, Icon FROM whats_new "
+                               "WHERE Major > %u OR "
+                               "(Major = %u AND Minor > %u) OR "
+                               "(Major = %u AND Minor = %u AND Patch > %u) "
+                               "ORDER BY Major ASC, Minor ASC, Patch ASC;";
+
+        const auto retQuery = db.query(query,
+                                       createTitleColumnName(utils::getDisplayLanguage()).c_str(),
+                                       createDescriptionColumnName(utils::getDisplayLanguage()).c_str(),
+                                       version.major,
+                                       version.major,
+                                       version.minor,
+                                       version.major,
+                                       version.minor,
+                                       version.patch);
 
         if ((retQuery == nullptr) || (retQuery->getRowCount() == 0)) {
             return {};
@@ -34,7 +50,7 @@ namespace
         ret.reserve(retQuery->getRowCount());
 
         do {
-            ret.push_back({.description{(*retQuery)[0].getString()}, .iconName{(*retQuery)[1].getString()}});
+            ret.push_back(Record{(*retQuery)[0].getString(), (*retQuery)[1].getString(), (*retQuery)[2].getString()});
         } while (retQuery->nextRow());
 
         return ret;
@@ -43,19 +59,19 @@ namespace
 
 namespace service::db::agents
 {
-    WhatsNew::WhatsNew(sys::Service *parentService, const std::string dbName)
+    WhatsNew::WhatsNew(sys::Service *parentService, const std::string &dbName)
         : DatabaseAgent{parentService}, dbName{dbName}, db{(purefs::dir::getDatabasesPath() / dbName).c_str()}
     {}
 
     void WhatsNew::registerMessages()
     {
-        parentService->connect(whatsNew::messages::GetByVersion({}),
+        parentService->connect(whatsnew::messages::GetByVersion({}),
                                [this](const auto &req) { return handleGetRecordsByVersion(req); });
     }
 
     void WhatsNew::unRegisterMessages()
     {
-        parentService->disconnect(typeid(whatsNew::messages::GetByVersion));
+        parentService->disconnect(typeid(whatsnew::messages::GetByVersion));
     }
 
     auto WhatsNew::getAgentName() -> const std::string
@@ -65,9 +81,9 @@ namespace service::db::agents
 
     sys::MessagePointer WhatsNew::handleGetRecordsByVersion(const sys::Message *req)
     {
-        if (auto msg = dynamic_cast<const whatsNew::messages::GetByVersion *>(req)) {
-            const auto records = getRecordsByVersion(&db, msg->version);
-            return std::make_shared<whatsNew::messages::Response>(records);
+        if (const auto msg = dynamic_cast<const whatsnew::messages::GetByVersion *>(req)) {
+            const auto &records = getRecordsByVersion(db, msg->version);
+            return std::make_shared<whatsnew::messages::Response>(records);
         }
         return std::make_shared<sys::ResponseMessage>();
     }

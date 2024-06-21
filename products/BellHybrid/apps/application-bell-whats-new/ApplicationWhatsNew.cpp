@@ -3,11 +3,13 @@
 
 #include "ApplicationWhatsNew.hpp"
 #include "WhatsNewCommon.hpp"
+#include "WhatsNewMainWindow.hpp"
+#include "WhatsNewMainPresenter.hpp"
+#include "WhatsNewFeaturesWindow.hpp"
+#include "WhatsNewFeaturesPresenter.hpp"
+#include "WhatsNewFeaturesModel.hpp"
 
-#include "windows/WhatsNewWindow.hpp"
-#include "presenter/WhatsNewPresenter.hpp"
-#include "models/WhatsNewModel.hpp"
-
+#include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/AppsBatteryStatusWindow.hpp>
 #include <system/messages/SentinelRegistrationMessage.hpp>
 
@@ -33,10 +35,6 @@ namespace app
             return ret;
         }
 
-        whatsNewModel = std::make_unique<whatsNew::models::WhatsNewModel>(this);
-
-        batteryModel                 = std::make_unique<app::BatteryModel>(this);
-        lowBatteryInfoModel          = std::make_unique<app::LowBatteryInfoModel>();
         cpuSentinel                  = std::make_shared<sys::CpuSentinel>(applicationWhatsNewName, this);
         auto sentinelRegistrationMsg = std::make_shared<sys::SentinelRegistrationMessage>(cpuSentinel);
         bus.sendUnicast(std::move(sentinelRegistrationMsg), service::name::system_manager);
@@ -49,15 +47,26 @@ namespace app
 
     void ApplicationWhatsNew::createUserInterface()
     {
-        windowsFactory.attach(whatsNew::window::name::main, [this](ApplicationCommon *app, const std::string &name) {
-            auto presenter = std::make_unique<app::whatsNew::WhatsNewPresenter>(*batteryModel, *lowBatteryInfoModel);
-            return std::make_unique<whatsNew::WhatsNewWindow>(app, std::move(presenter));
+        windowsFactory.attach(whatsnew::window::name::main, [this](ApplicationCommon *app, const std::string &name) {
+            auto presenter = std::make_unique<whatsnew::WhatsNewMainPresenter>(settings.get());
+            return std::make_unique<whatsnew::WhatsNewMainWindow>(app, std::move(presenter), name);
         });
 
-        windowsFactory.attach(whatsNew::window::name::whatsNewLowBattery,
+        windowsFactory.attach(
+            whatsnew::window::name::features, [this](ApplicationCommon *app, const std::string &name) {
+                auto model     = std::make_unique<whatsnew::models::WhatsNewFeaturesModel>(this, settings.get());
+                auto presenter = std::make_unique<whatsnew::WhatsNewFeaturesPresenter>(std::move(model));
+                return std::make_unique<whatsnew::WhatsNewFeaturesWindow>(app, std::move(presenter), name);
+            });
+        windowsFactory.attach(gui::window::bell_finished::defaultName,
                               [](ApplicationCommon *app, const std::string &name) {
-                                  return std::make_unique<gui::AppsBatteryStatusWindow>(app, name);
+                                  return std::make_unique<gui::BellFinishedWindow>(app, name);
                               });
+
+        //        windowsFactory.attach(whatsnew::window::name::whatsNewLowBattery,
+        //                              [](ApplicationCommon *app, const std::string &name) {
+        //                                  return std::make_unique<gui::AppsBatteryStatusWindow>(app, name);
+        //                              });
 
         attachPopups({gui::popup::ID::AlarmActivated,
                       gui::popup::ID::AlarmDeactivated,
