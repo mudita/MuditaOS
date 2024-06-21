@@ -7,10 +7,11 @@
 #include <Service/Message.hpp>
 #include <vector>
 
-namespace service::db::whatsNew
+namespace service::db::whatsnew
 {
     struct Record
     {
+        std::string title;
         std::string description;
         std::string iconName;
     };
@@ -39,6 +40,5 @@ namespace service::db::whatsNew
 
             std::vector<Record> records{};
         };
-
     } // namespace messages
-} // namespace service::db::whatsNew
+} // namespace service::db::whatsnew

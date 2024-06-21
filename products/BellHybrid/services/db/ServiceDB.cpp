@@ -29,7 +29,7 @@ namespace
     constexpr auto multimediaDatabaseName{"multimedia.db"};
     constexpr auto settingsDatabaseName{"settings_bell.db"};
     constexpr auto meditationStatsDatabaseName{"meditation_stats.db"};
-    constexpr auto whatsNewDatabaseName{"whats-new.db"};
+    constexpr auto whatsNewDatabaseName{"whats_new.db"};
 } // namespace
 
 ServiceDB::~ServiceDB()

@@ -14,14 +14,15 @@
 namespace
 {
     using namespace std::chrono;
-    static constexpr auto zeroOffset = 0;
-    static constexpr auto maxLimit   = std::numeric_limits<unsigned>::max();
-    static constexpr auto dayInSec   = duration_cast<seconds>(24h).count();
+
+    constexpr auto zeroOffset = 0;
+    constexpr auto maxLimit   = std::numeric_limits<unsigned>::max();
+    constexpr auto dayInSec   = duration_cast<seconds>(24h).count();
 
     bool hasCrossedMidnight(std::time_t current, std::time_t last)
     {
-        const std::tm lastTime    = *std::localtime(&last);
-        const std::tm currentTime = *std::localtime(&current);
+        const auto lastTime    = *std::localtime(&last);
+        const auto currentTime = *std::localtime(&current);
         if (currentTime.tm_mday != lastTime.tm_mday) {
             return true;
         }

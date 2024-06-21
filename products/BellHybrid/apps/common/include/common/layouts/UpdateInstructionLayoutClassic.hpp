@@ -10,8 +10,6 @@
 
 namespace gui
 {
-    class BellBaseLayout;
-
     using Instruction = std::vector<std::pair<std::string, UTF8>>;
 
     class UpdateInstructionLayoutClassic : public UpdateInstructionLayoutProvider, VBox
