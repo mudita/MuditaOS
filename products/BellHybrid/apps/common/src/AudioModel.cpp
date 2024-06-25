@@ -40,16 +40,17 @@ namespace
 
     auto SendAudioRequest(sys::Service *serv, std::shared_ptr<service::AudioMessage> msg)
     {
-        auto msgType = static_cast<int>(msg->type);
         auto ret     = serv->bus.sendUnicastSync(msg, service::audioServiceName, sys::BusProxy::defaultTimeout);
         if (ret.first == sys::ReturnCodes::Success) {
             if (auto resp = std::dynamic_pointer_cast<service::AudioResponseMessage>(ret.second)) {
                 return resp;
             }
-            LOG_ERROR("Message type [%d] - not AudioResponseMessage", msgType);
+            LOG_ERROR("Message type '%s' - not AudioResponseMessage", magic_enum::enum_name(msg->type).data());
             return std::make_shared<service::AudioResponseMessage>(audio::RetCode::Failed);
         }
-        LOG_ERROR("Command %d Failed with %d error", msgType, static_cast<int>(ret.first));
+        LOG_ERROR("Command '%s' failed with error '%s'",
+                  magic_enum::enum_name(msg->type).data(),
+                  magic_enum::enum_name(ret.first).data());
         return std::make_shared<service::AudioResponseMessage>(audio::RetCode::Failed);
     }
 } // namespace
