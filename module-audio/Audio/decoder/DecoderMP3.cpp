@@ -49,7 +49,7 @@ namespace
 
 namespace audio
 {
-    DecoderMP3::DecoderMP3(const std::string &filePath) : Decoder(filePath)
+    DecoderMP3::DecoderMP3(const std::string &filePath) : Decoder(filePath), mp3(std::make_unique<drmp3>())
     {
         if (fileSize == 0) {
             return;
@@ -63,10 +63,7 @@ namespace audio
             LOG_INFO("No ID3V2 tag to skip");
         }
 
-        mp3 = std::make_unique<drmp3>();
-
-        drmp3_init(mp3.get(), drmp3Read, drmp3Seek, this, nullptr);
-        if (mp3 == nullptr) {
+        if (drmp3_init(mp3.get(), drmp3Read, drmp3Seek, this, nullptr) == DRMP3_FALSE) {
             LOG_ERROR("Unable to initialize MP3 decoder");
             return;
         }
@@ -80,7 +77,11 @@ namespace audio
 
     DecoderMP3::~DecoderMP3()
     {
+        if (!isInitialized) {
+            return;
+        }
         drmp3_uninit(mp3.get());
+        isInitialized = false;
     }
 
     void DecoderMP3::setPosition(float pos)
