@@ -58,13 +58,14 @@ namespace gui
             list->rebuildList(listview::RebuildType::InPlace);
             return false;
         };
-        auto onListItemFocusAcquire = [this](const db::multimedia_files::MultimediaFilesRecord &record) {
+        auto onListItemFocusAcquire = [this, songsModel](const db::multimedia_files::MultimediaFilesRecord &record) {
             const auto &recordPath = record.fileInfo.path;
 
             /* Suppress initial calls of this function while the list is being
-             * loaded, only handle those caused by knob rotation. */
+             * loaded, only handle those caused by knob rotation. If currently
+             * selected file's missing, just assume the list is already loaded. */
             if (!listLoadingDone) {
-                if (recordPath == value()) {
+                if ((recordPath == value()) || !songsModel->fileExists(value())) {
                     listLoadingDone = true;
                 }
             }
