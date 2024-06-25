@@ -133,4 +133,10 @@ namespace app
     {
         return currentlyChosenRecordPath;
     }
+
+    auto SongsModel::fileExists(const std::string &path) -> bool
+    {
+        std::error_code ec;
+        return std::filesystem::exists(path, ec);
+    }
 } // namespace app

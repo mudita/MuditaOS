@@ -113,6 +113,9 @@ namespace app::bell_settings
 
     auto AlarmSettingsPresenter::handleAudioError(const UTF8 &path, gui::AudioErrorType errorType) -> void
     {
+        if (audioErrorModel == nullptr) {
+            return;
+        }
         const bool validPath = !audioErrorModel->isPathOnErrorList(path);
         if (validPath) {
             audioErrorModel->addPathToErrorList(path, errorType);
@@ -122,6 +125,9 @@ namespace app::bell_settings
 
     auto AlarmSettingsPresenter::validatePath(const UTF8 &path) const -> bool
     {
+        if (audioErrorModel == nullptr) {
+            return true;
+        }
         const auto errorType = audioErrorModel->getErrorType(path);
         if (errorType.has_value()) {
             showAudioError(errorType.value());

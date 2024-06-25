@@ -54,9 +54,10 @@ namespace app
         auto updateRecordsCount() -> void;
         auto nextRecordExists(gui::Order order) -> bool;
 
-        auto updateCurrentlyChosenRecordPath(const std::string &path) -> void;
         auto getLabelsFilesCount() -> std::vector<std::pair<std::string, std::uint32_t>>;
+        auto updateCurrentlyChosenRecordPath(const std::string &path) -> void;
         [[nodiscard]] auto getCurrentlyChosenRecordPath() const -> std::string;
+        [[nodiscard]] auto fileExists(const std::string &path) -> bool;
 
       private:
         auto onMusicListRetrieved(const std::vector<db::multimedia_files::MultimediaFilesRecord> &records,
