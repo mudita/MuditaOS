@@ -11,6 +11,13 @@ namespace settings
     class Settings;
 }
 
+namespace app
+{
+    class ApplicationCommon;
+    class AbstractBatteryModel;
+    class AbstractLowBatteryInfoModel;
+} // namespace app
+
 namespace app::whatsnew
 {
     class WhatsNewMainContract
@@ -28,18 +35,27 @@ namespace app::whatsnew
             virtual ~Presenter()                       = default;
             virtual auto setCurrentOsVersion() -> void = 0;
             virtual auto getFeaturesCount() -> bool    = 0;
+            virtual auto showFeatures() -> void        = 0;
         };
     };
 
     class WhatsNewMainPresenter : public WhatsNewMainContract::Presenter
     {
       public:
-        WhatsNewMainPresenter(models::WhatsNewFeaturesModel &model, settings::Settings *settings);
+        WhatsNewMainPresenter(app::ApplicationCommon *app,
+                              models::WhatsNewFeaturesModel &model,
+                              AbstractBatteryModel &batteryModel,
+                              AbstractLowBatteryInfoModel &lowBatteryInfoModel,
+                              settings::Settings *settings);
         auto setCurrentOsVersion() -> void override;
         auto getFeaturesCount() -> bool override;
+        auto showFeatures() -> void override;
 
       private:
+        app::ApplicationCommon *app;
         models::WhatsNewFeaturesModel &model;
+        AbstractBatteryModel &batteryModel;
+        AbstractLowBatteryInfoModel &lowBatteryInfoModel;
         settings::Settings *settings{nullptr};
     };
 } // namespace app::whatsnew
