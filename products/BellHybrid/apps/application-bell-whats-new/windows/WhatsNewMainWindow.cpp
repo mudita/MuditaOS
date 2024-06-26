@@ -34,7 +34,7 @@ namespace app::whatsnew
         };
 
         addWinSettings(utils::translate("app_bell_whatsnew_continue"), [this]([[maybe_unused]] Item &item) {
-            application->switchWindow(window::name::features);
+            presenter->showFeatures();
             return true;
         });
         addWinSettings(utils::translate("app_bell_whatsnew_skip"), [this]([[maybe_unused]] Item &item) {
