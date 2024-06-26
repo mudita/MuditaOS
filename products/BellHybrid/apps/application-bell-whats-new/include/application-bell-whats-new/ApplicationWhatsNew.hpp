@@ -12,6 +12,12 @@ namespace app::whatsnew::models
 
 namespace app
 {
+    class AbstractBatteryModel;
+    class AbstractLowBatteryInfoModel;
+} // namespace app
+
+namespace app
+{
     inline constexpr auto applicationWhatsNewName      = "ApplicationWhatsNew";
     inline constexpr auto applicationWhatsNewStackSize = 1024 * 14;
 
@@ -41,6 +47,8 @@ namespace app
       private:
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
         std::unique_ptr<whatsnew::models::WhatsNewFeaturesModel> featuresModel;
+        std::unique_ptr<AbstractBatteryModel> batteryModel;
+        std::unique_ptr<AbstractLowBatteryInfoModel> lowBatteryInfoModel;
     };
 
     template <>
