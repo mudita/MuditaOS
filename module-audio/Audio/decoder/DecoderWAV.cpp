@@ -15,6 +15,10 @@ namespace audio
 {
     DecoderWAV::DecoderWAV(const std::string &filePath) : Decoder(filePath), wav(std::make_unique<drwav>())
     {
+        if (fileSize == 0) {
+            return;
+        }
+
         if (drwav_init(wav.get(), drwavRead, drwavSeek, this, nullptr) == DRWAV_FALSE) {
             LOG_ERROR("Unable to init WAV decoder");
             return;
