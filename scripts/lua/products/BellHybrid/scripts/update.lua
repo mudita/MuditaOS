@@ -74,6 +74,16 @@ local function create_directories()
     lfs.mkdir(target_dir .. "/log")
     lfs.mkdir(target_dir .. "/crash_dumps")
     lfs.mkdir(target_dir .. "/var")
+
+    if not helpers.exists(paths.user_alarm_dir) then
+        print("Creating 'alarm' directory")
+        lfs.mkdir(paths.user_alarm_dir)
+    end
+
+    if not helpers.exists(paths.user_relaxation_dir) then
+        print("Creating 'relaxation' directory")
+        lfs.mkdir(paths.user_relaxation_dir)
+    end
 end
 
 local function migrate_db()
