@@ -91,6 +91,19 @@ namespace gui
         iconRing->image->set(progressStyle::ringIcon::image, ImageTypeSpecifier::W_G);
         iconRing->setVisible(false);
 
+        bottomDescription = new gui::TextFixedSize(
+            mainVBox, 0, 0, progressStyle::bottomDescription::maxSizeX, progressStyle::bottomDescription::maxSizeY);
+        bottomDescription->setMaximumSize(progressStyle::bottomDescription::maxSizeX,
+                                          progressStyle::bottomDescription::maxSizeY);
+        bottomDescription->setFont(progressStyle::bottomDescription::font);
+        bottomDescription->setMargins(gui::Margins(0, 0, 0, 0));
+        bottomDescription->activeItem = false;
+        bottomDescription->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        bottomDescription->setRichText(utils::translate("app_bellmain_power_nap"));
+        bottomDescription->drawUnderline(false);
+        bottomDescription->setVisible(true);
+
         mainVBox->resizeItems();
     }
 
