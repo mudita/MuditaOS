@@ -29,6 +29,7 @@ namespace gui
         VBox *mainVBox{nullptr};
         ArcProgressBar *progress{nullptr};
         TimeMinuteSecondWidget *timer{nullptr};
+        gui::TextFixedSize *bottomDescription{nullptr};
         Icon *icon{nullptr};
         BellStatusClock *clock{nullptr};
 

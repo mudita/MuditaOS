@@ -87,6 +87,18 @@ namespace gui
         icon->image->set(relStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
         icon->setVisible(false);
 
+        bottomDescription = new gui::TextFixedSize(
+            mainVBox, 0, 0, relStyle::bottomDescription::maxSizeX, relStyle::bottomDescription::maxSizeY);
+        bottomDescription->setMaximumSize(relStyle::bottomDescription::maxSizeX, relStyle::bottomDescription::maxSizeY);
+        bottomDescription->setFont(relStyle::bottomDescription::font);
+        bottomDescription->setMargins(gui::Margins(0, 0, 0, 0));
+        bottomDescription->activeItem = false;
+        bottomDescription->setAlignment(
+            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        bottomDescription->setRichText(utils::translate("app_bellmain_relaxation"));
+        bottomDescription->drawUnderline(false);
+        bottomDescription->setVisible(true);
+
         mainVBox->resizeItems();
     }
 
