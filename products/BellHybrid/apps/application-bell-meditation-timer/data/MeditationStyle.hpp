@@ -11,56 +11,64 @@ namespace app::meditationStyle
     {
         namespace progress
         {
-            constexpr inline auto radius                   = 192;
-            constexpr inline auto penWidth                 = 3;
-            constexpr inline auto verticalDeviationDegrees = 38;
+            inline constexpr auto radius                   = 192U;
+            inline constexpr auto penWidth                 = 3U;
+            inline constexpr auto verticalDeviationDegrees = 38U;
         } // namespace progress
 
         namespace timer
         {
-            constexpr inline auto marginTop = 39;
-            constexpr inline auto maxSizeX  = 340;
-            constexpr inline auto maxSizeY  = 198;
+            inline constexpr auto marginTop = 19U;
+            inline constexpr auto maxSizeX  = 340U;
+            inline constexpr auto maxSizeY  = 198U;
         } // namespace timer
 
         namespace pauseIcon
         {
-            constexpr inline auto image     = "big_pause";
-            constexpr inline auto marginTop = 39;
-            constexpr inline auto maxSizeX  = 203;
-            constexpr inline auto maxSizeY  = 203;
+            inline constexpr auto image     = "big_pause";
+            inline constexpr auto maxSizeX  = 203U;
+            inline constexpr auto maxSizeY  = 203U;
+            inline constexpr auto marginTop = timer::marginTop - (maxSizeY - timer::maxSizeY);
         } // namespace pauseIcon
 
         namespace clock
         {
-            constexpr inline auto marginTop = 17;
-            constexpr inline auto maxSizeX  = 340;
-            constexpr inline auto maxSizeY  = 84;
+            inline constexpr auto marginTop = 17U;
+            inline constexpr auto maxSizeX  = 340U;
+            inline constexpr auto maxSizeY  = 84U;
         } // namespace clock
+
+        namespace bottomDescription
+        {
+            inline constexpr auto marginTop = 38U;
+            inline constexpr auto maxSizeX  = 340U;
+            inline constexpr auto maxSizeY  = 80U;
+            inline constexpr auto font      = style::window::font::verybig;
+        } // namespace bottomDescription
     }     // namespace runningStyle
 
     namespace countdownStyle
     {
         namespace progress
         {
-            constexpr inline auto radius                   = runningStyle::progress::radius;
-            constexpr inline auto penWidth                 = 9;
-            constexpr inline auto verticalDeviationDegrees = runningStyle::progress::verticalDeviationDegrees;
+            inline constexpr auto radius                   = runningStyle::progress::radius;
+            inline constexpr auto penWidth                 = 9U;
+            inline constexpr auto verticalDeviationDegrees = runningStyle::progress::verticalDeviationDegrees;
         } // namespace progress
 
         namespace timer
         {
-            constexpr inline auto marginTop = 24;
-            constexpr inline auto maxSizeX  = runningStyle::timer::maxSizeX;
-            constexpr inline auto maxSizeY  = runningStyle::timer::maxSizeY;
+            inline constexpr auto marginTop = 24U;
+            inline constexpr auto maxSizeX  = runningStyle::timer::maxSizeX;
+            inline constexpr auto maxSizeY  = runningStyle::timer::maxSizeY;
         } // namespace timer
 
         namespace description
         {
-            constexpr inline auto font      = style::window::font::large;
-            constexpr inline auto marginTop = 63;
-            constexpr inline auto maxSizeX  = 380;
-            constexpr inline auto maxSizeY  = 102;
+            inline constexpr auto font      = style::window::font::large;
+            inline constexpr auto marginTop = 63U;
+            inline constexpr auto maxSizeX  = 380U;
+            inline constexpr auto maxSizeY  = 102U;
         } // namespace description
     }     // namespace countdownStyle
 
@@ -68,12 +76,12 @@ namespace app::meditationStyle
     {
         namespace text
         {
-            constexpr inline auto font = style::window::font::supersizemelight;
+            inline constexpr auto font = style::window::font::supersizemelight;
         }
 
         namespace minute
         {
-            constexpr inline auto font = style::window::font::largelight;
+            inline constexpr auto font = style::window::font::largelight;
         }
     } // namespace timerStyle
 } // namespace app::meditationStyle

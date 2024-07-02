@@ -10,6 +10,7 @@
 * Added update instruction screen at end of onboarding
 * Added update instruction screen in Settings
 * Added volume setting for focus timer application
+* Added label with the name of the application on the countdown screens
 
 ### Changed / Improved
 * Changed the refresh rate of the progress bar screen

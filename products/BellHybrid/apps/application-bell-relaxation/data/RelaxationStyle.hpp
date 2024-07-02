@@ -49,7 +49,7 @@ namespace gui::relaxationStyle
 
         namespace timer
         {
-            inline constexpr auto marginTop = 41U;
+            inline constexpr auto marginTop = 19U;
             inline constexpr auto font      = style::window::font::supersizeme;
             inline constexpr auto maxSizeX  = 340U;
             inline constexpr auto maxSizeY  = 198U;
@@ -58,9 +58,9 @@ namespace gui::relaxationStyle
         namespace pauseIcon
         {
             inline constexpr auto image     = "big_pause";
-            inline constexpr auto marginTop = 39U;
             inline constexpr auto maxSizeX  = 203U;
             inline constexpr auto maxSizeY  = 203U;
+            inline constexpr auto marginTop = timer::marginTop - (maxSizeY - timer::maxSizeY);
         } // namespace pauseIcon
 
         namespace clock
@@ -69,5 +69,13 @@ namespace gui::relaxationStyle
             inline constexpr auto maxSizeX  = 340U;
             inline constexpr auto maxSizeY  = 84U;
         } // namespace clock
+
+        namespace bottomDescription
+        {
+            inline constexpr auto marginTop = 38U;
+            inline constexpr auto maxSizeX  = 340U;
+            inline constexpr auto maxSizeY  = 80U;
+            inline constexpr auto font      = style::window::font::verybig;
+        } // namespace bottomDescription
     }     // namespace relStyle
 } // namespace gui::relaxationStyle
