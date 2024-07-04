@@ -7,6 +7,8 @@
 #include <db/WhatsNewMessages.hpp>
 #include <service-db/Settings.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
+#include <service-desktop/Constants.hpp>
+#include <module-utils/utility/Version.hpp>
 #include <product/version.hpp>
 #include <Utils.hpp>
 
@@ -52,9 +54,14 @@ namespace app::whatsnew::models
     WhatsNewFeaturesModel::WhatsNewFeaturesModel(app::ApplicationCommon *app, settings::Settings *settings)
         : settings{settings}
     {
-        const auto &lastVersion =
-            this->settings->getValue(settings::SystemProperties::osCurrentVersion, settings::SettingsScope::Global);
-        const auto &version = getVersionNumber(lastVersion);
+        auto previousVersion =
+            settings->getValue(settings::SystemProperties::osCurrentVersion, settings::SettingsScope::Global);
+        if (previousVersion == utils::defaultPreviousVersion) {
+            previousVersion = utils::getPreviousVersionFromFile(purefs::dir::getTemporaryPath() /
+                                                                sdesktop::paths::recoveryStatusFilename)
+                                  .value_or(utils::defaultPreviousVersion);
+        }
+        const auto &version = getVersionNumber(previousVersion);
         if (!version.has_value()) {
             LOG_ERROR("Failed to parse last version string!");
             return;
