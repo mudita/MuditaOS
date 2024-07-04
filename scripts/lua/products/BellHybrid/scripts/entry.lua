@@ -35,11 +35,18 @@ local function print_boot_reason()
     print(string.format("Boot reason: %s", rec.sys.boot_reason_str()))
 end
 
+local function get_os_version()
+    if helpers.exists(paths.version_file) then
+        return helpers.get_os_version(paths.version_file)
+    end
+    return "0.00.0"
+end
+
 local function generate_report_file(boot_reason_str, success, message)
     local file_path = paths.temp_dir .. "/recovery_status.json"
     local body = string.format(
-        "{\"version\": \"%s\",\"branch\": \"%s\",\"revision\": \"%s\",\"operation\": \"%s\",\"successful\": %s,\"message\": \"%s\"}",
-        rec.version(), rec.branch(), rec.revision(), boot_reason_str, tostring(success), message)
+        "{\"version\": \"%s\",\"branch\": \"%s\",\"revision\": \"%s\",\"operation\": \"%s\",\"successful\": %s,\"prevOsVersion\": \"%s\",\"message\": \"%s\"}",
+        rec.version(), rec.branch(), rec.revision(), boot_reason_str, tostring(success), get_os_version(), message)
     local fd = assert(io.open(file_path, 'w'))
     fd:write(body)
     fd:close()
