@@ -13,9 +13,11 @@
 #include <service-evtmgr/BatteryMessages.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-appmgr/Controller.hpp>
+#include <service-desktop/Constants.hpp>
 #include <popups/ChargingNotificationPopupRequestParams.hpp>
 #include <popups/ChargingDoneNotificationPopupRequestParams.hpp>
 #include <product/version.hpp>
+#include <module-utils/utility/Version.hpp>
 
 namespace app::manager
 {
@@ -127,8 +129,16 @@ namespace app::manager
 
     auto ApplicationManager::isWhatsNewAvailable() -> bool
     {
-        const auto &lastVersionNumber =
+        auto previousVersion =
             settings->getValue(settings::SystemProperties::osCurrentVersion, settings::SettingsScope::Global);
-        return lastVersionNumber != VERSION;
+        if (previousVersion == utils::defaultPreviousVersion) {
+            const auto version = utils::getPreviousVersionFromFile(purefs::dir::getTemporaryPath() /
+                                                                   sdesktop::paths::recoveryStatusFilename);
+            if (not version.has_value()) {
+                return true; // If we cannot get the version, display all What's New
+            }
+            previousVersion = version.value();
+        }
+        return previousVersion != VERSION;
     }
 } // namespace app::manager

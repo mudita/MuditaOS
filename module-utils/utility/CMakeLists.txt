@@ -4,6 +4,7 @@ target_sources(utility
     PRIVATE
         Utils.cpp
         Anonymize.cpp
+        Version.cpp
 
     PUBLIC
         integer.hpp
@@ -14,6 +15,7 @@ target_sources(utility
         Utils.hpp
         Units.hpp
         Anonymize.hpp
+        Version.hpp
 )
 
 target_include_directories(utility
@@ -28,6 +30,8 @@ target_link_libraries(utility
 
     PRIVATE
         hash-library::hash-library
+        json::json
+        purefs-paths
 )
 
 if (${ENABLE_TESTS})
