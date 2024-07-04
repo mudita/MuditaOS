@@ -31,6 +31,14 @@ namespace app
         cpuSentinel->BlockWfiMode(false);
     }
 
+    sys::MessagePointer ApplicationWhatsNew::handleAppClose(sys::Message *msgl)
+    {
+        if (featuresModel != nullptr) {
+            featuresModel->setCurrentOsVersion();
+        }
+        return ApplicationCommon::handleAppClose(msgl);
+    }
+
     sys::ReturnCodes ApplicationWhatsNew::InitHandler()
     {
         auto ret = Application::InitHandler();

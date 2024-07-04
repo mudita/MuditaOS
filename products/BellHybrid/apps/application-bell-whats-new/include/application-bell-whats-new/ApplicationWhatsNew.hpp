@@ -36,6 +36,7 @@ namespace app
         void createUserInterface() override;
         void destroyUserInterface() override
         {}
+        sys::MessagePointer handleAppClose(sys::Message *msgl) override;
 
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
