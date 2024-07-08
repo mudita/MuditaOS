@@ -56,6 +56,9 @@ namespace app
         std::unique_ptr<AbstractUsbStatusModel> usbStatusModel;
         std::unique_ptr<AbstractQuoteModel> quoteModel;
         std::shared_ptr<app::home_screen::HomeScreenPresenter> homeScreenPresenter;
+
+        sys::TimerHandle resetTimer;
+        sys::TimerHandle logFloodTimer;
     };
 
     template <>

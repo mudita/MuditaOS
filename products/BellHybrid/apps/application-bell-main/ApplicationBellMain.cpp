@@ -30,6 +30,8 @@
 #include <service-desktop/DesktopMessages.hpp>
 #include <appmgr/messages/AlarmMessage.hpp>
 
+#include <trng/trng.hpp>
+
 namespace app
 {
 
@@ -93,10 +95,33 @@ namespace app
             alarmModel->activateAlarm(false);
             return sys::msgHandled();
         });
+
         connect(typeid(AlarmActivated), [this](sys::Message *request) -> sys::MessagePointer {
             alarmModel->activateAlarm(true);
             return sys::msgHandled();
         });
+
+        constexpr auto logIntervalMs = 80;
+        logFloodTimer                = sys::TimerFactory::createPeriodicTimer(
+            this, "LogFloodTimer", std::chrono::milliseconds{logIntervalMs}, []([[maybe_unused]] sys::Timer &t) {
+                static std::size_t logCount = 1;
+                LOG_ERROR("*** This is very long message that is printed periodically every %d milliseconds to flood "
+                          "logs with data and force higher data throughput to eMMC memory, log count: %zu ***",
+                          logIntervalMs,
+                          logCount++);
+            });
+        logFloodTimer.start();
+
+        constexpr auto resetDelayMinS = 30;
+        constexpr auto resetDelayMaxS = 120;
+        const auto resetDelayS = resetDelayMinS + bsp::trng::getRandomValue() % (resetDelayMaxS - resetDelayMinS + 1);
+        LOG_ERROR("Resetting after %" PRIu32 " seconds", resetDelayS);
+
+        resetTimer = sys::TimerFactory::createSingleShotTimer(
+            this, "ResetTimer", std::chrono::seconds{resetDelayS}, []([[maybe_unused]] sys::Timer &t) {
+                NVIC_SystemReset();
+            });
+        resetTimer.start();
     }
 
     sys::ReturnCodes ApplicationBellMain::InitHandler()
