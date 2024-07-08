@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,15 +8,15 @@
 
 namespace purefs::fs::drivers
 {
-
     class directory_handle_littlefs final : public internal::directory_handle
     {
       public:
         directory_handle_littlefs(std::shared_ptr<internal::mount_point> mp, int error)
-            : internal::directory_handle(mp, error)
+            : internal::directory_handle(std::move(mp), error)
         {}
         virtual ~directory_handle_littlefs() = default;
-        auto lfs_dirp() noexcept
+
+        [[nodiscard]] auto lfs_dirp() noexcept
         {
             return &m_directory;
         }

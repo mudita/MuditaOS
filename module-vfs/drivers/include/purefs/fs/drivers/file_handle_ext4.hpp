@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <purefs/fs/file_handle.hpp>
 #include <ext4_config.h>
 #include <ext4.h>
@@ -12,13 +13,15 @@ namespace purefs::fs::drivers
     {
       public:
         file_handle_ext4(std::shared_ptr<internal::mount_point> mp, std::string_view path, unsigned flags)
-            : file_handle(mp, flags), m_path(path)
+            : file_handle(std::move(mp), flags), m_path(path)
         {}
         virtual ~file_handle_ext4() = default;
+
         [[nodiscard]] auto filp() noexcept
         {
             return &m_file;
         }
+
         [[nodiscard]] auto open_path() const noexcept -> std::string override
         {
             return m_path;

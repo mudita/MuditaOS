@@ -1,12 +1,14 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <memory>
 
 namespace purefs::fs::internal
 {
     class mount_point;
+
     class directory_handle
     {
       public:
@@ -15,14 +17,17 @@ namespace purefs::fs::internal
         directory_handle(const directory_handle &) = delete;
         auto operator=(const directory_handle &) = delete;
         virtual ~directory_handle()              = default;
+
         auto error(int error) noexcept -> void
         {
             m_error = error;
         }
+
         [[nodiscard]] auto error() noexcept
         {
             return m_error;
         }
+
         [[nodiscard]] auto mntpoint() noexcept
         {
             return m_mount_point.lock();

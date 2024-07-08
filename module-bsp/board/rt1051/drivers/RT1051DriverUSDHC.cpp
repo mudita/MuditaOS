@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RT1051DriverUSDHC.hpp"
@@ -7,7 +7,6 @@
 
 namespace drivers
 {
-
     RT1051DriverUSDHC::RT1051DriverUSDHC(std::string name, USDHCInstances inst) : DriverUSDHC(std::move(name), inst)
     {
         switch (instance) {
@@ -41,5 +40,4 @@ namespace drivers
         pll2Driver.reset();
         cpp_freertos::CriticalSection::Exit();
     }
-
 } // namespace drivers

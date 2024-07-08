@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,13 +15,15 @@ namespace purefs::fs::drivers
                          std::string_view path,
                          unsigned flags,
                          std::shared_ptr<filesystem_operations> fs)
-            : mount_point(diskh, path, flags, fs)
+            : mount_point(std::move(diskh), path, flags, std::move(fs))
         {}
         virtual ~mount_point_vfat() = default;
+
         [[nodiscard]] auto fatfs() noexcept
         {
             return &m_fatfs;
         }
+
         auto ff_drive(int lun) noexcept -> void
         {
             static constexpr auto drive_letter_min = 0;
@@ -33,22 +35,23 @@ namespace purefs::fs::drivers
                 m_ff_drive[0] = ' ';
             }
         }
+
         [[nodiscard]] auto ff_drive() const noexcept
         {
             return m_ff_drive;
         }
+
         [[nodiscard]] auto ff_lun() const noexcept -> int
         {
             return (m_ff_drive[0] == ' ') ? (-1) : (m_ff_drive[0] - '0');
         }
 
       private:
-        auto native_root() const noexcept -> std::string override
+        [[nodiscard]] auto native_root() const noexcept -> std::string override
         {
             return ff_drive();
         }
 
-      private:
         static constexpr auto disk_name_size = 3;
         ::FATFS m_fatfs{};
         char m_ff_drive[disk_name_size]{" :"};

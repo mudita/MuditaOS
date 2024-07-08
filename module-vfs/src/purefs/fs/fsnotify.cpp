@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/fsnotify.hpp>
@@ -16,6 +16,7 @@ namespace purefs::fs
             std::map<std::string, internal::notifier::item_it> items;
         };
     } // namespace internal
+
     inotify::inotify(std::shared_ptr<sys::Service> svc, std::shared_ptr<internal::notifier> notifier)
         : m_svc(svc), m_notify(notifier), m_evlist(std::make_unique<internal::inotify_container>()),
           m_lock(std::make_unique<cpp_freertos::MutexRecursive>())
@@ -54,7 +55,7 @@ namespace purefs::fs
             return -EIO;
         }
         cpp_freertos::LockGuard _lck(*m_lock);
-        m_evlist->items.emplace(std::make_pair(std::string(monitored_path), *it));
+        m_evlist->items.emplace(std::string(monitored_path), *it);
         return {};
     }
 

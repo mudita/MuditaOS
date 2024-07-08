@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <purefs/fs/filesystem_operations.hpp>
 
 namespace purefs::fs::drivers
 {
-
     /** Filesystem specific driver for the ext4 fs */
     class filesystem_ext4 final : public filesystem_operations
     {
@@ -14,6 +14,7 @@ namespace purefs::fs::drivers
         using fsfile               = std::shared_ptr<internal::file_handle>;
         using fsdir                = std::shared_ptr<internal::directory_handle>;
         using fsmount              = std::shared_ptr<internal::mount_point>;
+
         filesystem_ext4()          = default;
         virtual ~filesystem_ext4() = default;
 
@@ -55,5 +56,4 @@ namespace purefs::fs::drivers
       private:
         static auto stat(const char *mount_point, const char *path, struct stat *st, bool ro) noexcept -> int;
     };
-
 } // namespace purefs::fs::drivers

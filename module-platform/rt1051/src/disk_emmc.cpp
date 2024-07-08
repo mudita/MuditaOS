@@ -2,15 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "disk_emmc.hpp"
-
 #include "board/rt1051/bsp/eMMC/fsl_mmc.h"
 #include "board/BoardDefinitions.hpp"
 #include "board/pin_mux.h"
 #include <log/log.hpp>
 #include <Utils.hpp>
-
 #include <cstring>
-#include <task.h>
 
 namespace
 {
@@ -50,10 +47,6 @@ namespace purefs::blkdev
         mmcCard->usrParam.maxFreq      = BOARD_SDMMC_MMC_HOST_SUPPORT_HS200_FREQ;
         mmcCard->hostVoltageWindowVCCQ = kMMC_VoltageWindow120;
         mmcCard->hostVoltageWindowVCC  = kMMC_VoltageWindow170to195;
-        /* card detect type */
-#if defined DEMO_SDCARD_POWER_CTRL_FUNCTION_EXIST
-        g_sd.usrParam.pwr = &s_sdCardPwrCtrl;
-#endif
 
         driverUSDHC = drivers::DriverUSDHC::Create(
             "EMMC", static_cast<drivers::USDHCInstances>(BoardDefinitions::EMMC_USDHC_INSTANCE));
@@ -99,7 +92,7 @@ namespace purefs::blkdev
         if (pmState == pm_state::suspend) {
             driverUSDHC->Enable();
         }
-        err = MMC_WriteBlocks(mmcCard.get(), static_cast<const uint8_t *>(buf), lba, count);
+        err = MMC_WriteBlocks(mmcCard.get(), static_cast<const std::uint8_t *>(buf), lba, count);
         if (pmState == pm_state::suspend) {
             driverUSDHC->Disable();
         }
@@ -122,7 +115,7 @@ namespace purefs::blkdev
         if (pmState == pm_state::suspend) {
             driverUSDHC->Enable();
         }
-        err = MMC_ReadBlocks(mmcCard.get(), static_cast<uint8_t *>(buf), lba, count);
+        err = MMC_ReadBlocks(mmcCard.get(), static_cast<std::uint8_t *>(buf), lba, count);
         if (pmState == pm_state::suspend) {
             driverUSDHC->Disable();
         }
@@ -131,12 +124,14 @@ namespace purefs::blkdev
         }
         return statusBlkDevSuccess;
     }
+
     auto disk_emmc::sync() -> int
     {
         cpp_freertos::LockGuard lock(mutex);
         if (!mmcCard->isHostReady) {
             return statusBlkDevFail;
         }
+
         status_t error = MMC_PollingCardStatusBusy(mmcCard.get(), true, 10000U);
         if (kStatus_SDMMC_CardStatusIdle != error) {
             SDMMC_LOG("Error : read failed with wrong card status\r\n");
@@ -146,7 +141,6 @@ namespace purefs::blkdev
         if (pmState == pm_state::suspend) {
             driverUSDHC->Enable();
         }
-
         error = MMC_PollingCardStatusBusy(mmcCard.get(), true, 10000U);
         if (pmState == pm_state::suspend) {
             driverUSDHC->Disable();
@@ -156,6 +150,7 @@ namespace purefs::blkdev
         }
         return statusBlkDevSuccess;
     }
+
     auto disk_emmc::status() const -> media_status
     {
         cpp_freertos::LockGuard lock(mutex);
@@ -288,7 +283,7 @@ namespace purefs::blkdev
         constexpr auto bytesPerGB  = 1000UL * 1000UL * 1000UL;
         constexpr auto bytesPerGiB = 1024UL * 1024UL * 1024UL;
 
-        const disk_emmc_info emmcInfo = get_emmc_info();
+        const auto &emmcInfo          = get_emmc_info();
         const auto capacityGB         = static_cast<float>(emmcInfo.capacity) / static_cast<float>(bytesPerGB);
         const auto capacityGiB        = static_cast<float>(emmcInfo.capacity) / static_cast<float>(bytesPerGiB);
 

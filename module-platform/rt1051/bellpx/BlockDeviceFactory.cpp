@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <BlockDeviceFactory.hpp>
@@ -8,6 +8,7 @@ namespace
 {
     constexpr auto NO_DEVICE = nullptr;
 }
+
 using platform::rt1051::BlockDeviceFactory;
 
 std::unique_ptr<purefs::blkdev::disk> BlockDeviceFactory::makeDefaultBlockDevice()

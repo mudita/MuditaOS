@@ -1,27 +1,34 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <cstdint>
 #include <memory>
 
 namespace purefs::blkdev
 {
     //! Unsigned sector type
-    using sector_t = uint64_t;
+    using sector_t = std::uint64_t;
+
     //! Signed sector type
-    using scount_t = int64_t;
+    using scount_t = std::int64_t;
+
     //! Hardware partition type
-    using hwpart_t = uint8_t;
+    using hwpart_t = std::uint8_t;
+
     //! Common partition type
-    using part_t = int16_t;
+    using part_t = std::int16_t;
+
     //! Default hardware partition
     constexpr hwpart_t default_hw_partition = 0;
+
     namespace internal
     {
         class disk_handle;
     }
     using disk_fd = std::shared_ptr<internal::disk_handle>;
+
     //! Disk status result
     enum class media_status
     {
@@ -31,7 +38,8 @@ namespace purefs::blkdev
         wprotect, //! Write protected
         error,    //! Internal error
     };
-    // Information parameter
+
+    //! Information parameter
     enum class info_type
     {
         sector_count, //! Number of sectors on disk or part

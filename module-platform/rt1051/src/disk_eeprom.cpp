@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include "disk_eeprom.hpp"
 
 #include "bsp/eeprom/eeprom.hpp"
 #include "board/rt1051/bsp/eeprom/M24256.hpp"
-#include "board/BoardDefinitions.hpp"
 
 namespace purefs::blkdev
 {
@@ -48,8 +48,8 @@ namespace purefs::blkdev
             return -ERANGE;
         }
         cpp_freertos::LockGuard lock(mutex);
-        const size_t block_siz = bsp::eeprom::eeprom_block_size(bus_id);
-        const size_t total_siz = bsp::eeprom::eeprom_total_size(bus_id);
+        const std::size_t block_siz = bsp::eeprom::eeprom_block_size(bus_id);
+        const std::size_t total_siz = bsp::eeprom::eeprom_total_size(bus_id);
         const auto addr        = lba * block_siz;
         const auto len         = count * block_siz;
         if (addr + len > total_siz) {
@@ -65,14 +65,14 @@ namespace purefs::blkdev
             return -ERANGE;
         }
         cpp_freertos::LockGuard lock(mutex);
-        const size_t block_siz = bsp::eeprom::eeprom_block_size(bus_id);
-        const size_t total_siz = bsp::eeprom::eeprom_total_size(bus_id);
+        const std::size_t block_siz = bsp::eeprom::eeprom_block_size(bus_id);
+        const std::size_t total_siz = bsp::eeprom::eeprom_total_size(bus_id);
         const auto addr        = lba * block_siz;
         const auto len         = count * block_siz;
         if (addr + len > total_siz) {
             return -ERANGE;
         }
         const auto bytes_read = bsp::eeprom::eeprom_read(bus_id, addr, reinterpret_cast<char *>(buf), len);
-        return (bytes_read != int(len)) ? (-ENXIO) : (0);
+        return (bytes_read != static_cast<int>(len)) ? (-ENXIO) : (0);
     }
 } // namespace purefs::blkdev

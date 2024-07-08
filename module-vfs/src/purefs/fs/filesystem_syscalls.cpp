@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include <purefs/fs/filesystem.hpp>
-#include <errno.h>
+#include <cerrno>
 #include <log/log.hpp>
 #include <purefs/fs/filesystem_operations.hpp>
 #include <purefs/fs/directory_handle.hpp>
@@ -236,5 +237,4 @@ namespace purefs::fs
         }
         return invoke_fops(&filesystem_operations::dirclose, dirstate);
     }
-
 } // namespace purefs::fs

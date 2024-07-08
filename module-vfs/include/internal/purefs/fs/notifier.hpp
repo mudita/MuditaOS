@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 #pragma once
 
@@ -13,10 +13,12 @@ namespace sys
 {
     class Service;
 }
+
 namespace cpp_freertos
 {
     class MutexRecursive;
 }
+
 namespace purefs::fs::internal
 {
     //! Internal class related to the notify VFS events
@@ -30,6 +32,7 @@ namespace purefs::fs::internal
             const std::string path;
             const bool read_only;
         };
+
         //! Container for service and subscribed events
         struct service_item
         {
@@ -39,6 +42,7 @@ namespace purefs::fs::internal
             const std::weak_ptr<sys::Service> service;
             const inotify_flags subscribed_events;
         };
+
         //! Container for the the event
         using container_t = std::multimap<std::string, service_item>;
 
@@ -47,8 +51,10 @@ namespace purefs::fs::internal
         notifier(notifier &) = delete;
         notifier &operator=(notifier &) = delete;
         virtual ~notifier();
+
         //! Iterator for the registered event
         using item_it = container_t::iterator;
+
         /**
          * @brief Register selected path for the monitoring
          *
@@ -59,12 +65,14 @@ namespace purefs::fs::internal
          */
         auto register_path(std::string_view path, std::shared_ptr<sys::Service> owner, inotify_flags flags)
             -> std::optional<item_it>;
+
         /**
          * @brief Unregister selected path from monitoring
          *
          * @param item Iterator returned by the @see register_path method
          */
         auto unregister_path(item_it item) -> void;
+
         /**
          * @brief Internal method called on file open
          *
@@ -73,12 +81,14 @@ namespace purefs::fs::internal
          * @param ro File is opened in read only mode
          */
         auto notify_open(std::string_view path, int fd, bool ro) const -> void;
+
         /**
          * @brief Internal method called on closing gile
          *
          * @param fd File descriptor
          */
         auto notify_close(int fd) const -> void;
+
         /**
          * @brief Notify for event on the file system
          *
@@ -86,6 +96,7 @@ namespace purefs::fs::internal
          * @param mask Filesystem event type
          */
         auto notify(int fd, inotify_flags mask) const -> void;
+
         /**
          * @brief Notify for event on filesystem on path change
          *
@@ -94,6 +105,7 @@ namespace purefs::fs::internal
          * @param mask Filesystem event type
          */
         auto notify(std::string_view path, std::string_view path_prv, inotify_flags mask) const -> void;
+
         /**
          * @brief Notify for event on the filesystem
          *

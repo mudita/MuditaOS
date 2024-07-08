@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,15 +12,16 @@ namespace purefs::fs::drivers
     {
       public:
         directory_handle_ext4(std::shared_ptr<internal::mount_point> mp, int error)
-            : internal::directory_handle(mp, error)
+            : internal::directory_handle(std::move(mp), error)
         {}
         virtual ~directory_handle_ext4() = default;
-        auto dirp() noexcept
+
+        [[nodiscard]] auto dirp() noexcept
         {
             return &m_dir;
         }
 
       private:
-        ext4_dir m_dir{};
+        ::ext4_dir m_dir{};
     };
 } // namespace purefs::fs::drivers

@@ -1,10 +1,10 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include <purefs/fs/notifier.hpp>
 #include <purefs/fs/inotify_message.hpp>
 #include <functional>
 #include <Service/Service.hpp>
-#include <purefs/fs/inotify_message.hpp>
 #include <purefs/fs/thread_local_cwd.hpp>
 #include <log/log.hpp>
 
@@ -19,6 +19,7 @@ namespace purefs::fs::internal
                  it      = path.rfind(sep, it - 1))
                 fun(path.substr(0, it));
         }
+
         std::string absolute_path(std::string_view path)
         {
             using namespace std::string_literals;
@@ -35,10 +36,13 @@ namespace purefs::fs::internal
             return ret;
         }
     } // namespace
+
     notifier::notifier() : m_lock(std::make_unique<cpp_freertos::MutexRecursive>())
     {}
+
     notifier::~notifier()
     {}
+
     auto notifier::register_path(std::string_view path, std::shared_ptr<sys::Service> owner, inotify_flags flags)
         -> std::optional<item_it>
     {
@@ -53,11 +57,13 @@ namespace purefs::fs::internal
         }
         return m_events.emplace(std::make_pair(abspath, service_item(owner, flags)));
     }
+
     auto notifier::unregister_path(item_it item) -> void
     {
         cpp_freertos::LockGuard _lck(*m_lock);
         m_events.erase(item);
     }
+
     auto notifier::notify(int fd, inotify_flags mask) const -> void
     {
         cpp_freertos::LockGuard _lck(*m_lock);
@@ -66,6 +72,7 @@ namespace purefs::fs::internal
             notify(fname_it->second.path, mask);
         }
     }
+
     void notifier::notify(std::string_view path, std::string_view path_prv, inotify_flags mask) const
     {
         cpp_freertos::LockGuard _lck(*m_lock);
@@ -83,12 +90,14 @@ namespace purefs::fs::internal
             }
         });
     }
+
     auto notifier::notify_open(std::string_view path, int fd, bool ro) const -> void
     {
         cpp_freertos::LockGuard _lck(*m_lock);
-        m_fd_map.emplace(std::make_pair(fd, path_item(path, ro)));
+        m_fd_map.emplace(fd, path_item(path, ro));
         notify(path, inotify_flags::open);
     }
+
     auto notifier::notify_close(int fd) const -> void
     {
         cpp_freertos::LockGuard _lck(*m_lock);
@@ -99,6 +108,7 @@ namespace purefs::fs::internal
             m_fd_map.erase(fname_it);
         }
     }
+
     auto notifier::send_notification(std::shared_ptr<sys::Service> svc,
                                      inotify_flags flags,
                                      std::string_view name,

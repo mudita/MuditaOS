@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -30,17 +30,20 @@ namespace purefs::blkdev
         auto operator=(const disk_manager &) -> disk_manager & = delete;
         disk_manager();
         ~disk_manager();
-        /** Register a new disc
+
+        /** Register a new disk
          * @param[in] disk Block device register
          * @param[in] device_name Disk friendly name
          * @return zero on success othervise error
          */
         auto register_device(std::shared_ptr<disk> disk, std::string_view device_name, unsigned flags = 0) -> int;
-        /** Unregister a disc from the manager
-         *  param[in] Disc to unregister
+
+        /** Unregister a disk from the manager
+         *  param[in] Disk to unregister
          *  @return error code or 0 if success
          */
         auto unregister_device(std::string_view device_name) -> int;
+
         /** Write a data onto block device or partition
          * @param[in] dfd Disk manager fd
          * @param[in] buf Data buffer to write
@@ -50,6 +53,7 @@ namespace purefs::blkdev
          */
         auto write(disk_fd dfd, const void *buf, sector_t lba, std::size_t count) -> int;
         auto write(std::string_view device_name, const void *buf, sector_t lba, std::size_t count) -> int;
+
         /** Read a data from block device or partition
          * @param[in] dfd Disk manager fd
          * @param[in] buf Data buffer for read
@@ -60,21 +64,23 @@ namespace purefs::blkdev
 
         auto read(disk_fd dfd, void *buf, sector_t lba, std::size_t count) -> int;
         auto read(std::string_view device_name, void *buf, sector_t lba, std::size_t count) -> int;
+
         /** Erase selected area on the block device or partition
          * @param[in] dfd Disk manager fd
          * @param[in] lba First sector to erase
          * @param[in] count Sectors count for erase
          * @return zero or success otherwise error
          */
-
         auto erase(disk_fd dfd, sector_t lba, std::size_t count) -> int;
         auto erase(std::string_view device_name, sector_t lba, std::size_t count) -> int;
+
         /** Flush buffers and write all data into the physical device
-         * param[in] dfd Disc manager fd
+         * param[in] dfd Disk manager fd
          * @return zero or success otherwise error
          */
         auto sync(disk_fd dfd) -> int;
         auto sync(std::string_view device_name) -> int;
+
         /** Set block device power state
          * @param[in] device_name Device or partition name
          * @param[in] target_state Set the target power state
@@ -83,12 +89,14 @@ namespace purefs::blkdev
          */
         auto pm_control(disk_fd dfd, pm_state target_state) -> int;
         auto pm_control(std::string_view device_name, pm_state target_state) -> int;
-        /* Set all block devices registered in the disk manager to target pm state
+
+        /** Set all block devices registered in the disk manager to target pm state
          * @param[in] target_state Set the target power state
          * @return Error code from the last failed device
          * @note If the partition is changed the device state will be suspended
          */
         auto pm_control(pm_state target_state) -> int;
+
         /** Get block device power state
          * @param[in] dfd Disk device handle
          * @param[out] currrent_state Device current state
@@ -97,12 +105,14 @@ namespace purefs::blkdev
          */
         auto pm_read(disk_fd dfd, pm_state &current_state) -> int;
         auto pm_read(std::string_view device_name, pm_state &current_state) -> int;
+
         /** Read the current media status
          * @param[in] dfd Disk manager handle
          * @return Current media status @seee media_status
          */
         [[nodiscard]] auto status(disk_fd dfd) const -> media_status;
         [[nodiscard]] auto status(std::string_view device_name) const -> media_status;
+
         /** List the partitions on the underlaying device
          * @param[in] dfd Disk manager fd
          * @return Partition list @see partition
@@ -140,7 +150,7 @@ namespace purefs::blkdev
 
         /** Convert disk handle containing partitions to the full disk handle
          * @param disk Disk handle with partitions
-         * @return disk handle for whole disc
+         * @return disk handle for whole disk
          */
         static auto disk_handle_from_partition_handle(disk_fd disk) -> disk_fd;
 

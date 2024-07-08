@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <string>
 #include <list>
 #include <tuple>
@@ -39,6 +40,7 @@ namespace purefs::fs
         filesystem_operations(const filesystem_operations &) = delete;
         virtual ~filesystem_operations()                     = default;
         auto operator=(const filesystem_operations &) = delete;
+
         /** Allocate mount point class specify to the VFS
          * @return Allocated mount point structure
          */
@@ -86,9 +88,10 @@ namespace purefs::fs
         {
             return m_mount_count;
         }
+
         auto finalize_registration(std::weak_ptr<blkdev::disk_manager> diskmgr)
         {
-            m_diskmm = diskmgr;
+            m_diskmm = std::move(diskmgr);
             return filesystem_register_completed();
         }
 
@@ -97,6 +100,7 @@ namespace purefs::fs
         {
             return m_diskmm.lock();
         }
+
         virtual auto filesystem_register_completed() const noexcept -> int
         {
             return 0;

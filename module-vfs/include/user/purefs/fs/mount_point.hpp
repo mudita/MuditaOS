@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <memory>
 #include <string>
 #include <iostream>
@@ -32,31 +33,38 @@ namespace purefs::fs::internal
         mount_point(const mount_point &) = delete;
         auto operator=(const mount_point &) = delete;
         virtual ~mount_point()              = default;
-        auto disk() const noexcept
+
+        [[nodiscard]] auto disk() const noexcept
         {
             return m_diskh.lock();
         }
-        auto mount_path() const noexcept
+
+        [[nodiscard]] auto mount_path() const noexcept
         {
             return m_path;
         }
-        auto fs_ops() const noexcept
+
+        [[nodiscard]] auto fs_ops() const noexcept
         {
             return m_fs.lock();
         }
-        auto flags() const noexcept -> unsigned
+
+        [[nodiscard]] auto flags() const noexcept -> unsigned
         {
             return m_flags;
         }
-        auto is_ro() const noexcept -> bool
+
+        [[nodiscard]] auto is_ro() const noexcept -> bool
         {
             return (m_flags & mount_flags::read_only) == mount_flags::read_only;
         }
-        void modify_flags(unsigned flags) noexcept
+
+        auto modify_flags(unsigned flags) noexcept -> void
         {
             m_flags = flags;
         }
-        auto native_path(std::string_view full_path) const noexcept -> std::string
+
+        [[nodiscard]] auto native_path(std::string_view full_path) const noexcept -> std::string
         {
             const auto n1 = full_path.find(m_path);
             if (n1 == 0) {
@@ -71,7 +79,7 @@ namespace purefs::fs::internal
         }
 
       private:
-        virtual auto native_root() const noexcept -> std::string = 0;
+        [[nodiscard]] virtual auto native_root() const noexcept -> std::string = 0;
 
       private:
         const std::weak_ptr<blkdev::internal::disk_handle> m_diskh;

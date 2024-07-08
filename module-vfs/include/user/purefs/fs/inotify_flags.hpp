@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 namespace purefs::fs
 {
     //! Event monitor flag
@@ -16,21 +17,24 @@ namespace purefs::fs
         open          = 0x40, //! File was opended
         dmodify       = 0x80, //! Directory entry modified
     };
+
     inline auto operator|(inotify_flags fl1, inotify_flags fl2)
     {
         return static_cast<inotify_flags>(static_cast<unsigned>(fl1) | static_cast<unsigned>(fl2));
     }
+
     inline auto operator&(inotify_flags fl1, inotify_flags fl2)
     {
         return static_cast<inotify_flags>(static_cast<unsigned>(fl1) & static_cast<unsigned>(fl2));
     }
+
     inline auto operator&&(inotify_flags fl1, inotify_flags fl2) -> bool
     {
         return static_cast<bool>(static_cast<unsigned>(fl1) & static_cast<unsigned>(fl2));
     }
+
     inline auto operator||(inotify_flags fl1, inotify_flags fl2) -> bool
     {
         return static_cast<bool>(static_cast<unsigned>(fl1) | static_cast<unsigned>(fl2));
     }
-
 } // namespace purefs::fs

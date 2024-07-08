@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -8,19 +8,20 @@
 
 namespace purefs::fs::drivers
 {
-
     class file_handle_vfat final : public internal::file_handle
     {
       public:
         file_handle_vfat(std::shared_ptr<internal::mount_point> mp, std::string_view path, unsigned flags)
-            : file_handle(mp, flags), m_path(path)
+            : file_handle(std::move(mp), flags), m_path(path)
         {}
         virtual ~file_handle_vfat() = default;
-        auto ff_filp() noexcept
+
+        [[nodiscard]] auto ff_filp() noexcept
         {
             return &m_fil;
         }
-        auto open_path() const noexcept -> std::string override
+
+        [[nodiscard]] auto open_path() const noexcept -> std::string override
         {
             return m_path;
         }

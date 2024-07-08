@@ -1,7 +1,8 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
+
 #include <string>
 #include <memory>
 #include <list>
@@ -44,11 +45,13 @@ namespace purefs::fs
      * example for newlib or glibc syscalls
      */
     class filesystem_operations;
+
     namespace internal
     {
         class directory_handle;
         class notifier;
     } // namespace internal
+
     class filesystem
     {
         static constexpr auto path_separator = '/';
@@ -66,6 +69,7 @@ namespace purefs::fs
         ~filesystem();
         filesystem(const filesystem &) = delete;
         auto operator=(const filesystem &) = delete;
+
         /** Utility API */
         /** Register filesystem driver
          * @param[in] fsname Unique filesystem name for example fat
@@ -81,6 +85,7 @@ namespace purefs::fs
             return register_filesystem(fsname, std::shared_ptr<filesystem_operations>(fops));
         }
         auto register_filesystem(std::string_view fsname, std::shared_ptr<filesystem_operations> fops) -> int;
+
         /** Unregister filesystem driver
          * @param[in] fsname Unique filesystem name for example fat
          * @return zero on success otherwise error
@@ -100,22 +105,26 @@ namespace purefs::fs
                    std::string_view fs_type,
                    unsigned flags   = 0,
                    const void *data = nullptr) -> int;
-        /** Unmont filesystem from selected mount point
+
+        /** Unmount filesystem from selected mount point
          * @param[in] mount_point Mount point where the fs is mounted
          * @return zero on success otherwise error
          */
         auto umount(std::string_view mount_point) -> int;
+
         /** Return actually mounted filesystem list
          * @param[out] mountpoints List of mount points
          * @return zero on success otherwise error
          */
         auto read_mountpoints(std::list<std::string> &mountpoints) const -> int;
+
         /** Get actual filesystem statistics *  @see man statvfs
          * @param[in] path Pathname of any file within the mounted filesystem
          * @param[out] stat Pointer to a statvfs structure
          * @return zero on success otherwise error
          */
         auto stat_vfs(std::string_view path, struct statvfs &stat) const noexcept -> int;
+
         /** Standard file access API */
         auto open(std::string_view path, int flags, int mode) noexcept -> int;
         auto close(int fd) noexcept -> int;
@@ -165,16 +174,19 @@ namespace purefs::fs
          */
         auto find_mount_point(std::string_view path) const noexcept
             -> std::tuple<std::shared_ptr<internal::mount_point>, size_t>;
+
         /** Return absolute path from the relative path
          * @param[in] path Unormalized path
          * @return Full Normalized path
          */
         static auto absolute_path(std::string_view path) noexcept -> std::string;
+
         /** Normalize full path
          * @param[in] path Unnormalized full path
          * @param[out] Normalized path
          */
         static auto normalize_path(std::string_view path) noexcept -> std::string;
+
         /** Add handle to file descriptor
          */
         auto add_filehandle(fsfile file) noexcept -> int;
@@ -187,6 +199,7 @@ namespace purefs::fs
             ro, //! Syscall is RO
             rw  //! Syscall is RW
         };
+
         template <class Base, class T, typename... Args>
         inline auto invoke_fops(T Base::*method, int fds, Args &&...args)
             -> decltype((static_cast<Base *>(nullptr)->*method)(0, std::forward<Args>(args)...))
@@ -261,6 +274,7 @@ namespace purefs::fs
             else
                 return -EIO;
         }
+
         template <class Base, class T, typename... Args>
         inline auto invoke_fops(T Base::*method, fsdir dirp, Args &&...args)
             -> decltype((static_cast<Base *>(nullptr)->*method)(nullptr, std::forward<Args>(args)...))

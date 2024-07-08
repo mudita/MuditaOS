@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/fs/drivers/mount_point_ext4.hpp>
@@ -25,7 +25,7 @@ namespace purefs::fs::drivers
                                        std::string_view path,
                                        unsigned flags,
                                        std::shared_ptr<filesystem_operations> fs)
-        : mount_point(diskh, mount_path_mod(path), flags, fs), m_root(mount_path_mod(path)),
+        : mount_point(std::move(diskh), mount_path_mod(path), flags, std::move(fs)), m_root(mount_path_mod(path)),
           m_lock(std::make_unique<cpp_freertos::MutexRecursive>())
     {}
 
@@ -58,5 +58,4 @@ namespace purefs::fs::drivers
             std::abort();
         }
     }
-
 } // namespace purefs::fs::drivers

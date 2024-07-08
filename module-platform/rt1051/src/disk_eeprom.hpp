@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,6 +18,7 @@ namespace purefs::blkdev
         explicit disk_eeprom(int _bus_id) : bus_id(_bus_id)
         {}
         virtual ~disk_eeprom() = default;
+
         auto probe(unsigned flags) -> int override;
         auto write(const void *buf, sector_t lba, std::size_t count, hwpart_t hwpart) -> int override;
         auto read(void *buf, sector_t lba, std::size_t count, hwpart_t hwpart) -> int override;

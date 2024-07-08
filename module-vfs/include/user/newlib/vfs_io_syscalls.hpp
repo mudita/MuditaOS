@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -6,9 +6,10 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <dirent.h>
-#include <stdint.h>
+#include <cstdint>
 
 struct statvfs;
+
 namespace vfsn::internal::syscalls
 {
     int open(int &_errno_, const char *file, int flags, int mode);
@@ -48,5 +49,4 @@ namespace vfsn::internal::syscalls
     int symlink(int &_errno_, const char *name1, const char *name2);
     long fpathconf(int &_errno, int fd, int name);
     long pathconf(int &_errno, const char *path, int name);
-
 } // namespace vfsn::internal::syscalls

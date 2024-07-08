@@ -1,5 +1,6 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+
 #include <purefs/fs/filesystem.hpp>
 #include <purefs/fs/filesystem_operations.hpp>
 #include <purefs/fs/mount_point.hpp>
@@ -10,7 +11,7 @@
 #include <purefs/fs/fsnotify.hpp>
 #include <log/log.hpp>
 #include <split_sv.hpp>
-#include <errno.h>
+#include <cerrno>
 #include <mutex.hpp>
 
 namespace purefs::fs
@@ -59,7 +60,7 @@ namespace purefs::fs
                 LOG_ERROR("Disc: Unable to register filesystem finalize error %i", ret);
                 return ret;
             }
-            m_fstypes.emplace(std::make_pair(fsname, fops));
+            m_fstypes.emplace(fsname, fops);
             return {};
         }
     }
@@ -145,7 +146,7 @@ namespace purefs::fs
                 const auto mnt_point = vsi->second->mount_prealloc(diskh, target, flags);
                 const auto ret_mnt   = vsi->second->mount(mnt_point, data);
                 if (!ret_mnt) {
-                    m_mounts.emplace(std::make_pair(target, mnt_point));
+                    m_mounts.emplace(target, mnt_point);
                     m_partitions.emplace(dev_or_part);
                 }
                 else {
@@ -347,5 +348,4 @@ namespace purefs::fs
             }
         }
     }
-
 } // namespace purefs::fs

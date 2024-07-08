@@ -1,15 +1,14 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <purefs/blkdev/partition_parser.hpp>
 #include <purefs/blkdev/disk.hpp>
 #include <log/log.hpp>
-#include <errno.h>
+#include <cerrno>
 #include <limits>
 
 namespace purefs::blkdev::internal
 {
-
     namespace defs
     {
         namespace
@@ -31,18 +30,19 @@ namespace purefs::blkdev::internal
             constexpr auto min_sector_size    = 512;
         } // namespace
     }     // namespace defs
+
     namespace
     {
-        inline auto to_word(const std::vector<uint8_t> &vec, std::size_t offs)
+        inline auto to_word(const std::vector<std::uint8_t> &vec, std::size_t offs)
         {
             auto buf = &vec[offs];
-            return (uint32_t(buf[0]) << 0U) | (uint32_t(buf[1]) << 8U) | (uint32_t(buf[2]) << 16U) |
-                   (uint32_t(buf[3]) << 24U);
+            return (std::uint32_t(buf[0]) << 0U) | (std::uint32_t(buf[1]) << 8U) | (std::uint32_t(buf[2]) << 16U) |
+                   (std::uint32_t(buf[3]) << 24U);
         }
-        inline auto to_short(const std::vector<uint8_t> &vec, std::size_t offs)
+        inline auto to_short(const std::vector<std::uint8_t> &vec, std::size_t offs)
         {
             auto buf = &vec[offs];
-            return (uint16_t(buf[0]) << 0U) | (uint16_t(buf[1]) << 8U);
+            return (std::uint16_t(buf[0]) << 0U) | (std::uint16_t(buf[1]) << 8U);
         }
     } // namespace
 
@@ -100,12 +100,12 @@ namespace purefs::blkdev::internal
     auto partition_parser::check_partition(const std::shared_ptr<disk> disk, const partition &part) -> bool
     {
         auto sector_size     = disk->get_info(info_type::sector_size, 0);
-        const auto this_size = uint64_t(disk->get_info(info_type::sector_count, 0)) * uint64_t(sector_size);
-        const auto poffset   = uint64_t(part.start_sector) * uint64_t(sector_size);
-        const auto psize     = uint64_t(part.num_sectors) * uint64_t(sector_size);
-        const auto pnext     = uint64_t(part.start_sector) * uint64_t(sector_size) + poffset;
-        if ((poffset + psize > this_size) ||                    // oversized
-            (pnext < uint64_t(part.start_sector) * sector_size) // going backward
+        const auto this_size = std::uint64_t(disk->get_info(info_type::sector_count, 0)) * std::uint64_t(sector_size);
+        const auto poffset   = std::uint64_t(part.start_sector) * std::uint64_t(sector_size);
+        const auto psize     = std::uint64_t(part.num_sectors) * std::uint64_t(sector_size);
+        const auto pnext     = std::uint64_t(part.start_sector) * std::uint64_t(sector_size) + poffset;
+        if ((poffset + psize > this_size) ||                         // oversized
+            (pnext < std::uint64_t(part.start_sector) * sector_size) // going backward
         ) {
             LOG_WARN("Part %d looks strange: start_sector %u offset %u next %u\n",
                      unsigned(part.mbr_number),
@@ -117,7 +117,7 @@ namespace purefs::blkdev::internal
         return true;
     }
 
-    auto partition_parser::read_partitions(const std::vector<uint8_t> &buffer,
+    auto partition_parser::read_partitions(const std::vector<std::uint8_t> &buffer,
                                            std::array<partition, defs::num_parts> &parts) -> void
     {
         std::size_t offs = defs::ptbl_offs;
@@ -130,12 +130,13 @@ namespace purefs::blkdev::internal
             offs += defs::ptbl_size;
         }
     }
-    auto partition_parser::is_extended(uint8_t type) -> bool
+
+    auto partition_parser::is_extended(std::uint8_t type) -> bool
     {
         return type == defs::ext_linux_part || type == defs::ext_part || type == defs::ext_win98_part;
     }
 
-    auto partition_parser::parse_extended(uint32_t lba, uint32_t count) -> int
+    auto partition_parser::parse_extended(std::uint32_t lba, std::uint32_t count) -> int
     {
         static constexpr auto max_parts{100};
         auto sector_size = m_disk->get_info(info_type::sector_size, 0);
@@ -146,8 +147,8 @@ namespace purefs::blkdev::internal
         if (sector_size < 0) {
             return sector_size;
         }
-        uint32_t sector_in_buf{std::numeric_limits<uint32_t>::max()};
-        std::vector<uint8_t> sect_buf(sector_size);
+        std::uint32_t sector_in_buf{std::numeric_limits<std::uint32_t>::max()};
+        std::vector<std::uint8_t> sect_buf(sector_size);
 
         auto try_count{max_parts};
         int error{};
