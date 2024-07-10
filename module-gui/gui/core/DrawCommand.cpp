@@ -1,25 +1,24 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "DrawCommand.hpp"
 #include "Common.hpp"
 
-// gui components
 #include "Color.hpp"
 #include "Context.hpp"
 #include "ImageManager.hpp"
-// renderers
+
 #include "renderers/LineRenderer.hpp"
 #include "renderers/ArcRenderer.hpp"
 #include "renderers/CircleRenderer.hpp"
 #include "renderers/RectangleRenderer.hpp"
 #include <renderers/PixelRenderer.hpp>
-// text rendering
+
 #include "FontManager.hpp"
 #include "RawFont.hpp"
-// utils
+
 #include <log/log.hpp>
-// module-utils
+
 #include <cassert>
 
 #if DEBUG_FONT == 1
@@ -132,19 +131,19 @@ namespace gui
 
     void DrawText::draw(Context *ctx) const
     {
-        // check if there are any characters to draw in the string provided with message.
-        if (str.length() == 0) {
+        // Check if there are any characters to draw in the string provided with message.
+        if (str.empty()) {
             return;
         }
 
-        // retrieve font used to draw text
+        // Retrieve font used to draw text
         const auto font = FontManager::getInstance().getFont(fontID);
 
-        // draw every sign
-        uint32_t idLast = 0, idCurrent = 0;
+        // Draw every sign
+        std::uint32_t idLast = 0, idCurrent = 0;
         Point position = textOrigin;
 
-        for (uint32_t i = 0; i < str.length(); ++i) {
+        for (std::uint32_t i = 0; i < str.length(); ++i) {
             idCurrent        = str[i]; // id stands for glued together utf-16 with no order bytes (0xFF 0xFE)
             const auto glyph = font->getGlyph(idCurrent);
 
@@ -161,7 +160,7 @@ namespace gui
                 return;
             }
 
-            int32_t kernValue = 0;
+            std::int32_t kernValue = 0;
             if (i > 0) {
                 kernValue = font->getKerning(idLast, idCurrent);
             }
@@ -187,13 +186,13 @@ namespace gui
 
     void DrawImage::drawPixMap(Context *ctx, PixMap *pixMap) const
     {
-        uint32_t offsetImage   = 0;
-        uint32_t offsetContext = 0;
-        uint8_t *pixData       = pixMap->getData();
+        std::uint32_t offsetImage   = 0;
+        std::uint32_t offsetContext = 0;
+        std::uint8_t *pixData       = pixMap->getData();
         const auto ctxData     = ctx->getData();
         checkImageSize(ctx, pixMap);
 
-        for (uint32_t row = 0; row < std::min(ctx->getH(), pixMap->getHeight()); row++) {
+        for (std::uint32_t row = 0; row < std::min(ctx->getH(), pixMap->getHeight()); row++) {
             std::memcpy(ctxData + offsetContext, pixData + offsetImage, std::min(ctx->getW(), pixMap->getWidth()));
             offsetImage += pixMap->getWidth();
             offsetContext += ctx->getW();
@@ -202,27 +201,27 @@ namespace gui
 
     void DrawImage::drawVecMap(Context *ctx, VecMap *vecMap) const
     {
-        uint32_t offsetContext    = 0;
-        uint32_t offsetRowContext = 0;
-        uint32_t imageOffset      = 0;
-        uint8_t alphaColor        = vecMap->getAlphaColor();
+        std::uint32_t offsetContext    = 0;
+        std::uint32_t offsetRowContext = 0;
+        std::uint32_t imageOffset      = 0;
+        std::uint8_t alphaColor        = vecMap->getAlphaColor();
 
-        for (uint32_t row = 0; row < std::min(vecMap->getHeight(), ctx->getH()); row++) {
+        for (std::uint32_t row = 0; row < std::min(vecMap->getHeight(), ctx->getH()); row++) {
             checkImageSize(ctx, vecMap);
-            uint16_t vecCount = *(vecMap->getData() + imageOffset);
-            imageOffset += sizeof(uint16_t);
+            std::uint16_t vecCount = *(vecMap->getData() + imageOffset);
+            imageOffset += sizeof(std::uint16_t);
 
             const auto ctxData = ctx->getData();
             offsetRowContext   = offsetContext;
 
-            for (uint32_t vec = 0; vec < vecCount; ++vec) {
+            for (std::uint32_t vec = 0; vec < vecCount; ++vec) {
 
-                uint16_t vecOffset = *(vecMap->getData() + imageOffset);
-                imageOffset += sizeof(uint16_t);
-                uint16_t vecLength = *(vecMap->getData() + imageOffset);
-                imageOffset += sizeof(uint8_t);
-                uint8_t vecColor = *(vecMap->getData() + imageOffset);
-                imageOffset += sizeof(uint8_t);
+                std::uint16_t vecOffset = *(vecMap->getData() + imageOffset);
+                imageOffset += sizeof(std::uint16_t);
+                std::uint16_t vecLength = *(vecMap->getData() + imageOffset);
+                imageOffset += sizeof(std::uint8_t);
+                std::uint8_t vecColor = *(vecMap->getData() + imageOffset);
+                imageOffset += sizeof(std::uint8_t);
 
                 offsetRowContext += vecOffset;
                 if (vecColor != alphaColor) {
@@ -238,29 +237,29 @@ namespace gui
 
     void DrawImage::draw(Context *ctx) const
     {
-        // retrieve pixmap from the pixmap manager
-        ImageMap *imageMap = ImageManager::getInstance().getImageMap(imageID);
+        // Retrieve pixmap from the pixmap manager
+        auto imageMap = ImageManager::getInstance().getImageMap(imageID);
 
-        // if image is not found return;
+        // If image is not found return;
         if (imageMap == nullptr) {
             return;
         }
 
-        // get copy of original context using x,y of draw coordinates and original size of the widget
-        Context drawCtx = ctx->get(origin.x, origin.y, areaW, areaH);
+        // Get copy of original context using x,y of draw coordinates and original size of the widget
+        auto drawCtx = ctx->get(origin.x, origin.y, areaW, areaH);
 
-        if (imageMap->getType() == gui::ImageMap::Type::PIXMAP) {
+        if (imageMap->getType() == gui::ImageMap::Type::Pixmap) {
             auto pixMap = dynamic_cast<PixMap *>(imageMap);
             assert(pixMap);
             drawPixMap(&drawCtx, pixMap);
         }
-        else if (imageMap->getType() == gui::ImageMap::Type::VECMAP) {
+        else if (imageMap->getType() == gui::ImageMap::Type::Vecmap) {
             auto vecMap = dynamic_cast<VecMap *>(imageMap);
             assert(vecMap);
             drawVecMap(&drawCtx, vecMap);
         }
 
-        // reinsert drawCtx into bast context
+        // Reinsert drawCtx into base context
         ctx->insert(origin.x, origin.y, drawCtx);
     }
-} /* namespace gui */
+} // namespace gui

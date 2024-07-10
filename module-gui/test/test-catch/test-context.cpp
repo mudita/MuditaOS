@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 // Right now there are no asserts here, each test/section / test should have asserts
@@ -118,7 +118,7 @@ TEST_CASE("Draw vector image test")
     CAPTURE(id);
 
     REQUIRE(imageMap != nullptr);
-    REQUIRE(imageMap->getType() == gui::ImageMap::Type::VECMAP);
+    REQUIRE(imageMap->getType() == gui::ImageMap::Type::Vecmap);
 
     auto drawCommand    = gui::DrawImage();
     drawCommand.imageID = id;

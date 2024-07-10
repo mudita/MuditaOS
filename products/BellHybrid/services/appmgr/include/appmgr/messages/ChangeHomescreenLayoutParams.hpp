@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,8 +10,8 @@ namespace gui
     class ChangeHomescreenLayoutParams : public app::manager::actions::ActionParams
     {
       public:
-        ChangeHomescreenLayoutParams(std::string newHomescreenLayout)
-            : app::manager::actions::ActionParams{}, newHomescreenLayout{newHomescreenLayout} {};
+        explicit ChangeHomescreenLayoutParams(std::string newHomescreenLayout)
+            : app::manager::actions::ActionParams{}, newHomescreenLayout{std::move(newHomescreenLayout)} {};
 
         std::string getNewHomescreenLayoutName()
         {

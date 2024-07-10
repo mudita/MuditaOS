@@ -23,7 +23,6 @@ target_sources(application-bell-common
         src/BatteryLevelNotificationModel.cpp
         src/SoundsRepository.cpp
         src/BellListItemProvider.cpp
-        src/SoundsProvider.cpp
         src/BellSideListItemWithCallbacks.cpp
         src/TimeUtils.cpp
         src/AudioErrorPresenter.cpp

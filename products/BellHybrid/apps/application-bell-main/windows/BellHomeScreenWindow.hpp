@@ -28,7 +28,7 @@ namespace gui
         bool onDatabaseMessage(sys::Message *msg) override;
 
         void setViewState(app::home_screen::ViewState state) override;
-        std::time_t getAlarmTime() const override;
+        [[nodiscard]] std::time_t getAlarmTime() const override;
         void setAlarmTime(std::time_t newTime) override;
         void setSnoozeTime(std::time_t newTime) override;
 

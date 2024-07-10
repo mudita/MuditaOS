@@ -26,7 +26,6 @@ target_sources(application-bell-meditation-timer
         presenter/MeditationCountdownPresenter.cpp
         presenter/MeditationProgressPresenter.cpp
         presenter/MeditationTimerPresenter.cpp
-        presenter/ReadyGoingPresenter.cpp
         presenter/SettingsPresenter.cpp
         presenter/StatisticsPresenter.cpp
         windows/MeditationMainWindow.cpp

@@ -34,7 +34,7 @@ namespace app
                                          StatusIndicators statusIndicators   = StatusIndicators{},
                                          StartInBackground startInBackground = {false},
                                          std::uint32_t stackDepth            = applicationBellPowerNapStackSize);
-        ~ApplicationBellPowerNap();
+        ~ApplicationBellPowerNap() override;
         sys::ReturnCodes InitHandler() override;
 
         void createUserInterface() override;

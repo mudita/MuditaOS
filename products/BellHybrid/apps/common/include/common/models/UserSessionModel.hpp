@@ -38,7 +38,7 @@ namespace app
         };
 
       public:
-        explicit UserSessionModel(sys::Service *serv);
+        explicit UserSessionModel(sys::Service *service);
 
         void activateUserSession() override;
         void restartUserSession() override;
@@ -53,7 +53,7 @@ namespace app
 
       private:
         SessionState sessionState = SessionState::Inactive;
-        sys::Service *serv;
+        sys::Service *service{nullptr};
         sys::TimerHandle endSessionDelayTimer;
         bool isCurrentUserSessionHandled = true;
     };

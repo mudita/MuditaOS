@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "ImageManager.hpp"
@@ -8,14 +8,25 @@
 #include "DrawCommand.hpp"
 #include "Renderer.hpp"
 #include <log/log.hpp>
-#include <set>
+#include <fstream>
 #include <string>
-#include <filesystem>
 #include <list>
+
+namespace
+{
+    auto getFileSize(const std::string &path) -> std::uintmax_t
+    {
+        try {
+            return std::filesystem::file_size(path);
+        }
+        catch (const std::filesystem::filesystem_error &e) {
+            return 0;
+        }
+    }
+} // namespace
 
 namespace gui
 {
-
     ImageManager::ImageManager()
     {
         addFallbackImage();
@@ -26,152 +37,200 @@ namespace gui
         clear();
     }
 
-    void ImageManager::loadImageMaps(std::string baseDirectory)
+    auto ImageManager::init(const std::filesystem::path &baseDirectory) -> bool
     {
-        mapFolder                       = baseDirectory + "/images";
-        auto [pixMapFiles, vecMapFiles] = getImageMapList(".mpi", ".vpi");
-
-        for (std::string mapName : pixMapFiles) {
-            loadPixMap(mapName);
-        }
-        for (std::string mapName : vecMapFiles) {
-            loadVecMap(mapName);
-        }
+        // Load images from specified folder
+        loadImageMaps(baseDirectory);
+        return true;
     }
 
-    void ImageManager::clear()
+    auto ImageManager::clear() -> void
     {
-        for (ImageMap *imageMap : imageMaps) {
-            LOG_INFO("Deleting image: %s", imageMap->getName().c_str());
+        for (auto imageMap : imageMaps) {
+            LOG_INFO("Deleting image '%s'", imageMap->getName().c_str());
             delete imageMap;
         }
         imageMaps.clear();
     }
 
-    std::vector<std::string> splitpath(const std::string &str, const std::set<char> delimiters)
+    auto ImageManager::getInstance() -> ImageManager &
     {
-        std::vector<std::string> result;
-
-        char const *pch   = str.c_str();
-        char const *start = pch;
-        for (; *pch; ++pch) {
-            if (delimiters.find(*pch) != delimiters.end()) {
-                if (start != pch) {
-                    std::string str(start, pch);
-                    result.push_back(str);
-                }
-                else {
-                    result.push_back("");
-                }
-                start = pch + 1;
-            }
-        }
-        result.push_back(start);
-
-        return result;
+        static ImageManager instance;
+        return instance;
     }
 
-    ImageMap *ImageManager::loadPixMap(std::string filename)
+    auto ImageManager::getImageMap(std::uint32_t id) const -> ImageMap *
     {
+        if (id >= imageMaps.size()) {
+#if DEBUG_MISSING_ASSETS == 1
+            LOG_ERROR("Unable to find an image by id %" PRIu32, id);
+#endif
+            return imageMaps[fallbackImageId];
+        }
+        return imageMaps[id];
+    }
 
-        auto file = std::fopen(filename.c_str(), "rb");
-        if (file == nullptr) {
+    auto ImageManager::getImageMapID(const std::string &name, ImageTypeSpecifier specifier) -> std::uint32_t
+    {
+        const auto &searchName = checkAndAddSpecifierToName(name, specifier);
+
+        for (auto i = 0U; i < imageMaps.size(); ++i) {
+            if (imageMaps[i]->getName() == searchName) {
+                return i;
+            }
+        }
+#if DEBUG_MISSING_ASSETS == 1
+        LOG_ERROR("Unable to find an image '%s', using default fallback image instead", name.c_str());
+#endif
+        return fallbackImageId;
+    }
+
+    auto ImageManager::getImageMapList(const std::string &ext1, const std::string &ext2) const
+        -> std::pair<std::vector<std::string>, std::vector<std::string>>
+    {
+        std::vector<std::string> ext1MapFiles;
+        std::vector<std::string> ext2MapFiles;
+
+        LOG_INFO("Scanning extensions '%s' '%s' in images folder '%s'", ext1.c_str(), ext2.c_str(), mapFolder.c_str());
+
+        for (const auto &entry : std::filesystem::recursive_directory_iterator(mapFolder)) {
+            if (!entry.is_directory()) {
+                if (entry.path().extension() == ext1) {
+                    ext1MapFiles.push_back(entry.path().string());
+                }
+                else if (entry.path().extension() == ext2) {
+                    ext2MapFiles.push_back(entry.path().string());
+                }
+            }
+        }
+        LOG_INFO("Total number of images: %zu", ext2MapFiles.size() + ext1MapFiles.size());
+        return {ext1MapFiles, ext2MapFiles};
+    }
+
+    auto ImageManager::loadPixMap(const std::filesystem::path &filename) -> ImageMap *
+    {
+        const auto fileSize = getFileSize(filename);
+        if (fileSize == 0) {
             return nullptr;
         }
 
-        auto fileSize = std::filesystem::file_size(filename);
+        auto imageData = std::make_unique<std::uint8_t[]>(fileSize);
 
-        char *data = new char[fileSize];
-        if (data == nullptr) {
-            std::fclose(file);
-            LOG_ERROR(" Failed to allocate temporary font buffer");
+        std::ifstream input(filename, std::ios::in | std::ifstream::binary);
+        if (!input.is_open()) {
+            LOG_FATAL("Failed to open file '%s'", filename.c_str());
+            return nullptr;
+        }
+        if (!input.read(reinterpret_cast<char *>(imageData.get()), static_cast<std::streamsize>(fileSize))) {
+            return nullptr;
+        }
+        const auto bytesRead = static_cast<std::uintmax_t>(input.gcount());
+        if (bytesRead != fileSize) {
+            LOG_FATAL("Failed to read from file '%s', expected %" PRIuMAX "B, got %" PRIuMAX "B",
+                      filename.c_str(),
+                      fileSize,
+                      bytesRead);
             return nullptr;
         }
 
-        // read data to buffer
-        std::fread(data, 1, fileSize, file);
+        // Allocate memory for new pixmap
+        auto pixMap = new (std::nothrow) PixMap();
+        if (pixMap == nullptr) {
+            return nullptr;
+        }
 
-        // close file
-        std::fclose(file);
-
-        // allocate memory for new font
-        PixMap *pixMap = new PixMap();
-        if (pixMap->load(reinterpret_cast<uint8_t *>(data), fileSize) != gui::Status::GUI_SUCCESS) {
+        if (pixMap->load(imageData.get(), fileSize) != gui::Status::GUI_SUCCESS) {
             delete pixMap;
-            delete[] data;
             return nullptr;
         }
-        else {
-            // set id and push it to vector
-            pixMap->setID(imageMaps.size());
-            std::set<char> delims{'/'};
-            std::vector<std::string> path = splitpath(filename, delims);
-            std::string filename          = path[path.size() - 1];
-            filename                      = filename.substr(0, filename.length() - 4);
 
-            pixMap->setName(filename);
-            imageMaps.push_back(pixMap);
-        }
-        delete[] data;
+        // Set name, id and push it to vector
+        const auto &pixMapName = filename.stem();
+        pixMap->setName(pixMapName);
+        pixMap->setID(imageMaps.size());
+        imageMaps.push_back(pixMap);
+
         return pixMap;
     }
 
-    ImageMap *ImageManager::loadVecMap(std::string filename)
+    auto ImageManager::loadVecMap(const std::filesystem::path &filename) -> ImageMap *
     {
-
-        auto file = std::fopen(filename.c_str(), "rb");
-        if (!file) {
-            LOG_ERROR(" Unable to open file %s", filename.c_str());
+        const auto fileSize = getFileSize(filename);
+        if (fileSize == 0) {
             return nullptr;
         }
 
-        auto fileSize = std::filesystem::file_size(filename);
+        auto imageData = std::make_unique<std::uint8_t[]>(fileSize);
 
-        char *data = new char[fileSize];
-        if (data == nullptr) {
-            std::fclose(file);
-            LOG_ERROR(" Failed to allocate temporary font buffer");
+        std::ifstream input(filename, std::ios::in | std::ifstream::binary);
+        if (!input.is_open()) {
+            LOG_FATAL("Failed to open file '%s'", filename.c_str());
+            return nullptr;
+        }
+        if (!input.read(reinterpret_cast<char *>(imageData.get()), static_cast<std::streamsize>(fileSize))) {
+            return nullptr;
+        }
+        const auto bytesRead = static_cast<std::uintmax_t>(input.gcount());
+        if (bytesRead != fileSize) {
+            LOG_FATAL("Failed to read from file '%s', expected %" PRIuMAX "B, got %" PRIuMAX "B",
+                      filename.c_str(),
+                      fileSize,
+                      bytesRead);
             return nullptr;
         }
 
-        // read data to buffer
-        std::fread(data, 1, fileSize, file);
+        auto vecMap = new (std::nothrow) VecMap();
+        if (vecMap == nullptr) {
+            return nullptr;
+        }
 
-        // close file
-        std::fclose(file);
-
-        VecMap *vecMap = new VecMap();
-        if (vecMap->load(reinterpret_cast<uint8_t *>(data), fileSize) != gui::Status::GUI_SUCCESS) {
+        if (vecMap->load(imageData.get(), fileSize) != gui::Status::GUI_SUCCESS) {
             delete vecMap;
-            delete[] data;
             return nullptr;
         }
-        else {
-            // set id and push it to vector
-            vecMap->setID(imageMaps.size());
-            std::set<char> delims{'/'};
-            std::vector<std::string> path = splitpath(filename, delims);
-            std::string filename          = path[path.size() - 1];
-            filename                      = filename.substr(0, filename.length() - 4);
-            vecMap->setName(filename);
-            imageMaps.push_back(vecMap);
-        }
-        delete[] data;
+
+        // Set name, id and push it to vector
+        const auto &pixMapName = filename.stem();
+        vecMap->setName(pixMapName);
+        vecMap->setID(imageMaps.size());
+        imageMaps.push_back(vecMap);
+
         return vecMap;
     }
 
-    void ImageManager::addFallbackImage()
+    auto ImageManager::addFallbackImage() -> void
     {
         const std::string fallbackImageName{"FallbackImage"};
 
-        auto *fallbackImage = createFallbackImage();
+        auto fallbackImage  = createFallbackImage();
         fallbackImageId     = imageMaps.size();
         fallbackImage->setID(fallbackImageId);
         fallbackImage->setName(fallbackImageName);
         imageMaps.push_back(fallbackImage);
     }
 
-    ImageMap *ImageManager::createFallbackImage()
+    auto ImageManager::loadImageMaps(const std::filesystem::path &baseDirectory) -> void
+    {
+        mapFolder                       = baseDirectory / "images";
+        auto [pixMapFiles, vecMapFiles] = getImageMapList(".mpi", ".vpi");
+
+        for (const auto &mapName : pixMapFiles) {
+            loadPixMap(mapName);
+        }
+        for (const auto &mapName : vecMapFiles) {
+            loadVecMap(mapName);
+        }
+    }
+
+    auto ImageManager::checkAndAddSpecifierToName(const std::string &name, ImageTypeSpecifier specifier) -> std::string
+    {
+        if (specifier != ImageTypeSpecifier::None) {
+            return name + specifierMap[specifier];
+        }
+        return name;
+    }
+
+    auto ImageManager::createFallbackImage() const -> ImageMap *
     {
         // Creation of square with crossed lines as fallback image
         constexpr auto squareWidth = 15;
@@ -198,78 +257,4 @@ namespace gui
 
         return new PixMap(squareWidth, squareWidth, renderContext.getData());
     }
-
-    auto ImageManager::getImageMapList(std::string ext1, std::string ext2)
-        -> std::pair<std::vector<std::string>, std::vector<std::string>>
-    {
-        std::vector<std::string> ext1MapFiles;
-        std::vector<std::string> ext2MapFiles;
-
-        LOG_INFO("Scanning %s  %s images folder: %s", ext1.c_str(), ext2.c_str(), mapFolder.c_str());
-
-        for (const auto &entry : std::filesystem::recursive_directory_iterator(mapFolder)) {
-            if (!entry.is_directory()) {
-                if (entry.path().extension() == ext1) {
-                    ext1MapFiles.push_back(entry.path().string());
-                }
-                else if (entry.path().extension() == ext2) {
-                    ext2MapFiles.push_back(entry.path().string());
-                }
-            }
-        }
-        LOG_INFO("Total number of images: %u", static_cast<unsigned int>(ext2MapFiles.size() + ext1MapFiles.size()));
-        return {ext1MapFiles, ext2MapFiles};
-    }
-
-    bool ImageManager::init(std::string baseDirectory)
-    {
-        // load fonts from specified folder
-        loadImageMaps(baseDirectory);
-
-        return true;
-    }
-
-    ImageManager &ImageManager::getInstance()
-    {
-
-        static ImageManager instance;
-
-        return instance;
-    }
-
-    ImageMap *ImageManager::getImageMap(uint32_t id)
-    {
-        if (id >= imageMaps.size()) {
-#if DEBUG_MISSING_ASSETS == 1
-            LOG_ERROR("Unable to find an image by id: %" PRIu32, id);
-#endif
-            return imageMaps[fallbackImageId];
-        }
-        return imageMaps[id];
-    }
-    uint32_t ImageManager::getImageMapID(const std::string &name, ImageTypeSpecifier specifier)
-    {
-        auto searchName = checkAndAddSpecifierToName(name, specifier);
-
-        for (uint32_t i = 0; i < imageMaps.size(); ++i) {
-            if (imageMaps[i]->getName() == searchName) {
-                return i;
-            }
-        }
-#if DEBUG_MISSING_ASSETS == 1
-        LOG_ERROR("Unable to find an image: %s , using deafult fallback image instead.", name.c_str());
-#endif
-        return fallbackImageId;
-    }
-
-    std::string ImageManager::checkAndAddSpecifierToName(const std::string &name, ImageTypeSpecifier specifier)
-    {
-        if (specifier != ImageTypeSpecifier::None) {
-            return name + specifierMap[specifier];
-        }
-        else {
-            return name;
-        }
-    }
-
-} /* namespace gui */
+} // namespace gui

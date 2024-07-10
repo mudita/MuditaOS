@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,7 +13,6 @@
 #include "Context.hpp"
 #include <FontGlyph.hpp>
 
-// image
 #include "PixMap.hpp"
 #include "VecMap.hpp"
 
@@ -25,8 +24,8 @@ namespace gui
     class DrawCommand
     {
       public:
-        int16_t areaX{0};
-        int16_t areaY{0};
+        std::int16_t areaX{0};
+        std::int16_t areaY{0};
         Length areaW{0};
         Length areaH{0};
 
@@ -65,19 +64,19 @@ namespace gui
         Length height{0};
         Length radius{0};
 
-        // flags that defines whether paint given border
+        // Flags that defines whether paint given border
         RectangleEdge edges{RectangleEdge::All};
-        // flags that defines which edge should be flat. This will disable roundness on both sides of the edge.
+        // Flags that defines which edge should be flat. This will disable roundness on both sides of the edge.
         RectangleFlatEdge flatEdges{RectangleFlatEdge::None};
-        // flags that defines whether paint given corner (only for rounded corners)
+        // Flags that defines whether paint given corner (only for rounded corners)
         RectangleRoundedCorner corners{RectangleRoundedCorner::All};
-        // flags indicating yaps for speech bubbles, it takes precendece over other properties
+        // Flags indicating yaps for speech bubbles, it takes precedence over other properties
         RectangleYap yaps{RectangleYap::None};
-        // defines which of the edges and corners are painted
+        // Defines which of the edges and corners are painted
         unsigned short yapSize{0};
 
         bool filled{false};
-        uint8_t penWidth{1};
+        std::uint8_t penWidth{1};
         Color fillColor{ColorFullBlack};
         Color borderColor{ColorFullBlack};
 
@@ -137,11 +136,12 @@ namespace gui
     class DrawText : public DrawCommand
     {
       public:
-        // area where label wil be drawn
+        // Area where label will be drawn
         Point origin{0, 0};
         Length width{0};
         Length height{0};
-        // area occupied by text inside the label
+
+        // Area occupied by text inside the label
         Point textOrigin{0, 0};
         Length textHeight{0};
 
@@ -152,7 +152,7 @@ namespace gui
         void draw(Context *ctx) const override;
 
       private:
-        void drawChar(Context *ctx, const Point glyphOrigin, FontGlyph *glyph) const;
+        void drawChar(Context *ctx, Point glyphOrigin, FontGlyph *glyph) const;
     };
 
     /**
@@ -164,7 +164,7 @@ namespace gui
         Point origin{0, 0};
 
         // ID of the image
-        uint16_t imageID{0};
+        std::uint16_t imageID{0};
 
         void draw(Context *ctx) const override;
 
@@ -173,5 +173,4 @@ namespace gui
         void drawVecMap(Context *ctx, VecMap *vecMap) const;
         inline void checkImageSize(Context *ctx, ImageMap *image) const;
     };
-
 } /* namespace gui */

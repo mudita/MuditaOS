@@ -16,36 +16,39 @@
 
 namespace gui
 {
-    class FontGlyph;
-    class FontKerning;
-
-    /// class representation and usage of RawFont straight from file
+    /// Class representation and usage of RawFont straight from file
     class RawFont
     {
       public:
         virtual ~RawFont();
 
-        gui::Status load(uint8_t *data);
+        auto load(std::uint8_t *data) -> gui::Status;
 
-        static constexpr auto none_char_id = std::numeric_limits<std::uint32_t>().max();
-        // structure holding detailed information about font
+        static constexpr auto noneCharId = std::numeric_limits<std::uint32_t>::max();
+
+        // Structure holding detailed information about font
         FontInfo info;
-        // number of glyphs in the font
-        std::uint32_t glyph_count;
-        // offset to the beginning of the glyph data
-        std::uint32_t glyph_data_offset;
-        // number of kerning pairs
-        std::uint32_t kern_count;
-        // array of glyphs structures
-        std::uint32_t kern_data_offset;
-        // offset to the beginning of the image data
-        std::uint32_t image_data_offset;
-        // id of the font assigned by the font manager
+        // Number of glyphs in the font
+        std::uint32_t glyphCount;
+        // Offset to the beginning of the glyph data
+        std::uint32_t glyphDataOffset;
+        // Number of kerning pairs
+        std::uint32_t kernCount;
+        // Array of glyphs structures
+        std::uint32_t kernDataOffset;
+        // Offset to the beginning of the image data
+        std::uint32_t imageDataOffset;
+        // Id of the font assigned by the font manager
         std::uint32_t id;
 
-        /// return glyph for selected code
-        /// if code is not found in font, it is searched in the fallback font, if not found - unsupportedGlyph returned
-        FontGlyph *getGlyph(std::uint32_t id) const;
+        /**
+         * @brief Return glyph for selected code.
+         *        If code is not found in font, it is searched in the fallback font,
+         *        if not found - unsupportedGlyph is returned.
+         * @param id Code of the character to find glyph for.
+         * @return Pointer to FontGlyph representing the character or unsupportedGlyph if glyph not found.
+         */
+        [[nodiscard]] auto getGlyph(std::uint32_t id) const -> FontGlyph *;
 
         /**
          * @brief Returns kerning value for pair of the two characters.
@@ -53,14 +56,16 @@ namespace gui
          * @param id2 Code of the second character - if none_char_id then return 0
          * @return Value of the kerning or 0 if pair was not found.
          */
-        std::int32_t getKerning(std::uint32_t id1, std::uint32_t id2) const;
+        [[nodiscard]] auto getKerning(std::uint32_t id1, std::uint32_t id2) const -> std::int32_t;
+
         /**
          * @brief Method calculates how many chars will fit specified width using current font.
          * @param str UTF8 string that will be used to calculate how many chars can fit provided space.
          * @param space Number of pixels in width available to calculate how many chars will fit.
          * @return number of chars that can fit provided space;
          */
-        std::uint32_t getCharCountInSpace(const UTF8 &str, const std::uint32_t availableSpace) const;
+        [[nodiscard]] auto getCharCountInSpace(const UTF8 &str, std::uint32_t availableSpace) const -> std::uint32_t;
+
         /**
          * @brief Calculates how many pixels will occupy selected part of the string.
          * @param str String used as a source of text.
@@ -68,27 +73,35 @@ namespace gui
          * @param count Number of characters that should be used during calculating pixels width.
          * @return Number of pixels in width occupied by selected part of the text.
          */
-        std::uint32_t getPixelWidth(const UTF8 &str, const std::uint32_t start, const std::uint32_t count) const;
+        [[nodiscard]] auto getPixelWidth(const UTF8 &str, std::uint32_t start, std::uint32_t count) const
+            -> std::uint32_t;
+
         /**
          * @brief Calculates how many pixels will occupy string.
          * @param str String used as a source of text.
          * @return Number of pixels in width occupied by string.
          */
-        std::uint32_t getPixelWidth(const UTF8 &str) const;
+        [[nodiscard]] auto getPixelWidth(const UTF8 &str) const -> std::uint32_t;
+
         /**
          * @brief returns number of pixels occupied by character horizontally.
          *
          * if previous char is set - then tries to append kerning
          */
-        std::uint32_t getCharPixelWidth(std::uint32_t charCode, std::uint32_t previousChar = none_char_id) const;
+        [[nodiscard]] auto getCharPixelWidth(std::uint32_t charCode, std::uint32_t previousChar = noneCharId) const
+            -> std::uint32_t;
+
         /**
          * @brief Returns number of pixels occupied by the character vertically.
          */
-        std::uint32_t getCharPixelHeight(std::uint32_t charCode);
+        [[nodiscard]] auto getCharPixelHeight(std::uint32_t charCode) const -> std::uint32_t;
 
-        void setFallbackFont(RawFont *font);
+        /**
+         * @brief Sets fallback font.
+         */
+        auto setFallbackFont(RawFont *font) -> void;
 
-        const std::string getName()
+        [[nodiscard]] auto getName() const -> std::string
         {
             return info.face;
         }
@@ -96,18 +109,19 @@ namespace gui
       private:
         std::map<std::uint32_t, std::unique_ptr<FontGlyph>> glyphs;
         std::map<std::uint32_t, std::map<std::uint32_t, std::unique_ptr<FontKerning>>> kerning;
-        /// if the fallback font is set it is used in case of a glyph being unsupported in the primary font
-        RawFont *fallback_font = nullptr;
-        /// the glyph used when requested glyph is unsupported in the font (and the fallback font if one is set)
+        /// If the fallback font is set it is used in case of a glyph being unsupported in the primary font
+        RawFont *fallbackFont = nullptr;
+        /// The glyph used when requested glyph is unsupported in the font (and the fallback font if one is set)
         std::unique_ptr<FontGlyph> unsupported = nullptr;
 
         void createGlyphUnsupported();
 
-        /// return glyph for selected code
-        /// if code is not found - nullptr is returned
-        FontGlyph *findGlyph(std::uint32_t id) const;
-        /// return glyph for selected code
-        /// if code is not found - nullptr is returned
-        FontGlyph *findGlyphFallback(std::uint32_t id) const;
+        /// Return glyph for selected code
+        /// If code is not found - nullptr is returned
+        [[nodiscard]] auto findGlyph(std::uint32_t glyph_id) const -> FontGlyph *;
+
+        /// Return glyph for selected code
+        /// If code is not found - nullptr is returned
+        [[nodiscard]] auto findGlyphFallback(std::uint32_t glyph_id) const -> FontGlyph *;
     };
 } // namespace gui

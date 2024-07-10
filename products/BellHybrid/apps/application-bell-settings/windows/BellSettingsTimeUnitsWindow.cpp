@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
@@ -16,7 +16,7 @@ namespace gui
         app::ApplicationCommon *app,
         std::unique_ptr<app::bell_settings::TimeUnitsWindowContract::Presenter> &&windowPresenter,
         std::string name)
-        : AppWindow(app, name), presenter{std::move(windowPresenter)}
+        : AppWindow(app, std::move(name)), presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();

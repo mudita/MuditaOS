@@ -30,24 +30,13 @@ namespace app
 
     class ApplicationBellRelaxation : public Application
     {
-      private:
-        std::unique_ptr<AbstractAudioModel> audioModel;
-        std::unique_ptr<AbstractBatteryModel> batteryModel;
-        std::unique_ptr<AbstractLowBatteryInfoModel> lowBatteryInfoModel;
-        std::unique_ptr<relaxation::RelaxationPlayer> player;
-        sys::TimerHandle relaxationRebuildTimerHandle{};
-        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
-
-        void onStop() override;
-        sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
-
       public:
-        ApplicationBellRelaxation(std::string name                    = applicationBellRelaxationName,
-                                  std::string parent                  = "",
-                                  StatusIndicators statusIndicators   = StatusIndicators{},
-                                  StartInBackground startInBackground = {false},
-                                  std::uint32_t stackDepth            = 1024 * 8);
-        ~ApplicationBellRelaxation();
+        explicit ApplicationBellRelaxation(std::string name                    = applicationBellRelaxationName,
+                                           std::string parent                  = "",
+                                           StatusIndicators statusIndicators   = StatusIndicators{},
+                                           StartInBackground startInBackground = {false},
+                                           std::uint32_t stackDepth            = 1024 * 8);
+        ~ApplicationBellRelaxation() override;
         sys::ReturnCodes InitHandler() override;
 
         void createUserInterface() override;
@@ -60,6 +49,17 @@ namespace app
         {
             return sys::ReturnCodes::Success;
         }
+
+      private:
+        std::unique_ptr<AbstractAudioModel> audioModel;
+        std::unique_ptr<AbstractBatteryModel> batteryModel;
+        std::unique_ptr<AbstractLowBatteryInfoModel> lowBatteryInfoModel;
+        std::unique_ptr<relaxation::RelaxationPlayer> player;
+        sys::TimerHandle relaxationRebuildTimerHandle{};
+        std::shared_ptr<sys::CpuSentinel> cpuSentinel;
+
+        void onStop() override;
+        sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
     };
 
     template <>

@@ -1,12 +1,12 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
 
-#include "Common.hpp" // for Status
-#include <stdint.h>   // for uint16_t, uint32_t, uint8_t, int16_t
+#include "Common.hpp"
+#include <cstdint>
 
-typedef uint32_t ucode32;
+using ucode32 = std::uint32_t;
 
 namespace gui
 {
@@ -14,25 +14,28 @@ namespace gui
     {
       public:
         FontGlyph() = default;
-        FontGlyph(const FontGlyph *);
+        explicit FontGlyph(const FontGlyph *from);
+
         virtual ~FontGlyph();
-        gui::Status load(uint8_t *data, uint32_t &offset);
-        gui::Status loadImage(uint8_t *data, uint32_t offset);
-        // character id
+
+        gui::Status load(std::uint8_t *data, std::uint32_t &offset);
+        gui::Status loadImage(std::uint8_t *data, std::uint32_t offset);
+
+        // Character id
         ucode32 id = 0;
-        // offset in glyph data field
-        uint32_t glyph_offset = 0;
-        // width of the character image in the texture
-        uint16_t width = 0;
-        // height of the character image in the texture
-        uint16_t height = 0;
-        // how much the current position should be offset when copying the image from the texture to the screen
-        int16_t xoffset = 0;
-        // how much the current position should be offset when copying the image from the texture to the screen
-        int16_t yoffset = 0;
-        // how much the current position should be advanced after drawing the character
-        uint16_t xadvance = 0;
-        // image data of the glyph
-        uint8_t *data = nullptr;
+        // Offset in glyph data field
+        std::uint32_t glyph_offset = 0;
+        // Width of the character image in the texture
+        std::uint16_t width = 0;
+        // Height of the character image in the texture
+        std::uint16_t height = 0;
+        // How much the current position should be offset when copying the image from the texture to the screen
+        std::int16_t xoffset = 0;
+        // How much the current position should be offset when copying the image from the texture to the screen
+        std::int16_t yoffset = 0;
+        // How much the current position should be advanced after drawing the character
+        std::uint16_t xadvance = 0;
+        // Image data of the glyph
+        std::uint8_t *data = nullptr;
     };
 } // namespace gui

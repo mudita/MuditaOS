@@ -1,8 +1,7 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_GUI_GUI_CORE_IMAGEMAP_HPP_
-#define MODULE_GUI_GUI_CORE_IMAGEMAP_HPP_
+#pragma once
 
 #include <cstdint>
 #include <string>
@@ -10,79 +9,78 @@
 
 namespace gui
 {
-
-    /*
-     *
-     */
     class ImageMap
     {
       public:
         enum class Type
         {
-            NONE,
-            PIXMAP,
-            VECMAP
+            None,
+            Pixmap,
+            Vecmap
         };
 
-      protected:
-        // id of the pixmap asigned by the pixmap manager
-        uint32_t id;
-        // number of columns in the pixmap
-        uint16_t width;
-        // number of rows in the image
-        uint16_t height;
-        // data of the image
-        uint8_t *data = nullptr;
-        // file name
-        std::string name;
-        // type of the image
-        Type type = Type::NONE;
-
-      public:
         ImageMap();
-        ImageMap(uint16_t w, uint16_t h, uint8_t *data);
+        ImageMap(std::uint16_t w, std::uint16_t h, std::uint8_t *data);
+
         virtual ~ImageMap();
 
-        Type getType()
+        [[nodiscard]] auto getType() const -> Type
         {
             return type;
         };
-        uint16_t getWidth()
+
+        [[nodiscard]] auto getWidth() const -> std::uint16_t
         {
             return width;
         };
-        uint16_t getHeight()
+
+        [[nodiscard]] auto getHeight() const -> std::uint16_t
         {
             return height;
         };
-        uint8_t *getData()
+
+        auto getData() -> std::uint8_t *
         {
             return data;
         };
-        std::string getName()
+
+        [[nodiscard]] auto getName() const -> std::string
         {
             return name;
         };
-        uint32_t getID()
+
+        [[nodiscard]] auto getID() const -> std::uint32_t
         {
             return id;
         };
 
-        void setID(uint32_t id)
+        auto setID(std::uint32_t newId) -> void
         {
-            this->id = id;
-        };
-        void setName(std::string name)
-        {
-            this->name = name;
+            id = newId;
         };
 
-        virtual gui::Status load(uint8_t *data, uint32_t size = 0)
+        auto setName(const std::string &newName) -> void
+        {
+            name = newName;
+        };
+
+        virtual auto load(std::uint8_t *imageMapData, std::uint32_t size = 0) -> gui::Status
         {
             return gui::Status::GUI_SUCCESS;
         };
+
+      protected:
+        // Id of the pixmap asigned by the pixmap manager
+        std::uint32_t id;
+        // Number of columns in the pixmap
+        std::uint16_t width;
+        // Number of rows in the image
+        std::uint16_t height;
+        // Data of the image
+        std::uint8_t *data = nullptr;
+        // File name
+        std::string name;
+        // Type of the image
+        Type type = Type::None;
     };
-
 } /* namespace gui */
-
-#endif /* MODULE_GUI_GUI_CORE_IMAGEMAP_HPP_ */

@@ -6,11 +6,10 @@
 
 namespace app
 {
-
-    UserSessionModel::UserSessionModel(sys::Service *serv) : serv{serv}
+    UserSessionModel::UserSessionModel(sys::Service *service) : service{service}
     {
         endSessionDelayTimer = sys::TimerFactory::createPeriodicTimer(
-            serv, "EndOfUserSessionDelay", endOfUserSessionTimeout, [this](sys::Timer &) {
+            service, "EndOfUserSessionDelay", endOfUserSessionTimeout, [this](sys::Timer &) {
                 endOfSessionTimerCallback();
             });
     }
@@ -60,5 +59,4 @@ namespace app
         endSessionDelayTimer.stop();
         sessionState = SessionState::Inactive;
     }
-
 } // namespace app

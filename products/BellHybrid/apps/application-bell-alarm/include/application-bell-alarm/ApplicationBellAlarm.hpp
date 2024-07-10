@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -17,7 +17,7 @@ namespace app
                                       std::string parent                  = "",
                                       StatusIndicators statusIndicators   = StatusIndicators{},
                                       StartInBackground startInBackground = {false},
-                                      std::uint32_t stackDepth            = 8192);
+                                      std::uint32_t stackDepth            = 1024 * 8);
 
         ~ApplicationBellAlarm() override;
         sys::ReturnCodes InitHandler() override;

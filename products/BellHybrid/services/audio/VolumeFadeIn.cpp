@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "VolumeFadeIn.hpp"
@@ -13,7 +13,7 @@ namespace audio
         constexpr auto fadeStep{0.1f};
     } // namespace
 
-    VolumeFadeIn::VolumeFadeIn(sys::Service *parent, SetCallback callback) : setVolumeCallback(callback)
+    VolumeFadeIn::VolumeFadeIn(sys::Service *parent, SetCallback callback) : setVolumeCallback(std::move(callback))
     {
         timerHandle = sys::TimerFactory::createPeriodicTimer(
             parent, timerName, fadeInterval, [this]([[maybe_unused]] sys::Timer &timer) { PerformNextFadeStep(); });
@@ -67,5 +67,4 @@ namespace audio
             Stop();
         }
     }
-
 } // namespace audio
