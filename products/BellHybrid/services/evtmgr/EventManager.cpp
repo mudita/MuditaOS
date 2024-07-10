@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "WorkerEvent.hpp"
@@ -12,13 +12,11 @@
 #include "internal/key_sequences/ResetSequence.hpp"
 
 #include <appmgr/messages/PowerOffPopupRequestParams.hpp>
-#include <appmgr/messages/RebootPopupRequestParams.hpp>
 #include <evtmgr/EventManager.hpp>
 #include <evtmgr/battery/Thresholds.hpp>
 #include <service-appmgr/Controller.hpp>
 #include <hal/temperature_source/TemperatureSource.hpp>
 #include <system/Constants.hpp>
-#include <screen-light-control/ScreenLightControl.hpp>
 #include <service-evtmgr/KbdMessage.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-evtmgr/WorkerEventCommon.hpp>
@@ -30,11 +28,11 @@ namespace
     auto updateTemperature = [](hal::temperature::AbstractTemperatureSource &source) {
         const auto temp = source.read();
         if (not temp) {
-            LOG_FATAL("Error during reading from temperature source");
+            LOG_ERROR("Error during reading from temperature source");
         }
         else {
             evtmgr::internal::StaticData::get().setCurrentTemperature(*temp);
-        };
+        }
     };
 }
 
@@ -182,7 +180,7 @@ void EventManager::buildKeySequences()
     alarmActivateSeq->onAction = [this]() {
         latchStatus = sevm::LatchStatus::RELEASED;
         bus.sendUnicast(
-            std::make_shared<sys::AlarmActivationStatusChangeRequest>(sys::AlarmActivationStatus::ACTIVATED),
+            std::make_shared<sys::AlarmActivationStatusChangeRequest>(sys::AlarmActivationStatus::Activated),
             service::name::system_manager);
     };
     collection.emplace_back(std::move(alarmActivateSeq));
@@ -191,7 +189,7 @@ void EventManager::buildKeySequences()
     alarmDeactivateSeq->onAction = [this]() {
         latchStatus = sevm::LatchStatus::PRESSED;
         bus.sendUnicast(
-            std::make_shared<sys::AlarmActivationStatusChangeRequest>(sys::AlarmActivationStatus::DEACTIVATED),
+            std::make_shared<sys::AlarmActivationStatusChangeRequest>(sys::AlarmActivationStatus::Deactivated),
             service::name::system_manager);
     };
     collection.emplace_back(std::move(alarmDeactivateSeq));

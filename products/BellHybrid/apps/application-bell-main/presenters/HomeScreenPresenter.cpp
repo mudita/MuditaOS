@@ -18,7 +18,6 @@
 #include <Timers/SystemTimer.hpp>
 #include <Timers/TimerFactory.hpp>
 #include <service-db/DBNotificationMessage.hpp>
-#include <service-db/QuotesMessages.hpp>
 #include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <switches/LatchStatusRequest.hpp>
 
@@ -141,6 +140,7 @@ namespace app::home_screen
         getView()->setTemperature(temperatureModel.getTemperature());
         updateUsbStatus();
     }
+
     void HomeScreenPresenter::createData()
     {
         stateController = std::make_unique<StateController>(
@@ -151,12 +151,14 @@ namespace app::home_screen
     {
         app->refreshWindow(gui::RefreshModes::GUI_REFRESH_FAST);
     }
+
     void HomeScreenPresenter::onDatabaseMessage(db::NotificationMessage *msg)
     {
         if (msg->interface == db::Interface::Name::AlarmEvents && msg->type == db::Query::Type::Update) {
             alarmModel.update();
         }
     }
+
     void HomeScreenPresenter::handleAlarmModelReady()
     {
         getView()->setAlarmTime(alarmModel.getAlarmTime());
@@ -271,7 +273,7 @@ namespace app::home_screen
 
     UTF8 HomeScreenPresenter::getGreeting()
     {
-        const auto greetingCollection = utils::translate_array("app_bell_greeting_msg");
+        const auto &greetingCollection = utils::translate_array("app_bell_greeting_msg");
         if (greetingCollection.empty()) {
             LOG_WARN("Array 'app_bell_greeting_msg' does not exist, using default string");
             return "app_bell_greeting_msg";
@@ -328,8 +330,7 @@ namespace app::home_screen
     void HomeScreenPresenter::requestQuote() const
     {
         quoteModel.setCallback(
-            [this](std::string quote, std::string author) { getView()->setQuoteText(quote, author); });
+            [this](const std::string &quote, const std::string &author) { getView()->setQuoteText(quote, author); });
         quoteModel.sendQuery();
     }
-
 } // namespace app::home_screen

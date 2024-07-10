@@ -65,7 +65,7 @@ namespace service
     class AudioSettingsMessage : public AudioMessage
     {
       public:
-        AudioSettingsMessage(const audio::PlaybackType &playbackType, const std::string &value = {})
+        explicit AudioSettingsMessage(const audio::PlaybackType &playbackType, const std::string &value = {})
             : AudioMessage{}, playbackType{playbackType}, value{value}
         {}
 
@@ -76,7 +76,7 @@ namespace service
     class AudioGetVolume : public AudioSettingsMessage
     {
       public:
-        AudioGetVolume(const audio::PlaybackType &playbackType) : AudioSettingsMessage{playbackType}
+        explicit AudioGetVolume(const audio::PlaybackType &playbackType) : AudioSettingsMessage{playbackType}
         {}
     };
 

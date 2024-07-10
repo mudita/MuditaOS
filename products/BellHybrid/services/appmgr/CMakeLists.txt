@@ -12,7 +12,6 @@ target_sources(appmgr
         include/appmgr/messages/ChangeHomescreenLayoutMessage.hpp
         include/appmgr/messages/ChangeHomescreenLayoutParams.hpp
         include/appmgr/messages/PowerOffPopupRequestParams.hpp
-        include/appmgr/messages/RebootPopupRequestParams.hpp
 )
 
 target_include_directories(appmgr

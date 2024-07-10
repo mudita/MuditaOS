@@ -1,10 +1,9 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/TimeUtils.hpp>
 
 #include <time/time_conversion.hpp>
-#include <time/dateCommon.hpp>
 
 namespace utils::time
 {
@@ -17,6 +16,7 @@ namespace utils::time
     {
         return Duration{alarmTime, currentTime}.get();
     }
+
     std::time_t calculateMinutesDifference(std::time_t alarmTime, std::time_t currentTime)
     {
         const auto floorMinutesAlarmTime   = alarmTime - alarmTime % 60;
@@ -48,7 +48,7 @@ namespace utils::time
                        std::to_string(minutes) + " min";
             }
         }(duration.getHours(), duration.getMinutes());
-        return UTF8("<text>" + prefix + "<br />" + translate("app_bellmain_home_screen_bottom_desc_in") + " " +
-                    timeText + "</text>");
+        return {"<text>" + prefix + "<br />" + translate("app_bellmain_home_screen_bottom_desc_in") + " " + timeText +
+                "</text>"};
     }
 } // namespace utils::time

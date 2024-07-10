@@ -1,53 +1,51 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <string.h>
+#include <cstring>
 #include "VecMap.hpp"
 
 namespace gui
 {
-
     VecMap::VecMap()
     {
         width  = 0;
         height = 0;
-        name   = "";
-
-        type = Type::VECMAP;
+        name   = {};
+        type   = Type::Vecmap;
     }
 
-    VecMap::VecMap(uint16_t w, uint16_t h, uint8_t *data) : ImageMap(w, h, data)
+    VecMap::VecMap(std::uint16_t w, std::uint16_t h, std::uint8_t *vecMapData) : ImageMap(w, h, vecMapData)
     {
+        // Add empty vectors for all rows
+        data = new std::uint8_t[height];
+        type = Type::Vecmap;
 
-        // add empty vectors for all rows
-        this->data = new uint8_t[height];
-        type       = Type::VECMAP;
-
-        // no data provided - allocat buffer and clear it with white color
-        if (data == nullptr) {
-            if (this->data)
-                memset(this->data, 0x00, height);
+        // No data provided - allocate buffer and clear it with white color
+        if (vecMapData == nullptr) {
+            std::memset(data, 0x00, height);
         }
     }
 
-    gui::Status VecMap::load(uint8_t *data, uint32_t size)
+    auto VecMap::load(std::uint8_t *vecMapData, std::uint32_t size) -> gui::Status
     {
+        std::uint32_t offset = 0;
 
-        uint32_t offset = 0;
+        // Read width and height of the image
+        std::memcpy(&width, &vecMapData[offset], sizeof(std::uint16_t));
+        offset += sizeof(std::uint16_t);
+        std::memcpy(&height, &vecMapData[offset], sizeof(std::uint16_t));
+        offset += sizeof(std::uint16_t);
+        std::memcpy(&alphaColor, &vecMapData[offset], sizeof(std::uint8_t));
+        offset += sizeof(std::uint8_t);
 
-        // read width and height of the image
-        memcpy(&width, data + offset, sizeof(uint16_t));
-        offset += sizeof(uint16_t);
-        memcpy(&height, data + offset, sizeof(uint16_t));
-        offset += sizeof(uint16_t);
-        memcpy(&alphaColor, data + offset, sizeof(uint8_t));
-        offset += sizeof(uint8_t);
+        constexpr auto metadataSize = 2 * sizeof(std::uint16_t) + sizeof(std::uint8_t);
 
-        this->data = new uint8_t[size - 2 * sizeof(uint16_t) - sizeof(uint8_t)];
-        if (this->data)
-            memcpy(this->data, data + offset, size - 2 * sizeof(uint16_t) - sizeof(uint8_t));
+        data = new (std::nothrow) std::uint8_t[size - metadataSize];
+        if (data == nullptr) {
+            return gui::Status::GUI_FAILURE;
+        }
 
+        std::memcpy(data, &vecMapData[offset], size - metadataSize);
         return gui::Status::GUI_SUCCESS;
     }
-
 } /* namespace gui */

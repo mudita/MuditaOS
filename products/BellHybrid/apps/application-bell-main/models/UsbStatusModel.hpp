@@ -12,15 +12,15 @@ namespace app
       public:
         virtual ~AbstractUsbStatusModel() noexcept = default;
 
-        virtual bool isUsbConnected(const Store::Battery::State &state) const = 0;
+        [[nodiscard]] virtual bool isUsbConnected(const Store::Battery::State &state) const = 0;
     };
 
     class UsbStatusModel : public AbstractUsbStatusModel
     {
       public:
-        bool isUsbConnected(const Store::Battery::State &state) const override;
+        [[nodiscard]] bool isUsbConnected(const Store::Battery::State &state) const override;
 
       private:
-        bool isUsbConfigured() const;
+        [[nodiscard]] bool isUsbConfigured() const;
     };
 } // namespace app

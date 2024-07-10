@@ -36,18 +36,18 @@ namespace app::popup
         {
           public:
             virtual ~Presenter() noexcept                                  = default;
-            virtual time_t getAlarmTime() const noexcept                   = 0;
-            virtual bool isAlarmActive() const noexcept                    = 0;
+            [[nodiscard]] virtual std::time_t getAlarmTime() const noexcept = 0;
+            [[nodiscard]] virtual bool isAlarmActive() const noexcept       = 0;
         };
     };
 
     class AlarmActivatedPresenter : public AlarmActivatedContract::Presenter
     {
       public:
-        AlarmActivatedPresenter(AbstractAlarmModel &alarmModel);
+        explicit AlarmActivatedPresenter(AbstractAlarmModel &alarmModel);
 
-        time_t getAlarmTime() const noexcept;
-        bool isAlarmActive() const noexcept;
+        [[nodiscard]] std::time_t getAlarmTime() const noexcept override;
+        [[nodiscard]] bool isAlarmActive() const noexcept override;
 
       private:
         AbstractAlarmModel &alarmModel;

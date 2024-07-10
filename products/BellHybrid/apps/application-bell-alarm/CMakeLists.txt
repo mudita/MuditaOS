@@ -8,7 +8,7 @@ target_sources(application-bell-alarm
         presenter/BellAlarmSetPresenter.cpp
         windows/BellAlarmWindow.cpp
         windows/BellAlarmSetWindow.cpp
-    PRIVATE
+
         data/BellAlarmStyle.hpp
         presenter/BellAlarmWindowPresenter.hpp
         presenter/BellAlarmSetPresenter.hpp

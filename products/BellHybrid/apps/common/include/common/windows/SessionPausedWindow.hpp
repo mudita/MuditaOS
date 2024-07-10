@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -10,7 +10,6 @@
 
 namespace gui
 {
-
     namespace window::session_paused
     {
         inline constexpr auto sessionPaused = "SessionPausedWindow";
@@ -19,7 +18,7 @@ namespace gui
     class SessionPausedWindow : public AppWindow
     {
       public:
-        SessionPausedWindow(app::ApplicationCommon *app);
+        explicit SessionPausedWindow(app::ApplicationCommon *app);
 
         // virtual methods
         void buildInterface() override;

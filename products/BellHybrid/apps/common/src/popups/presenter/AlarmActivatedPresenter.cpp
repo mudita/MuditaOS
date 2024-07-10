@@ -2,9 +2,7 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/popups/presenter/AlarmActivatedPresenter.hpp>
-
 #include <Timers/TimerFactory.hpp>
-#include <service-appmgr/Controller.hpp>
 
 namespace app::popup
 {
@@ -16,9 +14,8 @@ namespace app::popup
         return alarmModel.isActive();
     }
 
-    time_t AlarmActivatedPresenter::getAlarmTime() const noexcept
+    std::time_t AlarmActivatedPresenter::getAlarmTime() const noexcept
     {
         return alarmModel.getAlarmTime();
     }
-
 } // namespace app::popup

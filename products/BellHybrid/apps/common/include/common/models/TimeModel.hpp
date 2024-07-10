@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -12,14 +12,14 @@ namespace app
       public:
         virtual ~AbstractTimeModel() noexcept = default;
 
-        virtual utils::time::Locale::TimeFormat getTimeFormat() const = 0;
-        virtual time_t getCurrentTime() const                         = 0;
+        [[nodiscard]] virtual utils::time::Locale::TimeFormat getTimeFormat() const = 0;
+        [[nodiscard]] virtual std::time_t getCurrentTime() const                    = 0;
     };
 
     class TimeModel : public AbstractTimeModel
     {
       public:
-        utils::time::Locale::TimeFormat getTimeFormat() const override;
-        time_t getCurrentTime() const override;
+        [[nodiscard]] utils::time::Locale::TimeFormat getTimeFormat() const override;
+        [[nodiscard]] std::time_t getCurrentTime() const override;
     };
 } // namespace app

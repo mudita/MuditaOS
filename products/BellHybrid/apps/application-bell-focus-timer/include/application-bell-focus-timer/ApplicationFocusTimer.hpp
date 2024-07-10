@@ -22,11 +22,11 @@ namespace app
     class ApplicationFocusTimer : public Application
     {
       public:
-        ApplicationFocusTimer(std::string name                    = applicationFocusTimerName,
-                              std::string parent                  = "",
-                              StatusIndicators statusIndicators   = StatusIndicators{},
-                              StartInBackground startInBackground = {false},
-                              std::uint32_t stackDepth            = applicationFocusTimerStackSize);
+        explicit ApplicationFocusTimer(std::string name                    = applicationFocusTimerName,
+                                       std::string parent                  = "",
+                                       StatusIndicators statusIndicators   = StatusIndicators{},
+                                       StartInBackground startInBackground = {false},
+                                       std::uint32_t stackDepth            = applicationFocusTimerStackSize);
         ~ApplicationFocusTimer();
         sys::ReturnCodes InitHandler() override;
 

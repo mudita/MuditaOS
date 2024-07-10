@@ -1,31 +1,27 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#ifndef MODULE_GUI_GUI_CORE_VECMAP_HPP_
-#define MODULE_GUI_GUI_CORE_VECMAP_HPP_
+#pragma once
 
 #include "ImageMap.hpp"
 
 namespace gui
 {
-
     /// Vector map item (*.vpi extension) loaded by `ImageManager::loadVecMap`
     class VecMap : public ImageMap
     {
-      protected:
-        uint8_t alphaColor = 0x0F;
-
       public:
         VecMap();
-        VecMap(uint16_t w, uint16_t h, uint8_t *data);
-        gui::Status load(uint8_t *data, uint32_t size = 0) override;
+        VecMap(std::uint16_t w, std::uint16_t h, std::uint8_t *data);
 
-        uint8_t getAlphaColor()
+        auto load(std::uint8_t *data, std::uint32_t size = 0) -> gui::Status override;
+
+        [[nodiscard]] auto getAlphaColor() const -> std::uint8_t
         {
             return alphaColor;
         };
+
+      protected:
+        std::uint8_t alphaColor = 0x0F;
     };
-
 } /* namespace gui */
-
-#endif /* MODULE_GUI_GUI_CORE_VECMAP_HPP_ */

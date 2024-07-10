@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/widgets/SnoozeTimer.hpp>
@@ -56,5 +56,4 @@ namespace gui
         timeSpinner->setFocusItem(nullptr);
         timeSpinner->informContentChanged();
     }
-
-} /* namespace gui */
+} // namespace gui

@@ -16,10 +16,10 @@ namespace gui
 {
     RawFont::~RawFont()
     {
-        fallback_font = nullptr;
+        fallbackFont = nullptr;
     }
 
-    gui::Status RawFont::load(uint8_t *data)
+    auto RawFont::load(std::uint8_t *data) -> gui::Status
     {
         std::uint32_t offset = 0;
 
@@ -27,57 +27,62 @@ namespace gui
             return gui::Status::GUI_FAILURE;
         }
 
-        // number of glyphs in the font
-        memcpy(&glyph_count, data + offset, sizeof(std::uint32_t));
+        // Number of glyphs in the font
+        std::memcpy(&glyphCount, &data[offset], sizeof(std::uint32_t));
         offset += sizeof(std::uint32_t);
-        // offset to the beginning of the glyph data
-        memcpy(&glyph_data_offset, data + offset, sizeof(std::uint32_t));
+
+        // Offset to the beginning of the glyph data
+        std::memcpy(&glyphDataOffset, &data[offset], sizeof(std::uint32_t));
         offset += sizeof(std::uint32_t);
-        // number of kerning pairs
-        memcpy(&kern_count, data + offset, sizeof(std::uint32_t));
+
+        // Number of kerning pairs
+        std::memcpy(&kernCount, &data[offset], sizeof(std::uint32_t));
         offset += sizeof(std::uint32_t);
-        // array of glyphs structures
-        memcpy(&kern_data_offset, data + offset, sizeof(std::uint32_t));
+
+        // Array of glyphs structures
+        std::memcpy(&kernDataOffset, &data[offset], sizeof(std::uint32_t));
         offset += sizeof(std::uint32_t);
-        // offset to the beginning of the image data
-        memcpy(&image_data_offset, data + offset, sizeof(std::uint32_t));
+
+        // Offset to the beginning of the image data
+        std::memcpy(&imageDataOffset, &data[offset], sizeof(std::uint32_t));
         offset += sizeof(std::uint32_t);
-        // id of the font assigned by the font manager
+
+        // Id of the font assigned by the font manager
         id = 1;
 
-        // load glyphs
-        std::uint32_t glyphOffset = glyph_data_offset;
-        for (std::uint32_t i = 0; i < glyph_count; i++) {
+        // Load glyphs
+        auto glyphOffset = glyphDataOffset;
+        for (auto i = 0U; i < glyphCount; i++) {
             auto glyph = std::make_unique<FontGlyph>();
             glyph->load(data, glyphOffset);
             glyph->loadImage(data, glyph->glyph_offset);
-            glyphs.insert(std::pair<std::uint32_t, std::unique_ptr<FontGlyph>>(glyph->id, std::move(glyph)));
+            glyphs.emplace(glyph->id, std::move(glyph));
         }
 
-        // load kerning
-        // first map contains index of the character and the map that holds values for kerning between
+        // Load kerning
+        // First map contains index of the character and the map that holds values for kerning between
         // first and second character. In second map key is the value of the second character
         // and value is the kerning between first and second element.
-        std::uint32_t kernOffset = kern_data_offset;
-        for (std::uint32_t i = 0; i < kern_count; i++) {
+        auto kernOffset = kernDataOffset;
+        for (auto i = 0U; i < kernCount; i++) {
             auto kern = std::make_unique<FontKerning>();
             kern->load(data, kernOffset);
 
-            // find map using first element of kerning as a key
+            // Find map using first element of kerning as a key
             const auto it = kerning.find(kern->first);
 
-            // element wasn't found
+            // Element wasn't found
             if (it == kerning.end()) {
                 std::map<std::uint32_t, std::unique_ptr<FontKerning>> kernMap;
                 const auto kern_first = kern->first;
-                kernMap.emplace(std::make_pair(kern->second, std::move(kern)));
+                kernMap.emplace(kern->second, std::move(kern));
 
                 // insert element to the first map
-                kerning.emplace(std::make_pair(kern_first, std::move(kernMap)));
+                kerning.emplace(kern_first, std::move(kernMap));
             }
             else {
                 auto &kernMap = it->second;
-                kernMap.emplace(std::make_pair(kern->second, std::move(kern)));
+                kernMap.emplace(kern->second, std::move(kern));
             }
         }
 
@@ -86,22 +91,23 @@ namespace gui
         return gui::Status::GUI_SUCCESS;
     }
 
-    std::int32_t RawFont::getKerning(std::uint32_t id1, std::uint32_t id2) const
+    auto RawFont::getKerning(std::uint32_t id1, std::uint32_t id2) const -> std::int32_t
     {
-        if (id2 == none_char_id) {
+        if (id2 == noneCharId) {
             return 0;
         }
-        // search for a map with kerning for given character (id1)
+
+        // Search for a map with kerning for given character (id1)
         const auto it1 = kerning.find(id1);
 
-        // if there is no map with kerning for id1 return 0;
+        // If there is no map with kerning for id1 return 0;
         if (it1 == kerning.end()) {
             return 0;
         }
 
         const auto &kernMap = it1->second;
 
-        // otherwise search for id2 in kernMap and return value or 0 if it's not found
+        // Otherwise search for id2 in kernMap and return value or 0 if it's not found
         const auto it2 = kernMap.find(id2);
         if (it2 == kernMap.end()) {
             return 0;
@@ -111,11 +117,11 @@ namespace gui
         return kern->amount;
     }
 
-    std::uint32_t RawFont::getCharCountInSpace(const UTF8 &str, const std::uint32_t availableSpace) const
+    auto RawFont::getCharCountInSpace(const UTF8 &str, std::uint32_t availableSpace) const -> std::uint32_t
     {
         std::uint32_t count          = 0;
         std::uint32_t usedSpace      = 0;
-        auto previousChar            = none_char_id;
+        auto previousChar            = noneCharId;
 
         while (count < str.length()) {
             const auto currentChar = str[count];
@@ -129,7 +135,7 @@ namespace gui
         return count;
     }
 
-    FontGlyph *RawFont::getGlyph(std::uint32_t glyph_id) const
+    auto RawFont::getGlyph(std::uint32_t glyph_id) const -> FontGlyph *
     {
         auto glyph = findGlyph(glyph_id);
         if (glyph != nullptr) {
@@ -144,7 +150,7 @@ namespace gui
         return unsupported.get();
     }
 
-    FontGlyph *RawFont::findGlyph(std::uint32_t glyph_id) const
+    auto RawFont::findGlyph(std::uint32_t glyph_id) const -> FontGlyph *
     {
         const auto glyph_found = glyphs.find(glyph_id);
         if (glyph_found != glyphs.end()) {
@@ -153,25 +159,26 @@ namespace gui
         return nullptr;
     }
 
-    FontGlyph *RawFont::findGlyphFallback(std::uint32_t glyph_id) const
+    auto RawFont::findGlyphFallback(std::uint32_t glyph_id) const -> FontGlyph *
     {
-        if (fallback_font == nullptr) {
+        if (fallbackFont == nullptr) {
             return nullptr;
         }
-        return fallback_font->findGlyph(glyph_id);
+        return fallbackFont->findGlyph(glyph_id);
     }
 
-    std::uint32_t RawFont::getPixelWidth(const UTF8 &str, const std::uint32_t start, const std::uint32_t count) const
+    auto RawFont::getPixelWidth(const UTF8 &str, const std::uint32_t start, const std::uint32_t count) const
+        -> std::uint32_t
     {
         if (count == 0) {
             return 0;
         }
 
-        if (str.length() == 0) {
+        if (str.empty()) {
             return 0;
         }
 
-        if ((start >= str.length()) || (start + count - 1 >= str.length())) {
+        if ((start >= str.length()) || ((start + count - 1) >= str.length())) {
             LOG_ERROR("Incorrect string index provided");
             return 0;
         }
@@ -179,9 +186,9 @@ namespace gui
         // width of text in pixels
         std::uint32_t width     = 0;
         std::uint32_t idCurrent = 0;
-        std::uint32_t idLast    = none_char_id;
+        std::uint32_t idLast    = noneCharId;
 
-        for (std::uint32_t i = 0; i < count; ++i) {
+        for (auto i = 0U; i < count; ++i) {
             idCurrent = str[start + i];
             width += getCharPixelWidth(idCurrent, idLast);
             idLast = idCurrent;
@@ -190,12 +197,12 @@ namespace gui
         return width;
     }
 
-    std::uint32_t RawFont::getPixelWidth(const UTF8 &str) const
+    auto RawFont::getPixelWidth(const UTF8 &str) const -> std::uint32_t
     {
         return getPixelWidth(str, 0, str.length());
     }
 
-    std::uint32_t RawFont::getCharPixelWidth(std::uint32_t charCode, std::uint32_t previousChar) const
+    auto RawFont::getCharPixelWidth(std::uint32_t charCode, std::uint32_t previousChar) const -> std::uint32_t
     {
         if (charCode == text::newline) { // newline doesn't have width
             return 0;
@@ -204,7 +211,7 @@ namespace gui
         return glyph->xadvance + getKerning(charCode, previousChar);
     }
 
-    std::uint32_t RawFont::getCharPixelHeight(std::uint32_t charCode)
+    auto RawFont::getCharPixelHeight(std::uint32_t charCode) const -> std::uint32_t
     {
         const auto glyph = getGlyph(charCode);
         return glyph->height;
@@ -282,7 +289,7 @@ namespace gui
     void RawFont::setFallbackFont(RawFont *fallback)
     {
         if (fallback != this) {
-            fallback_font = fallback;
+            fallbackFont = fallback;
         }
     }
 } // namespace gui

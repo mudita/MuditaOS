@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,13 +7,11 @@
 
 namespace sdesktop::endpoints
 {
-
     class EndpointFactoryBell : public EndpointFactory
     {
       public:
         explicit EndpointFactoryBell();
 
-        virtual auto create(Context &context, sys::Service *ownerServicePtr) -> std::unique_ptr<Endpoint> override;
+        auto create(Context &context, sys::Service *ownerServicePtr) -> std::unique_ptr<Endpoint> override;
     };
-
 } // namespace sdesktop::endpoints

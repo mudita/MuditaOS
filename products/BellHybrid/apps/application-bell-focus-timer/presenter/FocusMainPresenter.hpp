@@ -30,8 +30,8 @@ namespace app::focus
           public:
             virtual ~Presenter()                                               = default;
             virtual Store::Battery getBatteryState()                           = 0;
-            virtual bool isBatteryCharging(Store::Battery::State state) const  = 0;
-            virtual bool isBatteryBelowLowLevelThreshold(units::SOC soc) const = 0;
+            [[nodiscard]] virtual bool isBatteryCharging(Store::Battery::State state) const  = 0;
+            [[nodiscard]] virtual bool isBatteryBelowLowLevelThreshold(units::SOC soc) const = 0;
             [[nodiscard]] virtual bool isLowBatteryWindowHandled() const       = 0;
             virtual void handleLowBatteryWindow()                              = 0;
         };

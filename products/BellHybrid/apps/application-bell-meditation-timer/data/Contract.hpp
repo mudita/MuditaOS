@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -18,7 +18,7 @@ namespace app::meditation::contract
     {
       public:
         virtual ~Presenter() noexcept                                                   = default;
-        virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
+        [[nodiscard]] virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
         virtual void loadData()                                                         = 0;
         virtual void saveData()                                                         = 0;
         virtual void eraseProviderData()                                                = 0;
@@ -30,7 +30,7 @@ namespace app::meditation::contract
     {
       public:
         virtual ~StatisticsPresenter() noexcept                                         = default;
-        virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
+        [[nodiscard]] virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
         virtual void eraseProviderData()                                                = 0;
         virtual void handleExit()                                                       = 0;
     };

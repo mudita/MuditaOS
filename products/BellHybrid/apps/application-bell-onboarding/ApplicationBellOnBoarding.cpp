@@ -37,7 +37,6 @@ namespace
     constexpr auto informationTimerName     = "OnBoardingInformationTimer";
     constexpr auto userIdleTimeout          = std::chrono::minutes{3};
     constexpr auto userIdleTimerName        = "OnBoardingUserIdleTimer";
-
 } // namespace
 
 namespace app

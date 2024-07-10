@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "EndpointFactoryBell.hpp"
@@ -11,7 +11,6 @@
 #include <endpoints/restore/RestoreEndpoint.hpp>
 #include <endpoints/update/UpdateEndpoint.hpp>
 #include <endpoints/reboot/RebootEndpoint.hpp>
-#include <log/log.hpp>
 
 namespace sdesktop::endpoints
 {
@@ -45,5 +44,4 @@ namespace sdesktop::endpoints
     {
         return std::make_unique<EndpointFactoryBell>();
     }
-
 } // namespace sdesktop::endpoints

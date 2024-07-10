@@ -45,7 +45,7 @@ namespace app
       private:
         void onStart() override;
         sys::MessagePointer handleSwitchWindow(sys::Message *msgl) override;
-        bool setHomeScreenLayout(std::string layoutName);
+        bool setHomeScreenLayout(const std::string &layoutName);
         void startUserSessionEndTimer();
 
         std::unique_ptr<AbstractTimeModel> timeModel;

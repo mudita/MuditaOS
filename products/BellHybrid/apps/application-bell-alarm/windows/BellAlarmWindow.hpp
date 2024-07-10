@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -25,8 +25,8 @@ namespace gui
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void rebuild() override;
 
-        void setAlarmTime(time_t time) override;
-        time_t getAlarmTime() const override;
+        void setAlarmTime(std::time_t time) override;
+        std::time_t getAlarmTime() const override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt);
 
       private:

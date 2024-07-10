@@ -1,48 +1,41 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Font.hpp"
-#include "FontManager.hpp" // for FontManager
+#include "FontManager.hpp"
 #include "RawFont.hpp"
-#include <log/log.hpp>
-#include <algorithm>
-#include <sstream>
+#include <Utils.hpp>
 
 namespace gui
 {
-
-    auto toWeight(const std::string &val) -> Font::Weight;
-
-    Font::Font(std::string name, unsigned int size, Weight weight)
+    Font::Font(const std::string &name, unsigned size, Weight weight)
     {
         setFont(name, size, weight);
     }
 
-    Font::Font(unsigned int size, Weight weight)
-        : Font(FontManager::getInstance().getDefaultFontFamilyName(), size, weight)
+    Font::Font(unsigned size, Weight weight) : Font(FontManager::getInstance().getDefaultFontFamilyName(), size, weight)
     {}
 
-    Font::Font(RawFont *rawfont)
+    Font::Font(RawFont *rawFont)
     {
-        if (rawfont == nullptr) {
-            font = FontManager::getInstance().getFont(""); // get default
+        if (rawFont == nullptr) {
+            rawFont = FontManager::getInstance().getFont(""); // Get default
         }
 
-        auto name  = rawfont->getName();
-        auto pos   = name.npos;
-        auto parse = [&]() {
-            pos      = name.rfind('_');
-            auto val = name.substr(pos + 1, name.length());
-            name.erase(pos);
+        auto rawFontName = rawFont->getName();
+        auto parse       = [&]() {
+            const auto pos = rawFontName.rfind('_');
+            auto val       = rawFontName.substr(pos + 1, rawFontName.length());
+            rawFontName.erase(pos);
             return val;
         };
 
-        unsigned int size = std::stoi(parse());
-        Weight weight     = toWeight(parse());
-
-        setFont(name, size, weight);
+        const auto rawFontSize   = utils::toNumeric(parse());
+        const auto rawFontWeight = toWeight(parse());
+        setFont(rawFontName, rawFontSize, rawFontWeight);
     }
-    void Font::setFont(std::string new_name, unsigned int new_size, Weight new_weight)
+
+    auto Font::setFont(std::string newName, unsigned newSize, Weight newWeight) -> void
     {
         bool update = false;
         auto set    = [&](auto &val, auto &new_val) {
@@ -51,28 +44,28 @@ namespace gui
                 update = true;
             }
         };
-        set(name, new_name);
-        set(size, new_size);
-        set(weight, new_weight);
+        set(name, newName);
+        set(size, newSize);
+        set(weight, newWeight);
         if (update) {
-            std::string raw_font_name = new_name + "_" + c_str(new_weight) + "_" + std::to_string(new_size);
-            font                      = FontManager::getInstance().getFontByName(raw_font_name);
+            const auto &rawFontName = newName + "_" + c_str(newWeight) + "_" + std::to_string(newSize);
+            font                    = FontManager::getInstance().getFontByName(rawFontName);
         }
     }
 
-    void Font::setFont(unsigned int size, Weight weight)
+    auto Font::setFont(unsigned newSize, Weight newWeight) -> void
     {
-        setFont((FontManager::getInstance().getDefaultFontFamilyName()), size, weight);
+        setFont((FontManager::getInstance().getDefaultFontFamilyName()), newSize, newWeight);
     }
 
-    void Font::setSize(unsigned int new_size)
+    auto Font::setSize(unsigned newSize) -> void
     {
-        setFont(name, new_size, weight);
+        setFont(name, newSize, weight);
     }
 
-    void Font::setWeight(Weight new_weight)
+    auto Font::setWeight(Weight newWeight) -> void
     {
-        setFont(name, size, new_weight);
+        setFont(name, size, newWeight);
     }
 
     auto Font::raw() -> RawFont *
@@ -80,7 +73,7 @@ namespace gui
         return font;
     }
 
-    auto toWeight(const std::string &val) -> Font::Weight
+    auto Font::toWeight(const std::string &val) -> Font::Weight
     {
         if (val == c_str(Font::Weight::Regular)) {
             return Font::Weight::Regular;
@@ -93,4 +86,4 @@ namespace gui
         }
         return Font::Weight::Regular;
     }
-}; // namespace gui
+} // namespace gui

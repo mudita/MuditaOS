@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "BellAlarmWindow.hpp"
@@ -75,12 +75,12 @@ namespace gui
         presenter->onBeforeShow();
     }
 
-    void BellAlarmWindow::setAlarmTime(time_t time)
+    void BellAlarmWindow::setAlarmTime(std::time_t time)
     {
         timeSetFmtSpinner->setTime(time);
     }
 
-    time_t BellAlarmWindow::getAlarmTime() const
+    std::time_t BellAlarmWindow::getAlarmTime() const
     {
         return timeSetFmtSpinner->getTime();
     }

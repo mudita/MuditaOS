@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -9,7 +9,7 @@ namespace gui
 {
     class RawFont;
 
-    /// simple font interface for FontManager && RawFont
+    /// Simple font interface for FontManager && RawFont
     class Font
     {
       public:
@@ -17,38 +17,46 @@ namespace gui
         {
             Light,
             Regular,
-            Bold,
+            Bold
         };
 
-      private:
-        RawFont *font = nullptr;
-        std::string name;
-        unsigned int size = 0;
-        Weight weight     = Weight::Regular;
-
       public:
-        Font(std::string name, unsigned int size, Weight weight = Weight::Regular);
-        Font(unsigned int size, Weight weight = Weight::Regular);
-        Font(RawFont *font);
-        void setFont(std::string name, unsigned int size, Weight weight = Weight::Regular);
-        void setFont(unsigned int size, Weight weight = Weight::Regular);
-        void setSize(unsigned int size);
-        void setWeight(Weight weight);
+        Font(const std::string &name, unsigned size, Weight weight = Weight::Regular);
+        explicit Font(unsigned size, Weight weight = Weight::Regular);
+        explicit Font(RawFont *font);
+
+        auto setFont(std::string name, unsigned size, Weight weight = Weight::Regular) -> void;
+        auto setFont(unsigned size, Weight weight = Weight::Regular) -> void;
+
+        auto setSize(unsigned size) -> void;
+        auto setWeight(Weight weight) -> void;
+
         auto raw() -> RawFont *;
+
         [[nodiscard]] auto getSize() const
         {
             return size;
         }
+
         [[nodiscard]] auto getWeight() const
         {
             return weight;
         }
+
         [[nodiscard]] auto getName() const
         {
             return name;
         }
+
+      private:
+        RawFont *font = nullptr;
+        std::string name;
+        unsigned size = 0;
+        Weight weight = Weight::Regular;
+
+        [[nodiscard]] auto toWeight(const std::string &val) -> Font::Weight;
     };
-}; // namespace gui
+} // namespace gui
 
 inline auto c_str(enum gui::Font::Weight w) -> const char *
 {
@@ -59,6 +67,6 @@ inline auto c_str(enum gui::Font::Weight w) -> const char *
         return "regular";
     case gui::Font::Weight::Bold:
         return "bold";
-    };
+    }
     return "";
-};
+}

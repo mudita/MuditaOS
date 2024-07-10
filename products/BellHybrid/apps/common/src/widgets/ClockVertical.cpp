@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/widgets/ClockVertical.hpp>
@@ -9,7 +9,10 @@
 #include <gui/core/RawFont.hpp>
 #include <widgets/spinners/Spinners.hpp>
 
-static constexpr auto doubleDigit = 10;
+namespace
+{
+    constexpr auto doubleDigit = 10;
+}
 
 namespace gui
 {

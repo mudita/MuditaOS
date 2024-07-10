@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <sys/SystemManager.hpp>
@@ -7,7 +7,6 @@
 #include <system/messages/SystemManagerMessage.hpp>
 
 #include <appmgr/messages/AlarmMessage.hpp>
-#include <service-appmgr/ServiceApplicationManagerName.hpp>
 
 namespace sys
 {
@@ -39,10 +38,10 @@ namespace sys
         -> MessagePointer
     {
         switch (request->getStatus()) {
-        case AlarmActivationStatus::ACTIVATED:
+        case AlarmActivationStatus::Activated:
             bus.sendMulticast(std::make_shared<AlarmActivated>(), sys::BusChannel::AlarmNotifications);
             break;
-        case AlarmActivationStatus::DEACTIVATED:
+        case AlarmActivationStatus::Deactivated:
             bus.sendMulticast(std::make_shared<AlarmDeactivated>(), sys::BusChannel::AlarmNotifications);
             break;
         }
@@ -54,7 +53,7 @@ namespace sys
         set(State::ShutdownReady);
     }
 
-    const std::vector<std::string> &SystemManager::getWhiteListFor(WhiteListType /*type*/)
+    const std::vector<std::string> &SystemManager::getWhiteListFor([[maybe_unused]] WhiteListType type)
     {
         return RegularClose::whitelist;
     }
