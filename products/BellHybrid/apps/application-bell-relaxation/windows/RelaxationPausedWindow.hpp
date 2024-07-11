@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -13,14 +13,13 @@ namespace gui
     class RelaxationPausedWindow : public AppWindow, public app::relaxation::RelaxationPausedContract::View
     {
       public:
-        explicit RelaxationPausedWindow(
-            app::ApplicationCommon *app,
-            std::unique_ptr<app::relaxation::RelaxationPausedContract::Presenter> &&presenter);
+        RelaxationPausedWindow(app::ApplicationCommon *app,
+                               std::unique_ptr<app::relaxation::RelaxationPausedContract::Presenter> &&presenter);
 
       private:
         std::unique_ptr<app::relaxation::RelaxationPausedContract::Presenter> presenter;
 
-        gui::BellStatusClock *time = nullptr;
+        gui::BellStatusClock *clock{nullptr};
 
         void buildInterface() override;
         void setTime(std::time_t newTime) override;
@@ -29,5 +28,4 @@ namespace gui
         bool onInput(const InputEvent &inputEvent) override;
         RefreshModes updateTime() override;
     };
-
 } // namespace gui

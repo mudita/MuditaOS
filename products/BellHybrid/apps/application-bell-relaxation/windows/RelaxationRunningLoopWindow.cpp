@@ -17,59 +17,14 @@ namespace
     constexpr auto relaxationLoopTimerName{"RelaxationLoopTimer"};
     constexpr std::chrono::seconds relaxationLoopTimerPeriod{1};
     constexpr units::SOC dischargingLevelShowTop{20};
-    constexpr auto ellipsisSpace{2U};
-    constexpr auto ellipsis{"..."};
-    /* charsMultiplier is set a little bit less than max lines which is 2, because of final text formatting */
-    constexpr auto charsMultiplier{1.8f};
-
-    gui::Text *createTitle(gui::VBox *parent)
-    {
-        namespace relaxationStyle = gui::relaxationStyle;
-        auto title                = new gui::TextFixedSize(parent);
-        title->setFont(relaxationStyle::titleFont);
-        title->setMinimumWidth(relaxationStyle::title::width);
-        title->setMinimumHeightToFitText(relaxationStyle::title::maxLines);
-        title->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        title->drawUnderline(false);
-        return title;
-    }
-
-    gui::BellStatusClock *createClock(gui::Item *parent)
-    {
-        auto time = new gui::BellStatusClock(parent);
-        time->setFont(gui::relaxationStyle::clockFont);
-        time->setMaximumSize(parent->getWidth(), parent->getHeight());
-        time->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        return time;
-    }
-
-    gui::Text *createBottomText(gui::VBox *parent)
-    {
-        namespace relaxationStyle = gui::relaxationStyle;
-        auto title                = new gui::TextFixedSize(parent);
-        title->setFont(relaxationStyle::descriptionFont);
-        title->setMinimumWidth(relaxationStyle::text::minWidth);
-        title->setMinimumHeightToFitText(relaxationStyle::text::maxLines);
-        title->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        title->drawUnderline(false);
-        title->setText(utils::translate("app_bell_relaxation_looped"));
-        title->setVisible(false);
-        return title;
-    }
-
-    gui::BellBattery *createBattery(gui::VBox *parent)
-    {
-        auto battery = new gui::BellBattery(parent, gui::BatteryWidthMode::Fixed);
-        battery->setMinimumSize(gui::battery::battery_widget_w, gui::battery::battery_widget_h);
-        battery->setEdges(gui::RectangleEdge::None);
-        battery->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        battery->setBatteryPercentMode(gui::BatteryPercentMode::Show);
-        battery->setVisible(false);
-        return battery;
-    }
 
     std::string adjustDisplayedTitle(const UTF8 &title, const std::uint32_t maxCharsInLine)
     {
+        /* charsMultiplier is set a little bit less than max lines which is 2, because of final text formatting */
+        constexpr auto charsMultiplier{1.8f};
+        constexpr auto ellipsisSpace{2U};
+        constexpr auto ellipsis{"..."};
+
         const auto maxTitleLength =
             static_cast<std::uint32_t>(std::round(static_cast<float>(maxCharsInLine) * charsMultiplier));
         if (title.length() <= maxTitleLength) {
@@ -105,11 +60,11 @@ namespace gui
         }
 
         if (data && typeid(*data) == typeid(RelaxationSwitchData)) {
-            auto *audioSwitchData     = static_cast<RelaxationSwitchData *>(data);
+            auto audioSwitchData      = static_cast<RelaxationSwitchData *>(data);
             audioContext              = audioSwitchData->getAudioContext();
-            const auto maxCharsInLine = title->getTextFormat().getFont()->getCharCountInSpace(
-                audioContext->getSound().tags.title, title->getWidth());
-            title->setText(adjustDisplayedTitle(audioContext->getSound().tags.title, maxCharsInLine));
+            const auto maxCharsInLine = titleText->getTextFormat().getFont()->getCharCountInSpace(
+                audioContext->getSound().tags.title, titleText->getWidth());
+            titleText->setText(adjustDisplayedTitle(audioContext->getSound().tags.title, maxCharsInLine));
             presenter->activate(audioContext->getSound());
         }
     }
@@ -123,28 +78,55 @@ namespace gui
 
     void RelaxationRunningLoopWindow::buildLayout()
     {
-        using Alignment = gui::Alignment;
         statusBar->setVisible(false);
-        auto body = new gui::BellBaseLayout(this,
-                                            0,
-                                            0,
-                                            style::bell_base_layout::w,
-                                            style::bell_base_layout::h,
-                                            BellBaseLayout::LayoutType::WithoutArrows);
 
-        title      = createTitle(body->centerBox);
-        time       = createClock(body->firstBox);
-        battery    = createBattery(body->lastBox);
-        bottomText = createBottomText(body->lastBox);
+        auto mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
+        mainVBox->setEdges(rectangle_enums::RectangleEdge::None);
 
-        body->lastBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        clock = new BellStatusClock(mainVBox);
+        clock->setMaximumSize(relaxationStyle::relStyle::clock::maxSizeX, relaxationStyle::relStyle::clock::maxSizeY);
+        clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        clock->setMargins(Margins(0, relaxationStyle::relStyle::clock::marginTop, 0, 0));
+
+        titleText = new TextFixedSize(mainVBox);
+        titleText->setFont(relaxationStyle::titleFont);
+        titleText->setMinimumWidth(relaxationStyle::title::width);
+        titleText->setMinimumHeightToFitText(relaxationStyle::title::maxLines);
+        titleText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        titleText->setMargins(Margins(0, relaxationStyle::title::loopMarginTop, 0, 0));
+        titleText->drawUnderline(false);
+
+        loopedText = new TextFixedSize(mainVBox);
+        loopedText->setFont(relaxationStyle::relStyle::loopedDescription::font);
+        loopedText->setMaximumSize(relaxationStyle::relStyle::loopedDescription::maxSizeX,
+                                   relaxationStyle::relStyle::loopedDescription::maxSizeY);
+        loopedText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        loopedText->setMargins(Margins(0, relaxationStyle::relStyle::loopedDescription::marginTop, 0, 0));
+        loopedText->setText(utils::translate("app_bell_relaxation_looped"));
+        loopedText->drawUnderline(false);
+        loopedText->setVisible(true);
+
+        relaxationText = new TextFixedSize(mainVBox);
+        relaxationText->setMaximumSize(relaxationStyle::relStyle::bottomDescription::maxSizeX,
+                                       relaxationStyle::relStyle::bottomDescription::maxSizeY);
+        relaxationText->setFont(relaxationStyle::relStyle::bottomDescription::font);
+        relaxationText->setMargins(Margins(0, relaxationStyle::relStyle::bottomDescription::loopMarginTop, 0, 0));
+        relaxationText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        relaxationText->setText(utils::translate("app_bellmain_relaxation"));
+        relaxationText->drawUnderline(false);
+        relaxationText->setVisible(true);
+        relaxationText->activeItem = false;
+
+        battery = new BellBattery(mainVBox, BatteryWidthMode::Fixed);
+        battery->setMinimumSize(battery::battery_widget_w, battery::battery_widget_h);
+        battery->setMargins(Margins(0, relaxationStyle::relStyle::battery::loopMarginTop, 0, 0));
+        battery->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        battery->setBatteryPercentMode(BatteryPercentMode::Show);
+        battery->setEdges(RectangleEdge::None);
+        battery->setVisible(false);
+
         updateBatteryStatus();
-        body->resizeItems();
-
-        dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
-            body->setArea({0, 0, newDim.w, newDim.h});
-            return true;
-        };
+        mainVBox->resizeItems();
     }
 
     void RelaxationRunningLoopWindow::configureTimer()
@@ -189,13 +171,13 @@ namespace gui
 
     void RelaxationRunningLoopWindow::setTime(std::time_t newTime)
     {
-        time->setTime(newTime);
-        time->setTimeFormatSpinnerVisibility(true);
+        clock->setTime(newTime);
+        clock->setTimeFormatSpinnerVisibility(true);
     }
 
     void RelaxationRunningLoopWindow::setTimeFormat(utils::time::Locale::TimeFormat fmt)
     {
-        time->setTimeFormat(fmt);
+        clock->setTimeFormat(fmt);
     }
 
     void RelaxationRunningLoopWindow::resume()
@@ -218,14 +200,14 @@ namespace gui
 
         if (soc < dischargingLevelShowTop) {
             battery->update(soc, presenter->isBatteryCharging(state));
-            bottomText->setVisible(false);
+            relaxationText->setVisible(false);
             battery->setVisible(true);
             battery->informContentChanged();
         }
         else {
             battery->setVisible(false);
-            bottomText->setVisible(true);
-            bottomText->informContentChanged();
+            relaxationText->setVisible(true);
+            relaxationText->informContentChanged();
         }
 
         return true;

@@ -43,6 +43,7 @@ namespace gui
     void RelaxationRunningProgressWindow::buildLayout()
     {
         using namespace gui::relaxationStyle;
+
         const auto progressArcRadius = relStyle::progressTime::radius;
         const auto progressArcWidth  = relStyle::progressTime::penWidth;
         const auto arcStartAngle     = -90 - relStyle::progressTime::verticalDeviationDegrees;
@@ -64,6 +65,7 @@ namespace gui
         progress->setMaximum(arcProgressSteps);
 
         mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
+        mainVBox->setEdges(rectangle_enums::RectangleEdge::None);
 
         clock = new BellStatusClock(mainVBox);
         clock->setMaximumSize(relStyle::clock::maxSizeX, relStyle::clock::maxSizeY);
@@ -80,22 +82,23 @@ namespace gui
         timer->setMargins(Margins(0, relStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        icon = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
-        icon->setMinimumSize(relStyle::pauseIcon::maxSizeX, relStyle::pauseIcon::maxSizeY);
-        icon->setMargins(gui::Margins(0, relStyle::pauseIcon::marginTop, 0, 0));
-        icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        icon->image->set(relStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
-        icon->setVisible(false);
+        pauseBox = new VBox(mainVBox);
+        pauseBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        pauseBox->setEdges(RectangleEdge::None);
+        pauseBox->setMargins(Margins(0, relStyle::pauseIcon::marginTop, 0, 0));
+        pauseBox->setMinimumSize(relStyle::pauseIcon::minSizeX, relStyle::pauseIcon::runningMinSizeY);
+        new Image(pauseBox, relStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
+        pauseBox->setVisible(false);
+        pauseBox->resizeItems();
 
-        bottomDescription = new gui::TextFixedSize(
-            mainVBox, 0, 0, relStyle::bottomDescription::maxSizeX, relStyle::bottomDescription::maxSizeY);
+        bottomDescription = new gui::TextFixedSize(mainVBox);
         bottomDescription->setMaximumSize(relStyle::bottomDescription::maxSizeX, relStyle::bottomDescription::maxSizeY);
         bottomDescription->setFont(relStyle::bottomDescription::font);
         bottomDescription->setMargins(gui::Margins(0, 0, 0, 0));
         bottomDescription->activeItem = false;
         bottomDescription->setAlignment(
             gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        bottomDescription->setRichText(utils::translate("app_bellmain_relaxation"));
+        bottomDescription->setText(utils::translate("app_bellmain_relaxation"));
         bottomDescription->drawUnderline(false);
         bottomDescription->setVisible(true);
 
@@ -152,14 +155,14 @@ namespace gui
     void RelaxationRunningProgressWindow::onPaused()
     {
         timer->setVisible(false);
-        icon->setVisible(true);
+        pauseBox->setVisible(true);
         mainVBox->resizeItems();
     }
 
     void RelaxationRunningProgressWindow::resume()
     {
         timer->setVisible(true);
-        icon->setVisible(false);
+        pauseBox->setVisible(false);
         mainVBox->resizeItems();
     }
 

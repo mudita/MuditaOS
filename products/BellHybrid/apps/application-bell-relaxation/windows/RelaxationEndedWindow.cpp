@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "RelaxationEndedWindow.hpp"
@@ -33,7 +33,7 @@ namespace gui
             new Icon(this, 0, 0, style::window_width, style::window_height, "big_namaste", "", ImageTypeSpecifier::W_G);
         icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         icon->image->setMargins(
-            {0, gui::relaxationStyle::ended::image_top_margin, 0, gui::relaxationStyle::ended::image_bottom_margin});
+            {0, gui::relaxationStyle::ended::imageMarginTop, 0, gui::relaxationStyle::ended::imageMarginBottom});
         icon->text->setFont(style::window::font::verybiglight);
     }
 

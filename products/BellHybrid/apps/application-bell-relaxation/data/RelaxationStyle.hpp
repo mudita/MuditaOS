@@ -8,28 +8,22 @@
 namespace gui::relaxationStyle
 {
     inline constexpr auto descriptionFont = style::window::font::verybiglight;
-    inline constexpr auto titleFont       = style::window::font::largelight;
-    inline constexpr auto clockFont       = style::window::font::largelight;
+    inline constexpr auto titleFont       = style::window::font::large;
     inline constexpr auto timerValueFont  = style::window::font::supersizemelight;
     inline constexpr auto volumeValueFont = style::window::font::supersizemelight;
 
     namespace ended
     {
-        inline constexpr auto image_top_margin    = 170U;
-        inline constexpr auto image_bottom_margin = 30U;
+        inline constexpr auto imageMarginTop    = 170U;
+        inline constexpr auto imageMarginBottom = 30U;
     } // namespace ended
 
     namespace title
     {
+        inline constexpr auto loopMarginTop       = 42U;
         inline constexpr auto maxLines            = 2U;
         inline constexpr auto width               = 400U;
     } // namespace title
-
-    namespace text
-    {
-        inline constexpr auto maxLines = title::maxLines;
-        inline constexpr auto minWidth = 300U;
-    } // namespace text
 
     namespace relStyle
     {
@@ -58,9 +52,10 @@ namespace gui::relaxationStyle
         namespace pauseIcon
         {
             inline constexpr auto image     = "big_pause";
-            inline constexpr auto maxSizeX  = 203U;
-            inline constexpr auto maxSizeY  = 203U;
-            inline constexpr auto marginTop = timer::marginTop - (maxSizeY - timer::maxSizeY);
+            inline constexpr auto minSizeX        = 203U;
+            inline constexpr auto loopMinSizeY    = 140U;
+            inline constexpr auto runningMinSizeY = 154U;
+            inline constexpr auto marginTop       = 63U;
         } // namespace pauseIcon
 
         namespace clock
@@ -70,12 +65,26 @@ namespace gui::relaxationStyle
             inline constexpr auto maxSizeY  = 84U;
         } // namespace clock
 
+        namespace loopedDescription
+        {
+            inline constexpr auto marginTop = -8;
+            inline constexpr auto maxSizeX  = 340U;
+            inline constexpr auto maxSizeY  = 40U;
+            inline constexpr auto font      = style::window::font::big;
+        } // namespace loopedDescription
+
         namespace bottomDescription
         {
-            inline constexpr auto marginTop = 38U;
+            inline constexpr auto loopMarginTop   = 15U;
+            inline constexpr auto pausedMarginTop = 10U;
             inline constexpr auto maxSizeX  = 340U;
             inline constexpr auto maxSizeY  = 80U;
             inline constexpr auto font      = style::window::font::verybig;
         } // namespace bottomDescription
-    }     // namespace relStyle
+
+        namespace battery
+        {
+            inline constexpr auto loopMarginTop = 74U;
+        }
+    } // namespace relStyle
 } // namespace gui::relaxationStyle

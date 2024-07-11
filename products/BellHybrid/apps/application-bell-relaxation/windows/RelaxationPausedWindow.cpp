@@ -8,23 +8,11 @@
 #include <apps-common/widgets/BellBaseLayout.hpp>
 #include <i18n/i18n.hpp>
 
-namespace
-{
-    gui::BellStatusClock *createClock(gui::Item *parent)
-    {
-        auto time = new gui::BellStatusClock(parent);
-        time->setFont(gui::relaxationStyle::clockFont);
-        time->setMaximumSize(parent->getWidth(), parent->getHeight());
-        time->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        return time;
-    }
-} // namespace
-
 namespace gui
 {
     RelaxationPausedWindow::RelaxationPausedWindow(
         app::ApplicationCommon *app, std::unique_ptr<app::relaxation::RelaxationPausedContract::Presenter> &&presenter)
-        : AppWindow(app, gui::window::name::relaxationPaused), presenter{std::move(presenter)}
+        : AppWindow(app, window::name::relaxationPaused), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);
         buildInterface();
@@ -38,26 +26,38 @@ namespace gui
 
     void RelaxationPausedWindow::buildInterface()
     {
+        using namespace gui::relaxationStyle;
+
         AppWindow::buildInterface();
-
         statusBar->setVisible(false);
-        auto body = new gui::BellBaseLayout(this,
-                                            0,
-                                            0,
-                                            style::bell_base_layout::w,
-                                            style::bell_base_layout::h,
-                                            BellBaseLayout::LayoutType::WithoutArrows);
-        auto vBox =
-            new VBox(body->getCenterBox(), 0, 0, style::bell_base_layout::w, style::bell_base_layout::center_layout_h);
-        vBox->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        vBox->setEdges(gui::RectangleEdge::None);
 
-        new gui::Image(vBox, "big_pause_W_G");
+        auto mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
+        mainVBox->setEdges(rectangle_enums::RectangleEdge::None);
 
-        time = createClock(body->firstBox);
+        clock = new BellStatusClock(mainVBox);
+        clock->setMaximumSize(relStyle::clock::maxSizeX, relStyle::clock::maxSizeY);
+        clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        clock->setMargins(Margins(0, relStyle::clock::marginTop, 0, 0));
 
-        vBox->resizeItems();
-        body->resizeItems();
+        auto imageVBox = new VBox(mainVBox);
+        imageVBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        imageVBox->setEdges(RectangleEdge::None);
+        imageVBox->setMargins(Margins(0, relStyle::pauseIcon::marginTop, 0, 0));
+        imageVBox->setMinimumSize(relStyle::pauseIcon::minSizeX, relStyle::pauseIcon::loopMinSizeY);
+        new Image(imageVBox, relStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
+        imageVBox->resizeItems();
+
+        auto relaxationText = new TextFixedSize(mainVBox);
+        relaxationText->setMaximumSize(relStyle::bottomDescription::maxSizeX, relStyle::bottomDescription::maxSizeY);
+        relaxationText->setFont(relStyle::bottomDescription::font);
+        relaxationText->setMargins(Margins(0, relStyle::bottomDescription::pausedMarginTop, 0, 0));
+        relaxationText->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        relaxationText->setText(utils::translate("app_bellmain_relaxation"));
+        relaxationText->drawUnderline(false);
+        relaxationText->setVisible(true);
+        relaxationText->activeItem = false;
+
+        mainVBox->resizeItems();
     }
 
     bool RelaxationPausedWindow::onInput(const InputEvent &inputEvent)
@@ -68,7 +68,7 @@ namespace gui
         }
 
         if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
-            application->switchWindow(gui::name::window::main_window);
+            application->switchWindow(name::window::main_window);
             return true;
         }
         return AppWindow::onInput(inputEvent);
@@ -76,13 +76,13 @@ namespace gui
 
     void RelaxationPausedWindow::setTime(std::time_t newTime)
     {
-        time->setTime(newTime);
-        time->setTimeFormatSpinnerVisibility(true);
+        clock->setTime(newTime);
+        clock->setTimeFormatSpinnerVisibility(true);
     }
 
     void RelaxationPausedWindow::setTimeFormat(utils::time::Locale::TimeFormat fmt)
     {
-        time->setTimeFormat(fmt);
+        clock->setTimeFormat(fmt);
     }
 
     RefreshModes RelaxationPausedWindow::updateTime()

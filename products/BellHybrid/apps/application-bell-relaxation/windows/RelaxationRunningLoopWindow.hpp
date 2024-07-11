@@ -12,8 +12,8 @@
 
 namespace gui
 {
-    class HBarGraph;
-    class Text;
+    class TextFixedSize;
+
     class RelaxationRunningLoopWindow : public AppWindow, public app::relaxation::RelaxationRunningLoopContract::View
     {
       public:
@@ -25,10 +25,11 @@ namespace gui
         std::unique_ptr<app::relaxation::RelaxationRunningLoopContract::Presenter> presenter;
         std::unique_ptr<RelaxationAudioContext> audioContext;
 
-        gui::Text *title           = nullptr;
-        gui::Text *bottomText      = nullptr;
-        gui::BellStatusClock *time = nullptr;
-        gui::BellBattery *battery  = nullptr;
+        BellStatusClock *clock{nullptr};
+        TextFixedSize *titleText{nullptr};
+        TextFixedSize *loopedText{nullptr};
+        TextFixedSize *relaxationText{nullptr};
+        BellBattery *battery{nullptr};
 
         void buildInterface() override;
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
