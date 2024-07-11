@@ -58,7 +58,7 @@ namespace app::meditationStyle
 
         namespace timer
         {
-            inline constexpr auto marginTop = 24U;
+            inline constexpr auto marginTop = 4U;
             inline constexpr auto maxSizeX  = runningStyle::timer::maxSizeX;
             inline constexpr auto maxSizeY  = runningStyle::timer::maxSizeY;
         } // namespace timer
@@ -70,6 +70,14 @@ namespace app::meditationStyle
             inline constexpr auto maxSizeX  = 380U;
             inline constexpr auto maxSizeY  = 102U;
         } // namespace description
+
+        namespace bottomDescription
+        {
+            inline constexpr auto marginTop = runningStyle::bottomDescription::marginTop;
+            inline constexpr auto maxSizeX  = runningStyle::bottomDescription::maxSizeX;
+            inline constexpr auto maxSizeY  = runningStyle::bottomDescription::maxSizeY;
+            inline constexpr auto font      = runningStyle::bottomDescription::font;
+        } // namespace bottomDescription
     }     // namespace countdownStyle
 
     namespace timerStyle

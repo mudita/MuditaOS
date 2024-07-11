@@ -67,17 +67,29 @@ namespace gui
         description->setMaximumSize(countdownStyle::description::maxSizeX, countdownStyle::description::maxSizeY);
         description->setFont(countdownStyle::description::font);
         description->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        description->setMargins(gui::Margins(0, countdownStyle::description::marginTop, 0, 0));
+        description->setMargins(Margins(0, countdownStyle::description::marginTop, 0, 0));
 
-        timer = new gui::TimeMinuteSecondWidget(mainVBox,
-                                                0,
-                                                0,
-                                                countdownStyle::timer::maxSizeX,
-                                                countdownStyle::timer::maxSizeY,
-                                                gui::TimeMinuteSecondWidget::DisplayType::OnlySeconds);
+        timer = new TimeMinuteSecondWidget(mainVBox,
+                                           0,
+                                           0,
+                                           countdownStyle::timer::maxSizeX,
+                                           countdownStyle::timer::maxSizeY,
+                                           TimeMinuteSecondWidget::DisplayType::OnlySeconds);
         timer->setMinimumSize(countdownStyle::timer::maxSizeX, countdownStyle::timer::maxSizeY);
-        timer->setMargins(gui::Margins(0, countdownStyle::timer::marginTop, 0, 0));
+        timer->setMargins(Margins(0, countdownStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+
+        bottomDescription = new TextFixedSize(
+            mainVBox, 0, 0, countdownStyle::bottomDescription::maxSizeX, countdownStyle::bottomDescription::maxSizeY);
+        bottomDescription->setMaximumSize(countdownStyle::bottomDescription::maxSizeX,
+                                          countdownStyle::bottomDescription::maxSizeY);
+        bottomDescription->setFont(countdownStyle::bottomDescription::font);
+        bottomDescription->setMargins(Margins(0, 0, 0, 0));
+        bottomDescription->activeItem = false;
+        bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        bottomDescription->setRichText(utils::translate("app_bellmain_meditation_timer"));
+        bottomDescription->drawUnderline(false);
+        bottomDescription->setVisible(true);
 
         mainVBox->resizeItems();
     }
