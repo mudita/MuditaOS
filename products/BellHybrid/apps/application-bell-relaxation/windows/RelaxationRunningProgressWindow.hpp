@@ -29,8 +29,8 @@ namespace gui
         VBox *mainVBox{nullptr};
         ArcProgressBar *progress{nullptr};
         TimeMinuteSecondWidget *timer{nullptr};
-        gui::TextFixedSize *bottomDescription{nullptr};
-        Icon *icon{nullptr};
+        TextFixedSize *bottomDescription{nullptr};
+        VBox *pauseBox{nullptr};
         BellStatusClock *clock{nullptr};
 
         void setTime(std::time_t newTime) override;
