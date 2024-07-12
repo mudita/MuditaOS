@@ -32,7 +32,7 @@ namespace gui
         statusBar->setVisible(false);
 
         auto mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
-        mainVBox->setEdges(rectangle_enums::RectangleEdge::None);
+        mainVBox->setEdges(RectangleEdge::None);
 
         clock = new BellStatusClock(mainVBox);
         clock->setMaximumSize(relStyle::clock::maxSizeX, relStyle::clock::maxSizeY);

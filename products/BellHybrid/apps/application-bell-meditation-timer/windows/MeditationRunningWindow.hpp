@@ -3,18 +3,17 @@
 
 #pragma once
 
+#include "MeditationProgressPresenter.hpp"
+
 #include <Application.hpp>
 #include <AppWindow.hpp>
-#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
-
-#include "MeditationProgressPresenter.hpp"
 
 namespace gui
 {
     class ArcProgressBar;
     class BellStatusClock;
     class Icon;
-    class TimeFixedWidget;
+    class TimeMinuteSecondWidget;
 
     class MeditationRunningWindow : public AppWindow, public app::meditation::MeditationProgressContract::View
     {
@@ -36,9 +35,9 @@ namespace gui
         VBox *mainVBox{nullptr};
         ArcProgressBar *progress{nullptr};
         TimeMinuteSecondWidget *timer{nullptr};
-        gui::TextFixedSize *bottomDescription{nullptr};
+        TextFixedSize *bottomDescription{nullptr};
         Icon *icon{nullptr};
-        gui::BellStatusClock *clock{nullptr};
+        BellStatusClock *clock{nullptr};
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;

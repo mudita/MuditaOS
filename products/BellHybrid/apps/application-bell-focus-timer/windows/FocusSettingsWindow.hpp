@@ -32,7 +32,7 @@ namespace app::focus
       private:
         void switchToExitWindow();
 
-        gui::SideListView *sideListView{};
+        gui::SideListView *sideListView{nullptr};
         std::unique_ptr<SettingsContract::Presenter> presenter;
         bool isSaveNeeded{false};
     };

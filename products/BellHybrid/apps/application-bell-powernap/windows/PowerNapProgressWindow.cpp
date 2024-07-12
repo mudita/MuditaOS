@@ -61,6 +61,7 @@ namespace gui
         progress->setMaximum(arcProgressSteps);
 
         mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
+        mainVBox->setEdges(RectangleEdge::None);
 
         clock = new BellStatusClock(mainVBox);
         clock->setMaximumSize(progressStyle::clock::maxSizeX, progressStyle::clock::maxSizeY);

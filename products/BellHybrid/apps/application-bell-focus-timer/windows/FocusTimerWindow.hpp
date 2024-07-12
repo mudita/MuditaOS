@@ -6,25 +6,30 @@
 #include "data/FocusCommon.hpp"
 #include "presenter/FocusTimerPresenter.hpp"
 
-#include <Text.hpp>
-#include <apps-common/widgets/BarGraph.hpp>
-#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
-#include <common/widgets/BellStatusClock.hpp>
-#include <gui/widgets/Icon.hpp>
 #include <apps-common/windows/AppWindow.hpp>
+
+namespace gui
+{
+    class ArcProgressBar;
+    class TimeMinuteSecondWidget;
+    class Icon;
+    class BellStatusClock;
+} // namespace gui
 
 namespace app::focus
 {
-    class FocusTimerWindow : public gui::AppWindow, public FocusTimerContract::View
+    using namespace gui;
+
+    class FocusTimerWindow : public AppWindow, public FocusTimerContract::View
     {
       public:
         FocusTimerWindow(app::ApplicationCommon *app,
                          std::unique_ptr<FocusTimerContract::Presenter> &&windowPresenter,
                          const std::string &name = window::name::timer);
 
-        void onBeforeShow(gui::ShowMode mode, gui::SwitchData *data) override;
+        void onBeforeShow(ShowMode mode, SwitchData *data) override;
         void buildInterface() override;
-        bool onInput(const gui::InputEvent &inputEvent) override;
+        bool onInput(const InputEvent &inputEvent) override;
         void showFocusSessionCountdown() override;
         void showShortBreakCountdown() override;
         void showLongBreakCountdown() override;
@@ -36,17 +41,17 @@ namespace app::focus
 
       private:
         std::unique_ptr<FocusTimerContract::Presenter> presenter;
-        gui::VBox *mainVBox{nullptr};
-        gui::ArcProgressBar *progress{nullptr};
-        gui::TimeMinuteSecondWidget *timer{nullptr};
-        gui::TextFixedSize *bottomDescription{nullptr};
-        gui::Icon *iconPause{nullptr};
-        gui::Icon *iconRing{nullptr};
-        gui::BellStatusClock *clock{nullptr};
+        VBox *mainVBox{nullptr};
+        ArcProgressBar *progress{nullptr};
+        TimeMinuteSecondWidget *timer{nullptr};
+        TextFixedSize *bottomDescription{nullptr};
+        Icon *iconPause{nullptr};
+        Icon *iconRing{nullptr};
+        BellStatusClock *clock{nullptr};
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
-        gui::RefreshModes updateTime() override;
+        RefreshModes updateTime() override;
 
         void buildLayout();
         void configureTimer();

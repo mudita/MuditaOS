@@ -30,11 +30,11 @@ namespace app::focus
 
     std::list<Option> FocusMainWindow::settingsOptionsList()
     {
-        using ActivatedCallback = std::function<bool(gui::Item &)>;
+        using ActivatedCallback = std::function<bool(Item &)>;
         using Callback          = std::function<ActivatedCallback(const std::string &window)>;
 
         auto defaultCallback = [this](const std::string &window) {
-            return [window, this](gui::Item &) {
+            return [window, this](Item &) {
                 if (window.empty()) {
                     return false;
                 }
@@ -50,7 +50,7 @@ namespace app::focus
                 }
                 application->switchWindow(window);
             };
-            return [window, this](gui::Item &) {
+            return [window, this](Item &) {
                 const auto batteryState = presenter->getBatteryState();
                 const auto soc          = batteryState.level;
                 const auto isCharging   = presenter->isBatteryCharging(batteryState.state);
@@ -69,12 +69,12 @@ namespace app::focus
             };
         };
 
-        std::list<gui::Option> settingsOptionList;
+        std::list<Option> settingsOptionList;
         auto addWinSettings = [&](const UTF8 &name, const std::string &window, Callback &&callback) {
-            settingsOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
+            settingsOptionList.emplace_back(std::make_unique<option::OptionBellMenu>(
                 name,
                 callback(window),
-                [=](gui::Item &item) {
+                [=](Item &item) {
                     // put focus change callback here
                     return true;
                 },

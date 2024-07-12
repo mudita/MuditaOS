@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "StatisticsWindow.hpp"
@@ -17,7 +17,7 @@ namespace app::meditation
         InputEvent newEvent{inputEvent};
 
         if (inputEvent.is(KeyCode::KEY_UP)) {
-            newEvent.setKeyCode(gui::KeyCode::KEY_ENTER);
+            newEvent.setKeyCode(KeyCode::KEY_ENTER);
         }
 
         if (inputEvent.is(KeyCode::KEY_DOWN)) {
@@ -27,7 +27,7 @@ namespace app::meditation
         return newEvent;
     }
 
-    bool filterInputEvents(const gui::InputEvent &inputEvent)
+    bool filterInputEvents(const InputEvent &inputEvent)
     {
         return inputEvent.isShortRelease(KeyCode::KEY_ENTER);
     }
@@ -53,22 +53,22 @@ namespace app::meditation
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        sideListView = new gui::SideListView(
-            this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider(), PageBarType::None);
+        sideListView =
+            new SideListView(this, 0U, 0U, getWidth(), getHeight(), presenter->getPagesProvider(), PageBarType::None);
         sideListView->setEdges(RectangleEdge::None);
-        sideListView->setBoundaries(gui::Boundaries::Continuous);
+        sideListView->setBoundaries(Boundaries::Continuous);
 
         sideListView->rebuildList(listview::RebuildType::Full);
 
         setFocusItem(sideListView);
     }
 
-    void StatisticsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    void StatisticsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         setFocusItem(sideListView);
     }
 
-    bool StatisticsWindow::onInput(const gui::InputEvent &inputEvent)
+    bool StatisticsWindow::onInput(const InputEvent &inputEvent)
     {
         if (filterInputEvents(inputEvent)) {
             return true;

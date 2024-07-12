@@ -1,15 +1,17 @@
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
-#include <Arc.hpp>
-
 #include "MeditationTimer.hpp"
 #include "MeditationCommon.hpp"
 #include "MeditationCountdownWindow.hpp"
 #include "MeditationStyle.hpp"
 
-#include <keymap/KeyMap.hpp>
+#include <Arc.hpp>
+#include <Text.hpp>
+#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
+
+#include <keymap/KeyMap.hpp>
 
 namespace
 {
@@ -61,6 +63,7 @@ namespace gui
         progress = new Arc(this, arcParams);
 
         mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
+        mainVBox->setEdges(RectangleEdge::None);
 
         description = new Text(mainVBox, 0, 0, 0, 0);
         description->setText(utils::translate("app_meditation_countdown_desc"));
