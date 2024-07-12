@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapSessionEndedWindow.hpp"
@@ -24,7 +24,9 @@ namespace gui
     void PowerNapSessionEndedWindow::buildLayout()
     {
         statusBar->setVisible(false);
+
         auto body = new VBox(this, 0, 0, style::window_width, style::window_height);
+        body->setEdges(RectangleEdge::None);
         body->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         auto icon =

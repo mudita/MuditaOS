@@ -5,10 +5,12 @@
 #include <data/FocusTimerStyle.hpp>
 
 #include <Application.hpp>
-#include <apps-common/widgets/BellBaseLayout.hpp>
-#include <apps-common/ApplicationCommon.hpp>
+
+#include <gui/widgets/Icon.hpp>
+#include <common/widgets/BellStatusClock.hpp>
+#include <apps-common/widgets/BarGraph.hpp>
+#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
-#include <module-gui/gui/input/InputEvent.hpp>
 
 namespace
 {
@@ -19,6 +21,8 @@ namespace
 
 namespace app::focus
 {
+    using namespace gui;
+
     FocusTimerWindow::FocusTimerWindow(app::ApplicationCommon *app,
                                        std::unique_ptr<FocusTimerContract::Presenter> &&windowPresenter,
                                        const std::string &name)
@@ -50,60 +54,60 @@ namespace app::focus
         const auto arcSweepAngle    = 360 - (2 * runningStyle::progress::verticalDeviationDegrees);
         const auto arcProgressSteps = 1000;
 
-        gui::Arc::ShapeParams arcParams;
-        arcParams.setCenterPoint(gui::Point(getWidth() / 2, getHeight() / 2))
+        Arc::ShapeParams arcParams;
+        arcParams.setCenterPoint(Point(getWidth() / 2, getHeight() / 2))
             .setRadius(progressArcRadius)
             .setStartAngle(arcStartAngle)
             .setSweepAngle(arcSweepAngle)
             .setPenWidth(progressArcWidth)
-            .setBorderColor(gui::ColorFullBlack);
+            .setBorderColor(ColorFullBlack);
 
-        progress = new gui::ArcProgressBar(this,
-                                           arcParams,
-                                           gui::ArcProgressBar::ProgressDirection::CounterClockwise,
-                                           gui::ArcProgressBar::ProgressChange::DecrementFromFull);
+        progress = new ArcProgressBar(this,
+                                      arcParams,
+                                      ArcProgressBar::ProgressDirection::CounterClockwise,
+                                      ArcProgressBar::ProgressChange::DecrementFromFull);
         progress->setMaximum(arcProgressSteps);
 
-        mainVBox = new gui::VBox(this, 0, 0, style::window_width, style::window_height);
+        mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
+        mainVBox->setEdges(RectangleEdge::None);
 
-        clock = new gui::BellStatusClock(mainVBox);
+        clock = new BellStatusClock(mainVBox);
         clock->setMaximumSize(runningStyle::clock::maxSizeX, runningStyle::clock::maxSizeY);
-        clock->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
-        clock->setMargins(gui::Margins(0, runningStyle::clock::marginTop, 0, 0));
+        clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        clock->setMargins(Margins(0, runningStyle::clock::marginTop, 0, 0));
 
-        timer = new gui::TimeMinuteSecondWidget(mainVBox,
-                                                0,
-                                                0,
-                                                runningStyle::timer::maxSizeX,
-                                                runningStyle::timer::maxSizeY,
-                                                gui::TimeMinuteSecondWidget::DisplayType::MinutesThenSeconds);
+        timer = new TimeMinuteSecondWidget(mainVBox,
+                                           0,
+                                           0,
+                                           runningStyle::timer::maxSizeX,
+                                           runningStyle::timer::maxSizeY,
+                                           TimeMinuteSecondWidget::DisplayType::MinutesThenSeconds);
         timer->setMinimumSize(runningStyle::timer::maxSizeX, runningStyle::timer::maxSizeY);
-        timer->setMargins(gui::Margins(0, runningStyle::timer::marginTop, 0, 0));
-        timer->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        timer->setMargins(Margins(0, runningStyle::timer::marginTop, 0, 0));
+        timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        iconPause = new gui::Icon(mainVBox, 0, 0, 0, 0, {}, {});
+        iconPause = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
         iconPause->setMinimumSize(runningStyle::pauseIcon::maxSizeX, runningStyle::pauseIcon::maxSizeY);
-        iconPause->setMargins(gui::Margins(0, runningStyle::pauseIcon::marginTop, 0, 0));
-        iconPause->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        iconPause->image->set(runningStyle::pauseIcon::image, gui::ImageTypeSpecifier::W_G);
+        iconPause->setMargins(Margins(0, runningStyle::pauseIcon::marginTop, 0, 0));
+        iconPause->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        iconPause->image->set(runningStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
         iconPause->setVisible(false);
 
-        iconRing = new gui::Icon(mainVBox, 0, 0, 0, 0, {}, {});
+        iconRing = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
         iconRing->setMinimumSize(runningStyle::ringIcon::maxSizeX, runningStyle::ringIcon::maxSizeY);
-        iconRing->setMargins(gui::Margins(0, runningStyle::ringIcon::marginTop, 0, 0));
-        iconRing->setAlignment(gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        iconRing->image->set(runningStyle::ringIcon::image, gui::ImageTypeSpecifier::W_G);
+        iconRing->setMargins(Margins(0, runningStyle::ringIcon::marginTop, 0, 0));
+        iconRing->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        iconRing->image->set(runningStyle::ringIcon::image, ImageTypeSpecifier::W_G);
         iconRing->setVisible(false);
 
-        bottomDescription = new gui::TextFixedSize(
+        bottomDescription = new TextFixedSize(
             mainVBox, 0, 0, runningStyle::bottomDescription::maxSizeX, runningStyle::bottomDescription::maxSizeY);
         bottomDescription->setMaximumSize(runningStyle::bottomDescription::maxSizeX,
                                           runningStyle::bottomDescription::maxSizeY);
         bottomDescription->setFont(runningStyle::bottomDescription::font);
-        bottomDescription->setMargins(gui::Margins(0, 0, 0, 0));
+        bottomDescription->setMargins(Margins(0, 0, 0, 0));
         bottomDescription->activeItem = false;
-        bottomDescription->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         bottomDescription->setRichText(utils::translate("app_bell_focus_time"));
         bottomDescription->drawUnderline(false);
         bottomDescription->setVisible(true);
@@ -111,20 +115,20 @@ namespace app::focus
         mainVBox->resizeItems();
     }
 
-    void FocusTimerWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    void FocusTimerWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         AppWindow::onBeforeShow(mode, data);
         presenter->onBeforeShow();
         updateTime();
-        if (mode == gui::ShowMode::GUI_SHOW_INIT) {
+        if (mode == ShowMode::GUI_SHOW_INIT) {
             presenter->playGong();
             presenter->start();
         }
     }
 
-    bool FocusTimerWindow::onInput(const gui::InputEvent &inputEvent)
+    bool FocusTimerWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             if (presenter->isAllSessionsFinished()) {
                 presenter->finish();
             }
@@ -136,7 +140,7 @@ namespace app::focus
             }
             return true;
         }
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             static_cast<app::Application *>(application)->resumeIdleTimer();
             presenter->abandon();
             return true;
@@ -244,11 +248,11 @@ namespace app::focus
         clock->setTimeFormat(fmt);
     }
 
-    gui::RefreshModes FocusTimerWindow::updateTime()
+    RefreshModes FocusTimerWindow::updateTime()
     {
         if (presenter != nullptr) {
             presenter->handleUpdateTimeEvent();
         }
-        return gui::RefreshModes::GUI_REFRESH_FAST;
+        return RefreshModes::GUI_REFRESH_FAST;
     }
 } // namespace app::focus

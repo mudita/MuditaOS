@@ -3,17 +3,16 @@
 
 #pragma once
 
+#include "MeditationCountdownPresenter.hpp"
+
 #include <Application.hpp>
 #include <AppWindow.hpp>
 #include <InputEvent.hpp>
-#include <Text.hpp>
-#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
-
-#include "MeditationCountdownPresenter.hpp"
 
 namespace gui
 {
     class Arc;
+    class TimeMinuteSecondWidget;
 
     class MeditationCountdownWindow : public AppWindow, public app::meditation::MeditationCountdownContract::View
     {
@@ -22,7 +21,6 @@ namespace gui
             app::ApplicationCommon *app,
             std::unique_ptr<app::meditation::MeditationCountdownContract::Presenter> &&windowPresenter);
 
-        // virtual methods
         void onBeforeShow(ShowMode mode, SwitchData *data) override;
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;

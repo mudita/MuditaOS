@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationMainWindow.hpp"
@@ -14,8 +14,9 @@
 namespace app::meditation
 {
     using namespace gui;
+
     MeditationMainWindow::MeditationMainWindow(app::ApplicationCommon *app)
-        : BellOptionWindow(app, gui::name::window::main_window)
+        : BellOptionWindow(app, name::window::main_window)
     {
         addOptions(settingsOptionsList());
         setListTitle(utils::translate("app_bell_meditation_timer"));
@@ -23,11 +24,11 @@ namespace app::meditation
 
     std::list<Option> MeditationMainWindow::settingsOptionsList()
     {
-        using ActivatedCallback = std::function<bool(gui::Item &)>;
+        using ActivatedCallback = std::function<bool(Item &)>;
         using Callback          = std::function<ActivatedCallback(const std::string &window)>;
 
         auto defaultCallback = [this](const std::string &window) {
-            return [window, this](gui::Item &) {
+            return [window, this](Item &) {
                 if (window.empty()) {
                     return false;
                 }
@@ -36,12 +37,12 @@ namespace app::meditation
             };
         };
 
-        std::list<gui::Option> settingsOptionList;
+        std::list<Option> settingsOptionList;
         auto addWinSettings = [&](const UTF8 &name, const std::string &window, Callback &&callback) {
-            settingsOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
+            settingsOptionList.emplace_back(std::make_unique<option::OptionBellMenu>(
                 name,
                 callback(window),
-                [=](gui::Item &item) {
+                [=](Item &item) {
                     // put focus change callback here
                     return true;
                 },

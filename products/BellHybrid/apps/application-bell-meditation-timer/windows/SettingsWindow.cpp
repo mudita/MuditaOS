@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "MeditationMainWindow.hpp"
@@ -13,6 +13,7 @@
 namespace app::meditation
 {
     using namespace gui;
+
     SettingsWindow::SettingsWindow(app::ApplicationCommon *app,
                                    std::unique_ptr<app::meditation::contract::Presenter> presenter)
         : AppWindow(app, name), presenter{std::move(presenter)}
@@ -35,8 +36,8 @@ namespace app::meditation
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        sideListView = new gui::SideListView(
-            this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider(), PageBarType::None);
+        sideListView =
+            new SideListView(this, 0U, 0U, getWidth(), getHeight(), presenter->getPagesProvider(), PageBarType::None);
         sideListView->setEdges(RectangleEdge::None);
 
         sideListView->rebuildList(listview::RebuildType::Full);
@@ -44,13 +45,13 @@ namespace app::meditation
         presenter->loadData();
     }
 
-    void SettingsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    void SettingsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         AppWindow::onBeforeShow(mode, data);
         setFocusItem(sideListView);
     }
 
-    bool SettingsWindow::onInput(const gui::InputEvent &inputEvent)
+    bool SettingsWindow::onInput(const InputEvent &inputEvent)
     {
         if (sideListView->onInput(inputEvent)) {
             return true;

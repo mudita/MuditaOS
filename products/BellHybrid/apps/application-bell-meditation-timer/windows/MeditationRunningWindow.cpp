@@ -6,11 +6,11 @@
 #include "MeditationRunningWindow.hpp"
 #include "MeditationStyle.hpp"
 
-#include <apps-common/widgets/BellBaseLayout.hpp>
-#include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
-#include <apps-common/widgets/BarGraph.hpp>
-#include <common/widgets/BellStatusClock.hpp>
 #include <gui/widgets/Icon.hpp>
+#include <common/widgets/BellStatusClock.hpp>
+#include <apps-common/widgets/BarGraph.hpp>
+#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
+#include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
 
 namespace
 {
@@ -67,38 +67,38 @@ namespace gui
         progress->setMaximum(arcProgressSteps);
 
         mainVBox = new VBox(this, 0, 0, style::window_width, style::window_height);
+        mainVBox->setEdges(RectangleEdge::None);
 
         clock = new BellStatusClock(mainVBox);
         clock->setMaximumSize(runningStyle::clock::maxSizeX, runningStyle::clock::maxSizeY);
         clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        clock->setMargins(gui::Margins(0, runningStyle::clock::marginTop, 0, 0));
+        clock->setMargins(Margins(0, runningStyle::clock::marginTop, 0, 0));
 
-        timer = new gui::TimeMinuteSecondWidget(mainVBox,
-                                                0,
-                                                0,
-                                                runningStyle::timer::maxSizeX,
-                                                runningStyle::timer::maxSizeY,
-                                                gui::TimeMinuteSecondWidget::DisplayType::OnlyMinutes);
+        timer = new TimeMinuteSecondWidget(mainVBox,
+                                           0,
+                                           0,
+                                           runningStyle::timer::maxSizeX,
+                                           runningStyle::timer::maxSizeY,
+                                           TimeMinuteSecondWidget::DisplayType::OnlyMinutes);
         timer->setMinimumSize(runningStyle::timer::maxSizeX, runningStyle::timer::maxSizeY);
-        timer->setMargins(gui::Margins(0, runningStyle::timer::marginTop, 0, 0));
+        timer->setMargins(Margins(0, runningStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
         icon = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
         icon->setMinimumSize(runningStyle::pauseIcon::maxSizeX, runningStyle::pauseIcon::maxSizeY);
-        icon->setMargins(gui::Margins(0, runningStyle::pauseIcon::marginTop, 0, 0));
+        icon->setMargins(Margins(0, runningStyle::pauseIcon::marginTop, 0, 0));
         icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         icon->image->set(runningStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
         icon->setVisible(false);
 
-        bottomDescription = new gui::TextFixedSize(
+        bottomDescription = new TextFixedSize(
             mainVBox, 0, 0, runningStyle::bottomDescription::maxSizeX, runningStyle::bottomDescription::maxSizeY);
         bottomDescription->setMaximumSize(runningStyle::bottomDescription::maxSizeX,
                                           runningStyle::bottomDescription::maxSizeY);
         bottomDescription->setFont(runningStyle::bottomDescription::font);
-        bottomDescription->setMargins(gui::Margins(0, 0, 0, 0));
+        bottomDescription->setMargins(Margins(0, 0, 0, 0));
         bottomDescription->activeItem = false;
-        bottomDescription->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
+        bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         bottomDescription->setRichText(utils::translate("app_bellmain_meditation_timer"));
         bottomDescription->drawUnderline(false);
         bottomDescription->setVisible(true);
@@ -120,7 +120,7 @@ namespace gui
 
     bool MeditationRunningWindow::onInput(const InputEvent &inputEvent)
     {
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             if (presenter->isTimerStopped()) {
                 presenter->resume();
             }
@@ -129,7 +129,7 @@ namespace gui
             }
             return true;
         }
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_RF)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_RF)) {
             static_cast<app::Application *>(application)->resumeIdleTimer();
             presenter->abandon();
             return true;

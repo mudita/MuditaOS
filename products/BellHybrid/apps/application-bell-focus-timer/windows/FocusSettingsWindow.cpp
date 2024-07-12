@@ -12,6 +12,7 @@
 namespace app::focus
 {
     using namespace gui;
+
     SettingsWindow::SettingsWindow(app::ApplicationCommon *app,
                                    std::unique_ptr<SettingsContract::Presenter> presenter,
                                    const std::string &name)
@@ -35,7 +36,7 @@ namespace app::focus
         header->setTitleVisibility(false);
         navBar->setVisible(false);
 
-        sideListView = new gui::SideListView(
+        sideListView = new SideListView(
             this, 0U, 0U, this->getWidth(), this->getHeight(), presenter->getPagesProvider(), PageBarType::None);
         sideListView->setEdges(RectangleEdge::None);
 
@@ -44,13 +45,13 @@ namespace app::focus
         presenter->loadData();
     }
 
-    void SettingsWindow::onBeforeShow(gui::ShowMode mode, gui::SwitchData *data)
+    void SettingsWindow::onBeforeShow(ShowMode mode, SwitchData *data)
     {
         AppWindow::onBeforeShow(mode, data);
         setFocusItem(sideListView);
     }
 
-    bool SettingsWindow::onInput(const gui::InputEvent &inputEvent)
+    bool SettingsWindow::onInput(const InputEvent &inputEvent)
     {
         if (sideListView->onInput(inputEvent)) {
             return true;

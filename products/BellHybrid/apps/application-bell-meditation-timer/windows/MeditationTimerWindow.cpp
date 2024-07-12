@@ -6,9 +6,12 @@
 #include "MeditationStyle.hpp"
 #include "MeditationTimerWindow.hpp"
 
+#include <widgets/BellBaseLayout.hpp>
+
 namespace app::meditation
 {
     using namespace gui;
+
     MeditationTimerWindow::MeditationTimerWindow(
         app::ApplicationCommon *app,
         std::unique_ptr<app::meditation::MeditationTimerContract::Presenter> &&windowPresenter)
@@ -33,15 +36,15 @@ namespace app::meditation
         auto topMessage = new TextFixedSize(body->firstBox);
         topMessage->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::outer_layouts_h);
         topMessage->setFont(style::window::font::largelight);
-        topMessage->setEdges(gui::RectangleEdge::None);
+        topMessage->setEdges(RectangleEdge::None);
         topMessage->activeItem = false;
-        topMessage->setAlignment(Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Center));
+        topMessage->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         topMessage->setText(utils::translate("app_bell_meditation_timer"));
         topMessage->drawUnderline(false);
 
         spinner = new U8IntegerSpinner(
             U8IntegerSpinner::range{presenter->getMinValue(), presenter->getMaxValue(), presenter->getStepValue()},
-            gui::Boundaries::Fixed);
+            Boundaries::Fixed);
         spinner->onValueChanged = [this](const auto val) { this->onValueChanged(val); };
         spinner->setMaximumSize(style::bell_base_layout::w, style::bell_base_layout::h);
         spinner->setFont(timerStyle::text::font);
@@ -67,13 +70,13 @@ namespace app::meditation
         body->resize();
     }
 
-    bool MeditationTimerWindow::onInput(const gui::InputEvent &inputEvent)
+    bool MeditationTimerWindow::onInput(const InputEvent &inputEvent)
     {
         if (spinner->onInput(inputEvent)) {
             return true;
         }
 
-        if (inputEvent.isShortRelease(gui::KeyCode::KEY_ENTER)) {
+        if (inputEvent.isShortRelease(KeyCode::KEY_ENTER)) {
             presenter->activate(spinner->value());
             return true;
         }

@@ -32,7 +32,6 @@ namespace
             constexpr auto height = 146U;
             constexpr auto width  = 448U;
         } // namespace text
-
     } // namespace container
 } // namespace
 
@@ -52,6 +51,7 @@ namespace gui
     void ShortcutsLayoutClassic::buildInterface()
     {
         setAlignment(Alignment::Horizontal::Center);
+        setEdges(RectangleEdge::None);
 
         auto containerThreeBox = new HThreeBox<HBox, HBox, HBox>(this);
         containerThreeBox->setMinimumSize(container::width, container::image::height);
@@ -121,4 +121,4 @@ namespace gui
     {
         return this;
     }
-}; // namespace gui
+} // namespace gui

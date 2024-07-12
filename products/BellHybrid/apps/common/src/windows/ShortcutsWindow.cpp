@@ -1,8 +1,9 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "windows/ShortcutsWindow.hpp"
 
+#include <ApplicationCommon.hpp>
 #include <Style.hpp>
 #include <SideListView.hpp>
 #include <gui/input/InputEvent.hpp>
@@ -34,9 +35,7 @@ namespace gui
         auto selectedLayout = presenter->getFirstLayout();
         spinner->setCurrentValue(selectedLayout);
 
-        spinner->onValueChanged = [this](const auto &) {
-            getApplication()->render(gui::RefreshModes::GUI_REFRESH_DEEP);
-        };
+        spinner->onValueChanged = [this](const auto &) { getApplication()->render(RefreshModes::GUI_REFRESH_DEEP); };
 
         setFocusItem(spinner);
     }
@@ -47,7 +46,7 @@ namespace gui
         return presenter->isOneOfTwoLastLayouts(currentLayout);
     }
 
-    bool ShortcutsWindow::onInput(const gui::InputEvent &inputEvent)
+    bool ShortcutsWindow::onInput(const InputEvent &inputEvent)
     {
         if (spinner->onInput(inputEvent)) {
             return true;
@@ -59,5 +58,4 @@ namespace gui
 
         return AppWindow::onInput(inputEvent);
     }
-
 } // namespace gui
