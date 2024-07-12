@@ -94,7 +94,7 @@ namespace gui
             descriptionBody->setRichText(title, std::move(tokenMap.value()));
         }
         else {
-            descriptionBody->setText(title);
+            descriptionBody->setRichText(title);
         }
 
         body->centerBox->setMargins(gui::Margins{0, top_center_margin, 0, 0});
