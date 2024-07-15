@@ -6,7 +6,6 @@
 
 #include <Application.hpp>
 
-#include <gui/widgets/Icon.hpp>
 #include <common/widgets/BellStatusClock.hpp>
 #include <apps-common/widgets/BarGraph.hpp>
 #include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
@@ -86,19 +85,23 @@ namespace app::focus
         timer->setMargins(Margins(0, runningStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        iconPause = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
-        iconPause->setMinimumSize(runningStyle::pauseIcon::maxSizeX, runningStyle::pauseIcon::maxSizeY);
-        iconPause->setMargins(Margins(0, runningStyle::pauseIcon::marginTop, 0, 0));
-        iconPause->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        iconPause->image->set(runningStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
-        iconPause->setVisible(false);
+        pauseBox = new VBox(mainVBox);
+        pauseBox->setMinimumSize(runningStyle::pauseIcon::minSizeX, runningStyle::pauseIcon::minSizeY);
+        pauseBox->setMargins(Margins(0, runningStyle::pauseIcon::marginTop, 0, 0));
+        pauseBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        pauseBox->setEdges(RectangleEdge::None);
+        new Image(pauseBox, runningStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
+        pauseBox->setVisible(false);
+        pauseBox->resizeItems();
 
-        iconRing = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
-        iconRing->setMinimumSize(runningStyle::ringIcon::maxSizeX, runningStyle::ringIcon::maxSizeY);
-        iconRing->setMargins(Margins(0, runningStyle::ringIcon::marginTop, 0, 0));
-        iconRing->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        iconRing->image->set(runningStyle::ringIcon::image, ImageTypeSpecifier::W_G);
-        iconRing->setVisible(false);
+        ringBox = new VBox(mainVBox);
+        ringBox->setMinimumSize(runningStyle::ringIcon::minSizeX, runningStyle::ringIcon::minSizeY);
+        ringBox->setMargins(Margins(0, runningStyle::ringIcon::marginTop, 0, 0));
+        ringBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        ringBox->setEdges(RectangleEdge::None);
+        new Image(ringBox, runningStyle::ringIcon::image, ImageTypeSpecifier::W_G);
+        ringBox->setVisible(false);
+        ringBox->resizeItems();
 
         bottomDescription = new TextFixedSize(
             mainVBox, 0, 0, runningStyle::bottomDescription::maxSizeX, runningStyle::bottomDescription::maxSizeY);
@@ -152,8 +155,8 @@ namespace app::focus
     void FocusTimerWindow::showEndOfAllSessionsInfo()
     {
         timer->setVisible(false);
-        iconPause->setVisible(false);
-        iconRing->setVisible(true);
+        pauseBox->setVisible(false);
+        ringBox->setVisible(true);
         bottomDescription->setVisible(true);
         bottomDescription->setText(utils::translate("app_bell_focus_well_done"));
         mainVBox->resizeItems();
@@ -163,8 +166,8 @@ namespace app::focus
     void FocusTimerWindow::showFocusSessionCountdown()
     {
         timer->setVisible(true);
-        iconPause->setVisible(false);
-        iconRing->setVisible(false);
+        pauseBox->setVisible(false);
+        ringBox->setVisible(false);
         bottomDescription->setVisible(true);
         bottomDescription->setText(utils::translate("app_bell_focus_time"));
         mainVBox->resizeItems();
@@ -173,8 +176,8 @@ namespace app::focus
     void FocusTimerWindow::showTimeForBreakInfo()
     {
         timer->setVisible(false);
-        iconPause->setVisible(false);
-        iconRing->setVisible(true);
+        pauseBox->setVisible(false);
+        ringBox->setVisible(true);
         bottomDescription->setVisible(true);
         bottomDescription->setText(utils::translate("app_bell_focus_time_for_break"));
         mainVBox->resizeItems();
@@ -184,8 +187,8 @@ namespace app::focus
     void FocusTimerWindow::showShortBreakCountdown()
     {
         timer->setVisible(true);
-        iconPause->setVisible(false);
-        iconRing->setVisible(false);
+        pauseBox->setVisible(false);
+        ringBox->setVisible(false);
         bottomDescription->setVisible(true);
         bottomDescription->setText(utils::translate("app_bell_focus_short_break"));
         mainVBox->resizeItems();
@@ -194,8 +197,8 @@ namespace app::focus
     void FocusTimerWindow::showLongBreakCountdown()
     {
         timer->setVisible(true);
-        iconPause->setVisible(false);
-        iconRing->setVisible(false);
+        pauseBox->setVisible(false);
+        ringBox->setVisible(false);
         bottomDescription->setVisible(true);
         bottomDescription->setText(utils::translate("app_bell_focus_long_break"));
         mainVBox->resizeItems();
@@ -204,8 +207,8 @@ namespace app::focus
     void FocusTimerWindow::showTimeForFocusInfo()
     {
         timer->setVisible(false);
-        iconPause->setVisible(false);
-        iconRing->setVisible(true);
+        pauseBox->setVisible(false);
+        ringBox->setVisible(true);
         bottomDescription->setVisible(true);
         bottomDescription->setText(utils::translate("app_bell_focus_time_for_focus"));
         mainVBox->resizeItems();
@@ -215,16 +218,16 @@ namespace app::focus
     void FocusTimerWindow::pause()
     {
         timer->setVisible(false);
-        iconPause->setVisible(true);
-        iconRing->setVisible(false);
+        pauseBox->setVisible(true);
+        ringBox->setVisible(false);
         mainVBox->resizeItems();
     }
 
     void FocusTimerWindow::resume()
     {
         timer->setVisible(true);
-        iconPause->setVisible(false);
-        iconRing->setVisible(false);
+        pauseBox->setVisible(false);
+        ringBox->setVisible(false);
         mainVBox->resizeItems();
     }
 

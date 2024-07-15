@@ -84,12 +84,14 @@ namespace gui
         timer->setMargins(Margins(0, runningStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        icon = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
-        icon->setMinimumSize(runningStyle::pauseIcon::maxSizeX, runningStyle::pauseIcon::maxSizeY);
-        icon->setMargins(Margins(0, runningStyle::pauseIcon::marginTop, 0, 0));
-        icon->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        icon->image->set(runningStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
-        icon->setVisible(false);
+        pauseBox = new VBox(mainVBox);
+        pauseBox->setMinimumSize(runningStyle::pauseIcon::minSizeX, runningStyle::pauseIcon::minSizeY);
+        pauseBox->setMargins(Margins(0, runningStyle::pauseIcon::marginTop, 0, 0));
+        pauseBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        pauseBox->setEdges(RectangleEdge::None);
+        new Image(pauseBox, runningStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
+        pauseBox->setVisible(false);
+        pauseBox->resizeItems();
 
         bottomDescription = new TextFixedSize(
             mainVBox, 0, 0, runningStyle::bottomDescription::maxSizeX, runningStyle::bottomDescription::maxSizeY);
@@ -99,7 +101,7 @@ namespace gui
         bottomDescription->setMargins(Margins(0, 0, 0, 0));
         bottomDescription->activeItem = false;
         bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
-        bottomDescription->setRichText(utils::translate("app_bellmain_meditation_timer"));
+        bottomDescription->setText(utils::translate("app_bellmain_meditation_timer"));
         bottomDescription->drawUnderline(false);
         bottomDescription->setVisible(true);
 
@@ -151,14 +153,14 @@ namespace gui
     void MeditationRunningWindow::pause()
     {
         timer->setVisible(false);
-        icon->setVisible(true);
+        pauseBox->setVisible(true);
         mainVBox->resizeItems();
     }
 
     void MeditationRunningWindow::resume()
     {
         timer->setVisible(true);
-        icon->setVisible(false);
+        pauseBox->setVisible(false);
         mainVBox->resizeItems();
     }
 

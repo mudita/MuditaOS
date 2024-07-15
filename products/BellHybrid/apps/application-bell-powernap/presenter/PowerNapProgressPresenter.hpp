@@ -87,8 +87,6 @@ namespace app::powernap
         auto onBeforeShow() -> void override;
 
       private:
-        static constexpr auto endWindowTimeout = std::chrono::seconds{5};
-
         app::ApplicationCommon *app{};
         settings::Settings *settings{};
         AbstractAudioModel &audioModel;

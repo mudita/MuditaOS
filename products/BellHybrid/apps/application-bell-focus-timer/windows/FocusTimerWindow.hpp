@@ -41,13 +41,14 @@ namespace app::focus
 
       private:
         std::unique_ptr<FocusTimerContract::Presenter> presenter;
+
         VBox *mainVBox{nullptr};
+        BellStatusClock *clock{nullptr};
         ArcProgressBar *progress{nullptr};
+        VBox *pauseBox{nullptr};
+        VBox *ringBox{nullptr};
         TimeMinuteSecondWidget *timer{nullptr};
         TextFixedSize *bottomDescription{nullptr};
-        Icon *iconPause{nullptr};
-        Icon *iconRing{nullptr};
-        BellStatusClock *clock{nullptr};
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;

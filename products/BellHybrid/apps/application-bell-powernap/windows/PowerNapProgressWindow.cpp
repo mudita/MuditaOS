@@ -2,10 +2,16 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "PowerNapProgressWindow.hpp"
-#include "application-bell-powernap/ApplicationBellPowerNap.hpp"
+#include "ApplicationBellPowerNap.hpp"
 #include "data/PowerNapStyle.hpp"
 #include "data/PowerNapSwitchData.hpp"
+
 #include <apps-common/widgets/ProgressTimerWithBarGraphAndCounter.hpp>
+#include <apps-common/widgets/BarGraph.hpp>
+#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
+#include <common/widgets/BellStatusClock.hpp>
+#include <gui/widgets/Icon.hpp>
+
 #include <keymap/KeyMap.hpp>
 
 namespace
@@ -19,7 +25,7 @@ namespace gui
     PowerNapProgressWindow::PowerNapProgressWindow(
         app::ApplicationCommon *app,
         std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> &&windowPresenter)
-        : AppWindow(app, gui::window::name::powerNapProgress), presenter{std::move(windowPresenter)}
+        : AppWindow(app, window::name::powerNapProgress), presenter{std::move(windowPresenter)}
     {
         presenter->attach(this);
         buildInterface();
@@ -39,7 +45,7 @@ namespace gui
 
     void PowerNapProgressWindow::buildLayout()
     {
-        using namespace gui::powerNapStyle;
+        using namespace powerNapStyle;
         const auto progressArcRadius = progressStyle::progress::radius;
         const auto progressArcWidth  = progressStyle::progress::penWidth;
         const auto arcStartAngle     = -90 - progressStyle::progress::verticalDeviationDegrees;
@@ -66,7 +72,7 @@ namespace gui
         clock = new BellStatusClock(mainVBox);
         clock->setMaximumSize(progressStyle::clock::maxSizeX, progressStyle::clock::maxSizeY);
         clock->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        clock->setMargins(gui::Margins(0, progressStyle::clock::marginTop, 0, 0));
+        clock->setMargins(Margins(0, progressStyle::clock::marginTop, 0, 0));
 
         timer = new TimeMinuteSecondWidget(mainVBox,
                                            0,
@@ -75,33 +81,36 @@ namespace gui
                                            progressStyle::timer::maxSizeY,
                                            TimeMinuteSecondWidget::DisplayType::OnlyMinutes);
         timer->setMinimumSize(progressStyle::timer::maxSizeX, progressStyle::timer::maxSizeY);
-        timer->setMargins(gui::Margins(0, progressStyle::timer::marginTop, 0, 0));
+        timer->setMargins(Margins(0, progressStyle::timer::marginTop, 0, 0));
         timer->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
 
-        iconPause = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
-        iconPause->setMinimumSize(progressStyle::pauseIcon::maxSizeX, progressStyle::pauseIcon::maxSizeY);
-        iconPause->setMargins(gui::Margins(0, progressStyle::pauseIcon::marginTop, 0, 0));
-        iconPause->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        iconPause->image->set(progressStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
-        iconPause->setVisible(false);
+        pauseBox = new VBox(mainVBox);
+        pauseBox->setMinimumSize(progressStyle::pauseIcon::minSizeX, progressStyle::pauseIcon::minSizeY);
+        pauseBox->setMargins(Margins(0, progressStyle::pauseIcon::marginTop, 0, 0));
+        pauseBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        pauseBox->setEdges(RectangleEdge::None);
+        new Image(pauseBox, progressStyle::pauseIcon::image, ImageTypeSpecifier::W_G);
+        pauseBox->setVisible(false);
+        pauseBox->resizeItems();
 
-        iconRing = new Icon(mainVBox, 0, 0, 0, 0, {}, {});
-        iconRing->setMinimumSize(progressStyle::ringIcon::maxSizeX, progressStyle::ringIcon::maxSizeY);
-        iconRing->setMargins(gui::Margins(0, progressStyle::ringIcon::marginTop, 0, 0));
-        iconRing->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        iconRing->image->set(progressStyle::ringIcon::image, ImageTypeSpecifier::W_G);
-        iconRing->setVisible(false);
+        ringBox = new VBox(mainVBox);
+        ringBox->setMinimumSize(progressStyle::ringIcon::minSizeX, progressStyle::ringIcon::minSizeY);
+        ringBox->setMargins(Margins(0, progressStyle::pauseIcon::marginTop, 0, 0));
+        ringBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
+        ringBox->setEdges(RectangleEdge::None);
+        new Image(ringBox, progressStyle::ringIcon::image, ImageTypeSpecifier::W_G);
+        ringBox->setVisible(false);
+        ringBox->resizeItems();
 
-        bottomDescription = new gui::TextFixedSize(
+        bottomDescription = new TextFixedSize(
             mainVBox, 0, 0, progressStyle::bottomDescription::maxSizeX, progressStyle::bottomDescription::maxSizeY);
         bottomDescription->setMaximumSize(progressStyle::bottomDescription::maxSizeX,
                                           progressStyle::bottomDescription::maxSizeY);
         bottomDescription->setFont(progressStyle::bottomDescription::font);
-        bottomDescription->setMargins(gui::Margins(0, 0, 0, 0));
+        bottomDescription->setMargins(Margins(0, 0, 0, 0));
         bottomDescription->activeItem = false;
-        bottomDescription->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        bottomDescription->setRichText(utils::translate("app_bellmain_power_nap"));
+        bottomDescription->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        bottomDescription->setText(utils::translate("app_bellmain_power_nap"));
         bottomDescription->drawUnderline(false);
         bottomDescription->setVisible(true);
 
@@ -153,7 +162,7 @@ namespace gui
 
     void PowerNapProgressWindow::napEnded()
     {
-        application->switchWindow(gui::window::name::powerNapSessionEnded, std::make_unique<gui::PowerNapSwitchData>());
+        application->switchWindow(window::name::powerNapSessionEnded, std::make_unique<PowerNapSwitchData>());
     }
 
     void PowerNapProgressWindow::setTime(std::time_t newTime)
@@ -178,22 +187,22 @@ namespace gui
     void PowerNapProgressWindow::pause()
     {
         timer->setVisible(false);
-        iconPause->setVisible(true);
+        pauseBox->setVisible(true);
         mainVBox->resizeItems();
     }
 
     void PowerNapProgressWindow::resume()
     {
         timer->setVisible(true);
-        iconPause->setVisible(false);
+        pauseBox->setVisible(false);
         mainVBox->resizeItems();
     }
 
     void PowerNapProgressWindow::progressFinished()
     {
         timer->setVisible(false);
-        iconPause->setVisible(false);
-        iconRing->setVisible(true);
+        pauseBox->setVisible(false);
+        ringBox->setVisible(true);
         mainVBox->resizeItems();
     }
 

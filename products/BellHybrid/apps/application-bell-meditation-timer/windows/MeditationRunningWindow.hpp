@@ -12,7 +12,6 @@ namespace gui
 {
     class ArcProgressBar;
     class BellStatusClock;
-    class Icon;
     class TimeMinuteSecondWidget;
 
     class MeditationRunningWindow : public AppWindow, public app::meditation::MeditationProgressContract::View
@@ -32,12 +31,13 @@ namespace gui
 
       private:
         std::unique_ptr<app::meditation::MeditationProgressContract::Presenter> presenter;
+
         VBox *mainVBox{nullptr};
+        BellStatusClock *clock{nullptr};
         ArcProgressBar *progress{nullptr};
+        VBox *pauseBox{nullptr};
         TimeMinuteSecondWidget *timer{nullptr};
         TextFixedSize *bottomDescription{nullptr};
-        Icon *icon{nullptr};
-        BellStatusClock *clock{nullptr};
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
