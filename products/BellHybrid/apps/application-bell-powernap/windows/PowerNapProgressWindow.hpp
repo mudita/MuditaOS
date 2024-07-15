@@ -4,18 +4,16 @@
 #pragma once
 
 #include "presenter/PowerNapProgressPresenter.hpp"
-#include <apps-common/widgets/BarGraph.hpp>
-#include <apps-common/widgets/TimeMinuteSecondWidget.hpp>
-#include <common/widgets/BellStatusClock.hpp>
-#include <gui/widgets/Icon.hpp>
+
 #include <AppWindow.hpp>
-#include <Application.hpp>
-#include <InputEvent.hpp>
-#include <Text.hpp>
 
 namespace gui
 {
     class Text;
+    class ArcProgressBar;
+    class TimeMinuteSecondWidget;
+    class BellStatusClock;
+
     class PowerNapProgressWindow : public AppWindow, public app::powernap::PowerNapProgressContract::View
     {
       public:
@@ -32,13 +30,14 @@ namespace gui
 
       private:
         std::shared_ptr<app::powernap::PowerNapProgressContract::Presenter> presenter;
+
         VBox *mainVBox{nullptr};
-        ArcProgressBar *progress{nullptr};
-        TimeMinuteSecondWidget *timer{nullptr};
-        gui::TextFixedSize *bottomDescription{nullptr};
         BellStatusClock *clock{nullptr};
-        Icon *iconPause{nullptr};
-        Icon *iconRing{nullptr};
+        ArcProgressBar *progress{nullptr};
+        VBox *pauseBox{nullptr};
+        VBox *ringBox{nullptr};
+        TimeMinuteSecondWidget *timer{nullptr};
+        TextFixedSize *bottomDescription{nullptr};
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;

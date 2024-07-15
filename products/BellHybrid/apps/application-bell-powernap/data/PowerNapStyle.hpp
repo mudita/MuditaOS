@@ -29,17 +29,17 @@ namespace gui::powerNapStyle
         namespace pauseIcon
         {
             inline constexpr auto image     = "big_pause";
-            inline constexpr auto maxSizeX  = 203U;
-            inline constexpr auto maxSizeY  = 203U;
-            inline constexpr auto marginTop = timer::marginTop - (maxSizeY - timer::maxSizeY);
+            inline constexpr auto minSizeX  = 203U;
+            inline constexpr auto minSizeY  = 154U;
+            inline constexpr auto marginTop = 63U;
         } // namespace pauseIcon
 
         namespace ringIcon
         {
             inline constexpr auto image     = "big_bell_ringing";
-            inline constexpr auto maxSizeX  = 210U;
-            inline constexpr auto maxSizeY  = 203U;
-            inline constexpr auto marginTop = timer::marginTop - (maxSizeY - timer::maxSizeY);
+            inline constexpr auto minSizeX  = 210U;
+            inline constexpr auto minSizeY  = 154U;
+            inline constexpr auto marginTop = 63U;
         } // namespace ringIcon
 
         namespace clock
