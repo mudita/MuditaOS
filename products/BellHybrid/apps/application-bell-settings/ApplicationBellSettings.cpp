@@ -7,6 +7,7 @@
 #include "models/TemperatureUnitModel.hpp"
 #include "models/AboutYourBellModel.hpp"
 #include "models/AudioErrorModel.hpp"
+#include "models/RelaxationListItemProvider.hpp"
 #include "models/alarm_settings/AlarmSettingsListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpListItemProvider.hpp"
 #include "models/alarm_settings/BedtimeSettingsListItemProvider.hpp"
@@ -30,6 +31,7 @@
 #include "windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp"
 #include "windows/alarm_settings/BellSettingsPrewakeUpWindow.hpp"
 #include "windows/BellSettingsBedtimeToneWindow.hpp"
+#include "windows/BellSettingsRelaxationWindow.hpp"
 #include "windows/BellSettingsHomeViewWindow.hpp"
 #include "windows/BellSettingsTimeUnitsWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
@@ -39,6 +41,7 @@
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/models/BedtimeModel.hpp>
 #include <common/models/LayoutModel.hpp>
+#include <common/models/RelaxationFadeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
 #include <common/windows/BellTurnOffWindow.hpp>
 #include <common/windows/ShortcutsWindow.hpp>
@@ -104,6 +107,15 @@ namespace app
                     this, std::move(layoutModel), std::move(timeModel), std::move(quoteModel));
                 return std::make_unique<gui::BellSettingsLayoutWindow>(app, std::move(presenter), name);
             });
+
+        windowsFactory.attach(gui::window::name::bellSettingsRelaxation,
+                              [](ApplicationCommon *app, [[maybe_unused]] const std::string &name) {
+                                  auto fadeModel = std::make_unique<RelaxationFadeModel>(app);
+                                  auto provider =
+                                      std::make_shared<bell_settings::RelaxationListItemProvider>(std::move(fadeModel));
+                                  auto presenter = std::make_unique<bell_settings::RelaxationWindowPresenter>(provider);
+                                  return std::make_unique<gui::BellSettingsRelaxationWindow>(app, std::move(presenter));
+                              });
 
         windowsFactory.attach(
             gui::BellSettingsFrontlightWindow::name, [](ApplicationCommon *app, const std::string &name) {

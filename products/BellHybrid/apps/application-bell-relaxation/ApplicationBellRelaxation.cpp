@@ -25,6 +25,7 @@
 #include <common/models/BatteryModel.hpp>
 #include <common/models/AudioModel.hpp>
 #include <common/models/SongsModel.hpp>
+#include <common/models/RelaxationFadeModel.hpp>
 #include <common/windows/AppsBatteryStatusWindow.hpp>
 #include <common/AudioErrorPresenter.hpp>
 #include <common/windows/AudioErrorWindow.hpp>
@@ -71,7 +72,8 @@ namespace app
 
         batteryModel                 = std::make_unique<app::BatteryModel>(this);
         lowBatteryInfoModel          = std::make_unique<app::LowBatteryInfoModel>();
-        player                       = std::make_unique<relaxation::RelaxationPlayer>(*audioModel);
+        fadeModel                    = std::make_unique<app::RelaxationFadeModel>(this);
+        player                       = std::make_unique<relaxation::RelaxationPlayer>(*fadeModel, *audioModel);
         relaxationRebuildTimerHandle = sys::TimerFactory::createSingleShotTimer(
             this, relaxationRebuildTimer, relaxationRebuildTimerInterval, [this](sys::Timer &) {
                 const auto mainWindow = getWindow(gui::name::window::main_window);

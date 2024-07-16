@@ -11,7 +11,8 @@ namespace app::relaxation
         return playbackMode;
     }
 
-    RelaxationPlayer::RelaxationPlayer(AbstractAudioModel &audioModel) : audioModel{audioModel}
+    RelaxationPlayer::RelaxationPlayer(AbstractRelaxationFadeModel &fadeModel, AbstractAudioModel &audioModel)
+        : fadeModel{fadeModel}, audioModel{audioModel}
     {}
 
     void RelaxationPlayer::start(const std::string &filePath,
@@ -42,9 +43,14 @@ namespace app::relaxation
             }
         };
 
-        auto fadeParams = audio::FadeParams{.mode = audio::Fade::InOut, .playbackDuration = playbackDuration};
+        auto fadeParams = audio::FadeParams{.mode = getFadeMode(), .playbackDuration = playbackDuration};
         audioModel.setPlaybackFinishedCb(std::move(onPlayerFinished));
         audioModel.play(filePath, Type::Multimedia, std::move(stateChangeCallback), std::move(fadeParams));
+    }
+
+    audio::Fade RelaxationPlayer::getFadeMode() const
+    {
+        return fadeModel.getFade().getValue() ? audio::Fade::InOut : audio::Fade::Disable;
     }
 
     void RelaxationPlayer::stop(AbstractAudioModel::OnStateChangeCallback &&callback)
