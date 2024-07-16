@@ -28,6 +28,7 @@ target_sources(application-bell-settings
         models/FrontlightListItemProvider.cpp
         models/FrontlightModel.cpp
         models/AudioErrorModel.cpp
+        models/RelaxationListItemProvider.cpp
         models/alarm_settings/AlarmSettingsListItemProvider.cpp
         models/alarm_settings/AlarmSettingsModel.cpp
         models/alarm_settings/BedtimeSettingsListItemProvider.cpp
@@ -46,6 +47,7 @@ target_sources(application-bell-settings
         presenter/LayoutWindowPresenter.cpp
         presenter/ShortcutsWindowPresenter.cpp
         presenter/UpdateInstructionWindowPresenter.cpp
+        presenter/RelaxationWindowPresenter.cpp
         presenter/alarm_settings/AlarmSettingsPresenter.cpp
         presenter/alarm_settings/PrewakeUpPresenter.cpp
         presenter/alarm_settings/SnoozePresenter.cpp
@@ -67,6 +69,7 @@ target_sources(application-bell-settings
         windows/BellSettingsLayoutWindow.cpp
         windows/BellSettingsFrontlightWindow.cpp
         windows/BellSettingsFactoryResetWindow.cpp
+        windows/BellSettingsRelaxationWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.cpp
