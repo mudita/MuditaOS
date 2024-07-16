@@ -58,6 +58,9 @@ namespace gui
         addWinSettings(utils::translate("app_bell_settings_alarm_settings"),
                        BellSettingsAlarmSettingsMenuWindow::name,
                        defaultCallback);
+        addWinSettings(utils::translate("app_bell_settings_relaxation_fade"),
+                       window::name::bellSettingsRelaxation,
+                       defaultCallback);
         addWinSettings(utils::translate("app_bell_settings_bedtime_chime"),
                        window::name::bellSettingsBedtimeTone,
                        defaultCallback);

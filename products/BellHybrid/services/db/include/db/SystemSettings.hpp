@@ -47,6 +47,11 @@ namespace bell::settings
         inline constexpr auto duration         = "bedtime_duration";
     } // namespace Bedtime
 
+    namespace Relaxation
+    {
+        inline constexpr auto fadeActive = "relaxation_fade_active";
+    }
+
     namespace Layout
     {
         inline constexpr auto layout = "layout";

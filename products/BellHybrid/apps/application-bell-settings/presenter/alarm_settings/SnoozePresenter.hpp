@@ -19,28 +19,32 @@ namespace app::bell_settings
 {
     class SnoozeListItemProvider;
 
-    class View
+    class SnoozeWindowContract
     {
       public:
-        virtual ~View() noexcept                 = default;
-        virtual auto exit() -> void              = 0;
-        virtual auto deepRefresh() -> void       = 0;
-        virtual auto handleError() -> void       = 0;
-        virtual auto handleDeletedFile() -> void = 0;
+        class View
+        {
+          public:
+            virtual ~View() noexcept                 = default;
+            virtual auto exit() -> void              = 0;
+            virtual auto deepRefresh() -> void       = 0;
+            virtual auto handleError() -> void       = 0;
+            virtual auto handleDeletedFile() -> void = 0;
+        };
+
+        class AbstractSnoozePresenter : public BasePresenter<View>
+        {
+          public:
+            virtual ~AbstractSnoozePresenter()                                              = default;
+            virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
+            virtual auto saveData() -> void                                                 = 0;
+            virtual auto loadData() -> void                                                 = 0;
+            virtual auto eraseProviderData() -> void                                        = 0;
+            virtual auto exitWithoutSave() -> void                                          = 0;
+        };
     };
 
-    class AbstractSnoozePresenter : public BasePresenter<View>
-    {
-      public:
-        virtual ~AbstractSnoozePresenter()                                              = default;
-        virtual auto getPagesProvider() const -> std::shared_ptr<gui::ListItemProvider> = 0;
-        virtual auto saveData() -> void                                                 = 0;
-        virtual auto loadData() -> void                                                 = 0;
-        virtual auto eraseProviderData() -> void                                        = 0;
-        virtual auto exitWithoutSave() -> void                                          = 0;
-    };
-
-    class SnoozePresenter : public AbstractSnoozePresenter
+    class SnoozePresenter : public SnoozeWindowContract::AbstractSnoozePresenter
     {
       public:
         SnoozePresenter(ApplicationCommon *app,
