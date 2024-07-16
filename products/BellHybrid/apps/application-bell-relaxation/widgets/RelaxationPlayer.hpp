@@ -4,6 +4,7 @@
 #pragma once
 
 #include <common/models/AbstractAudioModel.hpp>
+#include <common/models/AbstractRelaxationFadeModel.hpp>
 
 namespace app
 {
@@ -36,13 +37,14 @@ namespace app::relaxation
         virtual void pause(AbstractAudioModel::OnStateChangeCallback &&callback)                = 0;
         virtual void resume(AbstractAudioModel::OnStateChangeCallback &&callback)               = 0;
         virtual PlaybackMode getCurrentMode() const noexcept                                    = 0;
+        virtual audio::Fade getFadeMode() const                                                 = 0;
         virtual bool isPaused()                                                                 = 0;
     };
 
     class RelaxationPlayer : public AbstractRelaxationPlayer
     {
       public:
-        explicit RelaxationPlayer(AbstractAudioModel &audioModel);
+        RelaxationPlayer(AbstractRelaxationFadeModel &fadeModel, AbstractAudioModel &audioModel);
 
       private:
         void start(const std::string &filePath,
@@ -54,8 +56,10 @@ namespace app::relaxation
         void pause(AbstractAudioModel::OnStateChangeCallback &&callback) override;
         void resume(AbstractAudioModel::OnStateChangeCallback &&callback) override;
         PlaybackMode getCurrentMode() const noexcept override;
+        audio::Fade getFadeMode() const override;
         bool isPaused() override;
 
+        AbstractRelaxationFadeModel &fadeModel;
         AbstractAudioModel &audioModel;
         std::string recentFilePath;
         PlaybackMode playbackMode = PlaybackMode::SingleShot;

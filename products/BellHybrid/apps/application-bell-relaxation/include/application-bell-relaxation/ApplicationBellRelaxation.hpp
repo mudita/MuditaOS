@@ -5,6 +5,7 @@
 
 #include <Application.hpp>
 #include <common/models/AbstractAudioModel.hpp>
+#include <common/models/AbstractRelaxationFadeModel.hpp>
 #include <common/models/BatteryModel.hpp>
 #include <common/models/LowBatteryInfoModel.hpp>
 #include <purefs/filesystem_paths.hpp>
@@ -32,6 +33,7 @@ namespace app
     {
       private:
         std::unique_ptr<AbstractAudioModel> audioModel;
+        std::unique_ptr<AbstractRelaxationFadeModel> fadeModel;
         std::unique_ptr<AbstractBatteryModel> batteryModel;
         std::unique_ptr<AbstractLowBatteryInfoModel> lowBatteryInfoModel;
         std::unique_ptr<relaxation::RelaxationPlayer> player;

@@ -12,7 +12,7 @@ namespace gui
 {
     class SideListView;
 
-    class BellSettingsAlarmSettingsSnoozeWindow : public AppWindow, app::bell_settings::View
+    class BellSettingsAlarmSettingsSnoozeWindow : public AppWindow, app::bell_settings::SnoozeWindowContract::View
     {
       public:
         static constexpr auto name = "BellSettingsAlarmSettingsSnooze";
