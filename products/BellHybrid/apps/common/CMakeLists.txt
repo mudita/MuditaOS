@@ -44,6 +44,7 @@ target_sources(application-bell-common
         src/models/LowBatteryInfoModel.cpp
         src/models/SongsModel.cpp
         src/models/PreWakeUpModel.cpp
+        src/models/RelaxationFadeModel.cpp
 
         src/popups/AlarmActivatedWindow.cpp
         src/popups/AlarmActivatedWindow.cpp
@@ -116,6 +117,7 @@ target_sources(application-bell-common
         include/common/data/BatteryStatusSwitchData.hpp
 
         include/common/models/AbstractAlarmModel.hpp
+        include/common/models/AbstractRelaxationFadeModel.hpp
         include/common/models/AbstractBedtimeModel.hpp
         include/common/models/AbstractSettingsModel.hpp
         include/common/models/AbstractAudioModel.hpp
@@ -123,6 +125,7 @@ target_sources(application-bell-common
         include/common/models/SettingsModel.hpp
         include/common/models/BedtimeModel.hpp
         include/common/models/BatteryModel.hpp
+        include/common/models/RelaxationFadeModel.hpp
         include/common/models/BatteryLevelNotificationModel.hpp
         include/common/models/TimeModel.hpp
         include/common/models/UserSessionModel.hpp
