@@ -19,13 +19,15 @@ namespace audio
         void Start(float targetVolume, float minVolume, float maxVolume, audio::FadeParams fadeParams);
         void Restart();
         void Stop();
+        void SetVolume(float volume);
         bool IsActive();
 
       private:
-        enum class State
+        enum class Phase
         {
-            Disable,
+            Idle,
             FadeIn,
+            Wait,
             FadeOut
         };
 
@@ -36,12 +38,15 @@ namespace audio
         float maxVolume;
         float currentVolume;
         SetCallback setVolumeCallback;
-        State state{State::Disable};
+        Phase phase{Phase::Idle};
         std::chrono::time_point<std::chrono::system_clock> timestamp;
 
         void PerformNextFadeStep();
+        void RestartTimer();
         void TurnUpVolume();
         void TurnDownVolume();
+        void SetTargetVolume(float volume);
+        bool IsFadePhaseActive();
     };
 
 } // namespace audio
