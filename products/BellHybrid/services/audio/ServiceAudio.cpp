@@ -331,7 +331,10 @@ namespace service
         const auto clampedValue = std::clamp(utils::getNumericValue<float>(value), minVolumeToSet, maxVolumeToSet);
         auto retCode            = audio::RetCode::Success;
 
-        if (const auto activeInput = audioMux.GetActiveInput(); activeInput.has_value()) {
+        if (volumeFade->IsActive()) {
+            volumeFade->SetVolume(clampedValue);
+        }
+        else if (const auto activeInput = audioMux.GetActiveInput(); activeInput.has_value()) {
             if (activeInput.value() != nullptr) {
                 retCode = activeInput.value()->audio->SetOutputVolume(clampedValue);
             }

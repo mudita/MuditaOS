@@ -28,7 +28,7 @@ namespace audio
 
     VolumeFade::VolumeFade(sys::Service *parent, SetCallback callback) : setVolumeCallback(std::move(callback))
     {
-        timerHandle = sys::TimerFactory::createPeriodicTimer(
+        timerHandle = sys::TimerFactory::createSingleShotTimer(
             parent, timerName, fadeInterval, [this]([[maybe_unused]] sys::Timer &timer) { PerformNextFadeStep(); });
     }
 
@@ -51,7 +51,7 @@ namespace audio
         this->minVolume    = minVolume;
         this->maxVolume    = maxVolume;
         currentVolume      = minVolume + fadeStep;
-        state              = State::FadeIn;
+        phase              = Phase::FadeIn;
         timestamp          = std::chrono::system_clock::now();
         Restart();
         timerHandle.restart(fadeInterval);
@@ -66,8 +66,35 @@ namespace audio
 
     void VolumeFade::Stop()
     {
-        timerHandle.stop();
-        state = State::Disable;
+        if (timerHandle.isActive()) {
+            timerHandle.stop();
+        }
+        phase = Phase::Idle;
+    }
+
+    void VolumeFade::SetVolume(float volume)
+    {
+        if (IsFadePhaseActive()) {
+            SetTargetVolume(volume);
+        }
+        else {
+            currentVolume = std::clamp(volume, minVolume, maxVolume);
+            if (setVolumeCallback != nullptr) {
+                setVolumeCallback(currentVolume);
+            }
+            RestartTimer();
+        }
+    }
+
+    void VolumeFade::SetTargetVolume(float volume)
+    {
+        targetVolume = std::clamp(volume, minVolume, maxVolume);
+        if (currentVolume > targetVolume) {
+            currentVolume = std::clamp(currentVolume, minVolume, targetVolume);
+            if (setVolumeCallback != nullptr) {
+                setVolumeCallback(currentVolume);
+            }
+        }
     }
 
     bool VolumeFade::IsActive()
@@ -75,25 +102,31 @@ namespace audio
         return timerHandle.isActive();
     }
 
+    bool VolumeFade::IsFadePhaseActive()
+    {
+        return (phase == Phase::FadeIn) || (phase == Phase::FadeOut);
+    }
+
     void VolumeFade::PerformNextFadeStep()
     {
-        switch (state) {
-        case State::FadeIn:
+        switch (phase) {
+        case Phase::FadeIn:
             if (currentVolume < targetVolume) {
                 TurnUpVolume();
+                timerHandle.restart(fadeInterval);
             }
             else if (fadeParams.mode == audio::Fade::InOut && fadeParams.playbackDuration.has_value()) {
-                state                  = State::FadeOut;
-                const auto now         = std::chrono::system_clock::now();
-                const auto timeElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - timestamp);
-                timerHandle.restart(
-                    calculateTimerPeriod(timeElapsed, fadeParams.playbackDuration.value(), currentVolume));
+                phase = Phase::Wait;
+                RestartTimer();
             }
             else {
                 Stop();
             }
             break;
-        case State::FadeOut:
+        case Phase::Wait:
+            phase = Phase::FadeOut;
+            [[fallthrough]];
+        case Phase::FadeOut:
             if (currentVolume > 0.0f) {
                 TurnDownVolume();
                 timerHandle.restart(fadeInterval);
@@ -121,6 +154,13 @@ namespace audio
         if (setVolumeCallback != nullptr) {
             setVolumeCallback(currentVolume);
         }
+    }
+
+    void VolumeFade::RestartTimer()
+    {
+        const auto now         = std::chrono::system_clock::now();
+        const auto timeElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - timestamp);
+        timerHandle.restart(calculateTimerPeriod(timeElapsed, fadeParams.playbackDuration.value(), currentVolume));
     }
 
 } // namespace audio
