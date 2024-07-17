@@ -53,6 +53,16 @@ namespace audio
         currentVolume      = minVolume + fadeStep;
         phase              = Phase::FadeIn;
         timestamp          = std::chrono::system_clock::now();
+
+        if (this->fadeParams.playbackDuration.has_value()) {
+            // If the song is shorter than the fade in and out durations, we reduce the target volume value so that both
+            // phases have time to complete
+            const auto maxFadePeriod =
+                std::chrono::duration_cast<std::chrono::milliseconds>(fadeParams.playbackDuration.value()) / 2;
+            const auto maxTargetVolume = (maxFadePeriod.count() * fadeStep) / fadeInterval.count();
+            this->targetVolume         = std::clamp(std::min(targetVolume, maxTargetVolume), minVolume, maxVolume);
+        }
+
         Restart();
         timerHandle.restart(fadeInterval);
     }
