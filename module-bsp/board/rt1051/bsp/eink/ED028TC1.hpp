@@ -1,28 +1,10 @@
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
-/**
- * @file ED028TC1.h
- * @author Lukasz Skrzypczak (l.skrzypczak@mudita.com)
- * @date Sep 6, 2017
- * @brief Header for EInk ED028TC1 electronic paper display driver
- * @copyright Copyright (C) 2017 mudita.com.
- * @details This is hardware specific electronic paper display ED028TC1 driver.
- */
+#pragma once
 
-/* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __ED028TC1_H
-#define __ED028TC1_H
+#include <cstdint>
 
-#include "FreeRTOS.h"
-#include "semphr.h"
-
-#if defined(__cplusplus)
-extern "C"
-{
-#endif /* __cplusplus */
-
-/* Exported macro ------------------------------------------------------------*/
 /**
  * @brief ED028TC1 register definitions
  */
@@ -212,17 +194,18 @@ extern "C"
 #define EINK_DITHER_4BPP_MODE (0 << 1)
 #define EINK_DITHER_2BPP_MODE (1 << 1)
 
+// Flags
 #define EINK_FLAG_BUSY_N 0x0001 ///< This flag informs that the driver is busy. 0 - busy, 1 - idle
 #define EINK_FLAG_POWER_OFF_IN_PROGRESS                                                                                \
     0x0002 ///< This flag informs that the Power Off sequence is in progress. 1 - in progress
 #define EINK_FLAG_POWER_ON_IN_PROGRESS                                                                                 \
     0x0004 ///< This flag informs that the Power On sequence is in progress. 1 - in progress
 #define EINK_FLAG_ENTIRE_FRAME_RECEIVED                                                                                \
-    0x0008 ///< This flag informs that the driver received data for entire frame defined in the \ref
+    0x0008 ///< This flag informs that the driver received data for entire frame defined in the
            ///< EinkDataStartTransmissionWindow command
-#define EINK_FLAG_I2C_BUSY           0x0010 ///< This flag informs that the I2C master periph is busy. Active low
+#define EINK_FLAG_I2C_BUSY           0x0010 ///< This flag informs that the I2C master peripheral is busy. Active low
 #define EINK_FLAG_I2C_ERROR          0x0020 ///< This flag informs that the I2C master acquired an error
-#define EINK_FLAG_PIPELINE_COLLISION 0x0040 ///< This flag informs that two frames sent in the pipelin overlap
+#define EINK_FLAG_PIPELINE_COLLISION 0x0040 ///< This flag informs that two frames sent in the pipeline overlap
 #define EINK_FLAG_PIPELINE_BUSY      0x0080 ///< This flag informs that pipeline insertion is in progress
 #define EINK_FLAG_REAGL_BUSY         0x0100 ///< This flag informs that the REAGLS function processing is in progress
 #define EINK_FLAG_DITHER_IN_PROGRESS 0x0200 ///< This flag informs that the Dither process is in progress
@@ -234,137 +217,143 @@ extern "C"
 #define EINK_FLAG_BOOST_VOLTAGE_READY       0x4000 ///< This flag informs that the Boost voltage is ready
 #define EINK_FLAG_RAM_TEST_FLAG             0x8000 ///< This flag is for internal SRAM memory testing
 
-    /* Exported types ------------------------------------------------------------*/
-    /**
-     * @enum EinkStatus_e
-     */
-    typedef enum
+// Booster configs
+#define EPD_BOOSTER_START_PERIOD_10MS 0
+#define EPD_BOOSTER_START_PERIOD_20MS 1
+#define EPD_BOOSTER_START_PERIOD_30MS 2
+#define EPD_BOOSTER_START_PERIOD_40MS 3
+#define EPD_BOOSTER_START_PERIOD_POS  6
+
+#define EPD_BOOSTER_DRIVING_STRENGTH_1   0
+#define EPD_BOOSTER_DRIVING_STRENGTH_2   1
+#define EPD_BOOSTER_DRIVING_STRENGTH_3   2
+#define EPD_BOOSTER_DRIVING_STRENGTH_4   3
+#define EPD_BOOSTER_DRIVING_STRENGTH_5   4
+#define EPD_BOOSTER_DRIVING_STRENGTH_6   5
+#define EPD_BOOSTER_DRIVING_STRENGTH_7   6
+#define EPD_BOOSTER_DRIVING_STRENGTH_8   7
+#define EPD_BOOSTER_DRIVING_STRENGTH_POS 3
+
+#define EPD_BOOSTER_OFF_TIME_GDR_0_27uS 0
+#define EPD_BOOSTER_OFF_TIME_GDR_0_34uS 1
+#define EPD_BOOSTER_OFF_TIME_GDR_0_40uS 2
+#define EPD_BOOSTER_OFF_TIME_GDR_0_54uS 3
+#define EPD_BOOSTER_OFF_TIME_GDR_0_80uS 4
+#define EPD_BOOSTER_OFF_TIME_GDR_1_54uS 5
+#define EPD_BOOSTER_OFF_TIME_GDR_3_34uS 6
+#define EPD_BOOSTER_OFF_TIME_GDR_6_58uS 7
+#define EPD_BOOSTER_OFF_TIME_GDR_POS    0
+
+#define EINK_IMAGE_CONFIG_SIZE 2 // 2 bytes at the beginning of each image frame
+#define EINK_BITS_IN_BYTE      8
+#define EINK_MAX_BPP           4
+
+namespace bsp::eink
+{
+    enum class EinkStatus
     {
-        EinkOK, //!< EinkOK
-        EinkError,
-        EinkSPIErr,                //!< EinkSPIErr
-        EinkSPINotInitializedErr,  //!< EinkSPINotInitializedErr
-        EinkDMAErr,                //!< EinkDMAErr
-        EinkInitErr,               //!< EinkInitErr
-        EinkTimeout,               //!< Timeout occured while waiting for not busy signal from EINK
-        EinkNoMem,                 //!< Could not allocate memory
-        EinkWaveformsFileOpenFail, //!< Could not open the file with the waveforms for EPD display
-    } EinkStatus_e;
+        OK,
+        Error,
+        SPIErr,
+        SPINotInitializedErr,
+        DMAErr,
+        InitErr,
+        Timeout,              //!< Timeout occured while waiting for not busy signal from EINK
+        NoMem,                //!< Could not allocate memory
+        WaveformsFileOpenFail //!< Could not open the file with the waveforms for EPD display
+    };
 
-    /**
-     * @enum EinkBpp_e
-     */
-    typedef enum
+    enum class EinkBpp
     {
-        Eink1Bpp = 1, //!< Eink1Bpp
-        Eink2Bpp,     //!< Eink2Bpp
-        Eink3Bpp,     //!< Eink3Bpp
-        Eink4Bpp      //!< Eink4Bpp
-    } EinkBpp_e;
+        Eink1Bpp = 1, //!< 1 bit per pixel
+        Eink2Bpp,     //!< 2 bits per pixel
+        Eink3Bpp,     //!< 3 bits per pixel
+        Eink4Bpp      //!< 4 bits per pixel
+    };
 
-    typedef enum
+    enum class EinkWaveform
     {
-        EinkWaveformINIT,  ///< Clears deeply the display
-        EinkWaveformA2,    ///< Fastest, direct update, no flashing. Severe ghosting effect
-        EinkWaveformDU2,   ///< Fast, direct update, no flashing. Medium ghosting effect
-        EinkWaveformGLD16, ///< Slow, little flashing. Light ghosting mode
-        EinkWaveformGC16,  ///< Slow, strong flashing. Next to none ghosting
-    } EinkWaveforms_e;
+        INIT,  ///< Clears deeply the display
+        A2,    ///< Fastest, direct update, no flashing. Severe ghosting effect
+        DU2,   ///< Fast, direct update, no flashing. Medium ghosting effect
+        GLD16, ///< Slow, little flashing. Light ghosting mode
+        GC16   ///< Slow, strong flashing. Next to none ghosting
+    };
 
-    typedef enum
+    enum class EinkDisplayColorFilling
     {
-        EinkDisplayTimingsDeepCleanMode,
-        EinkDisplayTimingsHighContrastMode,
-        EinkDisplayTimingsFastRefreshMode
-    } EinkDisplayTimingsMode_e;
+        Black = 0x00,
+        White = 0xFF
+    };
 
-    typedef enum
+    enum class EinkDisplayColorMode
     {
-        EinkDisplayColorBlack = 0,
-        EinkDisplayColorWhite = 0xFF
-    } EinkDisplayColorFilling_e;
+        Standard,
+        Inverted
+    };
 
-    typedef enum
+    struct EinkWaveformSettings
     {
-        EinkDisplayColorModeStandard,
-        EinkDisplayColorModeInverted
-    } EinkDisplayColorMode_e;
+        EinkWaveform mode;        // Type of eink's waveform
+        std::int32_t temperature; // Temperature of surrounding
+        std::uint32_t useCounter; // Counts usage of this waveform (display refreshes)
+        std::uint8_t *LUTCData;   // Pointer to lookup table for LUTC
+        std::uint32_t LUTCSize;   // Size of LUTC data
+        std::uint8_t *LUTDData;   // Pointer to lookup table for LUTD
+        std::uint32_t LUTDSize;   // Size of LUTD data
+    };
 
-    typedef struct
+    struct EinkFrame
     {
-        // type of eink's waveform
-        EinkWaveforms_e mode;
-        // temperature of surrounding
-        int32_t temperature;
-        // counts usage of this waveform (display refreshes)
-        uint32_t useCounter;
-        // pointer to lookup table for lut c
-        uint8_t *LUTCData;
-        // sizeo of lutc data
-        uint32_t LUTCSize;
-        // pointer to lookup table for lut d
-        uint8_t *LUTDData;
-        // size of lutd data
-        uint32_t LUTDSize;
-    } EinkWaveformSettings_t;
-
-    typedef struct
-    {
-        uint16_t pos_x;
-        uint16_t pos_y;
-        uint16_t width;
-        uint16_t height;
-    } EinkFrame_t;
-
-    /* Exported constants --------------------------------------------------------*/
-
-    /* Exported functions ------------------------------------------------------- */
-
-    /**
-     * This function returns the state of the EPD siplay powe
-     * @return 1 if is currently powered on, 0 otherwise
-     */
-    bool EinkIsPoweredOn();
-
-    /**
-     * This function powers on the display. Needed for refreshing, measuring the temperature
-     */
-    EinkStatus_e EinkPowerOn();
+        std::uint16_t posX;
+        std::uint16_t posY;
+        std::uint16_t width;
+        std::uint16_t height;
+    };
 
     /**
-     * This functions powers off the display
+     * @brief This function returns the state of the EPD display power state
+     * @return true if is currently powered on, false otherwise
      */
-    EinkStatus_e EinkPowerOff();
+    bool isPoweredOn();
+
+    /**
+     * @brief This function powers on the display. Needed for refreshing, measuring the temperature
+     */
+    EinkStatus powerOn();
+
+    /**
+     * @brief This functions powers off the display
+     */
+    EinkStatus powerOff();
 
     /**
      * @brief This function is responsible for turning eink of and releasing all resources.
      */
-    EinkStatus_e EinkPowerDown(void);
+    EinkStatus powerDown();
 
     /**
-     * This function measures the ambient temperature using the ED028TC1 display internal temperature sensor.
+     * @brief This function measures the ambient temperature using the ED028TC1 display internal temperature sensor.
      * @note The display needs to be powered on
      *
      * @return Ambient temperature in the degrees of Celsius
      */
-    int16_t EinkGetTemperatureInternal();
+    std::int16_t getTemperatureInternal();
 
     /**
      * @brief This function resets the eink display and setups the initial configuration
      */
-    EinkStatus_e EinkResetAndInitialize();
+    EinkStatus resetAndInitialize();
 
     /**
-     * TODO: Fill The doxy when got info what does it do
-     * @return
+     * @brief TODO: Fill The doxy when got info what does it do
      */
-    EinkStatus_e EinkWaitTillPipelineBusy();
+    EinkStatus waitTillPipelineBusy();
 
     /**
-     * TODO: Fill The doxy when got info what does it do
-     * @return
+     * @brief TODO: Fill The doxy when got info what does it do
      */
-    EinkStatus_e EinkDitherDisplay();
+    EinkStatus ditherDisplay();
 
     /**
      * @brief This function sends the part of image from the given buffer to the internal memory of the display. It
@@ -372,23 +361,12 @@ extern "C"
      * @param frame [in] - part of screen on which the image will be written
      * @param buffer [in] -  pointer to image encoded according to \ref bpp set in initialization
      * @param bpp [in] - The format of the \ref buffer (number of the bits per pixel)
-     * @param invertColors[in] - true if colors of the image are to be inverted, false otherwise
+     * @param invertColors [in] - true if colors of the image are to be inverted, false otherwise
      *
      * @return  EinkNoMem - Could not allocate the temporary buffer
      *          EinkOK - Part of image send successfully
      */
-    EinkStatus_e EinkUpdateFrame(EinkFrame_t frame,
-                                 const uint8_t *buffer,
-                                 EinkBpp_e bpp,
-                                 EinkDisplayColorMode_e invertColors);
-
-    /**
-     * @brief This function sets the waveform to the \ref EinkWaveformINIT to make the display clearing more deep and
-     * sends the white background
-     * @param temperature [in] - current ambient temperature
-     * @return EinkOK
-     */
-    // EinkStatus_e EinkClearScreenDeep (int8_t temperature);
+    EinkStatus updateFrame(EinkFrame frame, const std::uint8_t *buffer, EinkBpp bpp, EinkDisplayColorMode invertColors);
 
     /**
      * @brief This function just displays the color (black or white) on the entire display. Used to clear the display
@@ -396,19 +374,16 @@ extern "C"
      * @param colorFill [in] - color which is used to fill the display
      * @return EinkOK
      */
-    EinkStatus_e EinkFillScreenWithColor(EinkDisplayColorFilling_e colorFill);
+    EinkStatus fillScreenWithColor(EinkDisplayColorFilling colorFill);
 
     /**
      * @brief Refresh window on the screen. E-paper display tends to loose contrast over time. To Keep the image sharp
      * refresh is needed.
-     * @param frame - part of screen on which image will be written
-     * @param refreshTimingsMode [in] - EinkDisplayTimingsDeepCleanMode - if image is to be cleared precisely
-     *                                  EinkDisplayTimingsHighContrastMode - if image is displayed in the high contrast
-     * mode EinkDisplayTimingsFastRefreshMode - if image is to be displayed fast
+     * @param frame [in] - part of screen on which image will be written
      *
      * @return EinkOK
      */
-    EinkStatus_e EinkRefreshImage(EinkFrame_t frame, EinkDisplayTimingsMode_e refreshTimingsMode);
+    EinkStatus refreshImage(EinkFrame frame);
 
     /**
      * @brief This function sends the proper waveform consisting from the LUTC and LUTD data,
@@ -418,25 +393,5 @@ extern "C"
      * @param LUTCData [in] - Data
      * @return
      */
-    EinkStatus_e EinkUpdateWaveform(const EinkWaveformSettings_t *settings);
-
-    /**
-     * This function converts the ARGB image to the L4 format
-     * @param dataIn  [in]  - input image
-     * @param dataOut [out] - output image
-     * @param displayWidth    [in] - display width in pixels
-     * @param displayHeight   [in] - display height in pixels
-     */
-    void EinkARGBToLuminance(const uint8_t *dataIn, uint8_t *dataOut, uint32_t displayWidth, uint32_t displayHeight);
-
-    /**
-     * This function gets resolutions settings from EINK display
-     */
-    EinkStatus_e EinkGetResolutionSettings();
-#if defined(__cplusplus)
-}
-#endif /* __cplusplus */
-
-#endif /* __ED028TC1_H */
-
-/******************* (C) COPYRIGHT 2017 mudita *****END OF FILE****/
+    EinkStatus updateWaveform(const EinkWaveformSettings *settings);
+} // namespace bsp::eink

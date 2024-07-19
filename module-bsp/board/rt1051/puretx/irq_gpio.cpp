@@ -8,7 +8,7 @@
 #include <fsl_common.h>
 #include <fsl_rtwdog.h>
 
-#include "board/rt1051/bsp/eink/bsp_eink.h"
+#include "board/rt1051/bsp/eink/BspEink.hpp"
 #include <hal/key_input/KeyInput.hpp>
 #include <hal/battery_charger/BatteryChargerIRQ.hpp>
 #include <log/log.hpp>
@@ -17,7 +17,7 @@
 
 namespace bsp
 {
-    void irq_gpio_Init(void)
+    void irq_gpio_Init()
     {
         DisableIRQ(GPIO1_Combined_0_15_IRQn);
         DisableIRQ(GPIO1_Combined_16_31_IRQn);
@@ -59,7 +59,7 @@ namespace bsp
         void GPIO1_Combined_0_15_IRQHandler(void)
         {
             BaseType_t xHigherPriorityTaskWoken = 0;
-            uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO1);
+            std::uint32_t irq_mask              = GPIO_GetPinsInterruptFlags(GPIO1);
 
             if (irq_mask & (1 << BSP_CELLULAR_STATUS_PIN)) {
                 xHigherPriorityTaskWoken |= cellular::status::statusIRQhandler();
@@ -75,7 +75,7 @@ namespace bsp
         void GPIO1_Combined_16_31_IRQHandler(void)
         {
             BaseType_t xHigherPriorityTaskWoken = 0;
-            uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO1);
+            std::uint32_t irq_mask              = GPIO_GetPinsInterruptFlags(GPIO1);
 
             if (irq_mask & (1 << BSP_BLUETOOTH_UART_CTS_PIN)) {
                 LOG_DEBUG("CTS IRQ!");
@@ -91,7 +91,7 @@ namespace bsp
         void GPIO2_Combined_0_15_IRQHandler(void)
         {
             BaseType_t xHigherPriorityTaskWoken = 0;
-            uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO2);
+            std::uint32_t irq_mask              = GPIO_GetPinsInterruptFlags(GPIO2);
 
             if (irq_mask & (1 << BOARD_KEYBOARD_RF_BUTTON_PIN)) {
                 xHigherPriorityTaskWoken |= hal::key_input::rightFunctionalIRQHandler();
@@ -115,7 +115,7 @@ namespace bsp
         void GPIO2_Combined_16_31_IRQHandler(void)
         {
             BaseType_t xHigherPriorityTaskWoken = 0;
-            uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO2);
+            std::uint32_t irq_mask              = GPIO_GetPinsInterruptFlags(GPIO2);
 
             if (irq_mask & (1 << BOARD_KEYBOARD_IRQ_GPIO_PIN)) {
                 xHigherPriorityTaskWoken |= hal::key_input::generalIRQHandler(irq_mask);
@@ -143,11 +143,10 @@ namespace bsp
         void GPIO3_Combined_16_31_IRQHandler(void)
         {
             BaseType_t xHigherPriorityTaskWoken = 0;
-            uint32_t irq_mask                   = GPIO_GetPinsInterruptFlags(GPIO3);
+            std::uint32_t irq_mask              = GPIO_GetPinsInterruptFlags(GPIO3);
 
             if (irq_mask & (1 << BOARD_EINK_BUSY_GPIO_PIN)) {
-
-                xHigherPriorityTaskWoken |= BSP_EinkBusyPinStateChangeHandler();
+                xHigherPriorityTaskWoken |= bsp::eink::busyPinStateChangeHandler();
             }
 
             // Clear all IRQs on the GPIO3 port
@@ -170,11 +169,11 @@ namespace bsp
          * Get the value of last PC state and store in non-volatile SNVS register
          * to have any data that can be used to debug if program died in IRQ or
          * critical section and neither log nor crashdump was created. */
-        __attribute__((used, noreturn)) void RTWDOG_Handler(const uint32_t *sp)
+        __attribute__((used, noreturn)) void RTWDOG_Handler(const std::uint32_t *sp)
         {
             RTWDOG_ClearStatusFlags(RTWDOG, kRTWDOG_InterruptFlag);
 
-            const uint32_t pc = sp[6];
+            const std::uint32_t pc = sp[6];
             SNVS->LPGPR[1]    = pc;
 
             while (true) {}; // Wait for RTWDOG to reset the board
