@@ -3,7 +3,7 @@
 
 #pragma once
 
-#include <board/rt1051/bsp/eink/ED028TC1.h>
+#include <board/rt1051/bsp/eink/ED028TC1.hpp>
 #include <chip.hpp>
 
 extern "C"
