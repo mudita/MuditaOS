@@ -461,7 +461,7 @@ namespace service::eink
     {
         const auto waveformUpdateMsg = static_cast<service::eink::PrepareDisplayEarlyRequest *>(message);
         display->prepareEarlyRequest(translateToEinkRefreshMode(waveformUpdateMsg->getRefreshMode()),
-                                     hal::eink::WaveformTemperature::MEASURE_NEW);
+                                     hal::eink::WaveformTemperature::MeasureNew);
         return sys::MessageNone{};
     }
 

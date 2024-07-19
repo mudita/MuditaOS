@@ -17,7 +17,7 @@ namespace hal::eink
 {
     namespace
     {
-        constexpr auto DefaultSurroundingTemperature = -1000;
+        constexpr auto defaultSurroundingTemperature = -1000;
         constexpr auto LUTDSize                      = 16385;
         constexpr auto LUTCSize                      = 64;
         constexpr auto LUTRSize                      = 256; ///< Needed due to \ref LutsFileName structure
@@ -30,15 +30,16 @@ namespace hal::eink
         constexpr auto LUTTemperatureOffsetInterval    = 3;
         constexpr auto LUTTemperatureOffsetSubcritical = 12;
         constexpr auto LUTTemperatureOffsetCritical    = 13;
-        constexpr auto EinkDisplayMaxInitRetries       = 10U;
+        constexpr auto einkDisplayMaxInitRetries       = 10U;
 
-        const auto LutsFilePath = purefs::dir::getAssetsDirPath() / "luts.bin";
+        const auto lutsFilePath = purefs::dir::getAssetsDirPath() / "luts.bin";
 
-        EinkWaveformSettings_t createDefaultWaveFormSettings(EinkWaveforms_e waveformMode)
+        constexpr auto createDefaultWaveformSettings(bsp::eink::EinkWaveform waveformMode)
+            -> bsp::eink::EinkWaveformSettings
         {
-            EinkWaveformSettings_t settings{};
+            bsp::eink::EinkWaveformSettings settings{};
             settings.mode        = waveformMode;
-            settings.temperature = DefaultSurroundingTemperature;
+            settings.temperature = defaultSurroundingTemperature;
             settings.useCounter  = 0;
             settings.LUTCData    = nullptr;
             settings.LUTCSize    = 0;
@@ -47,7 +48,7 @@ namespace hal::eink
             return settings;
         }
 
-        unsigned int toWaveformTemperatureOffset(std::int32_t temperature) noexcept
+        constexpr auto toWaveformTemperatureOffset(std::int32_t temperature) noexcept -> unsigned
         {
             if (temperature >= LUTTemperatureCritical) {
                 return LUTTemperatureOffsetCritical;
@@ -61,67 +62,67 @@ namespace hal::eink
             return temperature / LUTTemperatureOffsetInterval;
         }
 
-        unsigned int toWaveformOffset(unsigned short LUTbank, unsigned int temperatureOffset) noexcept
+        constexpr auto toWaveformOffset(unsigned short LUTbank, unsigned temperatureOffset) noexcept -> unsigned
         {
             constexpr auto singleLUTOffset = (LUTTemperatureOffsetCritical + 1);
             return LUTSTotalSize * (singleLUTOffset * LUTbank + temperatureOffset);
         }
 
-        unsigned int toWaveformOffset(EinkWaveforms_e mode, unsigned int temperatureOffset)
+        constexpr auto toWaveformOffset(bsp::eink::EinkWaveform mode, unsigned temperatureOffset) -> unsigned
         {
             switch (mode) {
-            case EinkWaveformINIT:
+            case bsp::eink::EinkWaveform::INIT:
                 return toWaveformOffset(0, temperatureOffset);
-            case EinkWaveformA2:
+            case bsp::eink::EinkWaveform::A2:
                 return toWaveformOffset(1, temperatureOffset);
-            case EinkWaveformDU2:
+            case bsp::eink::EinkWaveform::DU2:
                 return toWaveformOffset(2, temperatureOffset);
-            case EinkWaveformGLD16:
+            case bsp::eink::EinkWaveform::GLD16:
                 return toWaveformOffset(3, temperatureOffset);
-            case EinkWaveformGC16:
+            case bsp::eink::EinkWaveform::GC16:
                 return toWaveformOffset(4, temperatureOffset);
             default:
                 throw std::invalid_argument{"Invalid waveform mode."};
             }
         }
+
+        constexpr auto translateDisplayColorMode(EinkDisplayColorMode mode) -> bsp::eink::EinkDisplayColorMode
+        {
+            return mode == EinkDisplayColorMode::EinkDisplayColorModeStandard
+                       ? bsp::eink::EinkDisplayColorMode::Standard
+                       : bsp::eink::EinkDisplayColorMode::Inverted;
+        }
+
+        constexpr auto translateStatus(bsp::eink::EinkStatus status) -> EinkStatus
+        {
+            switch (status) {
+            case bsp::eink::EinkStatus::OK:
+                return EinkStatus::EinkOK;
+            case bsp::eink::EinkStatus::Error:
+                return EinkStatus::EinkError;
+            case bsp::eink::EinkStatus::SPIErr:
+                return EinkStatus::EinkSPIErr;
+            case bsp::eink::EinkStatus::SPINotInitializedErr:
+                return EinkStatus::EinkSPINotInitializedErr;
+            case bsp::eink::EinkStatus::DMAErr:
+                return EinkStatus::EinkDMAErr;
+            case bsp::eink::EinkStatus::InitErr:
+                return EinkStatus::EinkInitErr;
+            case bsp::eink::EinkStatus::Timeout:
+                return EinkStatus::EinkTimeout;
+            case bsp::eink::EinkStatus::NoMem:
+                return EinkStatus::EinkNoMem;
+            case bsp::eink::EinkStatus::WaveformsFileOpenFail:
+                return EinkStatus::EinkWaveformsFileOpenFail;
+            default:
+                return EinkStatus::EinkUnknown;
+            }
+        }
     } // namespace
 
-    EinkDisplayColorMode_e translateDisplayColorMode(const EinkDisplayColorMode mode)
-    {
-        return mode == EinkDisplayColorMode::EinkDisplayColorModeStandard
-                   ? EinkDisplayColorMode_e::EinkDisplayColorModeStandard
-                   : EinkDisplayColorMode_e::EinkDisplayColorModeInverted;
-    }
-
-    EinkStatus translateStatus(const EinkStatus_e status_e)
-    {
-        switch (status_e) {
-        case EinkOK:
-            return EinkStatus::EinkOK;
-        case EinkError:
-            return EinkStatus::EinkError;
-        case EinkSPIErr:
-            return EinkStatus::EinkSPIErr;
-        case EinkSPINotInitializedErr:
-            return EinkStatus::EinkSPINotInitializedErr;
-        case EinkDMAErr:
-            return EinkStatus::EinkDMAErr;
-        case EinkInitErr:
-            return EinkStatus::EinkInitErr;
-        case EinkTimeout:
-            return EinkStatus::EinkTimeout;
-        case EinkNoMem:
-            return EinkStatus::EinkNoMem;
-        case EinkWaveformsFileOpenFail:
-            return EinkStatus::EinkWaveformsFileOpenFail;
-        default:
-            return EinkStatus::EinkUnknown;
-        }
-    }
-
     EinkDisplay::EinkDisplay(FrameSize size)
-        : size{size}, currentWaveform{createDefaultWaveFormSettings(EinkWaveformGC16)},
-          displayMode{EinkDisplayColorMode_e::EinkDisplayColorModeStandard}
+        : size{size}, currentWaveform{createDefaultWaveformSettings(bsp::eink::EinkWaveform::GC16)},
+          displayMode{EinkDisplayColorMode::EinkDisplayColorModeStandard}
     {
 #if defined(TARGET_RT1051)
         driverLPSPI = drivers::DriverLPSPI::Create(
@@ -135,17 +136,17 @@ namespace hal::eink
         delete[] currentWaveform.LUTDData;
     }
 
-    EinkStatus EinkDisplay::prepareDisplay(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour)
+    auto EinkDisplay::prepareDisplay(EinkRefreshMode refreshMode, WaveformTemperature behaviour) -> EinkStatus
     {
         if (const auto status = reinitAndPowerOn(); status != EinkStatus::EinkOK) {
             return status;
         }
 
-        const auto temperature =
-            behaviour == WaveformTemperature::KEEP_CURRENT ? getLastTemperature() : EinkGetTemperatureInternal();
+        const auto temperature = (behaviour == WaveformTemperature::KeepCurrent) ? getLastTemperature()
+                                                                                 : bsp::eink::getTemperatureInternal();
 
         if (refreshMode == EinkRefreshMode::REFRESH_DEEP) {
-            auto status = setWaveform(EinkWaveforms_e::EinkWaveformGC16, temperature);
+            auto status = setWaveform(bsp::eink::EinkWaveform::GC16, temperature);
             if (status == EinkStatus::EinkOK) {
                 if (const auto ditherStatus = dither(); ditherStatus != EinkStatus::EinkOK) {
                     return ditherStatus;
@@ -153,30 +154,27 @@ namespace hal::eink
             }
             return status;
         }
-        return setWaveform(EinkWaveforms_e::EinkWaveformDU2, temperature);
+        return setWaveform(bsp::eink::EinkWaveform::DU2, temperature);
     }
 
-    EinkStatus EinkDisplay::updateDisplay(EinkFrame frame, const std::uint8_t *frameBuffer)
+    auto EinkDisplay::updateDisplay(EinkFrame frame, const std::uint8_t *frameBuffer) -> EinkStatus
     {
         return translateStatus(
-            EinkUpdateFrame(EinkFrame_t{frame.pos_x, frame.pos_y, frame.size.width, frame.size.height},
-                            frameBuffer,
-                            getCurrentBitsPerPixelFormat(),
-                            translateDisplayColorMode(displayMode)));
+            updateFrame(bsp::eink::EinkFrame{frame.pos_x, frame.pos_y, frame.size.width, frame.size.height},
+                        frameBuffer,
+                        getCurrentBitsPerPixelFormat(),
+                        translateDisplayColorMode(displayMode)));
     }
 
-    EinkStatus EinkDisplay::refreshDisplay(EinkFrame frame, const EinkRefreshMode refreshMode)
+    auto EinkDisplay::refreshDisplay(EinkFrame frame) -> EinkStatus
     {
-        const auto refreshTimingsMode = refreshMode == EinkRefreshMode::REFRESH_DEEP
-                                            ? EinkDisplayTimingsDeepCleanMode
-                                            : EinkDisplayTimingsFastRefreshMode;
-
-        currentWaveform.useCounter += 1;
-        return translateStatus(EinkRefreshImage(
-            EinkFrame_t{frame.pos_x, frame.pos_y, frame.size.width, frame.size.height}, refreshTimingsMode));
+        currentWaveform.useCounter++;
+        return translateStatus(bsp::eink::refreshImage(
+            bsp::eink::EinkFrame{frame.pos_x, frame.pos_y, frame.size.width, frame.size.height}));
     }
 
-    EinkStatus EinkDisplay::showImageUpdate(const std::vector<EinkFrame> &updateFrames, const std::uint8_t *frameBuffer)
+    auto EinkDisplay::showImageUpdate(const std::vector<EinkFrame> &updateFrames, const std::uint8_t *frameBuffer)
+        -> EinkStatus
     {
         if (const auto status = reinitAndPowerOn(); status != EinkStatus::EinkOK) {
             return status;
@@ -192,26 +190,26 @@ namespace hal::eink
         return EinkStatus::EinkOK;
     }
 
-    EinkStatus EinkDisplay::showImageRefresh(const EinkFrame &refreshFrame, const EinkRefreshMode refreshMode)
+    auto EinkDisplay::showImageRefresh(const EinkFrame &refreshFrame, const EinkRefreshMode refreshMode) -> EinkStatus
     {
-        if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KEEP_CURRENT);
+        if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KeepCurrent);
             status != EinkStatus::EinkOK) {
             return status;
         }
 
-        if (const auto status = refreshDisplay(refreshFrame, refreshMode); status != EinkStatus::EinkOK) {
+        if (const auto status = refreshDisplay(refreshFrame); status != EinkStatus::EinkOK) {
             return status;
         }
 
         return EinkStatus::EinkOK;
     }
 
-    EinkStatus EinkDisplay::showImage(const std::vector<EinkFrame> &updateFrames,
-                                      const EinkFrame &refreshFrame,
-                                      const std::uint8_t *frameBuffer,
-                                      const EinkRefreshMode refreshMode)
+    auto EinkDisplay::showImage(const std::vector<EinkFrame> &updateFrames,
+                                const EinkFrame &refreshFrame,
+                                const std::uint8_t *frameBuffer,
+                                const EinkRefreshMode refreshMode) -> EinkStatus
     {
-        if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KEEP_CURRENT);
+        if (const auto status = prepareDisplay(refreshMode, WaveformTemperature::KeepCurrent);
             status != EinkStatus::EinkOK) {
             return status;
         }
@@ -223,88 +221,91 @@ namespace hal::eink
             }
         }
 
-        if (const auto status = refreshDisplay(refreshFrame, refreshMode); status != EinkStatus::EinkOK) {
+        if (const auto status = refreshDisplay(refreshFrame); status != EinkStatus::EinkOK) {
             return status;
         }
 
         return EinkStatus::EinkOK;
     }
 
-    void EinkDisplay::prepareEarlyRequest(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour)
+    auto EinkDisplay::prepareEarlyRequest(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour)
+        -> void
     {
         prepareDisplay(refreshMode, behaviour);
     }
 
-    EinkStatus EinkDisplay::resetAndInit()
+    auto EinkDisplay::resetAndInit() -> EinkStatus
     {
-        return translateStatus(EinkResetAndInitialize());
+        return translateStatus(bsp::eink::resetAndInitialize());
     }
 
-    EinkStatus EinkDisplay::dither()
+    auto EinkDisplay::dither() -> EinkStatus
     {
-        return translateStatus(EinkDitherDisplay());
+        return translateStatus(bsp::eink::ditherDisplay());
     }
 
-    EinkStatus EinkDisplay::powerOn()
+    auto EinkDisplay::powerOn() -> EinkStatus
     {
         if (driverLPSPI) {
             driverLPSPI->Enable();
         }
-        return translateStatus(EinkPowerOn());
+        return translateStatus(bsp::eink::powerOn());
     }
 
-    EinkStatus EinkDisplay::powerOff()
+    auto EinkDisplay::powerOff() -> EinkStatus
     {
-        const auto status = translateStatus(EinkPowerOff());
+        const auto status = translateStatus(bsp::eink::powerOff());
         if (driverLPSPI) {
             driverLPSPI->Disable();
         }
         return status;
     }
 
-    EinkStatus EinkDisplay::shutdown()
+    auto EinkDisplay::shutdown() -> EinkStatus
     {
-        const auto status = translateStatus(EinkPowerDown());
+        const auto status = translateStatus(bsp::eink::powerDown());
         if (driverLPSPI) {
             driverLPSPI->Disable();
         }
         return status;
     }
 
-    EinkStatus EinkDisplay::wipeOut()
+    auto EinkDisplay::wipeOut() -> EinkStatus
     {
-        if (const auto status = prepareDisplay(EinkRefreshMode::REFRESH_DEEP, WaveformTemperature::KEEP_CURRENT);
+        if (const auto status = prepareDisplay(EinkRefreshMode::REFRESH_DEEP, WaveformTemperature::KeepCurrent);
             status != EinkStatus::EinkOK) {
             return status;
         }
-        return translateStatus(EinkFillScreenWithColor(EinkDisplayColorFilling_e::EinkDisplayColorWhite));
+        return translateStatus(bsp::eink::fillScreenWithColor(bsp::eink::EinkDisplayColorFilling::White));
     }
 
-    EinkBpp_e EinkDisplay::getCurrentBitsPerPixelFormat() const noexcept
+    auto EinkDisplay::getCurrentBitsPerPixelFormat() const noexcept -> bsp::eink::EinkBpp
     {
-        if ((currentWaveform.mode == EinkWaveformA2) || (currentWaveform.mode == EinkWaveformDU2)) {
-            return Eink4Bpp; // this should be 1Bpp, but the OS is not ready for this (in 1Bpp → halftones disappear)
+        if ((currentWaveform.mode == bsp::eink::EinkWaveform::A2) ||
+            (currentWaveform.mode == bsp::eink::EinkWaveform::DU2)) {
+            /* Should be 1Bpp, but the OS is not ready for this and probably never will (in 1Bpp halftones disappear) */
+            return bsp::eink::EinkBpp::Eink4Bpp;
         }
-        return Eink4Bpp;
+        return bsp::eink::EinkBpp::Eink4Bpp;
     }
 
-    bool EinkDisplay::isNewWaveformNeeded(const EinkWaveforms_e newMode, const std::int32_t newTemperature) const
+    auto EinkDisplay::isNewWaveformNeeded(bsp::eink::EinkWaveform newMode, std::int32_t newTemperature) const -> bool
     {
-        constexpr auto lenientTemperatureUseCounter = 50; // arbitrary. not documented
-        auto alloweLenientTemperature               = currentWaveform.useCounter < lenientTemperatureUseCounter;
+        constexpr auto lenientTemperatureUseCounter = 50; // Arbitrary, not documented
+        const auto allowLenientTemperature          = currentWaveform.useCounter < lenientTemperatureUseCounter;
 
-        // at least: modes cannot differ
-        if (alloweLenientTemperature && newMode == currentWaveform.mode) {
+        // At least: modes cannot differ
+        if (allowLenientTemperature && newMode == currentWaveform.mode) {
             bool temperatureFine = false;
 
             switch (currentWaveform.mode) {
-            case EinkWaveformA2:
-            case EinkWaveformDU2:
+            case bsp::eink::EinkWaveform::A2:
+            case bsp::eink::EinkWaveform::DU2:
                 temperatureFine = abs(newTemperature - currentWaveform.temperature) <= 3;
                 break;
-            case EinkWaveformINIT:
-            case EinkWaveformGLD16:
-            case EinkWaveformGC16:
+            case bsp::eink::EinkWaveform::INIT:
+            case bsp::eink::EinkWaveform::GLD16:
+            case bsp::eink::EinkWaveform::GC16:
                 temperatureFine = abs(newTemperature - currentWaveform.temperature) <= 2;
                 break;
             }
@@ -316,30 +317,31 @@ namespace hal::eink
         return true;
     }
 
-    EinkStatus EinkDisplay::setWaveform(const EinkWaveforms_e mode, const std::int32_t temperature)
+    auto EinkDisplay::setWaveform(bsp::eink::EinkWaveform mode, std::int32_t temperature) -> EinkStatus
     {
         if (!isNewWaveformNeeded(mode, temperature)) {
-            EinkUpdateWaveform(&currentWaveform);
+            updateWaveform(&currentWaveform);
             return EinkStatus::EinkOK;
         }
 
-        auto currentOffset =
+        const auto currentOffset =
             toWaveformOffset(currentWaveform.mode, toWaveformTemperatureOffset(currentWaveform.temperature));
-        // assume it is changed
+
+        // Assume it's changed
         currentWaveform.useCounter  = 0;
         currentWaveform.temperature = temperature;
         currentWaveform.mode        = mode;
 
-        auto offset = toWaveformOffset(mode, toWaveformTemperatureOffset(temperature));
+        auto offset = static_cast<long>(toWaveformOffset(mode, toWaveformTemperatureOffset(temperature)));
 
         if (offset == currentOffset) {
-            // current waveform is still the best fit
+            // Current waveform is still the best fit
             return EinkStatus::EinkOK;
         }
 
-        auto file = std::fopen(LutsFilePath.c_str(), "rb");
+        auto file = std::fopen(lutsFilePath.c_str(), "rb");
         if (file == nullptr) {
-            LOG_FATAL("Could not find LUTS file in '%s'! Returning...", LutsFilePath.c_str());
+            LOG_FATAL("Could not find LUTS file in '%s'! Returning...", lutsFilePath.c_str());
             return EinkStatus::EinkWaveformsFileOpenFail;
         }
         auto fileHandlerCleanup = gsl::finally([&file]() { std::fclose(file); });
@@ -349,7 +351,7 @@ namespace hal::eink
         std::fread(&currentWaveform.LUTDData[1], 1, LUTDSize, file);
 
         // 0x00 - 1 frame, ... , 0x0F - 16 frames
-        const uint8_t waveformFrameCount = currentWaveform.LUTDData[1] + 1;
+        const std::uint8_t waveformFrameCount = currentWaveform.LUTDData[1] + 1;
         // (frameCount * 64) - size of actual LUT; (+1) - the byte containing frameCount; (+1) - EinkLUTD command
         currentWaveform.LUTDSize = (waveformFrameCount * 64) + 1 + 1;
 
@@ -357,11 +359,11 @@ namespace hal::eink
         std::fseek(file, offset, SEEK_SET);
         std::fread(&currentWaveform.LUTCData[1], 1, LUTCSize, file);
 
-        EinkUpdateWaveform(&currentWaveform);
+        updateWaveform(&currentWaveform);
         return EinkStatus::EinkOK;
     }
 
-    void EinkDisplay::resetWaveformSettings()
+    auto EinkDisplay::resetWaveformSettings() -> void
     {
         delete[] currentWaveform.LUTDData;
         currentWaveform.LUTDSize    = 0;
@@ -374,42 +376,42 @@ namespace hal::eink
         currentWaveform.LUTCData[0] = EinkLUTC;
     }
 
-    void EinkDisplay::setMode(const EinkDisplayColorMode mode) noexcept
+    auto EinkDisplay::setMode(EinkDisplayColorMode mode) noexcept -> void
     {
         displayMode = mode;
     }
 
-    EinkDisplayColorMode EinkDisplay::getMode() const noexcept
+    auto EinkDisplay::getMode() const noexcept -> EinkDisplayColorMode
     {
         return displayMode;
     }
 
-    std::int32_t EinkDisplay::getLastTemperature() const noexcept
+    auto EinkDisplay::getLastTemperature() const noexcept -> std::int32_t
     {
         return currentWaveform.temperature;
     }
 
-    [[nodiscard]] auto EinkDisplay::getDevice() const noexcept -> std::shared_ptr<devices::Device>
+    auto EinkDisplay::getDevice() const noexcept -> std::shared_ptr<devices::Device>
     {
         return driverLPSPI;
     }
 
-    std::unique_ptr<AbstractEinkDisplay> AbstractEinkDisplay::Factory::create(FrameSize size)
+    auto AbstractEinkDisplay::Factory::create(FrameSize size) -> std::unique_ptr<AbstractEinkDisplay>
     {
         return std::make_unique<EinkDisplay>(size);
     }
 
-    EinkStatus EinkDisplay::reinitAndPowerOn()
+    auto EinkDisplay::reinitAndPowerOn() -> EinkStatus
     {
         auto errorCounter = 0U;
         auto status       = EinkStatus::EinkUnknown;
-        if (EinkIsPoweredOn()) {
+        if (bsp::eink::isPoweredOn()) {
             return EinkStatus::EinkOK;
         }
-        while (status != EinkStatus::EinkOK && errorCounter++ < EinkDisplayMaxInitRetries) {
+        while (status != EinkStatus::EinkOK && errorCounter++ < einkDisplayMaxInitRetries) {
             status = tryReinitAndPowerOn();
             if (status != EinkStatus::EinkOK) {
-                if (errorCounter < EinkDisplayMaxInitRetries) {
+                if (errorCounter < einkDisplayMaxInitRetries) {
                     LOG_WARN("Failed to initialize and power on Eink, trying once more...");
                 }
                 else {
@@ -417,21 +419,19 @@ namespace hal::eink
                 }
             }
         }
-
         return status;
     }
 
-    EinkStatus EinkDisplay::tryReinitAndPowerOn()
+    auto EinkDisplay::tryReinitAndPowerOn() -> EinkStatus
     {
         if (const auto status = resetAndInit(); status != EinkStatus::EinkOK) {
-            LOG_WARN("Eink initialization failed (%s)", magic_enum::enum_name(status).data());
+            LOG_WARN("Eink initialization failed: %s", magic_enum::enum_name(status).data());
             return status;
         }
         if (const auto status = powerOn(); status != EinkStatus::EinkOK) {
-            LOG_WARN("Eink power on failed (%s)", magic_enum::enum_name(status).data());
+            LOG_WARN("Eink power on failed: %s", magic_enum::enum_name(status).data());
             return status;
         }
         return EinkStatus::EinkOK;
     }
-
 } // namespace hal::eink
