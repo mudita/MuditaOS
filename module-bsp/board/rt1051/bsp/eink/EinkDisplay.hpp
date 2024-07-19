@@ -3,13 +3,13 @@
 
 #pragma once
 
-#include <cstdint>
-#include <memory>
+#include "drivers/lpspi/DriverLPSPI.hpp"
+#include "ED028TC1.hpp"
 
 #include <hal/eink/AbstractEinkDisplay.hpp>
 
-#include "drivers/lpspi/DriverLPSPI.hpp"
-#include "ED028TC1.h"
+#include <cstdint>
+#include <memory>
 
 namespace hal::eink
 {
@@ -21,50 +21,50 @@ namespace hal::eink
     class EinkDisplay : public AbstractEinkDisplay
     {
       public:
-        EinkDisplay(FrameSize size);
+        explicit EinkDisplay(FrameSize size);
 
-        ~EinkDisplay() noexcept;
+        ~EinkDisplay() noexcept override;
 
-        void setMode(EinkDisplayColorMode mode) noexcept override;
-        EinkDisplayColorMode getMode() const noexcept override;
+        auto setMode(EinkDisplayColorMode mode) noexcept -> void override;
+        [[nodiscard]] auto getMode() const noexcept -> EinkDisplayColorMode override;
 
-        EinkStatus showImageUpdate(const std::vector<EinkFrame> &updateFrames,
-                                   const std::uint8_t *frameBuffer) override;
-        EinkStatus showImageRefresh(const EinkFrame &refreshFrame, const EinkRefreshMode refreshMode) override;
-        EinkStatus showImage(const std::vector<EinkFrame> &updateFrames,
-                             const EinkFrame &refreshFrame,
-                             const std::uint8_t *frameBuffer,
-                             const EinkRefreshMode refreshMode) override;
-        void prepareEarlyRequest(EinkRefreshMode refreshMode, const WaveformTemperature behaviour) override;
+        auto showImageUpdate(const std::vector<EinkFrame> &updateFrames, const std::uint8_t *frameBuffer)
+            -> EinkStatus override;
+        auto showImageRefresh(const EinkFrame &refreshFrame, EinkRefreshMode refreshMode) -> EinkStatus override;
+        auto showImage(const std::vector<EinkFrame> &updateFrames,
+                       const EinkFrame &refreshFrame,
+                       const std::uint8_t *frameBuffer,
+                       EinkRefreshMode refreshMode) -> EinkStatus override;
+        auto prepareEarlyRequest(EinkRefreshMode refreshMode, WaveformTemperature behaviour) -> void override;
 
-        EinkStatus resetAndInit() override;
-        EinkStatus dither() override;
-        EinkStatus powerOn() override;
-        EinkStatus powerOff() override;
-        EinkStatus shutdown() override;
-        EinkStatus wipeOut() override;
-        EinkStatus reinitAndPowerOn() override;
+        [[nodiscard]] auto resetAndInit() -> EinkStatus override;
+        [[nodiscard]] auto dither() -> EinkStatus override;
+        [[nodiscard]] auto powerOn() -> EinkStatus override;
+        [[nodiscard]] auto powerOff() -> EinkStatus override;
+        [[nodiscard]] auto shutdown() -> EinkStatus override;
+        [[nodiscard]] auto wipeOut() -> EinkStatus override;
+        [[nodiscard]] auto reinitAndPowerOn() -> EinkStatus override;
 
         [[nodiscard]] auto getDevice() const noexcept -> std::shared_ptr<devices::Device> override;
 
       private:
-        bool isNewWaveformNeeded(const EinkWaveforms_e newMode, const int32_t newTemperature) const;
-        void resetWaveformSettings();
+        [[nodiscard]] auto isNewWaveformNeeded(bsp::eink::EinkWaveform newMode, std::int32_t newTemperature) const
+            -> bool;
+        [[nodiscard]] auto setWaveform(bsp::eink::EinkWaveform mode, std::int32_t temperature) -> EinkStatus;
+        auto resetWaveformSettings() -> void;
 
-        EinkBpp_e getCurrentBitsPerPixelFormat() const noexcept;
+        [[nodiscard]] auto getCurrentBitsPerPixelFormat() const noexcept -> bsp::eink::EinkBpp;
 
-        EinkStatus setWaveform(const EinkWaveforms_e mode, const std::int32_t temperature);
+        [[nodiscard]] auto getLastTemperature() const noexcept -> std::int32_t;
 
-        std::int32_t getLastTemperature() const noexcept;
-
-        EinkStatus updateDisplay(EinkFrame frame, const std::uint8_t *frameBuffer);
-        EinkStatus refreshDisplay(EinkFrame frame, const EinkRefreshMode refreshMode);
-        EinkStatus prepareDisplay(const EinkRefreshMode refreshMode, const WaveformTemperature behaviour);
-        EinkStatus tryReinitAndPowerOn();
+        auto updateDisplay(EinkFrame frame, const std::uint8_t *frameBuffer) -> EinkStatus;
+        auto refreshDisplay(EinkFrame frame) -> EinkStatus;
+        auto prepareDisplay(EinkRefreshMode refreshMode, WaveformTemperature behaviour) -> EinkStatus;
+        auto tryReinitAndPowerOn() -> EinkStatus;
 
         FrameSize size;
 
-        EinkWaveformSettings_t currentWaveform;
+        bsp::eink::EinkWaveformSettings currentWaveform;
         EinkDisplayColorMode displayMode;
 
         std::shared_ptr<drivers::DriverLPSPI> driverLPSPI;
