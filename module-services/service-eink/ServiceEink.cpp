@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <board.h>
@@ -461,7 +461,7 @@ namespace service::eink
     {
         const auto waveformUpdateMsg = static_cast<service::eink::PrepareDisplayEarlyRequest *>(message);
         display->prepareEarlyRequest(translateToEinkRefreshMode(waveformUpdateMsg->getRefreshMode()),
-                                     hal::eink::WaveformTemperature::MEASURE_NEW);
+                                     hal::eink::WaveformTemperature::MeasureNew);
         return sys::MessageNone{};
     }
 
