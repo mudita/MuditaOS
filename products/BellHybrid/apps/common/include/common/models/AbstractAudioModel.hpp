@@ -49,7 +49,7 @@ namespace app
         virtual void play(const std::string &filePath,
                           PlaybackType type,
                           OnStateChangeCallback &&callback,
-                          std::optional<audio::FadeParams> fadeParams = std::nullopt)      = 0;
+                          std::optional<audio::FadeParams> fadeParams = std::nullopt)    = 0;
         virtual void stopAny(OnStateChangeCallback &&callback)                           = 0;
         virtual void stopPlayedByThis(OnStateChangeCallback &&callback)                  = 0;
         virtual void pause(OnStateChangeCallback &&callback)                             = 0;
