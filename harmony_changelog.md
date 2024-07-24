@@ -3,6 +3,16 @@
 ## Unreleased
 
 ### Fixed
+
+### Added
+* Added label with the name of the application on the countdown screens
+* Added What's New section shown after update
+
+### Changed / Improved
+
+## [2.8.0 2024-07-23]
+
+### Fixed
 * Fixed incorrect Power Management statistics in the logs
 
 ### Added
@@ -10,8 +20,6 @@
 * Added update instruction screen at end of onboarding
 * Added update instruction screen in Settings
 * Added volume setting for Focus Timer application
-* Added label with the name of the application on the countdown screens
-* Added What's New section shown after update
 
 ### Changed / Improved
 * Changed the refresh rate of the progress bar screen
