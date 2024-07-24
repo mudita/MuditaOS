@@ -23,12 +23,10 @@ namespace app
       public:
         RelaxationFadeModel() = delete;
 
-        RelaxationFadeModel(ApplicationCommon *app)
-        {
-            fade = std::make_unique<RelaxationFadeSettings>(app);
-        }
+        explicit RelaxationFadeModel(ApplicationCommon *app) : fade{std::make_unique<RelaxationFadeSettings>(app)}
+        {}
 
-        gui::AbstractSettingsModel<bool> &getFade() override
+        auto getFade() -> gui::AbstractSettingsModel<bool> & override
         {
             return *fade;
         }
