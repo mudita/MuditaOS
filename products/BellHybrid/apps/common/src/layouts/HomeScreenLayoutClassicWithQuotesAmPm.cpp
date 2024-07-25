@@ -58,5 +58,4 @@ namespace gui
             ampm->setVisible(false);
         }
     }
-
-}; // namespace gui
+} // namespace gui

@@ -11,48 +11,48 @@ namespace
 {
     namespace container
     {
-        constexpr auto width      = 544U;
-        constexpr auto height     = 436U;
-        constexpr auto top_margin = 20U;
+        constexpr auto width{544U};
+        constexpr auto height{436U};
+        constexpr auto top_margin{20U};
 
         namespace centerBox
         {
-            constexpr auto width  = 448U;
-            constexpr auto height = container::height;
+            constexpr auto width{448U};
+            constexpr auto height{container::height};
         } // namespace centerBox
 
         namespace imageBox
         {
-            constexpr auto width  = centerBox::width;
-            constexpr auto height = 120U;
+            constexpr auto width{centerBox::width};
+            constexpr auto height{120U};
         } // namespace imageBox
 
         namespace title
         {
-            constexpr auto height        = 56U;
-            constexpr auto width         = centerBox::width;
-            constexpr auto font          = style::window::font::large;
-            constexpr auto bottom_margin = 32U;
+            constexpr auto height{56U};
+            constexpr auto width{centerBox::width};
+            constexpr auto font{style::window::font::large};
+            constexpr auto bottom_margin{32U};
         } // namespace title
 
         namespace instruction
         {
-            constexpr auto maxNumberOfLines = 3;
-            constexpr auto width            = centerBox::width - 40U;
-            constexpr auto minHeight        = 43U;
-            constexpr auto maxHeight        = minHeight * maxNumberOfLines;
-            constexpr auto bottom_margin    = 14U;
+            constexpr auto maxNumberOfLines{3};
+            constexpr auto width{centerBox::width - 40U};
+            constexpr auto minHeight{43U};
+            constexpr auto maxHeight{minHeight * maxNumberOfLines};
+            constexpr auto bottom_margin{14U};
 
             namespace number
             {
-                constexpr auto width = 36U;
-                constexpr auto font  = style::window::font::verybiglight;
+                constexpr auto width{36U};
+                constexpr auto font{style::window::font::verybiglight};
             } // namespace number
 
             namespace text
             {
-                constexpr auto width = instruction::width - number::width;
-                constexpr auto font  = style::window::font::verybiglight;
+                constexpr auto width{instruction::width - number::width};
+                constexpr auto font{style::window::font::verybiglight};
             } // namespace text
         }     // namespace instruction
     } // namespace container

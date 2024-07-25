@@ -22,6 +22,7 @@
 #include <service-evtmgr/WorkerEventCommon.hpp>
 #include <sys/messages/AlarmActivationStatusChangeRequest.hpp>
 #include <switches/LatchState.hpp>
+#include <ProductConfig.hpp>
 
 namespace
 {
@@ -49,7 +50,7 @@ EventManager::EventManager(LogDumpFunction logDumpFunction, const std::string &n
 #if CONFIG_ENABLE_TEMP == 1
     temperatureSource = hal::temperature::AbstractTemperatureSource::Factory::create();
     updateTemperature(*temperatureSource);
-    onMinuteTick = [this](const time_t) { updateTemperature(*temperatureSource); };
+    onMinuteTick = [this](std::time_t time) { updateTemperature(*temperatureSource); };
 #endif
 }
 

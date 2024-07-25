@@ -2,7 +2,6 @@
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "LayoutWindowPresenter.hpp"
-#include <service-appmgr/Controller.hpp>
 #include <common/layouts/BaseHomeScreenLayoutProvider.hpp>
 #include <appmgr/messages/ChangeHomescreenLayoutMessage.hpp>
 
@@ -10,17 +9,22 @@
 #include <Temperature.hpp>
 #include <service-appmgr/ServiceApplicationManagerName.hpp>
 
-constexpr auto alarmTime              = 0;
-constexpr auto clockTime              = 0;
-constexpr Store::Battery batteryState = {
-    .levelState = Store::Battery::LevelState::Normal,
-    .state      = Store::Battery::State::Discharging,
-    .level      = 100,
-};
-constexpr utils::temperature::Temperature temperature = {
-    .unit  = utils::temperature::Temperature::Unit::Celsius,
-    .value = 21.0f,
-};
+namespace
+{
+    constexpr auto alarmTime = 0;
+    constexpr auto clockTime = 0;
+
+    constexpr Store::Battery batteryState = {
+        .levelState = Store::Battery::LevelState::Normal,
+        .state      = Store::Battery::State::Discharging,
+        .level      = 100,
+    };
+
+    constexpr utils::temperature::Temperature temperature = {
+        .unit  = utils::temperature::Temperature::Unit::Celsius,
+        .value = 21.0f,
+    };
+} // namespace
 
 namespace app::bell_settings
 {
@@ -37,8 +41,9 @@ namespace app::bell_settings
     std::vector<gui::Item *> LayoutWindowPresenter::getLayouts() const
     {
         std::vector<gui::Item *> layouts;
+        layouts.reserve(layoutOptions.size());
 
-        for (auto const &[option, _] : layoutOptions) {
+        for (const auto &[option, _] : layoutOptions) {
             layouts.push_back(option->getLayout());
         }
 
@@ -47,9 +52,9 @@ namespace app::bell_settings
 
     gui::Item *LayoutWindowPresenter::getSelectedLayout() const
     {
-        const auto layoutSelected = layoutModel->getValue();
+        const auto &layoutSelected = layoutModel->getValue();
 
-        for (auto const &[option, name] : layoutOptions) {
+        for (const auto &[option, name] : layoutOptions) {
             if (name == layoutSelected) {
                 return option->getLayout();
             }
@@ -60,11 +65,11 @@ namespace app::bell_settings
 
     void LayoutWindowPresenter::setLayout(gui::Item *selectedLayout)
     {
-        for (auto const &[option, name] : layoutOptions) {
+        for (const auto &[option, name] : layoutOptions) {
             if (option->getLayout() == selectedLayout) {
                 layoutModel->setValue(name);
                 auto layoutChangeRequest = std::make_shared<ChangeHomescreenLayoutMessage>(name);
-                app->bus.sendUnicast(layoutChangeRequest, service::name::appmgr);
+                app->bus.sendUnicast(std::move(layoutChangeRequest), service::name::appmgr);
                 break;
             }
         }
@@ -72,7 +77,7 @@ namespace app::bell_settings
 
     void LayoutWindowPresenter::initLayoutOptions()
     {
-        quoteModel->setCallback([=](std::string quote, std::string author) {
+        quoteModel->setCallback([=](const auto &quote, const auto &author) {
             for (auto &[layout, _] : layoutOptions) {
                 layout->setQuoteText(quote, author);
             }
@@ -92,7 +97,7 @@ namespace app::bell_settings
             layout->setAlarmTime(alarmTime);
             layout->setBatteryLevelState(batteryState);
             layout->setTemperature(temperature);
-            layoutOptions.push_back({layout, layoutEntry.first});
+            layoutOptions.emplace_back(layout, layoutEntry.first);
         }
     }
 } // namespace app::bell_settings

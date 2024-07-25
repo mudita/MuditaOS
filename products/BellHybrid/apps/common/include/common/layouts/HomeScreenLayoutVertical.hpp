@@ -11,7 +11,6 @@
 
 namespace gui
 {
-
     class BellBaseLayout;
     class TextFixedSize;
     class AlarmIcon;
@@ -34,15 +33,15 @@ namespace gui
     class HomeScreenLayoutVertical : public BaseHomeScreenLayoutProvider, public LayoutVertical
     {
       public:
-        HomeScreenLayoutVertical(std::string name);
+        explicit HomeScreenLayoutVertical(std::string name);
 
-        virtual auto setViewState(app::home_screen::ViewState state) -> void override;
-        virtual auto setTime(std::time_t newTime) -> void override;
+        auto setViewState(app::home_screen::ViewState state) -> void override;
+        auto setTime(std::time_t newTime) -> void override;
         auto setTextDescription(const UTF8 &desc) -> void override;
         auto setBatteryLevelState(const Store::Battery &batteryContext) -> void override;
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
         auto setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
-        auto getAlarmTime() const -> std::time_t override;
+        [[nodiscard]] auto getAlarmTime() const -> std::time_t override;
         auto setAlarmTime(std::time_t newTime) -> void override;
         auto updateUsbStatus(bool isConnected) -> void override;
         void setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor) override;
@@ -54,6 +53,6 @@ namespace gui
         auto setScreenMode(ScreenMode mode) -> void;
         virtual bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext);
         virtual bool isAlarmTimeVisibilityAllowed();
-        bool isBatteryCharging(const Store::Battery::State state);
+        bool isBatteryCharging(Store::Battery::State state);
     };
-}; // namespace gui
+} // namespace gui

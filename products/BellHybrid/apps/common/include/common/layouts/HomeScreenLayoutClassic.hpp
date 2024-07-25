@@ -9,16 +9,15 @@
 
 namespace style::homescreen_classic
 {
-    constexpr inline auto status_box_layout_w          = 350U;
-    constexpr inline auto info_box_layout_h            = 70U;
-    constexpr inline auto connection_box_layout_h      = 44U;
-    constexpr inline auto connection_box_top_margin    = 20U;
-    constexpr inline auto connection_box_bottom_margin = -20;
-
+    inline constexpr auto status_box_layout_w{350U};
+    inline constexpr auto info_box_layout_h{70U};
+    inline constexpr auto connection_box_layout_h{44U};
+    inline constexpr auto connection_box_top_margin{20U};
+    inline constexpr auto connection_box_bottom_margin{-20};
 } // namespace style::homescreen_classic
+
 namespace gui
 {
-
     class BellBaseLayout;
     class TextFixedSize;
     class AlarmSetSpinner;
@@ -54,20 +53,19 @@ namespace gui
     class HomeScreenLayoutClassic : public BaseHomeScreenLayoutProvider, protected BellBaseLayout
     {
       public:
-        HomeScreenLayoutClassic(std::string name);
+        explicit HomeScreenLayoutClassic(std::string name);
 
-        virtual auto setViewState(app::home_screen::ViewState state) -> void override;
-        virtual auto setTime(std::time_t newTime) -> void override;
+        auto setViewState(app::home_screen::ViewState state) -> void override;
+        auto setTime(std::time_t newTime) -> void override;
         auto setTextDescription(const UTF8 &desc) -> void override;
         auto setBatteryLevelState(const Store::Battery &batteryContext) -> void override;
         auto setTimeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
         auto setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
         auto setSnoozeFormat(utils::time::Locale::TimeFormat fmt) -> void override;
-        auto getAlarmTime() const -> std::time_t override;
+        [[nodiscard]] auto getAlarmTime() const -> std::time_t override;
         auto setAlarmTime(std::time_t newTime) -> void override;
         auto setSnoozeTime(std::time_t newTime) -> void override;
         auto updateUsbStatus(bool isConnected) -> void override;
-        auto setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor) -> void override;
 
         auto getSnoozeTimer() -> SnoozeTimer * override;
         auto getLayout() -> Item * override;
@@ -83,20 +81,20 @@ namespace gui
         void adjustConnectionStatusPosition();
 
       protected:
-        VBox *widgetBox                        = nullptr;
-        HBox *timeHBox                         = nullptr;
-        TimeSetFmtSpinner *time                = nullptr;
-        HBox *statusBox                        = nullptr;
-        HBox *infoBox                          = nullptr;
-        HBox *connectionBox                    = nullptr;
-        BellBattery *battery                   = nullptr;
-        BellConnectionStatus *connectionStatus = nullptr;
-        TextFixedSize *bottomText              = nullptr;
-        AlarmSetSpinner *alarm    = nullptr;
-        SnoozeTimer *snoozeTimer  = nullptr;
-        Icon *lowBatteryWarning                = nullptr;
+        VBox *widgetBox{nullptr};
+        HBox *timeHBox{nullptr};
+        TimeSetFmtSpinner *time{nullptr};
+        HBox *statusBox{nullptr};
+        HBox *infoBox{nullptr};
+        HBox *connectionBox{nullptr};
+        BellBattery *battery{nullptr};
+        BellConnectionStatus *connectionStatus{nullptr};
+        TextFixedSize *bottomText{nullptr};
+        AlarmSetSpinner *alarm{nullptr};
+        SnoozeTimer *snoozeTimer{nullptr};
+        Icon *lowBatteryWarning{nullptr};
 
         std::function<void()> onShowMessage;
         std::function<void()> onHideMessage;
     };
-}; // namespace gui
+} // namespace gui
