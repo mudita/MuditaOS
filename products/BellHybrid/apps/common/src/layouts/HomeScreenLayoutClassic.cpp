@@ -20,7 +20,7 @@
 
 namespace
 {
-    constexpr auto dischargingLevelShowTop = 20;
+    constexpr auto dischargingLevelShowTop{20};
 
     bool isBatteryCharging(const Store::Battery::State state)
     {
@@ -406,8 +406,4 @@ namespace gui
             }
         }
     }
-
-    auto HomeScreenLayoutClassic::setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor) -> void
-    {}
-
-}; // namespace gui
+} // namespace gui

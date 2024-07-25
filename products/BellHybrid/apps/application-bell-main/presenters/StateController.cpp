@@ -111,8 +111,6 @@ namespace app::home_screen
             {};
             struct DeepDownPress
             {};
-            struct AlarmInput
-            {};
             struct Timer
             {};
             struct TimeUpdate

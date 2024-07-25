@@ -27,4 +27,4 @@ namespace gui
         void hideQuotes();
         void adjustWidgetBox();
     };
-}; // namespace gui
+} // namespace gui

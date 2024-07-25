@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "layouts/HomeScreenLayoutVerticalWithAmPm.hpp"
@@ -7,11 +7,9 @@
 #include "widgets/SnoozeTimer.hpp"
 
 #include <apps-common/actions/AlarmRingingData.hpp>
-#include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
-#include <time/time_constants.hpp>
 #include <widgets/AlarmIcon.hpp>
 #include <widgets/AlarmSetSpinner.hpp>
 #include <widgets/ClockVertical.hpp>
@@ -67,4 +65,4 @@ namespace gui
         const auto isPM  = date::is_pm(hours);
         ampm->setText(isPM ? utils::time::Locale::getPM() : utils::time::Locale::getAM());
     }
-}; // namespace gui
+} // namespace gui

@@ -18,7 +18,7 @@
 
 namespace
 {
-    constexpr auto dischargingLevelShowTop = 20;
+    constexpr auto dischargingLevelShowTop{20};
 } // namespace
 
 namespace gui
@@ -158,7 +158,7 @@ namespace gui
         return false;
     }
 
-    bool HomeScreenLayoutVertical::isBatteryCharging(const Store::Battery::State state)
+    bool HomeScreenLayoutVertical::isBatteryCharging(Store::Battery::State state)
     {
         using State = Store::Battery::State;
         return (state == State::Charging) || (state == State::ChargingDone);
@@ -212,5 +212,4 @@ namespace gui
         connectionStatus->show(isConnected);
         connectionStatus->informContentChanged();
     }
-
-}; // namespace gui
+} // namespace gui

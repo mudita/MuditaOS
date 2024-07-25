@@ -3,24 +3,22 @@
 
 #pragma once
 
-namespace gui
+#include <ProductConfig.hpp>
+
+namespace gui::layout
 {
-    namespace layout
-    {
-        constexpr auto Classic               = "Classic";
-        constexpr auto ClassicWithBattery    = "ClassicWithBattery";
-        constexpr auto ClassicWithAmPm       = "ClassicWithAmPm";
-        constexpr auto ClassicWithDate       = "ClassicWithDate";
-        constexpr auto ClassicWithQuotes     = "ClassicWithQuotes";
-        constexpr auto ClassicWithQuotesAmPm = "ClassicWithQuotesAmPm";
-        constexpr auto VerticalSimple        = "VerticalSimple";
-        constexpr auto VerticalWithDate      = "VerticalWithDate";
-        constexpr auto VerticalWithAmPm      = "VerticalWithAmPm";
-        constexpr auto VerticalWithDateAmPm  = "VerticalWithDateAmPm";
+    inline constexpr auto Classic               = "Classic";
+    inline constexpr auto ClassicWithBattery    = "ClassicWithBattery";
+    inline constexpr auto ClassicWithAmPm       = "ClassicWithAmPm";
+    inline constexpr auto ClassicWithDate       = "ClassicWithDate";
+    inline constexpr auto ClassicWithQuotes     = "ClassicWithQuotes";
+    inline constexpr auto ClassicWithQuotesAmPm = "ClassicWithQuotesAmPm";
+    inline constexpr auto VerticalSimple        = "VerticalSimple";
+    inline constexpr auto VerticalWithDate      = "VerticalWithDate";
+    inline constexpr auto VerticalWithAmPm      = "VerticalWithAmPm";
+    inline constexpr auto VerticalWithDateAmPm  = "VerticalWithDateAmPm";
 
 #if CONFIG_ENABLE_TEMP == 1
-        constexpr auto ClassicWithTemp = "ClassicWithTemp";
+    inline constexpr auto ClassicWithTemp = "ClassicWithTemp";
 #endif
-
-    } // namespace layout
 } // namespace gui

@@ -1,4 +1,3 @@
-
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
@@ -73,7 +72,8 @@ namespace gui::factory
 #if CONFIG_ENABLE_TEMP == 1
             ,
             {
-                "ClassicWithTemp", []() { return new HomeScreenLayoutClassicWithTemp("ClassicWithTemp"); }
+                gui::layout::ClassicWithTemp,
+                    []() { return new HomeScreenLayoutClassicWithTemp(gui::layout::ClassicWithTemp); }
             }
 #endif
         };

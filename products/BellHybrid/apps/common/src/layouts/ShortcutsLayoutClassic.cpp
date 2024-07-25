@@ -12,25 +12,25 @@ namespace
 {
     namespace container
     {
-        constexpr auto width      = 544U;
-        constexpr auto height     = 220U;
-        constexpr auto top_margin = 74U;
+        constexpr auto width{544U};
+        constexpr auto height{220U};
+        constexpr auto top_margin{74U};
 
         namespace separator
         {
-            constexpr auto height = 22U;
+            constexpr auto height{22U};
         } // namespace separator
 
         namespace image
         {
-            constexpr auto height = container::height - separator::height;
-            constexpr auto width  = 448U;
+            constexpr auto height{container::height - separator::height};
+            constexpr auto width{448U};
         } // namespace image
 
         namespace text
         {
-            constexpr auto height = 146U;
-            constexpr auto width  = 448U;
+            constexpr auto height{146U};
+            constexpr auto width{448U};
         } // namespace text
     } // namespace container
 } // namespace

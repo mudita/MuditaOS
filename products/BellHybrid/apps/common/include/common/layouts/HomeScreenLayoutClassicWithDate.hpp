@@ -10,7 +10,7 @@ namespace gui
     class HomeScreenLayoutClassicWithDate : public HomeScreenLayoutClassic
     {
       public:
-        HomeScreenLayoutClassicWithDate(std::string name);
+        explicit HomeScreenLayoutClassicWithDate(std::string name);
 
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
@@ -19,8 +19,7 @@ namespace gui
         void buildInterface() override;
         bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext) override;
 
-        Text *date          = nullptr;
-        TextFixedSize *ampm = nullptr;
-        bool showAMPM       = false;
+        Text *date{nullptr};
+        TextFixedSize *ampm{nullptr};
     };
-}; // namespace gui
+} // namespace gui

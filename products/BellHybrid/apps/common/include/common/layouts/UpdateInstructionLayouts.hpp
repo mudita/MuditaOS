@@ -10,10 +10,11 @@
 namespace gui
 {
     class UpdateInstructionLayoutProvider;
+
     using LayoutGenerator = std::function<UpdateInstructionLayoutProvider *()>;
 
     namespace factory
     {
         std::vector<LayoutGenerator> getUpdateInstructionLayouts();
     } // namespace factory
-};    // namespace gui
+} // namespace gui

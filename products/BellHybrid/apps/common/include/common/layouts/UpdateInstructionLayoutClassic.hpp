@@ -40,4 +40,4 @@ namespace gui
 
         auto buildInterface(const Instruction &instruction) -> void;
     };
-}; // namespace gui
+} // namespace gui

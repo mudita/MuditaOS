@@ -27,4 +27,4 @@ namespace gui
 
         virtual Item *getLayout() = 0;
     };
-}; // namespace gui
+} // namespace gui

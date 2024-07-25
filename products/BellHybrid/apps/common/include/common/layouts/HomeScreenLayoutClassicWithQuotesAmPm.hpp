@@ -20,4 +20,4 @@ namespace gui
 
         TextFixedSize *ampm{nullptr};
     };
-}; // namespace gui
+} // namespace gui

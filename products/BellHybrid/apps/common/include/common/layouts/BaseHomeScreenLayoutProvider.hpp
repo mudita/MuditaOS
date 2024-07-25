@@ -27,7 +27,7 @@ namespace app::home_screen
         AlarmSnoozed,
         PreWakeUpActive
     };
-};
+}
 
 namespace gui
 {
@@ -40,7 +40,7 @@ namespace gui
         std::string name;
 
       public:
-        BaseHomeScreenLayoutProvider(std::string name) : name{std::move(name)} {};
+        explicit BaseHomeScreenLayoutProvider(std::string name) : name{std::move(name)} {};
         virtual ~BaseHomeScreenLayoutProvider() noexcept = default;
 
         std::string getName()
@@ -54,7 +54,7 @@ namespace gui
         virtual void updateUsbStatus(bool isConnected)                          = 0;
         virtual void setTime(std::time_t newTime)                               = 0;
         virtual void setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt)    = 0;
-        virtual std::time_t getAlarmTime() const                                = 0;
+        [[nodiscard]] virtual std::time_t getAlarmTime() const                  = 0;
         virtual void setAlarmTime(std::time_t newTime)                          = 0;
         virtual SnoozeTimer *getSnoozeTimer()                                   = 0;
         virtual Item *getLayout()                                               = 0;
@@ -65,4 +65,4 @@ namespace gui
         virtual void setSnoozeTime(std::time_t newTime){};
         virtual void setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor){};
     };
-}; // namespace gui
+} // namespace gui

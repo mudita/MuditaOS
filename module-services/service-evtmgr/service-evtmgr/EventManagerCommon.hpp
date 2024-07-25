@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -36,7 +36,7 @@ class EventManagerCommon : public sys::Service
     sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
 
     // Invoked during initialization
-    sys::ReturnCodes InitHandler();
+    sys::ReturnCodes InitHandler() override;
 
     sys::ReturnCodes DeinitHandler() override;
 
@@ -61,10 +61,11 @@ class EventManagerCommon : public sys::Service
     LogDumpFunction logDumpFunction;
 
   protected:
-    std::function<void(const time_t)> onMinuteTick;
     virtual void handleKeyEvent(sys::Message *msg);
     virtual void initProductEvents();
     virtual auto createEventWorker() -> std::unique_ptr<WorkerEventCommon> = 0;
+
+    std::function<void(std::time_t time)> onMinuteTick;
 
     std::shared_ptr<settings::Settings> settings;
     std::unique_ptr<WorkerEventCommon> EventWorker;
@@ -73,13 +74,13 @@ class EventManagerCommon : public sys::Service
     // press settings.
     std::string targetApplication;
     // alarm timestamp in seconds from midnight
-    uint32_t alarmTimestamp;
+    std::uint32_t alarmTimestamp;
     // ID of alarm waiting to trigger
-    uint32_t alarmID;
+    std::uint32_t alarmID;
     const EventManagerParams eventManagerParams;
 
     /// @return: < 0 - error occured during log flush
     /// @return:   0 - log flush did not happen
-    /// @return:   1 - log flush successflul
+    /// @return:   1 - log flush successful
     int dumpLogsToFile();
 };

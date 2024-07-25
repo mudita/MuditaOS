@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <common/models/LayoutModel.hpp>
@@ -8,7 +8,6 @@
 
 namespace app::bell_settings
 {
-
     LayoutModel::LayoutModel(ApplicationCommon *app)
     {
         settings.init(service::ServiceProxy{app->weak_from_this()});
@@ -16,7 +15,7 @@ namespace app::bell_settings
 
     std::optional<std::string> LayoutModel::getValue() const
     {
-        if (const auto result = settings.getValue(bell::settings::Layout::layout, settings::SettingsScope::Global);
+        if (auto result = settings.getValue(bell::settings::Layout::layout, settings::SettingsScope::Global);
             not result.empty()) {
             return result;
         }
