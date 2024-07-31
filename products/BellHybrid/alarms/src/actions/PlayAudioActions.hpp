@@ -20,6 +20,7 @@ namespace alarms
         PlayAudioAction(sys::Service &service,
                         std::string_view toneSetting,
                         audio::PlaybackType                             = audio::PlaybackType::Alarm,
+                        audio::PlaybackMode                             = audio::PlaybackMode::Single,
                         std::optional<std::string_view> durationSetting = {});
 
         auto turnOff() -> bool override;
@@ -37,6 +38,7 @@ namespace alarms
         const std::string toneSetting;
         const std::optional<std::string> durationSetting;
         const audio::PlaybackType playbackType;
+        const audio::PlaybackMode playbackMode;
         settings::Settings settings;
     };
 

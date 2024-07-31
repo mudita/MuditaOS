@@ -96,7 +96,11 @@ namespace service
 
         connect(typeid(AudioStartPlaybackRequest), [this](sys::Message *msg) -> sys::MessagePointer {
             auto *msgl = static_cast<AudioStartPlaybackRequest *>(msg);
-            return handleStart(audio::Operation::Type::Playback, msgl->fadeParams, msgl->fileName, msgl->playbackType);
+            return handleStart(audio::Operation::Type::Playback,
+                               msgl->fadeParams,
+                               msgl->fileName,
+                               msgl->playbackType,
+                               msgl->playbackMode);
         });
 
         connect(typeid(internal::AudioEOFNotificationMessage), [this](sys::Message *msg) -> sys::MessagePointer {
@@ -170,7 +174,8 @@ namespace service
     auto Audio::handleStart(audio::Operation::Type opType,
                             std::optional<audio::FadeParams> fadeParams,
                             const std::string &fileName,
-                            const audio::PlaybackType &playbackType) -> std::unique_ptr<AudioResponseMessage>
+                            const audio::PlaybackType &playbackType,
+                            const audio::PlaybackMode &playbackMode) -> std::unique_ptr<AudioResponseMessage>
     {
         auto retCode  = audio::RetCode::Failed;
         auto retToken = audio::Token::MakeBadToken();
@@ -183,7 +188,7 @@ namespace service
                 retToken = audioMux.ResetInput(input);
 
                 try {
-                    retCode = (*input)->audio->Start(opType, retToken, fileName, playbackType);
+                    retCode = (*input)->audio->Start(opType, retToken, fileName, playbackType, playbackMode);
                 }
                 catch (const audio::AudioInitException &audioException) {
                     retCode = audio::RetCode::FailedToAllocateMemory;

@@ -4,7 +4,7 @@
 #pragma once
 
 #include "Decoder.hpp"
-#include <src/dr_mp3.h>
+#include <minimp3_ex.h>
 
 namespace audio
 {
@@ -19,7 +19,8 @@ namespace audio
         void setPosition(float pos) override;
 
       private:
-        std::unique_ptr<drmp3> mp3;
+        std::unique_ptr<mp3dec_ex_t> dec;
+        std::unique_ptr<mp3dec_io_t> io;
 
         // Callback for when data needs to be read from the client.
         //
@@ -31,7 +32,7 @@ namespace audio
         //
         // A return value of less than bytesToRead indicates the end of the stream. Do _not_ return from this callback
         // until either the entire bytesToRead is filled or you have reached the end of the stream.
-        static std::size_t drmp3Read(void *pUserData, void *pBufferOut, std::size_t bytesToRead);
+        static std::size_t mp3Read(void *pBufferOut, std::size_t bytesToRead, void *pUserData);
 
         // Callback for when data needs to be seeked.
         //
@@ -44,6 +45,6 @@ namespace audio
         // The offset will never be negative. Whether it is relative to the beginning or current position is
         // determined by the "origin" parameter which will be either drmp3_seek_origin_start or
         // drmp3_seek_origin_current.
-        static drmp3_bool32 drmp3Seek(void *pUserData, int offset, drmp3_seek_origin origin);
+        static int mp3Seek(std::uint64_t offset, void *pUserData);
     };
 } // namespace audio

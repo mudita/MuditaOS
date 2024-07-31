@@ -97,7 +97,8 @@ namespace audio
         virtual audio::RetCode Start(Operation::Type op,
                                      audio::Token token                      = audio::Token::MakeBadToken(),
                                      const std::string &filePath             = "",
-                                     const audio::PlaybackType &playbackType = audio::PlaybackType::None);
+                                     const audio::PlaybackType &playbackType = audio::PlaybackType::None,
+                                     const audio::PlaybackMode &playbackMode = audio::PlaybackMode::Single);
 
         virtual audio::RetCode Start();
         virtual audio::RetCode Stop();

@@ -6,7 +6,7 @@
 
 namespace app::relaxation
 {
-    AbstractRelaxationPlayer::PlaybackMode RelaxationPlayer::getCurrentMode() const noexcept
+    AbstractAudioModel::PlaybackMode RelaxationPlayer::getCurrentMode() const noexcept
     {
         return playbackMode;
     }
@@ -16,7 +16,7 @@ namespace app::relaxation
     {}
 
     void RelaxationPlayer::start(const std::string &filePath,
-                                 AbstractRelaxationPlayer::PlaybackMode mode,
+                                 AbstractAudioModel::PlaybackMode mode,
                                  AbstractAudioModel::OnStateChangeCallback &&stateChangeCallback,
                                  AbstractAudioModel::OnPlaybackFinishedCallback &&finishedCallback,
                                  std::optional<std::chrono::seconds> playbackDuration)
@@ -29,14 +29,7 @@ namespace app::relaxation
 
         auto onPlayerFinished = [callback = finishedCallback, this](Status status) {
             if (status == Status::Error) {
-                callback(status); // First playback finished with error
-            }
-            else if (playbackMode == PlaybackMode::Looped) {
-                audioModel.play(recentFilePath, Type::Multimedia, [&](audio::RetCode retCode) { // Replay in loop mode
-                    if (retCode != audio::RetCode::Success) {
-                        callback(Status::Error); // Replay fail in looped mode
-                    }
-                });
+                callback(status); // Playback finished with error
             }
             else {
                 callback(Status::Normal); // Normal finish in single shot mode
@@ -45,7 +38,8 @@ namespace app::relaxation
 
         auto fadeParams = audio::FadeParams{.mode = getFadeMode(), .playbackDuration = playbackDuration};
         audioModel.setPlaybackFinishedCb(std::move(onPlayerFinished));
-        audioModel.play(filePath, Type::Multimedia, std::move(stateChangeCallback), std::move(fadeParams));
+        audioModel.play(
+            filePath, Type::Multimedia, playbackMode, std::move(stateChangeCallback), std::move(fadeParams));
     }
 
     audio::Fade RelaxationPlayer::getFadeMode() const
