@@ -11,7 +11,8 @@ namespace audio
 {
     Audio::Audio(AudioServiceMessage::Callback callback) : currentOperation(), serviceCallback(std::move(callback))
     {
-        auto ret = Operation::Create(Operation::Type::Idle, "", audio::PlaybackType::None, serviceCallback);
+        auto ret = Operation::Create(
+            Operation::Type::Idle, "", audio::PlaybackType::None, audio::PlaybackMode::Single, serviceCallback);
         if (ret) {
             currentOperation = std::move(ret);
         }
@@ -50,11 +51,12 @@ namespace audio
     audio::RetCode Audio::Start(Operation::Type op,
                                 audio::Token token,
                                 const std::string &filePath,
-                                const audio::PlaybackType &playbackType)
+                                const audio::PlaybackType &playbackType,
+                                const audio::PlaybackMode &playbackMode)
     {
 
         try {
-            auto ret = Operation::Create(op, filePath, playbackType, serviceCallback);
+            auto ret = Operation::Create(op, filePath, playbackType, playbackMode, serviceCallback);
             switch (op) {
             case Operation::Type::Playback:
                 currentState = State::Playback;

@@ -14,6 +14,12 @@ namespace app
     class AbstractAudioModel
     {
       public:
+        enum class PlaybackMode
+        {
+            Single,
+            Loop
+        };
+
         enum class PlaybackType
         {
             Multimedia,
@@ -47,7 +53,8 @@ namespace app
         virtual std::optional<Volume> getVolume(PlaybackType playbackType)               = 0;
         virtual void getVolume(PlaybackType playbackType, OnGetValueCallback &&callback) = 0;
         virtual void play(const std::string &filePath,
-                          PlaybackType type,
+                          const PlaybackType &type,
+                          const PlaybackMode &mode,
                           OnStateChangeCallback &&callback,
                           std::optional<audio::FadeParams> fadeParams = std::nullopt)    = 0;
         virtual void stopAny(OnStateChangeCallback &&callback)                           = 0;
