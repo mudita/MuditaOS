@@ -146,7 +146,10 @@ namespace app::focus
 
         auto playSound = [this, notificationVolume]() {
             this->audioModel.setVolume(notificationVolume->value(), AbstractAudioModel::PlaybackType::FocusTimer);
-            this->audioModel.play(getFocusTimerAudioPath(), AbstractAudioModel::PlaybackType::FocusTimer, {});
+            this->audioModel.play(getFocusTimerAudioPath(),
+                                  AbstractAudioModel::PlaybackType::FocusTimer,
+                                  AbstractAudioModel::PlaybackMode::Single,
+                                  {});
         };
 
         notificationVolume->onEnter = playSound;

@@ -12,6 +12,8 @@
 * Added fade in and fade out to relaxation songs
 * Added time sync endpoint to be used by Mudita Center
 * Added bedside lamp settings
+* Added gapless audio transition in relaxation
+
 
 ### Changed / Improved
 
