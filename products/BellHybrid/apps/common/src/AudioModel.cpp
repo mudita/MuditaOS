@@ -31,6 +31,18 @@ namespace
         }
     }
 
+    constexpr audio::PlaybackMode convertPlaybackMode(app::AbstractAudioModel::PlaybackMode mode)
+    {
+        using Mode = app::AbstractAudioModel::PlaybackMode;
+        switch (mode) {
+        case Mode::Loop:
+            return audio::PlaybackMode::Loop;
+        case Mode::Single:
+        default:
+            return audio::PlaybackMode::Single;
+        }
+    }
+
     void reportError(const char *prefix, audio::RetCode code)
     {
         if (code != audio::RetCode::Success) {
@@ -85,13 +97,14 @@ namespace app
     }
 
     void AudioModel::play(const std::string &filePath,
-                          PlaybackType type,
+                          const PlaybackType &type,
+                          const PlaybackMode &mode,
                           OnStateChangeCallback &&callback,
                           std::optional<audio::FadeParams> fadeParams)
     {
         playbackFinishedFlag = false;
-        auto msg =
-            std::make_unique<service::AudioStartPlaybackRequest>(filePath, convertPlaybackType(type), fadeParams);
+        auto msg             = std::make_unique<service::AudioStartPlaybackRequest>(
+            filePath, convertPlaybackType(type), convertPlaybackMode(mode), fadeParams);
         auto task = app::AsyncRequest::createFromMessage(std::move(msg), service::audioServiceName);
 
         auto cb = [_callback = callback, this](auto response) {

@@ -59,10 +59,6 @@
 [submodule "CrashDebug"]
 	path = third-party/CrashDebug/src
 	url = https://github.com/adamgreen/CrashDebug.git
-[submodule "minimp3"]
-	path = third-party/minimp3/minimp3
-	url = ../minimp3.git
-	branch = RT1051
 [submodule "parallel-hashmap"]
 	path = third-party/parallel-hashmap/src
 	url = https://github.com/greg7mdp/parallel-hashmap.git
@@ -116,3 +112,7 @@
 [submodule "third-party/fakeit/FakeIt"]
 	path = third-party/fakeit/FakeIt
 	url = https://github.com/eranpeer/FakeIt.git
+[submodule "third-party/minimp3/minimp3"]	
+	path = third-party/minimp3/minimp3	
+	url = https://github.com/mudita/minimp3.git	
+	branch = mudita

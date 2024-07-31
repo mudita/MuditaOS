@@ -93,13 +93,14 @@ void audio::DecoderWorker::pushAudioData()
 
     while (!audioStreamOut->isFull() && playbackEnabled) {
         auto buffer = decoderBuffer.get();
-        samplesRead = decoder->decode(bufferSize / readScale, buffer);
+        const auto totalBufferSize = bufferSize / readScale;
+        samplesRead                = decoder->decode(totalBufferSize, buffer);
 
         if (samplesRead == Decoder::fileDeletedRetCode) {
             fileDeletedCallback();
             break;
         }
-        if (samplesRead == 0) {
+        if (samplesRead < totalBufferSize) {
             endOfFileCallback();
             break;
         }

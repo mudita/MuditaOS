@@ -4,7 +4,6 @@
 #pragma once
 
 #include <module-audio/Audio/AudioCommon.hpp>
-
 #include <string>
 #include <functional>
 #include <optional>
@@ -14,6 +13,12 @@ namespace app
     class AbstractAudioModel
     {
       public:
+        enum class PlaybackMode
+        {
+            Single,
+            Loop
+        };
+
         enum class PlaybackType
         {
             Multimedia,
@@ -39,15 +44,17 @@ namespace app
         using OnGetValueCallback         = std::function<void(const audio::RetCode, Volume)>;
         using OnPlaybackFinishedCallback = std::function<void(PlaybackFinishStatus)>;
 
-        virtual ~AbstractAudioModel() noexcept                                           = default;
+        virtual ~AbstractAudioModel() noexcept                             = default;
         virtual void setVolume(Volume volume,
                                PlaybackType playbackType,
                                audio::VolumeUpdateType updateType = audio::VolumeUpdateType::UpdateDB,
-                               OnStateChangeCallback &&callback   = {})                    = 0;
-        virtual std::optional<Volume> getVolume(PlaybackType playbackType)               = 0;
+                               OnStateChangeCallback &&callback   = {})      = 0;
+        virtual std::optional<Volume> getVolume(PlaybackType playbackType) = 0;
+
         virtual void getVolume(PlaybackType playbackType, OnGetValueCallback &&callback) = 0;
         virtual void play(const std::string &filePath,
-                          PlaybackType type,
+                          const PlaybackType &type,
+                          const PlaybackMode &mode,
                           OnStateChangeCallback &&callback,
                           std::optional<audio::FadeParams> fadeParams = std::nullopt)    = 0;
         virtual void stopAny(OnStateChangeCallback &&callback)                           = 0;
@@ -57,4 +64,5 @@ namespace app
         virtual void setPlaybackFinishedCb(OnPlaybackFinishedCallback &&callback)        = 0;
         virtual bool hasPlaybackFinished()                                               = 0;
     };
+
 } // namespace app

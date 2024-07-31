@@ -21,7 +21,8 @@ namespace app
         std::optional<Volume> getVolume(PlaybackType playbackType) override;
         void getVolume(PlaybackType playbackType, OnGetValueCallback &&callback) override;
         void play(const std::string &filePath,
-                  PlaybackType type,
+                  const PlaybackType &type,
+                  const PlaybackMode &mode,
                   OnStateChangeCallback &&callback,
                   std::optional<audio::FadeParams> fadeParams = std::nullopt) override;
         void stopAny(OnStateChangeCallback &&callback) override;

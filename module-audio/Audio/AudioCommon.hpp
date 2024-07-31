@@ -52,6 +52,12 @@ namespace audio
         Disabled
     };
 
+    enum class PlaybackMode
+    {
+        Single,
+        Loop
+    };
+
     enum class PlaybackType
     {
         None,
