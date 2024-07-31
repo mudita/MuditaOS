@@ -21,22 +21,16 @@ namespace app::relaxation
     class AbstractRelaxationPlayer
     {
       public:
-        enum class PlaybackMode
-        {
-            Looped,
-            SingleShot
-        };
-
         virtual ~AbstractRelaxationPlayer()                                                     = default;
         virtual void start(const std::string &filePath,
-                           PlaybackMode mode,
+                           const AbstractAudioModel::PlaybackMode &mode,
                            AbstractAudioModel::OnStateChangeCallback &&callback,
                            AbstractAudioModel::OnPlaybackFinishedCallback &&finishedCallback,
                            std::optional<std::chrono::seconds> playbackDuration = std::nullopt) = 0;
         virtual void stop(AbstractAudioModel::OnStateChangeCallback &&callback)                 = 0;
         virtual void pause(AbstractAudioModel::OnStateChangeCallback &&callback)                = 0;
         virtual void resume(AbstractAudioModel::OnStateChangeCallback &&callback)               = 0;
-        virtual PlaybackMode getCurrentMode() const noexcept                                    = 0;
+        virtual AbstractAudioModel::PlaybackMode getCurrentMode() const noexcept                = 0;
         virtual audio::Fade getFadeMode() const                                                 = 0;
         virtual bool isPaused()                                                                 = 0;
     };
@@ -48,21 +42,21 @@ namespace app::relaxation
 
       private:
         void start(const std::string &filePath,
-                   PlaybackMode mode,
+                   const AbstractAudioModel::PlaybackMode &mode,
                    AbstractAudioModel::OnStateChangeCallback &&callback,
                    AbstractAudioModel::OnPlaybackFinishedCallback &&finishedCallback,
                    std::optional<std::chrono::seconds> playbackDuration = std::nullopt) override;
         void stop(AbstractAudioModel::OnStateChangeCallback &&callback) override;
         void pause(AbstractAudioModel::OnStateChangeCallback &&callback) override;
         void resume(AbstractAudioModel::OnStateChangeCallback &&callback) override;
-        PlaybackMode getCurrentMode() const noexcept override;
+        AbstractAudioModel::PlaybackMode getCurrentMode() const noexcept override;
         audio::Fade getFadeMode() const override;
         bool isPaused() override;
 
         AbstractRelaxationFadeModel &fadeModel;
         AbstractAudioModel &audioModel;
         std::string recentFilePath;
-        PlaybackMode playbackMode = PlaybackMode::SingleShot;
+        AbstractAudioModel::PlaybackMode playbackMode{AbstractAudioModel::PlaybackMode::Single};
         bool paused{false};
     };
 } // namespace app::relaxation

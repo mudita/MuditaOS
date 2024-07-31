@@ -17,8 +17,9 @@ namespace audio
 
     PlaybackOperation::PlaybackOperation(const std::string &filePath,
                                          const audio::PlaybackType &playbackType,
+                                         const audio::PlaybackMode &playbackMode,
                                          Callback callback)
-        : Operation(std::move(callback), playbackType), dec(nullptr)
+        : Operation(std::move(callback), playbackType), playbackMode(playbackMode), dec(nullptr)
     {
         // order defines priority
         AddProfile(Profile::Type::PlaybackHeadphones, playbackType, false);
@@ -26,9 +27,14 @@ namespace audio
         AddProfile(Profile::Type::PlaybackLoudspeaker, playbackType, true);
 
         endOfFileCallback = [this]() {
-            state          = State::Idle;
-            const auto msg = AudioServiceMessage::EndOfFile(operationToken);
-            serviceCallback(&msg);
+            if (this->playbackMode == audio::PlaybackMode::Single) {
+                state          = State::Idle;
+                const auto msg = AudioServiceMessage::EndOfFile(operationToken);
+                serviceCallback(&msg);
+            }
+            else {
+                dec->setPosition(playbackStartPosition);
+            }
         };
 
         fileDeletedCallback = [this]() {

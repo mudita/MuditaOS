@@ -86,7 +86,10 @@ namespace app::meditation
 
         auto playSound = [this, chimeVolume]() {
             this->audioModel.setVolume(chimeVolume->value(), AbstractAudioModel::PlaybackType::Meditation);
-            this->audioModel.play(getMeditationGongSoundPath(), AbstractAudioModel::PlaybackType::Meditation, {});
+            this->audioModel.play(getMeditationGongSoundPath(),
+                                  AbstractAudioModel::PlaybackType::Meditation,
+                                  AbstractAudioModel::PlaybackMode::Single,
+                                  {});
         };
 
         chimeVolume->onEnter = playSound;

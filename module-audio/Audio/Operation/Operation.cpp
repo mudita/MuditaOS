@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Operation.hpp"
@@ -18,6 +18,7 @@ namespace audio
     std::unique_ptr<Operation> Operation::Create(Operation::Type t,
                                                  const std::string &filePath,
                                                  const audio::PlaybackType &playbackType,
+                                                 const PlaybackMode &playbackMode,
                                                  AudioServiceMessage::Callback callback)
     {
         std::unique_ptr<Operation> inst;
@@ -27,7 +28,7 @@ namespace audio
             inst = std::make_unique<IdleOperation>(filePath);
             break;
         case Type::Playback:
-            inst = std::make_unique<PlaybackOperation>(filePath, playbackType, callback);
+            inst = std::make_unique<PlaybackOperation>(filePath, playbackType, playbackMode, callback);
             break;
         case Type::Router:
             inst = std::make_unique<RouterOperation>(filePath, callback);
