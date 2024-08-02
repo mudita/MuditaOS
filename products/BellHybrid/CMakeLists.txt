@@ -135,11 +135,12 @@ add_hex_target(BellHybrid)
 
 include(DownloadAsset)
 # copy all assets required to build catalog under current folder as in json recipe
-download_asset_json(json-proprietary-target
-                    ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_proprietary.json
-                    ${SYSROOT_PATH}/system_a/
-                    MuditaOSAssets
-                    ${MUDITA_CACHE_DIR}
+download_asset_release_json(json-proprietary-target
+                            ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_proprietary.json
+                            ${SYSROOT_PATH}/system_a/
+                            MuditaOSAssets
+                            0.0.1
+                            ${MUDITA_CACHE_DIR}
     )
 download_asset_release_json(json-common-target
                             ${CMAKE_CURRENT_SOURCE_DIR}/assets/assets_common.json
