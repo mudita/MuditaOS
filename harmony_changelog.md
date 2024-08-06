@@ -8,6 +8,7 @@
 * Added label with the name of the application on the countdown screens
 * Added What's New section shown after update
 * Added versioning for private assets
+* Added greetings in all languages
 
 ### Changed / Improved
 
