@@ -24,7 +24,7 @@ namespace audio
         dec->io       = io.get();
 
         if (mp3dec_ex_open_cb(dec.get(), dec->io, MP3D_SEEK_TO_SAMPLE)) {
-            LOG_ERROR("Failed open minimp3");
+            LOG_ERROR("Failed to open minimp3");
             return;
         }
 
@@ -58,7 +58,8 @@ namespace audio
         const auto samplesRead = mp3dec_ex_read(dec.get(), reinterpret_cast<mp3d_sample_t *>(pcmData), samplesToRead);
         if (samplesRead > 0) {
             /* Calculate frame duration in seconds */
-            position += static_cast<float>(samplesRead) / static_cast<float>(sampleRate);
+            const auto samplesPerChannel = static_cast<float>(samplesRead) / static_cast<float>(channelCount);
+            position += samplesPerChannel / static_cast<float>(sampleRate);
         }
         else if (!fileExists(fd)) {
             /* Unfortunately this second check of file existence is needed
