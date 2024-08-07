@@ -55,8 +55,7 @@ namespace audio
 
     std::int32_t DecoderMP3::decode(std::uint32_t samplesToRead, std::int16_t *pcmData)
     {
-        const auto samplesRead =
-            mp3dec_ex_read(dec.get(), reinterpret_cast<mp3d_sample_t *>(pcmData), samplesToRead / channelCount);
+        const auto samplesRead = mp3dec_ex_read(dec.get(), reinterpret_cast<mp3d_sample_t *>(pcmData), samplesToRead);
         if (samplesRead > 0) {
             /* Calculate frame duration in seconds */
             position += static_cast<float>(samplesRead) / static_cast<float>(sampleRate);
@@ -68,7 +67,7 @@ namespace audio
             LOG_WARN("File '%s' was deleted during playback!", filePath.c_str());
             return fileDeletedRetCode;
         }
-        return samplesRead * channelCount;
+        return samplesRead;
     }
 
     std::size_t DecoderMP3::mp3Read(void *pBufferOut, std::size_t bytesToRead, void *pUserData)
