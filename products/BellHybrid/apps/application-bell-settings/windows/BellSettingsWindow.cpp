@@ -3,6 +3,7 @@
 
 #include "AboutYourBellWindow.hpp"
 #include "BellSettingsFrontlightWindow.hpp"
+#include "BellSettingsBedsideWindow.hpp"
 #include "BellSettingsFactoryResetWindow.hpp"
 #include "BellSettingsWindow.hpp"
 #include "alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp"
@@ -69,6 +70,8 @@ namespace gui
             utils::translate("app_bell_settings_language"), gui::window::name::bellSettingsLanguage, defaultCallback);
         addWinSettings(
             utils::translate("app_bell_settings_frontlight"), gui::BellSettingsFrontlightWindow::name, defaultCallback);
+        addWinSettings(
+            utils::translate("app_bell_settings_bedside_lamp"), gui::BellSettingsBedsideWindow::name, defaultCallback);
         addWinSettings(
             utils::translate("app_bell_settings_shortcuts"), window::name::bellSettingsShortcuts, defaultCallback);
         addWinSettings(utils::translate("app_bell_update_instruction_title"),

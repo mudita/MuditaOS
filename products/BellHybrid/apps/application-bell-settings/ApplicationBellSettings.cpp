@@ -8,6 +8,7 @@
 #include "models/AboutYourBellModel.hpp"
 #include "models/AudioErrorModel.hpp"
 #include "models/RelaxationListItemProvider.hpp"
+#include "models/BedsideListItemProvider.hpp"
 #include "models/alarm_settings/AlarmSettingsListItemProvider.hpp"
 #include "models/alarm_settings/PrewakeUpListItemProvider.hpp"
 #include "models/alarm_settings/BedtimeSettingsListItemProvider.hpp"
@@ -21,6 +22,7 @@
 #include "presenter/FrontlightPresenter.hpp"
 #include "presenter/ShortcutsWindowPresenter.hpp"
 #include "presenter/UpdateInstructionWindowPresenter.hpp"
+#include "presenter/BedsidePresenter.hpp"
 #include "windows/AboutYourBellWindow.hpp"
 #include "windows/BellSettingsLanguageWindow.hpp"
 #include "windows/BellSettingsLayoutWindow.hpp"
@@ -35,11 +37,13 @@
 #include "windows/BellSettingsHomeViewWindow.hpp"
 #include "windows/BellSettingsTimeUnitsWindow.hpp"
 #include "windows/BellSettingsWindow.hpp"
+#include "windows/BellSettingsBedsideWindow.hpp"
 
 #include <Paths.hpp>
 #include <apps-common/windows/Dialog.hpp>
 #include <common/BellPowerOffPresenter.hpp>
 #include <common/models/BedtimeModel.hpp>
+#include <common/models/BedsideModel.hpp>
 #include <common/models/LayoutModel.hpp>
 #include <common/models/RelaxationFadeModel.hpp>
 #include <common/windows/BellFinishedWindow.hpp>
@@ -124,6 +128,19 @@ namespace app
                 auto presenter =
                     std::make_unique<bell_settings::FrontlightPresenter>(std::move(provider), std::move(model));
                 return std::make_unique<gui::BellSettingsFrontlightWindow>(app, std::move(presenter));
+            });
+
+        windowsFactory.attach(
+            gui::BellSettingsBedsideWindow::name, [](ApplicationCommon *app, const std::string &name) {
+                auto frontlightModel = std::make_unique<bell_settings::FrontlightModel>(app);
+                auto brightnessModel = std::make_unique<bell_settings::BedsideBrightnessModel>(app);
+                auto timeModel       = std::make_unique<bell_settings::BedsideTimeModel>(app);
+                auto bedsideModel =
+                    std::make_unique<bell_settings::BedsideModel>(std::move(brightnessModel), std::move(timeModel));
+                auto provider  = std::make_shared<bell_settings::BedsideListItemProvider>(std::move(bedsideModel),
+                                                                                         std::move(frontlightModel));
+                auto presenter = std::make_unique<bell_settings::BedsidePresenter>(std::move(provider));
+                return std::make_unique<gui::BellSettingsBedsideWindow>(app, std::move(presenter));
             });
 
         windowsFactory.attach(gui::window::bell_finished::defaultName,

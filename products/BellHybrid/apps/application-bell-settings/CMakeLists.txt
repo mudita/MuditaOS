@@ -1,4 +1,4 @@
-﻿# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+﻿# Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 # For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 add_library(application-bell-settings STATIC)
@@ -27,7 +27,10 @@ target_sources(application-bell-settings
         models/AboutYourBellModel.cpp
         models/FrontlightListItemProvider.cpp
         models/FrontlightModel.cpp
+        models/BedsideListItemProvider.cpp
+        models/BedsideModel.cpp
         models/AudioErrorModel.cpp
+        models/LayoutModel.cpp
         models/RelaxationListItemProvider.cpp
         models/alarm_settings/AlarmSettingsListItemProvider.cpp
         models/alarm_settings/AlarmSettingsModel.cpp
@@ -37,11 +40,11 @@ target_sources(application-bell-settings
         models/alarm_settings/SnoozeListItemProvider.cpp
         models/alarm_settings/SnoozeSettingsModel.cpp
         models/alarm_settings/SettingsListItemProvider.cpp
-        models/LayoutModel.cpp
 
         presenter/BedtimeSettingsPresenter.cpp
         presenter/TimeUnitsPresenter.cpp
         presenter/FrontlightPresenter.cpp
+        presenter/BedsidePresenter.cpp
         presenter/AboutYourBellWindowPresenter.cpp
         presenter/LanguageWindowPresenter.cpp
         presenter/LayoutWindowPresenter.cpp
@@ -70,6 +73,7 @@ target_sources(application-bell-settings
         windows/BellSettingsFrontlightWindow.cpp
         windows/BellSettingsFactoryResetWindow.cpp
         windows/BellSettingsRelaxationWindow.cpp
+        windows/BellSettingsBedsideWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.cpp
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.cpp
@@ -77,6 +81,7 @@ target_sources(application-bell-settings
 
         models/AboutYourBellModel.hpp
         models/FrontlightListItemProvider.hpp
+        models/BedsideListItemProvider.hpp
         models/alarm_settings/AbstractPrewakeUpSettingsModel.hpp
         models/alarm_settings/AbstractSnoozeSettingsModel.hpp
         models/alarm_settings/AbstractAlarmSettingsModel.hpp
@@ -91,6 +96,7 @@ target_sources(application-bell-settings
 
         presenter/BedtimeSettingsPresenter.hpp
         presenter/FrontlightPresenter.hpp
+        presenter/BedsidePresenter.hpp
         presenter/AboutYourBellWindowPresenter.hpp
         presenter/LanguageWindowPresenter.hpp
         presenter/LayoutWindowPresenter.hpp
@@ -116,6 +122,7 @@ target_sources(application-bell-settings
         windows/BellSettingsLanguageWindow.hpp
         windows/BellSettingsLayoutWindow.hpp
         windows/BellSettingsFrontlightWindow.hpp
+        windows/BellSettingsBedsideWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsSnoozeWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsMenuWindow.hpp
         windows/alarm_settings/BellSettingsAlarmSettingsWindow.hpp

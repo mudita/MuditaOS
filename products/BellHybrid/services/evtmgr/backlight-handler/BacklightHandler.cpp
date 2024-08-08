@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include <evtmgr/backlight-handler/BacklightHandler.hpp>
@@ -17,7 +17,6 @@ namespace backlight
     {
         constexpr auto screenLightTimerTimeout       = std::chrono::seconds{5};
         constexpr auto screenLightTimerHoldTimeout   = std::chrono::seconds{10};
-        constexpr auto screenLightBedsideLampTimeout = std::chrono::minutes{10};
     } // namespace timers
 
     Handler::Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent)
@@ -32,9 +31,10 @@ namespace backlight
                         })
     {}
 
-    void Handler::init()
+    auto Handler::init() -> void
     {
         using namespace screen_light_control;
+
         settings->registerValueChange(settings::Brightness::brightnessLevel, [&](const std::string &value) {
             const ConstLinearProgressModeParameters params{utils::getNumericValue<float>(value)};
             screenLightController->processRequest(Action::setAutomaticModeParameters, Parameters(params));
@@ -45,17 +45,17 @@ namespace backlight
         });
     }
 
-    void Handler::handleKeyPressed([[maybe_unused]] int key)
+    auto Handler::handleKeyPressed([[maybe_unused]] int key) -> void
     {
         if (!ignoreKeypress) {
             handleScreenLightRefresh(key);
         }
     }
 
-    void Handler::handleScreenLightRefresh([[maybe_unused]] int key)
+    auto Handler::handleScreenLightRefresh([[maybe_unused]] int key) -> void
     {
-        auto controller = getScreenLightControl();
-        auto timer      = getScreenLightTimer();
+        const auto controller = getScreenLightControl();
+        const auto timer      = getScreenLightTimer();
 
         if (key != static_cast<int>(KeyMap::Frontlight) && backlightType != Type::BedsideLamp) {
             if (controller->isLightOn()) {
@@ -69,12 +69,13 @@ namespace backlight
         }
     }
 
-    void Handler::handleScreenLight(Type type)
+    auto Handler::handleScreenLight(Type type) -> void
     {
         const auto controller = getScreenLightControl();
         const auto timer      = getScreenLightTimer();
 
         auto lightTime = std::chrono::seconds(0);
+        auto lightParams = screen_light_control::Parameters{};
 
         switch (type) {
         case Type::Frontlight:
@@ -86,26 +87,27 @@ namespace backlight
             }
             break;
         case Type::BedsideLamp:
-            lightTime = timers::screenLightBedsideLampTimeout;
+            lightTime   = getBedsideModeLightTime();
+            lightParams = getBedsideModeLightParams();
             break;
         }
 
         if (controller->isLightOn() && type == Type::Frontlight) {
             setKeyPressedModeFrontlightOff();
-            controller->processRequest(screen_light_control::Action::turnOff);
+            controller->processRequest(screen_light_control::Action::turnOff, lightParams);
             timer->stop();
         }
         else if (!controller->isLightOn()) {
             setKeyPressedModeFrontlightOn();
-            controller->processRequest(screen_light_control::Action::turnOn);
+            controller->processRequest(screen_light_control::Action::turnOn, lightParams);
             timer->restart(lightTime);
         }
         backlightType = type;
     }
 
-    void Handler::processRequest(screen_light_control::Action action,
+    auto Handler::processRequest(screen_light_control::Action action,
                                  const screen_light_control::Parameters &params,
-                                 screen_light_control::Sender sender)
+                                 screen_light_control::Sender sender) -> void
     {
         switch (sender) {
         case screen_light_control::Sender::AlarmPrewakeup:
@@ -126,15 +128,15 @@ namespace backlight
         }
     }
 
-    void Handler::processScreenRequest(screen_light_control::Action action,
-                                       const screen_light_control::Parameters &params)
+    auto Handler::processScreenRequest(screen_light_control::Action action,
+                                       const screen_light_control::Parameters &params) -> void
     {
         handleScreenLightSettings(action, params);
         getScreenLightControl()->processRequest(action, params);
     }
 
-    void Handler::handleScreenLightSettings(screen_light_control::Action action,
-                                            const screen_light_control::Parameters &params)
+    auto Handler::handleScreenLightSettings(screen_light_control::Action action,
+                                            const screen_light_control::Parameters &params) -> void
     {
         switch (action) {
         case screen_light_control::Action::turnOn:
@@ -173,25 +175,43 @@ namespace backlight
         HandlerCommon::handleScreenLightSettings(action, params);
     }
 
-    void Handler::onScreenLightTurnedOn()
+    auto Handler::onScreenLightTurnedOn() -> void
     {
         if (backlightMode == BacklightMode::WithTimer && backlightType != Type::BedsideLamp) {
             startScreenLightTimer();
         }
     }
 
-    void Handler::setKeyPressedModeFrontlightOn()
+    auto Handler::setKeyPressedModeFrontlightOn() -> void
     {
         using namespace screen_light_control;
-        auto brightnessLevel = utils::getNumericValue<float>(getValue(settings::Brightness::brightnessLevel));
+
+        const auto brightnessLevel = utils::getNumericValue<float>(getValue(settings::Brightness::brightnessLevel));
         const ConstLinearProgressModeParameters params{brightnessLevel};
         screenLightController->processRequest(Action::setAutomaticModeParameters, Parameters(params));
     }
 
-    void Handler::setKeyPressedModeFrontlightOff()
+    auto Handler::setKeyPressedModeFrontlightOff() -> void
     {
         using namespace screen_light_control;
+
         screenLightController->processRequest(Action::setAutomaticModeParameters,
                                               Parameters(screen_light_control::ConstLinearProgressModeParameters{0}));
+    }
+
+    auto Handler::getBedsideModeLightTime() const -> std::chrono::seconds
+    {
+        const auto bedsideTime = utils::toNumeric(getValue(settings::Brightness::bedsideTime));
+        return std::chrono::minutes{bedsideTime};
+    }
+
+    auto Handler::getBedsideModeLightParams() const -> screen_light_control::Parameters
+    {
+        using namespace screen_light_control;
+
+        const auto bedsideBrightness =
+            utils::getNumericValue<float>(getValue(settings::Brightness::bedsideBrightnessLevel));
+        const auto manualParams = ManualModeParameters{bedsideBrightness};
+        return Parameters{manualParams};
     }
 } // namespace backlight

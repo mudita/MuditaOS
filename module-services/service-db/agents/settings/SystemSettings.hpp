@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -7,89 +7,93 @@ namespace settings
 {
     namespace SystemProperties
     {
-        constexpr inline auto activeSim                = "gs_active_sim";
-        constexpr inline auto lockPassHash             = "gs_lock_pass_hash";
-        constexpr inline auto lockScreenPasscodeIsOn   = "gs_lock_screen_passcode_is_on";
-        constexpr inline auto autoLockTimeInSec        = "gs_auto_lock_time";
-        constexpr inline auto unlockLockTime           = "gs_unlock_lock_time";
-        constexpr inline auto unlockAttemptLockTime    = "gs_unlock_attempt_lock_time";
-        constexpr inline auto noLockTimeAttemptsLeft   = "gs_no_lock_time_attempts_left";
-        constexpr inline auto displayLanguage          = "gs_display_language";
-        constexpr inline auto inputLanguage            = "gs_input_language";
-        constexpr inline auto automaticDateAndTimeIsOn = "gs_automatic_date_and_time_is_on";
-        constexpr inline auto timeFormat               = "gs_time_format";
-        constexpr inline auto dateFormat               = "gs_date_format";
-        constexpr inline auto onboardingDone           = "gs_onboarding_done";
-        constexpr inline auto eulaAccepted             = "gs_eula_accepted";
-        constexpr inline auto osCurrentVersion         = "gs_os_current_version";
-        constexpr inline auto osUpdateVersion          = "gs_os_update_version";
-        constexpr inline auto currentTimezoneName      = "gs_current_timezone_name";
-        constexpr inline auto currentTimezoneRules     = "gs_current_timezone_rules";
+        inline constexpr auto activeSim                = "gs_active_sim";
+        inline constexpr auto lockPassHash             = "gs_lock_pass_hash";
+        inline constexpr auto lockScreenPasscodeIsOn   = "gs_lock_screen_passcode_is_on";
+        inline constexpr auto autoLockTimeInSec        = "gs_auto_lock_time";
+        inline constexpr auto unlockLockTime           = "gs_unlock_lock_time";
+        inline constexpr auto unlockAttemptLockTime    = "gs_unlock_attempt_lock_time";
+        inline constexpr auto noLockTimeAttemptsLeft   = "gs_no_lock_time_attempts_left";
+        inline constexpr auto displayLanguage          = "gs_display_language";
+        inline constexpr auto inputLanguage            = "gs_input_language";
+        inline constexpr auto automaticDateAndTimeIsOn = "gs_automatic_date_and_time_is_on";
+        inline constexpr auto timeFormat               = "gs_time_format";
+        inline constexpr auto dateFormat               = "gs_date_format";
+        inline constexpr auto onboardingDone           = "gs_onboarding_done";
+        inline constexpr auto eulaAccepted             = "gs_eula_accepted";
+        inline constexpr auto osCurrentVersion         = "gs_os_current_version";
+        inline constexpr auto osUpdateVersion          = "gs_os_update_version";
+        inline constexpr auto currentTimezoneName      = "gs_current_timezone_name";
+        inline constexpr auto currentTimezoneRules     = "gs_current_timezone_rules";
     } // namespace SystemProperties
+
     namespace Bluetooth
     {
-        constexpr inline auto state            = "bt_state";
-        constexpr inline auto deviceVisibility = "bt_device_visibility";
-        constexpr inline auto deviceName       = "bt_device_name";
-        constexpr inline auto bondedDevices    = "bt_bonded_devices";
-        constexpr inline auto btKeys           = "bt_keys";
-        constexpr inline auto connectedDevice  = "connected_device";
+        inline constexpr auto state            = "bt_state";
+        inline constexpr auto deviceVisibility = "bt_device_visibility";
+        inline constexpr auto deviceName       = "bt_device_name";
+        inline constexpr auto bondedDevices    = "bt_bonded_devices";
+        inline constexpr auto btKeys           = "bt_keys";
+        inline constexpr auto connectedDevice  = "connected_device";
     } // namespace Bluetooth
+
     namespace Brightness
     {
-        constexpr inline auto state           = "br_state";
-        constexpr inline auto brightnessLevel = "br_level";
-        constexpr inline auto gammaFactor     = "br_gamma_Factor";
-        constexpr inline auto autoMode        = "br_auto_mode";
+        inline constexpr auto state                  = "br_state";
+        inline constexpr auto brightnessLevel        = "br_level";
+        inline constexpr auto bedsideBrightnessLevel = "br_bedside_level";
+        inline constexpr auto bedsideTime            = "br_bedside_time";
+        inline constexpr auto gammaFactor            = "br_gamma_Factor";
+        inline constexpr auto autoMode               = "br_auto_mode";
     } // namespace Brightness
 
     namespace Cellular
     {
-        constexpr inline auto apn_list     = "cl_apn_list";
-        constexpr inline auto offlineMode  = "cl_offline_mode";
-        constexpr inline auto currentUID   = "cl_current_uid";
-        constexpr inline auto volteEnabled = "cl_volte_enabled";
+        inline constexpr auto apn_list     = "cl_apn_list";
+        inline constexpr auto offlineMode  = "cl_offline_mode";
+        inline constexpr auto currentUID   = "cl_current_uid";
+        inline constexpr auto volteEnabled = "cl_volte_enabled";
     } // namespace Cellular
 
     namespace Battery
     {
-        constexpr inline auto batteryCriticalLevel = "battery_critical_level";
+        inline constexpr auto batteryCriticalLevel = "battery_critical_level";
     } // namespace Battery
 
     namespace Offline
     {
-        constexpr inline auto connectionFrequency     = "msg_only_mode_connection_frequency";
-        constexpr inline auto notificationsWhenLocked = "off_notifications_when_locked";
-        constexpr inline auto callsFromFavorites      = "off_calls_from_favorites";
+        inline constexpr auto connectionFrequency     = "msg_only_mode_connection_frequency";
+        inline constexpr auto notificationsWhenLocked = "off_notifications_when_locked";
+        inline constexpr auto callsFromFavorites      = "off_calls_from_favorites";
     } // namespace Offline
 
     namespace KeypadLight
     {
-        constexpr inline auto state = "keypad_light_state";
+        inline constexpr auto state = "keypad_light_state";
     } // namespace KeypadLight
 
     namespace Wallpaper
     {
-        constexpr inline auto option = "wallpaper_option";
+        inline constexpr auto option = "wallpaper_option";
     } // namespace Wallpaper
 
     namespace Quotes
     {
-        constexpr inline auto randomQuotesList        = "quotes_random_list";
-        constexpr inline auto randomQuoteIDUpdateTime = "quotes_random_id_update_time";
+        inline constexpr auto randomQuotesList        = "quotes_random_list";
+        inline constexpr auto randomQuoteIDUpdateTime = "quotes_random_id_update_time";
     } // namespace Quotes
 
     namespace Display
     {
-        constexpr inline auto invertedMode              = "display_inverted_mode";
-        constexpr inline auto lockScreenDeepRefreshRate = "display_lock_screen_deep_refresh_rate";
+        inline constexpr auto invertedMode              = "display_inverted_mode";
+        inline constexpr auto lockScreenDeepRefreshRate = "display_lock_screen_deep_refresh_rate";
     } // namespace Display
 
     namespace Meditation
     {
-        constexpr inline auto duration        = "meditation_duration";
-        constexpr inline auto intervalChime   = "meditation_interval_chime";
-        constexpr inline auto preparationTime = "meditation_preparation_time";
-        constexpr inline auto showCounter     = "meditation_show_counter";
+        inline constexpr auto duration        = "meditation_duration";
+        inline constexpr auto intervalChime   = "meditation_interval_chime";
+        inline constexpr auto preparationTime = "meditation_preparation_time";
+        inline constexpr auto showCounter     = "meditation_show_counter";
     } // namespace Meditation
-};    // namespace settings
+} // namespace settings
