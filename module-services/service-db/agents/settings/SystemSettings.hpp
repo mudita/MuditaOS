@@ -42,7 +42,7 @@ namespace settings
         inline constexpr auto state                  = "br_state";
         inline constexpr auto brightnessLevel        = "br_level";
         inline constexpr auto bedsideBrightnessLevel = "br_bedside_level";
-        inline constexpr auto bedsideBrightnessTime  = "br_bedside_time";
+        inline constexpr auto bedsideTime            = "br_bedside_time";
         inline constexpr auto gammaFactor            = "br_gamma_Factor";
         inline constexpr auto autoMode               = "br_auto_mode";
     } // namespace Brightness

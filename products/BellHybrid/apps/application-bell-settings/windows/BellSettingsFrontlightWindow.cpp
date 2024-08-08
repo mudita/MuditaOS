@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "application-bell-settings/ApplicationBellSettings.hpp"
@@ -14,7 +14,7 @@ namespace gui
 {
     BellSettingsFrontlightWindow::BellSettingsFrontlightWindow(
         app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::FrontlightPresenter> &&presenter)
-        : AppWindow(app, std::move(name)), presenter{std::move(presenter)}
+        : AppWindow(app, name), presenter{std::move(presenter)}
     {
         this->presenter->attach(this);
         buildInterface();
@@ -62,6 +62,7 @@ namespace gui
 
         return AppWindow::onInput(inputEvent);
     }
+
     void BellSettingsFrontlightWindow::exit()
     {
         presenter->saveConfig();
@@ -69,6 +70,7 @@ namespace gui
             window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create("circle_success_big", window::name::bellSettings));
     }
+
     void BellSettingsFrontlightWindow::onClose(Window::CloseReason reason)
     {
         if (reason != CloseReason::Popup) {

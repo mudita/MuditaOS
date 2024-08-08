@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "backlight-handler/BacklightHandlerCommon.hpp"
@@ -29,12 +29,12 @@ namespace backlight
 
     auto HandlerCommon::getValue(const std::string &path) const -> std::string
     {
-        return settings->getValue(path);
+        return settings->getValue(path, settings::SettingsScope::Global);
     }
 
     void HandlerCommon::setValue(const std::string &path, const std::string &value)
     {
-        settings->setValue(path, value);
+        settings->setValue(path, value, settings::SettingsScope::Global);
     }
 
     void HandlerCommon::startScreenLightTimer()

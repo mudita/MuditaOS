@@ -201,9 +201,8 @@ namespace backlight
 
     auto Handler::getBedsideModeLightTime() const -> std::chrono::seconds
     {
-        const auto bedsideBrightnessTime =
-            utils::getNumericValue<unsigned>(getValue(settings::Brightness::bedsideBrightnessTime));
-        return std::chrono::seconds{bedsideBrightnessTime};
+        const auto bedsideTime = utils::toNumeric(getValue(settings::Brightness::bedsideTime));
+        return std::chrono::minutes{bedsideTime};
     }
 
     auto Handler::getBedsideModeLightParams() const -> screen_light_control::Parameters
