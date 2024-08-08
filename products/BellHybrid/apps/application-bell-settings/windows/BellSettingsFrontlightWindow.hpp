@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -15,6 +15,7 @@ namespace gui
     {
       public:
         static constexpr auto name = "BellSettingsFrontlight";
+
         explicit BellSettingsFrontlightWindow(
             app::ApplicationCommon *app, std::unique_ptr<app::bell_settings::FrontlightPresenter> &&windowPresenter);
 
@@ -26,7 +27,7 @@ namespace gui
         void exit() override;
 
       private:
-        SideListView *listView{};
+        SideListView *listView{nullptr};
         std::unique_ptr<app::bell_settings::FrontlightPresenter> presenter;
     };
 } /* namespace gui */

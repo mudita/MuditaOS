@@ -62,6 +62,7 @@ namespace gui
 
         return AppWindow::onInput(inputEvent);
     }
+
     void BellSettingsFrontlightWindow::exit()
     {
         presenter->saveConfig();
@@ -69,6 +70,7 @@ namespace gui
             window::bell_finished::defaultName,
             BellFinishedWindowData::Factory::create("circle_success_big", window::name::bellSettings));
     }
+
     void BellSettingsFrontlightWindow::onClose(Window::CloseReason reason)
     {
         if (reason != CloseReason::Popup) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2022, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #pragma once
@@ -27,35 +27,39 @@ namespace backlight
         WithTimer,
         WithoutTimer
     };
+
     /// @brief Backlight events handler
     class Handler : public HandlerCommon
     {
       public:
         Handler(std::shared_ptr<settings::Settings> settings, sys::Service *parent);
 
-        void handleKeyPressed(int key = 0);
+        auto handleKeyPressed(int key = 0) -> void;
 
-        void handleScreenLight(Type type);
+        auto handleScreenLight(Type type) -> void;
 
-        void processRequest(screen_light_control::Action action,
+        auto processRequest(screen_light_control::Action action,
                             const screen_light_control::Parameters &params,
-                            screen_light_control::Sender sender);
+                            screen_light_control::Sender sender) -> void;
 
-        void init() override;
+        auto init() -> void override;
 
-        void processScreenRequest(screen_light_control::Action action,
-                                  const screen_light_control::Parameters &params) override;
+        auto processScreenRequest(screen_light_control::Action action, const screen_light_control::Parameters &params)
+            -> void override;
 
-        void handleScreenLightSettings(screen_light_control::Action action,
-                                       const screen_light_control::Parameters &params) override;
+        auto handleScreenLightSettings(screen_light_control::Action action,
+                                       const screen_light_control::Parameters &params) -> void override;
 
       private:
-        void handleScreenLightRefresh(int key = 0);
+        auto handleScreenLightRefresh(int key = 0) -> void;
 
-        void onScreenLightTurnedOn() override;
+        auto onScreenLightTurnedOn() -> void override;
 
-        void setKeyPressedModeFrontlightOn();
-        void setKeyPressedModeFrontlightOff();
+        auto setKeyPressedModeFrontlightOn() -> void;
+        auto setKeyPressedModeFrontlightOff() -> void;
+
+        [[nodiscard]] auto getBedsideModeLightTime() const -> std::chrono::seconds;
+        [[nodiscard]] auto getBedsideModeLightParams() const -> screen_light_control::Parameters;
 
         bool ignoreKeypress         = false;
         bool onDemandModeOn         = true;
