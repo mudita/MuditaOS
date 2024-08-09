@@ -19,7 +19,8 @@ namespace audio
     {
       public:
         explicit Operation(AudioServiceMessage::Callback callback,
-                           const PlaybackType &playbackType = PlaybackType::None)
+                           const PlaybackType &playbackType = PlaybackType::None,
+                           const PlaybackMode &playbackMode = PlaybackMode::Single)
             : playbackType(playbackType), serviceCallback(std::move(callback)), observer(serviceCallback)
         {
             factory = AudioPlatform::GetDeviceFactory();
@@ -59,9 +60,10 @@ namespace audio
         virtual ~Operation() = default;
 
         static std::unique_ptr<Operation> Create(Type t,
-                                                 const std::string &filePath            = "",
-                                                 const audio::PlaybackType &operations  = audio::PlaybackType::None,
-                                                 AudioServiceMessage::Callback callback = nullptr);
+                                                 const std::string &filePath             = "",
+                                                 const audio::PlaybackType &operations   = audio::PlaybackType::None,
+                                                 const audio::PlaybackMode &playbackMode = audio::PlaybackMode::Single,
+                                                 AudioServiceMessage::Callback callback  = nullptr);
 
         virtual audio::RetCode Start(audio::Token token)             = 0;
         virtual audio::RetCode Stop()                                = 0;

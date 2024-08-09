@@ -30,8 +30,10 @@ namespace app::bell_settings
             currentSoundPath = val;
             this->audioModel.setVolume(this->provider->getCurrentVolume(), AbstractAudioModel::PlaybackType::Snooze);
             this->audioModel.setPlaybackFinishedCb(std::move(onFinishedCallback));
-            this->audioModel.play(
-                currentSoundPath, AbstractAudioModel::PlaybackType::Snooze, std::move(onStartCallback));
+            this->audioModel.play(currentSoundPath,
+                                  AbstractAudioModel::PlaybackType::Snooze,
+                                  AbstractAudioModel::PlaybackMode::Single,
+                                  std::move(onStartCallback));
         };
 
         this->provider->onExit = [this]() { getView()->exit(); };

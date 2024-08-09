@@ -10,6 +10,8 @@
 * Added versioning for private assets
 * Added greetings in all languages
 * Added fade in and fade out to relaxation songs
+* Added gapless audio transition in relaxation
+
 
 ### Changed / Improved
 

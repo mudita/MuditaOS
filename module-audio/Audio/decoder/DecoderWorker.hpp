@@ -37,7 +37,7 @@ namespace audio
                       ChannelMode mode);
         ~DecoderWorker() override;
 
-        virtual auto init(std::list<sys::WorkerQueueInfo> queues = std::list<sys::WorkerQueueInfo>()) -> bool override;
+        auto init(std::list<sys::WorkerQueueInfo> queues = std::list<sys::WorkerQueueInfo>()) -> bool override;
 
         auto enablePlayback() -> bool;
         auto disablePlayback() -> bool;
@@ -45,7 +45,7 @@ namespace audio
       private:
         static constexpr std::size_t stackDepth = 12 * 1024;
 
-        virtual auto handleMessage(std::uint32_t queueID) -> bool override;
+        auto handleMessage(std::uint32_t queueID) -> bool override;
         void pushAudioData();
         bool stateChangeWait();
 

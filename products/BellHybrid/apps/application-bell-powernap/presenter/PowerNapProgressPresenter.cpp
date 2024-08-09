@@ -92,7 +92,11 @@ namespace app::powernap
                                       ? audio::Fade::In
                                       : audio::Fade::Disable;
 
-        audioModel.play(filePath, AbstractAudioModel::PlaybackType::Alarm, {}, audio::FadeParams{fadeInActive});
+        audioModel.play(filePath,
+                        AbstractAudioModel::PlaybackType::Alarm,
+                        AbstractAudioModel::PlaybackMode::Single,
+                        {},
+                        audio::FadeParams{fadeInActive});
         napAlarmTimer.start();
         napFinished = true;
     }

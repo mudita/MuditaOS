@@ -120,12 +120,15 @@ namespace service
       public:
         AudioStartPlaybackRequest(const std::string &fileName,
                                   const audio::PlaybackType &playbackType,
+                                  const audio::PlaybackMode &playbackMode     = audio::PlaybackMode::Single,
                                   std::optional<audio::FadeParams> fadeParams = std::nullopt)
-            : AudioMessage(), fileName(fileName), playbackType(playbackType), fadeParams(fadeParams)
+            : AudioMessage(), fileName(fileName), playbackType(playbackType), playbackMode(playbackMode),
+              fadeParams(fadeParams)
         {}
 
         const std::string fileName;
         const audio::PlaybackType playbackType;
+        const audio::PlaybackMode playbackMode;
         const std::optional<audio::FadeParams> fadeParams;
     };
 

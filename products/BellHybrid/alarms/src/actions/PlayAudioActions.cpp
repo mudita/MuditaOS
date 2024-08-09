@@ -12,10 +12,11 @@ namespace alarms
 {
     PlayAudioAction::PlayAudioAction(sys::Service &service,
                                      std::string_view toneSetting,
-                                     audio::PlaybackType playbackType,
+                                     const audio::PlaybackType &playbackType,
+                                     const audio::PlaybackMode &playbackMode,
                                      std::optional<std::string_view> durationSetting)
-        : service{service}, toneSetting{toneSetting}, durationSetting{durationSetting},
-          playbackType{playbackType}, settings{service::ServiceProxy{service.weak_from_this()}}
+        : service{service}, toneSetting{toneSetting}, durationSetting{durationSetting}, playbackType{playbackType},
+          playbackMode{playbackMode}, settings{service::ServiceProxy{service.weak_from_this()}}
     {}
 
     auto PlayAudioAction::play(const std::filesystem::path &path, std::optional<std::chrono::minutes> duration) -> bool
@@ -29,8 +30,8 @@ namespace alarms
                                        ? audio::Fade::In
                                        : audio::Fade::Disable;
 
-        auto msg =
-            std::make_shared<service::AudioStartPlaybackRequest>(path, playbackType, audio::FadeParams{fadeInEnabled});
+        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(
+            path, playbackType, playbackMode, audio::FadeParams{fadeInEnabled});
         return service.bus.sendUnicast(std::move(msg), service::audioServiceName);
     }
 

@@ -20,6 +20,7 @@ namespace audio
       public:
         PlaybackOperation(const std::string &filePath,
                           const audio::PlaybackType &playbackType,
+                          const audio::PlaybackMode &playbackMode,
                           AudioServiceMessage::Callback callback = nullptr);
 
         virtual ~PlaybackOperation();
@@ -38,6 +39,8 @@ namespace audio
 
       private:
         static constexpr auto playbackTimeConstraint = 10ms;
+        static constexpr auto playbackStartPosition  = 0U;
+        audio::PlaybackMode playbackMode             = audio::PlaybackMode::Single;
 
         std::unique_ptr<Stream> dataStreamOut;
         std::unique_ptr<Decoder> dec;

@@ -44,7 +44,8 @@ namespace service
         auto handleStart(audio::Operation::Type opType,
                          std::optional<audio::FadeParams> fadeParams,
                          const std::string &fileName             = {},
-                         const audio::PlaybackType &playbackType = audio::PlaybackType::None)
+                         const audio::PlaybackType &playbackType = audio::PlaybackType::None,
+                         const audio::PlaybackMode &playbackMode = audio::PlaybackMode::Single)
             -> std::unique_ptr<AudioResponseMessage>;
         auto handleStop(const std::vector<audio::PlaybackType> &stopTypes, const audio::Token &token)
             -> std::unique_ptr<AudioResponseMessage>;

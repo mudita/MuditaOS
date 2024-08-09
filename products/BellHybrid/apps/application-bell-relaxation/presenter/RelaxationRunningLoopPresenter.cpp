@@ -30,15 +30,15 @@ namespace app::relaxation
     {
         Expects(timer != nullptr);
 
-        AbstractRelaxationPlayer::PlaybackMode mode;
+        AbstractAudioModel::PlaybackMode mode;
         const auto value = settings->getValue(timerValueDBRecordName, settings::SettingsScope::AppLocal);
         if (utils::is_number(value) && utils::getNumericValue<int>(value) != 0) {
             timer->reset(std::chrono::minutes{utils::getNumericValue<int>(value)});
-            mode = AbstractRelaxationPlayer::PlaybackMode::Looped;
+            mode = AbstractAudioModel::PlaybackMode::Loop;
         }
         else {
             const auto songLength = std::chrono::seconds{song.audioProperties.songLength};
-            mode                  = AbstractRelaxationPlayer::PlaybackMode::SingleShot;
+            mode                  = AbstractAudioModel::PlaybackMode::Single;
 
             if (songLength > std::chrono::seconds::zero()) {
                 timer->reset(songLength);
