@@ -43,7 +43,7 @@ namespace sdesktop::endpoints
         case EndpointType::Calllog:
             return std::make_unique<CalllogEndpoint>(ownerServicePtr);
 #if ENABLE_DEVELOPER_MODE_ENDPOINT
-        case EndpointType::developerMode:
+        case EndpointType::DeveloperMode:
             return std::make_unique<DeveloperModeEndpoint>(ownerServicePtr);
 #endif
         case EndpointType::Bluetooth:
