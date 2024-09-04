@@ -21,17 +21,19 @@ namespace audio
 
 namespace audio
 {
-    inline constexpr Volume defaultVolumeStep = 1;
+    inline constexpr Volume defaultVolumeStep{1};
 
-    inline constexpr Volume maxVolume = 10;
-    inline constexpr Volume minVolume = 0;
+    inline constexpr Volume maxVolume{10};
+    inline constexpr Volume minVolume{0};
 
-    inline constexpr Gain maxGain = 100;
-    inline constexpr Gain minGain = 0;
+    inline constexpr Gain maxGain{100};
+    inline constexpr Gain minGain{0};
 
+    inline constexpr auto audioDbPrefix{"audio"};
+    inline constexpr auto dbPathSeparator{'/'};
 
-    inline constexpr auto audioDbPrefix   = "audio";
-    inline constexpr auto dbPathSeparator = '/';
+    inline constexpr std::chrono::seconds defaultMaxFadeDuration{5};
+    inline constexpr std::chrono::seconds alarmMaxFadeDuration{45};
 
     enum class Setting
     {
@@ -87,7 +89,8 @@ namespace audio
     struct FadeParams
     {
         Fade mode;
-        std::optional<std::chrono::seconds> playbackDuration = std::nullopt;
+        std::chrono::seconds maxFadeDuration{defaultMaxFadeDuration};
+        std::optional<std::chrono::seconds> playbackDuration{std::nullopt};
     };
 
     enum class VolumeUpdateType
@@ -294,8 +297,8 @@ namespace audio
             return *this;
         }
 
-        constexpr static TokenType tokenUninitialized = -1;
-        constexpr static TokenType tokenBad           = -2;
+        constexpr static TokenType tokenUninitialized{-1};
+        constexpr static TokenType tokenBad{-2};
 
         TokenType t;
         friend class ::audio::AudioMux;

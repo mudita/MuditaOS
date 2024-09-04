@@ -37,15 +37,18 @@ namespace audio
         float minVolume;
         float maxVolume;
         float currentVolume;
+        std::chrono::milliseconds fadeInterval;
         SetCallback setVolumeCallback;
         Phase phase{Phase::Idle};
         std::chrono::time_point<std::chrono::system_clock> timestamp;
 
         void PerformNextFadeStep();
-        void RestartTimer();
+        void RestartWaitingTimer();
         void TurnUpVolume();
         void TurnDownVolume();
         void SetTargetVolume(float volume);
         bool IsFadePhaseActive();
+        std::chrono::milliseconds calculateFadeInterval(std::chrono::seconds maxDuration);
+        std::chrono::milliseconds calculateWaitingTimerPeriod(std::chrono::seconds timeElapsed);
     };
 } // namespace audio

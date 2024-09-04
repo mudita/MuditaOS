@@ -10,24 +10,14 @@ namespace audio
     {
         using namespace std::chrono_literals;
         constexpr auto timerName{"volumeFadeTimer"};
-        constexpr auto fadeInterval{33ms};
+        constexpr auto minFadeInterval{33ms};
         constexpr auto fadeStep{0.1f};
-
-        std::chrono::milliseconds calculateTimerPeriod(std::chrono::seconds elapsed,
-                                                       std::chrono::seconds duration,
-                                                       float currentVolume)
-        {
-            using floatToMs         = std::chrono::duration<float, std::chrono::milliseconds::period>;
-            const auto timeRequired = floatToMs(currentVolume / fadeStep) * fadeInterval.count();
-            const auto calculatedTime =
-                std::chrono::duration_cast<std::chrono::milliseconds>(duration - elapsed - timeRequired);
-            return std::max(calculatedTime, fadeInterval);
-        }
     } // namespace
 
     VolumeFade::VolumeFade(sys::Service *parent, SetCallback callback) : setVolumeCallback(std::move(callback))
     {
-        timerHandle = sys::TimerFactory::createPeriodicTimer(
+        fadeInterval = minFadeInterval;
+        timerHandle  = sys::TimerFactory::createPeriodicTimer(
             parent, timerName, fadeInterval, [this]([[maybe_unused]] sys::Timer &timer) { PerformNextFadeStep(); });
     }
 
@@ -52,8 +42,9 @@ namespace audio
         currentVolume      = minVolume + fadeStep;
         phase              = Phase::FadeIn;
         timestamp          = std::chrono::system_clock::now();
+        fadeInterval       = calculateFadeInterval(fadeParams.maxFadeDuration);
 
-        if (this->fadeParams.playbackDuration.has_value()) {
+        if (this->fadeParams.mode == audio::Fade::InOut && this->fadeParams.playbackDuration.has_value()) {
             // If the song is shorter than the fade in and out durations, we reduce the target volume value so that both
             // phases have time to complete
             const auto maxFadePeriod =
@@ -91,7 +82,7 @@ namespace audio
             if (setVolumeCallback != nullptr) {
                 setVolumeCallback(currentVolume);
             }
-            RestartTimer();
+            RestartWaitingTimer();
         }
     }
 
@@ -125,7 +116,7 @@ namespace audio
             }
             else if (fadeParams.mode == audio::Fade::InOut && fadeParams.playbackDuration.has_value()) {
                 phase = Phase::Wait;
-                RestartTimer();
+                RestartWaitingTimer();
             }
             else {
                 Stop();
@@ -164,11 +155,34 @@ namespace audio
         }
     }
 
-    void VolumeFade::RestartTimer()
+    void VolumeFade::RestartWaitingTimer()
     {
         const auto now         = std::chrono::system_clock::now();
         const auto timeElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - timestamp);
-        timerHandle.restart(calculateTimerPeriod(timeElapsed, fadeParams.playbackDuration.value(), currentVolume));
+        timerHandle.restart(calculateWaitingTimerPeriod(timeElapsed));
+    }
+
+    std::chrono::milliseconds VolumeFade::calculateFadeInterval(std::chrono::seconds maxDuration)
+    {
+        const auto volumeDifference = maxVolume - minVolume;
+        if (volumeDifference <= 0) {
+            return minFadeInterval;
+        }
+        const auto calculatedTime =
+            std::chrono::duration_cast<std::chrono::milliseconds>(maxDuration / (volumeDifference / fadeStep));
+        return std::max(calculatedTime, minFadeInterval);
+    }
+
+    std::chrono::milliseconds VolumeFade::calculateWaitingTimerPeriod(std::chrono::seconds timeElapsed)
+    {
+        using floatToMs = std::chrono::duration<float, std::chrono::milliseconds::period>;
+        if (!fadeParams.playbackDuration.has_value()) {
+            return minFadeInterval;
+        }
+        const auto timeRequired   = floatToMs(currentVolume / fadeStep) * fadeInterval.count();
+        const auto calculatedTime = std::chrono::duration_cast<std::chrono::milliseconds>(
+            fadeParams.playbackDuration.value() - timeElapsed - timeRequired);
+        return std::max(calculatedTime, minFadeInterval);
     }
 
 } // namespace audio
