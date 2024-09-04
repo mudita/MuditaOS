@@ -104,7 +104,6 @@ if (${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         SYSROOT sysroot
         DEPENDS
             install_scripts
-            create_product_databases
             create_user_directories
             assets
             recovery.bin-target
@@ -120,7 +119,6 @@ else()
         LUTS ""
         DEPENDS
             install_scripts
-            create_product_databases
             remove_var_directory
             create_user_directories
             assets
