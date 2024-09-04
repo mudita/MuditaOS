@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
 
 #include "Helpers.hpp"
@@ -8,39 +8,34 @@
 #include <set>
 #include <algorithm>
 #include <utility>
+#include <fstream>
 
 namespace
 {
-    std::string readContent(const std::string &filename) noexcept
+    std::string readContent(const std::string &filename)
     {
-        auto getFileSize = [](FILE *fd) -> std::size_t {
-            std::fseek(fd, 0, SEEK_END);
-            const auto size = std::ftell(fd);
-            std::rewind(fd);
-            return size;
-        };
-
-        std::vector<char> fileContent;
-        if (const auto fp = std::fopen(filename.c_str(), "r")) {
-            const auto fileSize = getFileSize(fp);
-
-            fileContent.reserve(fileSize + 1);
-            std::fread(fileContent.data(), 1, fileSize, fp);
-            std::fclose(fp);
-            fileContent[fileSize] = '\0';
-            return fileContent.data();
+        std::ifstream file{filename};
+        if (!file.is_open()) {
+            return {};
         }
-        return {};
+
+        const auto fileSize = std::filesystem::file_size(filename);
+        auto fileContent    = std::make_unique<char[]>(fileSize + 1);
+
+        file.read(fileContent.get(), fileSize);
+        fileContent[fileSize] = '\0';
+
+        return std::string{fileContent.get()};
     }
 
     std::vector<std::string> readCommands(const std::filesystem::path &filePath)
     {
-        const auto fileContent = readContent(filePath.c_str());
+        const auto &fileContent = readContent(filePath.c_str());
         std::string currentStatement{};
         std::vector<std::string> statements{};
 
         std::string line{};
-        for (const auto &c : fileContent) {
+        for (const auto c : fileContent) {
             if (c != '\n') {
                 line += c;
             }

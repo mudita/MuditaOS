@@ -54,7 +54,7 @@ endif()
 
 if (${ENABLE_TESTS})
     enable_testing()
-    add_custom_target(check ${CMAKE_CTEST_COMMAND} -V DEPENDS create_test_product_databases)
+    add_custom_target(check ${CMAKE_CTEST_COMMAND} -V)
     add_subdirectory(test)
     include(PureCoverage)
 endif ()

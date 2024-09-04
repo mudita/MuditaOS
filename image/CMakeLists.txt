@@ -5,6 +5,7 @@ set(SYSTEM_DEST_DIR ${SYSROOT_PATH}/system_a)
 set(USER_DEST_DIR ${SYSROOT_PATH}/user)
 
 set(ASSETS_DEPENDENCIES "json-common-target")
+list(APPEND ASSETS_DEPENDENCIES "create_product_databases")
 
 if (${ASSETS_TYPE} STREQUAL "Proprietary")
     list(APPEND ASSETS_DEPENDENCIES "json-proprietary-target")
