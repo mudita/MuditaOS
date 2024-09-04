@@ -46,7 +46,7 @@ download_asset_json(json-test-proprietary-target
                     ${MUDITA_CACHE_DIR}
     )
 
-set(ASSETS_DEPENDENCIES "")
+set(ASSETS_DEPENDENCIES "create_test_product_databases")
 
 if (${ASSETS_TYPE} STREQUAL "Proprietary")
     list(APPEND ASSETS_DEPENDENCIES "json-test-proprietary-target")
