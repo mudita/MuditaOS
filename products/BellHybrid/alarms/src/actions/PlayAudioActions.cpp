@@ -29,8 +29,8 @@ namespace alarms
                                        ? audio::Fade::In
                                        : audio::Fade::Disable;
 
-        auto msg =
-            std::make_shared<service::AudioStartPlaybackRequest>(path, playbackType, audio::FadeParams{fadeInEnabled});
+        auto msg = std::make_shared<service::AudioStartPlaybackRequest>(
+            path, playbackType, audio::FadeParams{fadeInEnabled, audio::alarmMaxFadeDuration});
         return service.bus.sendUnicast(std::move(msg), service::audioServiceName);
     }
 
