@@ -74,7 +74,7 @@ namespace audio
         Snooze,
         FocusTimer,
         Bedtime,
-        Last = Bedtime,
+        Last = Bedtime
     };
 
     enum class VolumeChangeRequestSource
@@ -141,7 +141,7 @@ namespace audio
         CallLoudspeakerOff,
     };
 
-    constexpr auto hwStateUpdateMaxEvent = magic_enum::enum_index(EventType::BluetoothA2DPDeviceState);
+    inline constexpr auto hwStateUpdateMaxEvent = magic_enum::enum_index(EventType::BluetoothA2DPDeviceState);
 
     class Event
     {
@@ -158,12 +158,12 @@ namespace audio
 
         virtual ~Event() = default;
 
-        EventType getType() const noexcept
+        [[nodiscard]] EventType getType() const noexcept
         {
             return eventType;
         }
 
-        DeviceState getDeviceState() const noexcept
+        [[nodiscard]] DeviceState getDeviceState() const noexcept
         {
             return deviceState;
         }
@@ -181,14 +181,14 @@ namespace audio
             auto hwUpdateEventIdx = magic_enum::enum_integer(stateChangeEvent->getType());
             if (hwUpdateEventIdx <= hwStateUpdateMaxEvent) {
                 audioSinkState.set(hwUpdateEventIdx,
-                                   stateChangeEvent->getDeviceState() == Event::DeviceState::Connected ? true : false);
+                                   stateChangeEvent->getDeviceState() == Event::DeviceState::Connected);
             }
         }
 
-        std::vector<std::shared_ptr<Event>> getUpdateEvents() const
+        [[nodiscard]] std::vector<std::shared_ptr<Event>> getUpdateEvents() const
         {
             std::vector<std::shared_ptr<Event>> updateEvents;
-            for (size_t i = 0; i <= hwStateUpdateMaxEvent; i++) {
+            for (auto i = 0; i <= hwStateUpdateMaxEvent; i++) {
                 auto isConnected =
                     audioSinkState.test(i) ? Event::DeviceState::Connected : Event::DeviceState::Disconnected;
                 auto updateEvt = magic_enum::enum_cast<EventType>(i);
@@ -197,7 +197,7 @@ namespace audio
             return updateEvents;
         }
 
-        bool isConnected(EventType deviceUpdateEvent) const
+        [[nodiscard]] bool isConnected(EventType deviceUpdateEvent) const
         {
             return audioSinkState.test(magic_enum::enum_integer(deviceUpdateEvent));
         }
@@ -231,22 +231,22 @@ namespace audio
 
     struct AudioInitException : public std::runtime_error
     {
-      protected:
-        audio::RetCode errorCode = audio::RetCode::Failed;
-
       public:
-        AudioInitException(const char *message, audio::RetCode errorCode) : runtime_error(message)
+        AudioInitException(const char *message, audio::RetCode errorCode) : runtime_error(message), errorCode{errorCode}
         {}
 
-        audio::RetCode getErrorCode() const noexcept
+        [[nodiscard]] audio::RetCode getErrorCode() const noexcept
         {
             return errorCode;
         }
+
+      protected:
+        audio::RetCode errorCode = audio::RetCode::Failed;
     };
 
     class Token
     {
-        using TokenType = int16_t;
+        using TokenType = std::int16_t;
 
       public:
         explicit Token(TokenType initValue = tokenUninitialized) : t(initValue)
@@ -266,7 +266,7 @@ namespace audio
          * Valid token is one connected with existing sequence of operations
          * @return True if valid, false otherwise
          */
-        bool IsValid() const
+        [[nodiscard]] bool IsValid() const
         {
             return t > tokenUninitialized;
         }
@@ -274,7 +274,7 @@ namespace audio
          * Bad token cannot be used anymore
          * @return True if token is flagged bad
          */
-        bool IsBad() const
+        [[nodiscard]] bool IsBad() const
         {
             return t == tokenBad;
         }
@@ -282,7 +282,7 @@ namespace audio
          * Uninitialized token can be used but it is not connected to any sequence of operations
          * @return True if token is flagged uninitialized
          */
-        bool IsUninitialized() const
+        [[nodiscard]] bool IsUninitialized() const
         {
             return t == tokenUninitialized;
         }
@@ -303,8 +303,8 @@ namespace audio
             return *this;
         }
 
-        constexpr static TokenType tokenUninitialized{-1};
-        constexpr static TokenType tokenBad{-2};
+        static constexpr TokenType tokenUninitialized{-1};
+        static constexpr TokenType tokenBad{-2};
 
         TokenType t;
         friend class ::audio::AudioMux;
@@ -322,7 +322,8 @@ namespace AudioServiceMessage
       public:
         explicit EndOfFile(audio::Token &token) : token(token)
         {}
-        const audio::Token &GetToken() const
+
+        [[nodiscard]] const audio::Token &GetToken() const
         {
             return token;
         }
@@ -336,7 +337,8 @@ namespace AudioServiceMessage
       public:
         explicit FileDeleted(audio::Token &token) : token(token)
         {}
-        const audio::Token &GetToken() const
+
+        [[nodiscard]] const audio::Token &GetToken() const
         {
             return token;
         }
@@ -350,7 +352,8 @@ namespace AudioServiceMessage
       public:
         explicit FileSystemNoSpace(audio::Token &token) : token(token)
         {}
-        const audio::Token &GetToken() const
+
+        [[nodiscard]] const audio::Token &GetToken() const
         {
             return token;
         }
@@ -380,12 +383,12 @@ namespace AudioServiceMessage
             : device(std::move(device)), type(type)
         {}
 
-        auto getDevice() const noexcept -> std::shared_ptr<audio::AudioDevice>
+        [[nodiscard]] auto getDevice() const noexcept -> std::shared_ptr<audio::AudioDevice>
         {
             return device;
         }
 
-        auto getDeviceType() const noexcept -> audio::AudioDevice::Type
+        [[nodiscard]] auto getDeviceType() const noexcept -> audio::AudioDevice::Type
         {
             return type;
         }

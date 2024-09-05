@@ -216,7 +216,7 @@ namespace audio
         // check if audio device supports Decoder's profile
         if (auto format = dec->getSourceFormat(); !audioDevice->isFormatSupportedBySink(format)) {
             LOG_ERROR("Format unsupported by the audio device: %s", format.toString().c_str());
-            return RetCode::Failed;
+            return RetCode::InvalidFormat;
         }
 
         // store profile

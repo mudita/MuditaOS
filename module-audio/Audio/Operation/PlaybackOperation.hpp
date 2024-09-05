@@ -23,7 +23,7 @@ namespace audio
                           const audio::PlaybackMode &playbackMode,
                           AudioServiceMessage::Callback callback = nullptr);
 
-        virtual ~PlaybackOperation();
+        ~PlaybackOperation() override;
 
         audio::RetCode Start(audio::Token token) final;
         audio::RetCode Stop() final;
