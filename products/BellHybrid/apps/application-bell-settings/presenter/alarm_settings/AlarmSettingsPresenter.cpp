@@ -15,11 +15,18 @@ namespace app::bell_settings
         : app{app}, provider{std::move(provider)}, settingsModel{std::move(settingsModel)}, audioModel{audioModel},
           frontlight{std::move(frontlight)}, audioErrorModel{std::move(audioErrorModel)}
     {
-
         auto playSound = [this](const UTF8 &val) {
             auto onStartCallback = [this, val](audio::RetCode retCode) {
-                if (retCode != audio::RetCode::Success) {
+                switch (retCode) {
+                case audio::RetCode::Success:
+                    break;
+                case audio::RetCode::FileDoesntExist:
+                    handleAudioError(val, gui::AudioErrorType::FileDeleted);
+                    break;
+                case audio::RetCode::InvalidFormat:
+                default: // Maybe one day each error will get its own UI message...
                     handleAudioError(val, gui::AudioErrorType::UnsupportedMediaType);
+                    break;
                 }
             };
 
@@ -90,23 +97,23 @@ namespace app::bell_settings
         return provider;
     }
 
-    void AlarmSettingsPresenter::eraseProviderData()
+    auto AlarmSettingsPresenter::eraseProviderData() -> void
     {
         provider->clearData();
     }
 
-    void AlarmSettingsPresenter::stopSound()
+    auto AlarmSettingsPresenter::stopSound() -> void
     {
         this->audioModel.stopPlayedByThis({});
     }
 
-    void AlarmSettingsPresenter::exitWithSave()
+    auto AlarmSettingsPresenter::exitWithSave() -> void
     {
         saveData();
         eraseProviderData();
     }
 
-    void AlarmSettingsPresenter::exitWithRollback()
+    auto AlarmSettingsPresenter::exitWithRollback() -> void
     {
         this->stopSound();
         settingsModel->getAlarmVolume().restoreDefault();

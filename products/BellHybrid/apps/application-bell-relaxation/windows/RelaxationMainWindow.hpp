@@ -22,7 +22,6 @@ namespace gui
         gui::ListViewWithLabels *songList{nullptr};
 
         void buildInterface() override;
-        void handleError() override;
         void rebuild() override;
         void updateViewState() override;
         void activate(const db::multimedia_files::MultimediaFilesRecord &selectedSound);

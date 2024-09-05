@@ -10,9 +10,9 @@ namespace app::music
 {
     class AbstractSongsRepository;
 }
+
 namespace app::relaxation
 {
-
     class RelaxationMainWindowContract
     {
       public:
@@ -22,7 +22,6 @@ namespace app::relaxation
             virtual ~View() = default;
 
             virtual void updateViewState()                                                             = 0;
-            virtual void handleError()                                                                 = 0;
         };
 
         class Presenter : public BasePresenter<RelaxationMainWindowContract::View>
@@ -38,15 +37,15 @@ namespace app::relaxation
 
     class RelaxationMainWindowPresenter : public RelaxationMainWindowContract::Presenter
     {
+      public:
+        explicit RelaxationMainWindowPresenter(std::unique_ptr<SongsModel> songsModel);
+
       private:
-        std::shared_ptr<SongsModel> songsModel;
         void createData(SongsModel::OnActivateCallback activateCallback) override;
         void updateViewState() override;
         void updateRecordsCount() override;
         std::shared_ptr<SongsModel> getSongsModel() override;
 
-      public:
-        explicit RelaxationMainWindowPresenter(std::unique_ptr<SongsModel> songsModel);
+        std::shared_ptr<SongsModel> songsModel;
     };
-
 } // namespace app::relaxation

@@ -8,8 +8,6 @@
 #include <ApplicationBellRelaxation.hpp>
 #include <common/options/BellOptionsNavigation.hpp>
 #include <common/options/OptionBellMenu.hpp>
-#include <common/BellCommonNames.hpp>
-#include <popups/data/AudioErrorParams.hpp>
 #include <i18n/i18n.hpp>
 
 namespace gui
@@ -57,12 +55,6 @@ namespace gui
         auto audioContext = std::make_unique<RelaxationAudioContext>(selectedSound);
         auto switchData   = std::make_unique<RelaxationSwitchData>(std::move(audioContext));
         application->switchWindow(gui::window::name::relaxationTimerSelect, std::move(switchData));
-    }
-
-    void RelaxationMainWindow::handleError()
-    {
-        auto switchData = std::make_unique<AudioErrorParams>(AudioErrorType::FilesLimitExceeded);
-        application->switchWindow(gui::window::name::audioErrorWindow, std::move(switchData));
     }
 
     void RelaxationMainWindow::updateViewState()

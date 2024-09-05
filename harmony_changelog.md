@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Fixed
+* Fixed message shown when entering alarm sound list after deleting selected alarm file
 
 ### Added
 * Added label with the name of the application on the countdown screens
