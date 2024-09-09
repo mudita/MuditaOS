@@ -378,6 +378,11 @@ namespace service
     auto Audio::handlePause() -> std::unique_ptr<AudioResponseMessage>
     {
         auto retCode = audio::RetCode::InvokedInIncorrectState;
+
+        if (volumeFade->IsActive()) {
+            volumeFade->Pause();
+        }
+
         if (const auto activeInput = audioMux.GetActiveInput(); activeInput) {
             auto playbackType = (*activeInput)->audio->GetCurrentOperationPlaybackType();
             if (isResumable(playbackType)) {
@@ -394,6 +399,11 @@ namespace service
     auto Audio::handleResume() -> std::unique_ptr<AudioResponseMessage>
     {
         auto retCode = audio::RetCode::InvokedInIncorrectState;
+
+        if (!volumeFade->IsActive()) {
+            volumeFade->Resume();
+        }
+
         if (const auto activeInput = audioMux.GetActiveInput();
             activeInput && activeInput.value()->audio->GetCurrentOperationState() == audio::Operation::State::Paused) {
             retCode = activeInput.value()->audio->Resume();
