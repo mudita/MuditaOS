@@ -42,6 +42,7 @@ namespace audio
         currentVolume      = minVolume + fadeStep;
         phase              = Phase::FadeIn;
         timestamp          = std::chrono::system_clock::now();
+        timeElapsed        = std::chrono::milliseconds::zero();
         fadeInterval       = calculateFadeInterval(fadeParams.maxFadeDuration);
 
         if (this->fadeParams.mode == audio::Fade::InOut && this->fadeParams.playbackDuration.has_value()) {
@@ -72,6 +73,24 @@ namespace audio
         phase = Phase::Idle;
     }
 
+    void VolumeFade::Pause()
+    {
+        timerHandle.stop();
+        timeElapsed +=
+            std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - timestamp);
+    }
+
+    void VolumeFade::Resume()
+    {
+        timestamp = std::chrono::system_clock::now();
+        if (phase == Phase::Wait) {
+            RestartWaitingTimer();
+        }
+        else {
+            timerHandle.start();
+        }
+    }
+
     void VolumeFade::SetVolume(float volume)
     {
         if (IsFadePhaseActive()) {
@@ -82,7 +101,9 @@ namespace audio
             if (setVolumeCallback != nullptr) {
                 setVolumeCallback(currentVolume);
             }
-            RestartWaitingTimer();
+            if (IsActive()) {
+                RestartWaitingTimer();
+            }
         }
     }
 
@@ -158,8 +179,8 @@ namespace audio
     void VolumeFade::RestartWaitingTimer()
     {
         const auto now         = std::chrono::system_clock::now();
-        const auto timeElapsed = std::chrono::duration_cast<std::chrono::seconds>(now - timestamp);
-        timerHandle.restart(calculateWaitingTimerPeriod(timeElapsed));
+        const auto totalTimeElapsed = std::chrono::duration_cast<std::chrono::seconds>(timeElapsed + (now - timestamp));
+        timerHandle.restart(calculateWaitingTimerPeriod(totalTimeElapsed));
     }
 
     std::chrono::milliseconds VolumeFade::calculateFadeInterval(std::chrono::seconds maxDuration)
@@ -173,7 +194,7 @@ namespace audio
         return std::max(calculatedTime, minFadeInterval);
     }
 
-    std::chrono::milliseconds VolumeFade::calculateWaitingTimerPeriod(std::chrono::seconds timeElapsed)
+    std::chrono::milliseconds VolumeFade::calculateWaitingTimerPeriod(std::chrono::seconds totalTimeElapsed)
     {
         using floatToMs = std::chrono::duration<float, std::chrono::milliseconds::period>;
         if (!fadeParams.playbackDuration.has_value()) {
@@ -181,7 +202,7 @@ namespace audio
         }
         const auto timeRequired   = floatToMs(currentVolume / fadeStep) * fadeInterval.count();
         const auto calculatedTime = std::chrono::duration_cast<std::chrono::milliseconds>(
-            fadeParams.playbackDuration.value() - timeElapsed - timeRequired);
+            fadeParams.playbackDuration.value() - totalTimeElapsed - timeRequired);
         return std::max(calculatedTime, minFadeInterval);
     }
 
