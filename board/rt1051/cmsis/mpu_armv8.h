@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
+
 /******************************************************************************
  * @file     mpu_armv8.h
  * @brief    CMSIS MPU API for Armv8-M MPU

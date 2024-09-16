@@ -1,3 +1,6 @@
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
+
 /*
  * FreeRTOS Kernel V10.0.0
  * Copyright (C) 2017 Amazon.com, Inc. or its affiliates.  All Rights Reserved.

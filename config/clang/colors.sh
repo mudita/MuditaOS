@@ -1,6 +1,6 @@
 #!/bin/env bash
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
-# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+# Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 export RED='\e[38;2;255;13;0m'
 export YELLOW="\e[38;2;255;232;0m"

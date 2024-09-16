@@ -1,5 +1,5 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
-// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 // This is minimalistic example how our GUI renderer works - this code won't compile right now
 // there shouldn't be much work to do to make it compile again, there is no target like that in need so it's not added

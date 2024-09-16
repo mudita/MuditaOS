@@ -1,5 +1,5 @@
--- Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
--- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+-- Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 -- Message: Move gs_onboarding_done to global scope
 -- Revision: 06e96a01-c32c-49b7-8909-43b310f181ff
