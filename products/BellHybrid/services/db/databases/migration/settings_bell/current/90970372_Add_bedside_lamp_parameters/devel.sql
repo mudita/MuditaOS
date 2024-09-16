@@ -1,5 +1,5 @@
 -- Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
--- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+-- For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 -- Message: Add bedside lamp parameters
 -- Revision: 90970372-6151-4de3-91dd-f1c8684bc6f4

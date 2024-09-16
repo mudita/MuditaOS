@@ -1,5 +1,5 @@
--- Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
--- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+-- Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 -- Message: Removed unsupported char from quotes
 -- Revision: 618dbb3c-ea59-48d7-b882-9c568fd19905

@@ -1,5 +1,5 @@
-// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
-// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include <lwext4/ext4_bdev.hpp>
 #include <ext4_config.h>

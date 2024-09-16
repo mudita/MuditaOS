@@ -1,5 +1,5 @@
 // Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
-// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+// For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "module-apps/application-music-player/widgets/SongItem.hpp"
 #include <gui/widgets/text/Label.hpp>

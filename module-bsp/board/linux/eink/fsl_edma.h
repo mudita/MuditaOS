@@ -1,5 +1,5 @@
-﻿// Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
-// For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #ifndef MODULE_BSP_BOARD_LINUX_FSL_DRIVERS_FSL_EDMA_H_
 #define MODULE_BSP_BOARD_LINUX_FSL_DRIVERS_FSL_EDMA_H_

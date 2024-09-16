@@ -1,6 +1,6 @@
 #!/bin/bash
-# Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
-# For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+# Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+# For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 
 #time update doesn't work below
@@ -23,7 +23,7 @@ CURRENT_YEAR=$(date "+%Y")
 LICENSE_CHEK="\(.*\)\(Copyright (c) 2017-\)\(.*\)\(, Mudita Sp. z.o.o. All rights reserved.\).*"
 LICENSE_CHEK_BASH_RE="(.*)(Copyright \(c\) 2017-)(.*)(, Mudita Sp. z.o.o. All rights reserved.)"
 LICENSE1="Copyright (c) 2017-${CURRENT_YEAR}, Mudita Sp. z.o.o. All rights reserved."
-LICENSE2="For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md"
+LICENSE2="For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md"
 
 CHECK_ONLY="false"
 EXIT_CODE=0

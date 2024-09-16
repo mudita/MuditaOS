@@ -1,5 +1,5 @@
--- Copyright (c) 2017-2021, Mudita Sp. z.o.o. All rights reserved.
--- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+-- Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 BEGIN;
 INSERT OR IGNORE INTO notes ("_id","date","snippet") VALUES (1,1565586181,'Enjoy life. Offline');

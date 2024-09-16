@@ -1,5 +1,5 @@
--- Copyright (c) 2017-2023, Mudita Sp. z.o.o. All rights reserved.
--- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md
+-- Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+-- For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 -- Message: Adding new column to templates table to manage templates order
 -- Revision: 111a2d1b-dc32-40a3-9a2a-02a9e186bcac
