@@ -22,7 +22,7 @@ databases_set = "databases.json"
 env_file = "dbm_env.ini"
 
 license_header = f"-- Copyright (c) 2017-{datetime.date.today().year}, Mudita Sp. z.o.o. All rights reserved.\n" \
-                 "-- For licensing, see https://github.com/mudita/MuditaOS/LICENSE.md\n\n"
+                 "-- For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md\n\n"
 
 cli = ArgumentParser()
 subparsers = cli.add_subparsers(dest="subcommand")
