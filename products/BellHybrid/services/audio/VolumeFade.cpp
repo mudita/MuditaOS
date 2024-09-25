@@ -101,7 +101,7 @@ namespace audio
             if (setVolumeCallback != nullptr) {
                 setVolumeCallback(currentVolume);
             }
-            if (IsActive()) {
+            if (timerHandle.isActive()) {
                 RestartWaitingTimer();
             }
         }
@@ -120,7 +120,7 @@ namespace audio
 
     bool VolumeFade::IsActive()
     {
-        return timerHandle.isActive();
+        return phase != Phase::Idle;
     }
 
     bool VolumeFade::IsFadePhaseActive()
