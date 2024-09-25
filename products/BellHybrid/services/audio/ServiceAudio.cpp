@@ -400,7 +400,7 @@ namespace service
     {
         auto retCode = audio::RetCode::InvokedInIncorrectState;
 
-        if (!volumeFade->IsActive()) {
+        if (volumeFade->IsActive()) {
             volumeFade->Resume();
         }
 
