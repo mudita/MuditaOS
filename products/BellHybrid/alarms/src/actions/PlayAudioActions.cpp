@@ -8,6 +8,11 @@
 #include <db/SystemSettings.hpp>
 #include <Timers/TimerFactory.hpp>
 
+namespace
+{
+    constexpr std::chrono::seconds alarmFadeDuration{45};
+} // namespace
+
 namespace alarms
 {
     PlayAudioAction::PlayAudioAction(sys::Service &service,
@@ -31,7 +36,7 @@ namespace alarms
                                        : audio::Fade::Disable;
 
         auto msg = std::make_shared<service::AudioStartPlaybackRequest>(
-            path, playbackType, playbackMode, audio::FadeParams{fadeInEnabled, audio::alarmMaxFadeDuration});
+            path, playbackType, playbackMode, audio::FadeParams{fadeInEnabled, alarmFadeDuration});
         return service.bus.sendUnicast(std::move(msg), service::audioServiceName);
     }
 
