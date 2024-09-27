@@ -4,6 +4,7 @@
 
 ### Fixed
 * Fixed message shown when entering alarm sound list after deleting selected alarm file
+* Fixed invalid accusative form in meditation summary in Polish
 
 ### Added
 * Added label with the name of the application on the countdown screens

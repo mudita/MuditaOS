@@ -6,6 +6,7 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <apps-common/BasePresenter.hpp>
 #include <apps-common/widgets/TimerWithCallbacks.hpp>
+#include <common/windows/BellFinishedWindow.hpp>
 #include <time/time_locale.hpp>
 
 #include <memory>
@@ -103,5 +104,6 @@ namespace app::meditation
         void onIntervalReached();
 
         void addMeditationEntry(std::chrono::minutes elapsed);
+        void onMeditationEnd(gui::BellFinishedWindowData::ExitBehaviour exitBehaviour);
     };
 } // namespace app::meditation

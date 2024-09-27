@@ -4,11 +4,11 @@
 #include "MeditationTimer.hpp"
 #include "MeditationCommon.hpp"
 #include "MeditationProgressPresenter.hpp"
+#include "MeditationTimerWindow.hpp"
 #include "models/ChimeInterval.hpp"
 #include "models/Statistics.hpp"
 
 #include <common/models/TimeModel.hpp>
-#include <common/windows/BellFinishedWindow.hpp>
 #include <audio/AudioMessage.hpp>
 #include <service-db/Settings.hpp>
 #include <LanguageUtils.hpp>
@@ -86,38 +86,12 @@ namespace app::meditation
 
     void MeditationProgressPresenter::abandon()
     {
-        timer->stop();
-        const auto elapsed     = std::chrono::duration_cast<std::chrono::minutes>(timer->getElapsed());
-        const auto summaryText = utils::translate("app_meditation_summary") + std::to_string(elapsed.count()) + " " +
-                                 utils::language::getCorrectMinutesNumeralForm(elapsed.count());
-
-        addMeditationEntry(elapsed);
-
-        app->switchWindow(
-            gui::window::bell_finished::defaultName,
-            gui::BellFinishedWindowData::Factory::create("big_namaste_W_G",
-                                                         "MeditationTimerWindow",
-                                                         summaryText,
-                                                         gui::BellFinishedWindowData::ExitBehaviour::SwitchWindow,
-                                                         endWindowTimeout));
+        onMeditationEnd(gui::BellFinishedWindowData::ExitBehaviour::SwitchWindow);
     }
 
     void MeditationProgressPresenter::finish()
     {
-        timer->stop();
-        const auto elapsed     = std::chrono::duration_cast<std::chrono::minutes>(timer->getElapsed());
-        const auto summaryText = utils::translate("app_meditation_summary") + std::to_string(elapsed.count()) + " " +
-                                 utils::language::getCorrectMinutesAccusativeForm(elapsed.count());
-
-        addMeditationEntry(elapsed);
-
-        app->switchWindow(
-            gui::window::bell_finished::defaultName,
-            gui::BellFinishedWindowData::Factory::create("big_namaste_W_G",
-                                                         "",
-                                                         summaryText,
-                                                         gui::BellFinishedWindowData::ExitBehaviour::ReturnToHomescreen,
-                                                         endWindowTimeout));
+        onMeditationEnd(gui::BellFinishedWindowData::ExitBehaviour::ReturnToHomescreen);
     }
 
     void MeditationProgressPresenter::onBeforeShow()
@@ -157,5 +131,22 @@ namespace app::meditation
         if (elapsed > std::chrono::minutes::zero()) {
             statisticsModel.addEntry(elapsed);
         }
+    }
+
+    void MeditationProgressPresenter::onMeditationEnd(gui::BellFinishedWindowData::ExitBehaviour exitBehaviour)
+    {
+        using ExitBehaviour = gui::BellFinishedWindowData::ExitBehaviour;
+
+        timer->stop();
+        const auto elapsed      = std::chrono::duration_cast<std::chrono::minutes>(timer->getElapsed());
+        const auto &summaryText = utils::translate("app_meditation_summary") + std::to_string(elapsed.count()) + " " +
+                                  utils::language::getCorrectMinutesAccusativeForm(elapsed.count());
+
+        addMeditationEntry(elapsed);
+
+        const auto &windowToReturn = (exitBehaviour == ExitBehaviour::SwitchWindow) ? MeditationTimerWindow::name : "";
+        app->switchWindow(gui::window::bell_finished::defaultName,
+                          gui::BellFinishedWindowData::Factory::create(
+                              "big_namaste_W_G", windowToReturn, summaryText, exitBehaviour, endWindowTimeout));
     }
 } // namespace app::meditation
