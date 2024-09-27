@@ -14,6 +14,7 @@
 namespace
 {
     constexpr auto powerNapAlarmTimerName = "PowerNapAlarmTimer";
+    constexpr std::chrono::seconds fadeInDuration{45};
 } // namespace
 
 namespace app::powernap
@@ -96,7 +97,7 @@ namespace app::powernap
                         AbstractAudioModel::PlaybackType::Alarm,
                         AbstractAudioModel::PlaybackMode::Single,
                         {},
-                        audio::FadeParams{fadeInActive});
+                        audio::FadeParams{fadeInActive, fadeInDuration});
         napAlarmTimer.start();
         napFinished = true;
     }

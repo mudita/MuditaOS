@@ -33,7 +33,6 @@ namespace audio
     inline constexpr auto dbPathSeparator{'/'};
 
     inline constexpr std::chrono::seconds defaultMaxFadeDuration{5};
-    inline constexpr std::chrono::seconds alarmMaxFadeDuration{45};
 
     enum class Setting
     {
