@@ -33,8 +33,8 @@ namespace sdesktop::endpoints
                 std::make_shared<app::manager::DOMRequest>(service::name::service_desktop,
                                                            std::make_unique<sdesktop::Event>(std::move(event))),
                 service::name::appmgr);
-            return {sent::delayed, std::nullopt};
+            return {Sent::Delayed, std::nullopt};
         }
-        return {sent::no, std::nullopt};
+        return {Sent::No, std::nullopt};
     }
 }; // namespace sdesktop::endpoints

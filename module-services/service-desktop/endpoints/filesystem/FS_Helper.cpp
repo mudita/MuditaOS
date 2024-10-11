@@ -68,7 +68,7 @@ namespace sdesktop::endpoints
             response = {.status = http::Code::BadRequest};
         }
 
-        return {sent::no, std::move(response)};
+        return {Sent::No, std::move(response)};
     }
 
     auto FS_Helper::processPut(Context &context) -> ProcessResult
@@ -96,7 +96,7 @@ namespace sdesktop::endpoints
             response = ResponseContext{.status = http::Code::BadRequest};
         }
 
-        return {sent::no, std::move(response)};
+        return {Sent::No, std::move(response)};
     }
 
     auto FS_Helper::processDelete(Context &context) -> ProcessResult
@@ -118,7 +118,7 @@ namespace sdesktop::endpoints
             LOG_ERROR("Bad request, missing or invalid argument");
         }
 
-        return {sent::no, ResponseContext{.status = code}};
+        return {Sent::No, ResponseContext{.status = code}};
     }
     auto FS_Helper::requestLogsFlush() const -> void
     {

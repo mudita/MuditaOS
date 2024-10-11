@@ -16,17 +16,17 @@ namespace sdesktop::endpoints
 
         if (rebootType == json::reboot::msc) {
             sys::SystemManagerCommon::RebootMSC(owner);
-            return {sent::no, ResponseContext{.status = http::Code::Accepted}};
+            return {Sent::No, ResponseContext{.status = http::Code::Accepted}};
         }
         else if (rebootType == json::reboot::reboot) {
             sys::SystemManagerCommon::Reboot(owner);
-            return {sent::no, ResponseContext{.status = http::Code::Accepted}};
+            return {Sent::No, ResponseContext{.status = http::Code::Accepted}};
         }
         else if (rebootType == json::reboot::shutdown) {
             sys::SystemManagerCommon::RegularPowerDown(owner);
-            return {sent::no, ResponseContext{.status = http::Code::Accepted}};
+            return {Sent::No, ResponseContext{.status = http::Code::Accepted}};
         }
         LOG_ERROR("Invalid request: %s", rebootType.c_str());
-        return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
+        return {Sent::No, ResponseContext{.status = http::Code::BadRequest}};
     }
 } // namespace sdesktop::endpoints

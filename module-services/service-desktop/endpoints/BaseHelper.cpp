@@ -7,7 +7,7 @@ namespace sdesktop::endpoints
 {
     auto ret() -> BaseHelper::ProcessResult
     {
-        return {sent::no, std::nullopt};
+        return {Sent::No, std::nullopt};
     }
 
     auto BaseHelper::processPut(Context &) -> ProcessResult
@@ -44,6 +44,6 @@ namespace sdesktop::endpoints
             return processPut(context);
         }
         postProcess(method, context);
-        return {sent::no, std::nullopt};
+        return {Sent::No, std::nullopt};
     }
 } // namespace sdesktop::endpoints

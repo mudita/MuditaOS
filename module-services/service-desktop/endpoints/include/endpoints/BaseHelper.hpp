@@ -15,28 +15,28 @@ namespace sys
 
 namespace sdesktop::endpoints
 {
-
     class Context;
-    enum class sent
+
+    enum class Sent
     {
         /// response was sent from Helper class
         /// we should avoid that
-        yes,
+        Yes,
         /// response wasn't sent from Helper class
         /// we should send it from endpoint based on processing result
-        no,
+        No,
         /// works on global context
         /// mechanism:
         /// - Send message which is delayed
         /// - send the actual response form ServiceDesktop on `sdesktop::developerMode::DeveloperModeRequest`
-        delayed,
+        Delayed,
     };
 
     /// base helper class to avoid copies
     class BaseHelper
     {
       public:
-        using ProcessResult = std::pair<sent, std::optional<ResponseContext>>;
+        using ProcessResult = std::pair<Sent, std::optional<ResponseContext>>;
 
       protected:
         sys::Service *owner = nullptr;
@@ -68,5 +68,4 @@ namespace sdesktop::endpoints
         /// pre and post processing is available on pre/post process method override
         [[nodiscard]] auto process(http::Method method, Context &context) -> ProcessResult;
     };
-
 } // namespace sdesktop::endpoints
