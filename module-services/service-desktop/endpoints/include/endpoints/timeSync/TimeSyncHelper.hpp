@@ -14,6 +14,7 @@ namespace sdesktop::endpoints
         explicit TimeSyncHelper(sys::Service *p) : BaseHelper(p)
         {}
 
+        auto processGet(Context &context) -> ProcessResult final;
         auto processPost(Context &context) -> ProcessResult final;
 
       private:

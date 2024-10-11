@@ -43,7 +43,7 @@ namespace sdesktop::endpoints
         Entry recovery;
     };
 
-    std::optional<json11::Json> fetchVersionJsonFromFile(const std::filesystem::path &path)
+    auto fetchVersionJsonFromFile(const std::filesystem::path &path) -> std::optional<json11::Json>
     {
         std::ifstream versionJsonFile{path};
         if (not versionJsonFile.is_open()) {
@@ -60,7 +60,7 @@ namespace sdesktop::endpoints
         return versionJson;
     }
 
-    std::optional<UpdatePackageEntries> getUpdatePackageEntries(const std::filesystem::path &path)
+    auto getUpdatePackageEntries(const std::filesystem::path &path) -> std::optional<UpdatePackageEntries>
     {
         if (const auto version = fetchVersionJsonFromFile(path)) {
             return UpdatePackageEntries{version.value()};
@@ -68,7 +68,7 @@ namespace sdesktop::endpoints
         return std::nullopt;
     }
 
-    bool validateImageEntry(const std::filesystem::path &path, const std::string &hash)
+    auto validateImageEntry(const std::filesystem::path &path, const std::string &hash) -> bool
     {
         auto fd = std::fopen(path.c_str(), "rb");
         if (fd == nullptr) {
@@ -88,7 +88,7 @@ namespace sdesktop::endpoints
         return (md5.getHash() == hash);
     }
 
-    bool removeDirectory(const std::filesystem::path &path)
+    auto removeDirectory(const std::filesystem::path &path) -> bool
     {
         if (std::filesystem::is_directory(path)) {
             LOG_INFO("Removing directory: %s", path.c_str());
@@ -100,7 +100,7 @@ namespace sdesktop::endpoints
         return true;
     }
 
-    bool unpackUpdatePackage(const std::filesystem::path &path, const std::filesystem::path &where)
+    auto unpackUpdatePackage(const std::filesystem::path &path, const std::filesystem::path &where) -> bool
     {
         if (not removeDirectory(where)) {
             LOG_ERROR("Removing '%s' directory failed", path.c_str());
@@ -118,7 +118,8 @@ namespace sdesktop::endpoints
         return true;
     }
 
-    bool validateUpdatePackage(const std::filesystem::path &packagePath, const std::filesystem::path &binariesPath)
+    auto validateUpdatePackage(const std::filesystem::path &packagePath, const std::filesystem::path &binariesPath)
+        -> bool
     {
         LOG_INFO("Validating '%s' package", packagePath.c_str());
         const auto entries = getUpdatePackageEntries(packagePath / purefs::file::version_json);
@@ -132,7 +133,7 @@ namespace sdesktop::endpoints
                validateImageEntry(prefix / entries->bootloader.first, entries->bootloader.second);
     }
 
-    bool checkAvailableSpace(const std::filesystem::path &path, const std::filesystem::path &updatePackage)
+    auto checkAvailableSpace(const std::filesystem::path &path, const std::filesystem::path &updatePackage) -> bool
     {
         struct statvfs stat
         {};
@@ -156,13 +157,13 @@ namespace sdesktop::endpoints
         return freeSpace >= requiredSpace;
     }
 
-    bool checkUpdatePackageFile(const std::filesystem::path &path)
+    auto checkUpdatePackageFile(const std::filesystem::path &path) -> bool
     {
         LOG_INFO("Checking if update package exist, '%s'", path.c_str());
         return std::filesystem::exists(path);
     }
 
-    void UpdateHelper::preProcess(http::Method method, [[maybe_unused]] Context &context)
+    auto UpdateHelper::preProcess(http::Method method, [[maybe_unused]] Context &context) -> void
     {
         LOG_INFO("UpdateHelper requesting: %s", magic_enum::enum_name(method).data());
     }
@@ -172,32 +173,32 @@ namespace sdesktop::endpoints
         const auto &body = context.getBody();
 
         if (body[json::update::update] != true || body[json::update::reboot] != true) {
-            return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
+            return {Sent::No, ResponseContext{.status = http::Code::BadRequest}};
         }
 
         if (not checkUpdatePackageFile(purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename)) {
-            return {sent::no, ResponseContext{.status = http::Code::NotFound}};
+            return {Sent::No, ResponseContext{.status = http::Code::NotFound}};
         }
 
         if (not checkAvailableSpace(purefs::dir::getUserDiskPath(),
                                     purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename)) {
-            return {sent::no, ResponseContext{.status = http::Code::NotAcceptable}};
+            return {Sent::No, ResponseContext{.status = http::Code::NotAcceptable}};
         }
 
         if (not unpackUpdatePackage(purefs::dir::getTemporaryPath() / sdesktop::paths::updateFilename,
                                     updatePackagePath)) {
-            return {sent::no, ResponseContext{.status = http::Code::UnprocessableEntity}};
+            return {Sent::No, ResponseContext{.status = http::Code::UnprocessableEntity}};
         }
 
         if (not validateUpdatePackage(updatePackagePath, binariesPath)) {
-            return {sent::no, ResponseContext{.status = http::Code::UnprocessableEntity}};
+            return {Sent::No, ResponseContext{.status = http::Code::UnprocessableEntity}};
         }
 
         if (sys::SystemManagerCommon::RebootToRecovery(owner, sys::RecoveryReason::Update)) {
-            return {sent::no, ResponseContext{.status = http::Code::NoContent}};
+            return {Sent::No, ResponseContext{.status = http::Code::NoContent}};
         }
 
-        return {sent::no, ResponseContext{.status = http::Code::InternalServerError}};
+        return {Sent::No, ResponseContext{.status = http::Code::InternalServerError}};
     }
 
     UpdateHelper::UpdateHelper(sys::Service *p)

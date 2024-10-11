@@ -23,13 +23,13 @@ namespace sdesktop::endpoints
     auto SecurityEndpointHelper::processPut(Context &context) -> ProcessResult
     {
         auto code = processConfiguration(context);
-        return {sent::no, ResponseContext{.status = code}};
+        return {Sent::No, ResponseContext{.status = code}};
     }
 
     auto SecurityEndpointHelper::processGet(Context &context) -> ProcessResult
     {
         if (context.getBody()[json::messages::category].string_value() == json::usb::phoneLockStatus) {
-            return {sent::no, processStatus(context)};
+            return {Sent::No, processStatus(context)};
         }
         if (context.getBody()[json::messages::category].string_value() == json::usb::phoneLockTime) {
             if (auto phoneLockTime = getPhoneLockTime(context); phoneLockTime > std::time(nullptr)) {
@@ -43,9 +43,9 @@ namespace sdesktop::endpoints
                 context.setResponseStatus(http::Code::UnprocessableEntity);
             }
             putToSendQueue(context.createSimpleResponse());
-            return {sent::yes, std::nullopt};
+            return {Sent::Yes, std::nullopt};
         }
-        return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
+        return {Sent::No, ResponseContext{.status = http::Code::BadRequest}};
     }
 
     auto SecurityEndpointHelper::processStatus(Context & /*context*/) -> ResponseContext
@@ -119,5 +119,4 @@ namespace sdesktop::endpoints
 
         return status;
     }
-
 } // namespace sdesktop::endpoints
