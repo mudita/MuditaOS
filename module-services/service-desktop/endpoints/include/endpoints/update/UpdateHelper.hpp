@@ -15,7 +15,7 @@ namespace sdesktop::endpoints
         explicit UpdateHelper(sys::Service *p);
 
         auto processPost(Context &context) -> ProcessResult final;
-        void preProcess(http::Method method, Context &context) final;
+        auto preProcess(http::Method method, Context &context) -> void final;
 
       private:
         std::filesystem::path updatePackagePath;

@@ -8,15 +8,14 @@
 
 namespace sdesktop::endpoints
 {
-
     auto UpdateEndpoint::handle(Context &context) -> void
     {
         auto &p               = helperSwitcher(context);
         auto [sent, response] = p.process(context.getMethod(), context);
-        if (sent == sent::delayed) {
+        if (sent == Sent::Delayed) {
             LOG_DEBUG("There is no proper delayed serving mechanism - depend on invisible context caching");
         }
-        if (sent == sent::no) {
+        if (sent == Sent::No) {
             if (not response) {
                 LOG_ERROR("Response not sent & response not created : respond with error");
                 context.setResponseStatus(http::Code::NotAcceptable);
@@ -27,7 +26,7 @@ namespace sdesktop::endpoints
 
             sender::putToSendQueue(context.createSimpleResponse());
         }
-        if (sent == sent::yes and response) {
+        if (sent == Sent::Yes and response) {
             LOG_ERROR("Response set when we already handled response in handler");
         }
     }
@@ -36,5 +35,4 @@ namespace sdesktop::endpoints
     {
         return *updateHelper;
     }
-
 } // namespace sdesktop::endpoints

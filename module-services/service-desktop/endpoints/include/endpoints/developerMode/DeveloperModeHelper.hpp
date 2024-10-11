@@ -10,17 +10,16 @@
 
 namespace sdesktop::endpoints
 {
-
     class DeveloperModeHelper : public BaseHelper
     {
         static auto getKeyCode(int val) noexcept -> bsp::KeyCodes;
-        bool sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state);
+        auto sendKeypress(bsp::KeyCodes keyCode, gui::InputEvent::State state) -> bool;
 
-        void requestSimChange(int simSelected);
+        auto requestSimChange(int simSelected) -> void;
         auto smsRecordFromJson(const json11::Json &msgJson) -> SMSRecord;
-        bool requestCellularPowerStateChange(int simSelected);
-        bool requestServiceStateInfo(sys::Service *serv);
-        bool requestCellularSleepModeInfo(sys::Service *serv);
+        auto requestCellularPowerStateChange(int simSelected) -> bool;
+        auto requestServiceStateInfo(sys::Service *serv) -> bool;
+        auto requestCellularSleepModeInfo(sys::Service *serv) -> bool;
         auto prepareSMS(Context &context) -> ProcessResult;
 
       public:
@@ -73,5 +72,4 @@ namespace sdesktop::endpoints
         inline constexpr auto tetheringOff = "off";
 
     } // namespace json::developerMode
-
 } // namespace sdesktop::endpoints

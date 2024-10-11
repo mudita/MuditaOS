@@ -120,6 +120,7 @@ namespace sdesktop::endpoints::json
 
     namespace timeSync
     {
+        inline constexpr auto value     = "value";
         inline constexpr auto timestamp = "timestamp";
     }
 } // namespace sdesktop::endpoints::json

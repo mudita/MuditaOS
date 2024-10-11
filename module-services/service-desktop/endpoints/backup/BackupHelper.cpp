@@ -20,7 +20,7 @@ namespace sdesktop::endpoints
             return checkSyncState(context);
         }
 
-        return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
+        return {Sent::No, ResponseContext{.status = http::Code::BadRequest}};
     }
 
     auto BackupHelper::processPost(Context &context) -> ProcessResult
@@ -33,16 +33,16 @@ namespace sdesktop::endpoints
             return executeBackupRequest(context);
         }
 
-        return {sent::no, ResponseContext{.status = http::Code::BadRequest}};
+        return {Sent::No, ResponseContext{.status = http::Code::BadRequest}};
     }
 
     auto BackupHelper::executeBackupRequest([[maybe_unused]] Context &context) -> ProcessResult
     {
         if (sys::SystemManagerCommon::RebootToRecovery(owner, sys::RecoveryReason::Backup)) {
-            return {sent::no, ResponseContext{.status = http::Code::NoContent}};
+            return {Sent::No, ResponseContext{.status = http::Code::NoContent}};
         }
 
-        return {sent::no, ResponseContext{.status = http::Code::InternalServerError}};
+        return {Sent::No, ResponseContext{.status = http::Code::InternalServerError}};
     }
 
     auto BackupHelper::executeSyncRequest([[maybe_unused]] Context &context) -> ProcessResult
@@ -52,7 +52,7 @@ namespace sdesktop::endpoints
         if (ownerServicePtr->getSyncStatus().state == Sync::OperationState::Running) {
             LOG_DEBUG("Sync already running");
             // a sync package preparation is already running, don't start a second task
-            return {sent::no, ResponseContext{.status = http::Code::NotAcceptable}};
+            return {Sent::No, ResponseContext{.status = http::Code::NotAcceptable}};
         }
         else {
             LOG_DEBUG("Starting a sync package preparation");
@@ -64,7 +64,7 @@ namespace sdesktop::endpoints
 
             // return new generated sync package info
 
-            return {sent::no, ResponseContext{.status = http::Code::Accepted, .body = json11::Json::object{}}};
+            return {Sent::No, ResponseContext{.status = http::Code::Accepted, .body = json11::Json::object{}}};
         }
     }
 
@@ -75,7 +75,6 @@ namespace sdesktop::endpoints
 
         const auto status =
             (syncStatus.state == Sync::OperationState::Finished) ? http::Code::SeeOther : http::Code::NoContent;
-        return {sent::no, ResponseContext{.status = status, .body = syncStatus}};
+        return {Sent::No, ResponseContext{.status = status, .body = syncStatus}};
     }
-
 } // namespace sdesktop::endpoints
