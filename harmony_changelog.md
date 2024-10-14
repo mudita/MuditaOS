@@ -18,6 +18,7 @@
 
 
 ### Changed / Improved
+* Optimized power consumption for bedside lamp functionality
 
 ## [2.8.0 2024-07-23]
 
