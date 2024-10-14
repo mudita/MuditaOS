@@ -19,7 +19,7 @@ namespace bell::screen_light_control
 
         controlTimer  = sys::TimerFactory::createPeriodicTimer(parent,
                                                               "LightControlTimer",
-                                                              std::chrono::milliseconds{CONTROL_TIMER_MS},
+                                                              std::chrono::milliseconds{controlTimerIntervalMs},
                                                               [this](sys::Timer &) { controlTimerCallback(); });
         automaticMode = ScreenLightMode::Automatic;
     }
@@ -29,12 +29,12 @@ namespace bell::screen_light_control
         disableTimers();
     }
 
-    void ScreenLightController::processRequest(Action action)
+    auto ScreenLightController::processRequest(Action action) -> void
     {
         processRequest(action, Parameters{});
     }
 
-    void ScreenLightController::processRequest(Action action, const Parameters &params)
+    auto ScreenLightController::processRequest(Action action, const Parameters &params) -> void
     {
         switch (action) {
         case Action::turnOff:
@@ -57,7 +57,7 @@ namespace bell::screen_light_control
         }
     }
 
-    void ScreenLightController::controlTimerCallback()
+    auto ScreenLightController::controlTimerCallback() -> void
     {
         auto newBrightness = ::screen_light_control::functions::brightnessRampOut();
         bsp::eink_frontlight::setBrightness(newBrightness);
@@ -67,11 +67,11 @@ namespace bell::screen_light_control
                 setUpAutomaticFunction(getNextAutomaticFunction(), newBrightness);
             }
             else {
-                if (newBrightness == MINIMAL_TARGET) {
+                if (newBrightness == minimalTargetBrightness) {
                     turnOff();
                     bsp::eink_frontlight::turnOff();
                 }
-                setBrightnessInstant(MINIMAL_TARGET);
+                setBrightnessInstant(minimalTargetBrightness);
                 disableTimers();
             }
         }
@@ -82,7 +82,7 @@ namespace bell::screen_light_control
         return lightOn;
     }
 
-    bool ScreenLightController::isAutoModeOn() const noexcept
+    auto ScreenLightController::isAutoModeOn() const noexcept -> bool
     {
         return automaticMode == ScreenLightMode::Automatic;
     }
@@ -92,17 +92,17 @@ namespace bell::screen_light_control
         return brightnessWhenOn;
     }
 
-    void ScreenLightController::enableTimers()
+    auto ScreenLightController::enableTimers() -> void
     {
         controlTimer.start();
     }
 
-    void ScreenLightController::disableTimers()
+    auto ScreenLightController::disableTimers() -> void
     {
         controlTimer.stop();
     }
 
-    void ScreenLightController::setParameters(const LinearProgressModeParameters &params)
+    auto ScreenLightController::setParameters(const LinearProgressModeParameters &params) -> void
     {
         if (params.functions.empty()) {
             disableTimers();
@@ -123,36 +123,36 @@ namespace bell::screen_light_control
         }
     }
 
-    void ScreenLightController::setAutomaticModeFunctions(
-        const LinearProgressModeParameters::LinearFunctions &functions)
+    auto ScreenLightController::setAutomaticModeFunctions(
+        const LinearProgressModeParameters::LinearFunctions &functions) -> void
     {
         automaticModeFunctions = LinearProgressModeParameters::LinearFunctions{functions.rbegin(), functions.rend()};
     }
 
-    ::screen_light_control::functions::LinearProgressFunction ScreenLightController::getNextAutomaticFunction()
+    auto ScreenLightController::getNextAutomaticFunction() -> ::screen_light_control::functions::LinearProgressFunction
     {
         auto function = automaticModeFunctions.back();
         automaticModeFunctions.pop_back();
         return function;
     }
 
-    void ScreenLightController::setUpAutomaticFunction(
+    auto ScreenLightController::setUpAutomaticFunction(
         ::screen_light_control::functions::LinearProgressFunction function,
-        bsp::eink_frontlight::BrightnessPercentage currentBrightness)
+        bsp::eink_frontlight::BrightnessPercentage currentBrightness) -> void
     {
         const auto rampTarget = getStandarizedRampTarget(function.target);
         ::screen_light_control::functions::setRampStep(
             std::abs(rampTarget - currentBrightness) /
-            (static_cast<float>(function.duration.count()) / CONTROL_TIMER_MS));
+            (static_cast<float>(function.duration.count()) / controlTimerIntervalMs));
         ::screen_light_control::functions::setRampTarget(rampTarget);
     }
 
-    void ScreenLightController::setParameters(const ConstLinearProgressModeParameters &params)
+    auto ScreenLightController::setParameters(const ConstLinearProgressModeParameters &params) -> void
     {
         setBrightnessInstant(getStandarizedRampTarget(params.targetBrightness));
     }
 
-    void ScreenLightController::turnOn(const std::optional<ManualModeParameters> &params)
+    auto ScreenLightController::turnOn(const std::optional<ManualModeParameters> &params) -> void
     {
         if (params.has_value()) {
             brightnessWhenOn = getStandarizedRampTarget(params->manualModeBrightness);
@@ -165,38 +165,38 @@ namespace bell::screen_light_control
         lightOn = true;
     }
 
-    void ScreenLightController::setBrightnessInstant(bsp::eink_frontlight::BrightnessPercentage brightness)
+    auto ScreenLightController::setBrightnessInstant(bsp::eink_frontlight::BrightnessPercentage brightness) -> void
     {
         brightnessWhenOn = getStandarizedRampTarget(brightness);
         ::screen_light_control::functions::setRampTarget(brightnessWhenOn);
-        ::screen_light_control::functions::setRampStep(RAMP_STEP_PER_MS * CONTROL_TIMER_MS);
+        ::screen_light_control::functions::setRampStep(rampStepPerMs * controlTimerIntervalMs);
     }
 
-    void ScreenLightController::turnOff()
+    auto ScreenLightController::turnOff() -> void
     {
         lightOn = false;
-        setBrightnessInstant(MINIMAL_TARGET);
+        setBrightnessInstant(minimalTargetBrightness);
         cpuSentinelRelease();
         enableTimers();
     }
 
-    void ScreenLightController::cpuSentinelKeepOn()
+    auto ScreenLightController::cpuSentinelKeepOn() -> void
     {
-        cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_6);
+        cpuSentinel->HoldMinimumFrequency(bsp::CpuFrequencyMHz::Level_3);
     }
 
-    void ScreenLightController::cpuSentinelRelease()
+    auto ScreenLightController::cpuSentinelRelease() -> void
     {
         cpuSentinel->ReleaseMinimumFrequency();
     }
 
-    bsp::eink_frontlight::BrightnessPercentage ScreenLightController::getStandarizedRampTarget(
-        bsp::eink_frontlight::BrightnessPercentage target)
+    auto ScreenLightController::getStandarizedRampTarget(bsp::eink_frontlight::BrightnessPercentage target)
+        -> bsp::eink_frontlight::BrightnessPercentage
     {
-        return std::max<bsp::eink_frontlight::BrightnessPercentage>(target, MINIMAL_TARGET);
+        return std::max<bsp::eink_frontlight::BrightnessPercentage>(target, minimalTargetBrightness);
     }
 
-    bool ScreenLightController::isFadeOutOngoing()
+    auto ScreenLightController::isFadeOutOngoing() -> bool
     {
         return false;
     }

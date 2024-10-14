@@ -20,7 +20,7 @@ namespace sys
 /// Processing of ambient light sensor input to screen brightness output.
 namespace bell::screen_light_control
 {
-    constexpr auto screenLightControlName = "ScreenLightControl";
+    inline constexpr auto screenLightControlName = "ScreenLightControl";
 
     /// Control screen light and keeps it's current state
     class ScreenLightController : public ::screen_light_control::ScreenLightController
@@ -36,47 +36,47 @@ namespace bell::screen_light_control
         explicit ScreenLightController(sys::Service *parent);
         ~ScreenLightController() override;
 
-        void processRequest(Action action) override;
-        void processRequest(Action action, const Parameters &params) override;
+        auto processRequest(Action action) -> void override;
+        auto processRequest(Action action, const Parameters &params) -> void override;
 
         [[nodiscard]] auto isLightOn() const noexcept -> bool override;
-        [[nodiscard]] bool isAutoModeOn() const noexcept override;
+        [[nodiscard]] auto isAutoModeOn() const noexcept -> bool override;
         [[nodiscard]] auto getBrightnessValue() const noexcept -> bsp::eink_frontlight::BrightnessPercentage override;
         [[nodiscard]] auto isFadeOutOngoing() -> bool override;
 
       private:
-        void controlTimerCallback();
+        auto controlTimerCallback() -> void;
 
-        void enableTimers();
-        void disableTimers();
+        auto enableTimers() -> void;
+        auto disableTimers() -> void;
 
-        void setParameters(const LinearProgressModeParameters &params);
-        void setParameters(const ConstLinearProgressModeParameters &params);
-        void setBrightnessInstant(bsp::eink_frontlight::BrightnessPercentage brightness);
+        auto setParameters(const LinearProgressModeParameters &params) -> void;
+        auto setParameters(const ConstLinearProgressModeParameters &params) -> void;
+        auto setBrightnessInstant(bsp::eink_frontlight::BrightnessPercentage brightness) -> void;
 
-        void setAutomaticModeFunctions(const LinearProgressModeParameters::LinearFunctions &functions);
+        auto setAutomaticModeFunctions(const LinearProgressModeParameters::LinearFunctions &functions) -> void;
         ::screen_light_control::functions::LinearProgressFunction getNextAutomaticFunction();
-        void setUpAutomaticFunction(::screen_light_control::functions::LinearProgressFunction function,
-                                    bsp::eink_frontlight::BrightnessPercentage currentBrightness);
+        auto setUpAutomaticFunction(::screen_light_control::functions::LinearProgressFunction function,
+                                    bsp::eink_frontlight::BrightnessPercentage currentBrightness) -> void;
 
-        void turnOff();
-        void turnOn(const std::optional<ManualModeParameters> &params = std::nullopt);
+        auto turnOff() -> void;
+        auto turnOn(const std::optional<ManualModeParameters> &params = std::nullopt) -> void;
 
-        void cpuSentinelKeepOn();
-        void cpuSentinelRelease();
+        auto cpuSentinelKeepOn() -> void;
+        auto cpuSentinelRelease() -> void;
 
         bsp::eink_frontlight::BrightnessPercentage getStandarizedRampTarget(
             bsp::eink_frontlight::BrightnessPercentage target);
 
-        static constexpr inline auto CONTROL_TIMER_MS = 25;
-        static constexpr inline auto RAMP_STEP_PER_MS = 0.1;
-        static constexpr inline auto MINIMAL_TARGET   = 15;
+        static constexpr auto controlTimerIntervalMs  = 25;
+        static constexpr auto rampStepPerMs           = 0.1f;
+        static constexpr auto minimalTargetBrightness = 15;
 
         sys::TimerHandle controlTimer;
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;
         bool lightOn                                                = false;
         ScreenLightMode automaticMode                               = ScreenLightMode::Manual;
-        bsp::eink_frontlight::BrightnessPercentage brightnessWhenOn = MINIMAL_TARGET;
+        bsp::eink_frontlight::BrightnessPercentage brightnessWhenOn = minimalTargetBrightness;
         LinearProgressModeParameters::LinearFunctions automaticModeFunctions;
     };
 } // namespace bell::screen_light_control
