@@ -5,7 +5,7 @@
 #include <Service/Service.hpp>
 #include <Timers/TimerMessage.hpp>
 #include <log/log.hpp>
-#include <projdefs.h>
+#include <ticks.hpp>
 #include <memory>
 
 #if DEBUG_TIMER == 1
@@ -16,12 +16,9 @@
 
 namespace sys::timer
 {
-    SystemTimer::SystemTimer(Service *parent,
-                             const std::string &name,
-                             std::chrono::milliseconds interval,
-                             timer::Type type)
-        : cpp_freertos::Timer(name.c_str(), pdMS_TO_TICKS(interval.count()), type == timer::Type::Periodic), name{name},
-          interval{interval}, type{type}, parent{parent}
+    SystemTimer::SystemTimer(Service *parent, const std::string &name, std::chrono::milliseconds interval, Type type)
+        : cpp_freertos::Timer(name.c_str(), cpp_freertos::Ticks::MsToTicks(interval.count()), type == Type::Periodic),
+          name{name}, interval{interval}, type{type}, parent{parent}
     {
         attachToService();
         log_debug("%s %s timer created", name.c_str(), type == Type::Periodic ? "periodic" : "single-shot");
@@ -84,9 +81,9 @@ namespace sys::timer
 
     void SystemTimer::setInterval(std::chrono::milliseconds value)
     {
-        log_debug("Timer %s set interval to %ld ms!", name.c_str(), static_cast<long int>(value.count()));
+        log_debug("Timer %s set interval to %" PRIi64 " ms!", name.c_str(), value.count());
         interval = value;
-        cpp_freertos::Timer::SetPeriod(pdMS_TO_TICKS(interval.count()), 0);
+        cpp_freertos::Timer::SetPeriod(cpp_freertos::Ticks::MsToTicks(interval.count()), 0);
     }
 
     void SystemTimer::onTimeout()
@@ -101,7 +98,7 @@ namespace sys::timer
             return;
         }
         log_debug("Timer %s runs callback", name.c_str());
-        if (type == timer::Type::SingleShot) {
+        if (type == Type::SingleShot) {
             stop();
         }
         callback(*this);
@@ -112,7 +109,7 @@ namespace sys::timer
         return active;
     }
 
-    void SystemTimer::connect(timer::TimerCallback &&newCallback) noexcept
+    void SystemTimer::connect(TimerCallback &&newCallback) noexcept
     {
         callback = std::move(newCallback);
     }

@@ -4,11 +4,11 @@
 #pragma once
 
 #include "FreeRTOS.h"
-#include "portmacro.h"                             // for TickType_t
-#include <module-os/RTOSWrapper/include/timer.hpp> // for Timer
+#include "portmacro.h"
 #include <Timers/Timer.hpp>
-#include <functional> // for function
-#include <string>     // for string
+#include <timer.hpp>
+#include <functional>
+#include <string>
 #include <atomic>
 
 namespace sys
@@ -26,7 +26,7 @@ namespace sys::timer
         /// @param name this will be name of timer + postfix
         /// @param interval time for next timer event in
         /// @param type type of timer
-        SystemTimer(Service *parent, const std::string &name, std::chrono::milliseconds interval, timer::Type type);
+        SystemTimer(Service *parent, const std::string &name, std::chrono::milliseconds interval, Type type);
         SystemTimer(const SystemTimer &)     = delete;
         SystemTimer(SystemTimer &&) noexcept = delete;
         SystemTimer &operator=(const SystemTimer &) = delete;
@@ -36,10 +36,10 @@ namespace sys::timer
         void start() override;
         void restart(std::chrono::milliseconds newInterval) override;
         void stop() override;
-        bool isActive() const noexcept override;
+        [[nodiscard]] bool isActive() const noexcept override;
 
         void setInterval(std::chrono::milliseconds value);
-        void connect(timer::TimerCallback &&newCallback) noexcept;
+        void connect(TimerCallback &&newCallback) noexcept;
         void onTimeout();
 
       private:
@@ -52,9 +52,9 @@ namespace sys::timer
         void attachToService();
 
         std::string name;
-        timer::TimerCallback callback;
+        TimerCallback callback;
         std::chrono::milliseconds interval;
-        timer::Type type;
+        Type type;
         Service *parent         = nullptr;
         std::atomic_bool active = false;
     };
