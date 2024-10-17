@@ -10,7 +10,6 @@
 
 namespace hal::eink
 {
-
     enum class EinkDisplayColorMode
     {
         EinkDisplayColorModeStandard,
@@ -19,8 +18,8 @@ namespace hal::eink
 
     enum class WaveformTemperature
     {
-        KEEP_CURRENT,
-        MEASURE_NEW,
+        KeepCurrent,
+        MeasureNew
     };
 
     enum class EinkRefreshMode
@@ -41,20 +40,19 @@ namespace hal::eink
         EinkTimeout,               //!< Timeout occured while waiting for not busy signal from EINK
         EinkNoMem,                 //!< Could not allocate memory
         EinkWaveformsFileOpenFail, //!< Could not open the file with the waveforms for EPD display
-
-        EinkUnknown,
+        EinkUnknown
     };
 
     struct FrameSize
     {
-        uint16_t width;
-        uint16_t height;
+        std::uint16_t width;
+        std::uint16_t height;
     };
 
     struct EinkFrame
     {
-        uint16_t pos_x;
-        uint16_t pos_y;
+        std::uint16_t pos_x;
+        std::uint16_t pos_y;
         FrameSize size;
     };
 
@@ -68,24 +66,24 @@ namespace hal::eink
 
         virtual ~AbstractEinkDisplay() = default;
 
-        virtual void setMode(const EinkDisplayColorMode mode) noexcept                                        = 0;
-        virtual EinkDisplayColorMode getMode() const noexcept                                                 = 0;
-        virtual EinkStatus showImageUpdate(const std::vector<EinkFrame> &updateFrames,
-                                           const std::uint8_t *frameBuffer)                                   = 0;
-        virtual EinkStatus showImageRefresh(const EinkFrame &refreshFrame, const EinkRefreshMode refreshMode) = 0;
-        virtual EinkStatus showImage(const std::vector<EinkFrame> &updateFrames,
-                                     const EinkFrame &refreshFrame,
-                                     const std::uint8_t *frameBuffer,
-                                     const EinkRefreshMode refreshMode)                                       = 0;
-        virtual void prepareEarlyRequest(EinkRefreshMode refreshMode, const WaveformTemperature behaviour)    = 0;
+        virtual auto setMode(EinkDisplayColorMode mode) noexcept -> void            = 0;
+        [[nodiscard]] virtual auto getMode() const noexcept -> EinkDisplayColorMode = 0;
+        virtual auto showImageUpdate(const std::vector<EinkFrame> &updateFrames, const std::uint8_t *frameBuffer)
+            -> EinkStatus                                                                                       = 0;
+        virtual auto showImageRefresh(const EinkFrame &refreshFrame, EinkRefreshMode refreshMode) -> EinkStatus = 0;
+        virtual auto showImage(const std::vector<EinkFrame> &updateFrames,
+                               const EinkFrame &refreshFrame,
+                               const std::uint8_t *frameBuffer,
+                               EinkRefreshMode refreshMode) -> EinkStatus                                       = 0;
+        virtual auto prepareEarlyRequest(EinkRefreshMode refreshMode, WaveformTemperature behaviour) -> void    = 0;
 
-        virtual EinkStatus dither()                                         = 0;
-        virtual EinkStatus powerOn()                                        = 0;
-        virtual EinkStatus powerOff()                                       = 0;
-        virtual EinkStatus shutdown()                                       = 0;
-        virtual EinkStatus wipeOut()                                        = 0;
-        virtual EinkStatus resetAndInit()                                   = 0;
-        virtual std::shared_ptr<devices::Device> getDevice() const noexcept = 0;
-        virtual EinkStatus reinitAndPowerOn()                               = 0;
+        virtual auto dither() -> EinkStatus                                                       = 0;
+        virtual auto powerOn() -> EinkStatus                                                      = 0;
+        virtual auto powerOff() -> EinkStatus                                                     = 0;
+        virtual auto shutdown() -> EinkStatus                                                     = 0;
+        virtual auto wipeOut() -> EinkStatus                                                      = 0;
+        virtual auto resetAndInit() -> EinkStatus                                                 = 0;
+        [[nodiscard]] virtual auto getDevice() const noexcept -> std::shared_ptr<devices::Device> = 0;
+        virtual auto reinitAndPowerOn() -> EinkStatus                                             = 0;
     };
 } // namespace hal::eink
