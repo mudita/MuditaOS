@@ -101,9 +101,9 @@ namespace Quotes
             settings->getValue(settings::Quotes::randomQuoteIDUpdateTime, settings::SettingsScope::Global);
 
         try {
-            lastTimestamp = stol(lastTimestampString);
+            lastTimestamp = std::stoll(lastTimestampString);
         }
-        catch (std::invalid_argument &e) {
+        catch (const std::exception &e) {
             LOG_ERROR("Invalid timestamp, set to 0! Cause: %s", e.what());
             lastTimestamp = 0;
         }
