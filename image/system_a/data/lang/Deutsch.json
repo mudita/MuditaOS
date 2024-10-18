@@ -175,7 +175,7 @@
     "app_bell_welcome_charge_message": "<text>Charge Harmony<br/>und leicht dr\u00fccken</text>",
     "app_bell_welcome_message": "<text>Mudita Harmony<br/>ist ausgeschaltet</text>",
     "app_bell_whatsnew_continue": "Weiter",
-    "app_bell_whatsnew_end_screen_text": "<text>Teile uns deine Meinung zu<br/>diesem Update mit auf<br/><b>mudita.com/forum</b></text>",
+    "app_bell_whatsnew_end_screen_text": "<text>Teile uns deine Meinung zu<br/>diesem Update mit auf<br/><b>forum.mudita.com</b></text>",
     "app_bell_whatsnew_skip": "\u00dcberspr.",
     "app_bell_whatsnew_title": "Neues",
     "app_bell_whatsnew_version": "<text>OS-Version: <token>$VERSION</token></text>",

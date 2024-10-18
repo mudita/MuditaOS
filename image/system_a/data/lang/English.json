@@ -177,7 +177,7 @@
     "app_bell_welcome_charge_message": "<text>Charge Harmony<br/>and press light click</text>",
     "app_bell_welcome_message": "<text>Mudita Harmony<br/>is switched OFF</text>",
     "app_bell_whatsnew_continue": "Continue",
-    "app_bell_whatsnew_end_screen_text": "<text>We'd love to hear your<br/>feedback about this update at<br/><b>mudita.com/forum</b></text>",
+    "app_bell_whatsnew_end_screen_text": "<text>We'd love to hear your<br/>feedback about this update at<br/><b>forum.mudita.com</b></text>",
     "app_bell_whatsnew_skip": "Skip",
     "app_bell_whatsnew_title": "What's New",
     "app_bell_whatsnew_version": "<text>OS version: <token>$VERSION</token></text>",
