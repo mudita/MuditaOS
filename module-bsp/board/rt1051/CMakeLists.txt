@@ -10,11 +10,11 @@ target_sources(module-bsp
 		bsp/cellular/rt1051_cellular.cpp
 		bsp/eeprom/eeprom.cpp
 		bsp/eink_frontlight/eink_frontlight.cpp
-		bsp/eink/bsp_eink.cpp
+        bsp/eink/BspEink.cpp
 		bsp/eink/ED028TC1.cpp
 		bsp/eink/EinkDisplay.cpp
-		bsp/eink/eink_binarization_luts.c
-		bsp/eink/eink_dimensions.cpp
+		bsp/eink/EinkDimensions.cpp
+		bsp/eink/EinkBufferTransformation.cpp
 		bsp/eMMC/fsl_mmc.c
 		bsp/eMMC/fsl_sdmmc_common.c
 		bsp/eMMC/fsl_sdmmc_event.c
@@ -33,6 +33,7 @@ target_sources(module-bsp
 		bsp/lpm/LDO.cpp
 		bsp/lpm/DCDC.cpp
 		bsp/magnetometer/ALS31300.cpp
+		bsp/magnetometer/magnetometer.cpp
 		bsp/pit/pit.cpp
 		bsp/trng/trng.cpp
 		bsp/trng/RT1051Trng.cpp
@@ -57,7 +58,6 @@ target_sources(module-bsp
 		drivers/RT1051DriverPWM.cpp
 		drivers/RT1051DriverSEMC.cpp
 		drivers/RT1051DriverUSDHC.cpp
-   		bsp/magnetometer/magnetometer.cpp
 )
 
 target_include_directories(module-bsp
