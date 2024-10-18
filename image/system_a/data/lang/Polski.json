@@ -175,7 +175,7 @@
     "app_bell_welcome_charge_message": "<text>Na\u0142aduj Harmony<br/>i kliknij lekko</text>",
     "app_bell_welcome_message": "<text>Mudita Harmony<br/>jest wy\u0142\u0105czony</text>",
     "app_bell_whatsnew_continue": "Kontynuuj",
-    "app_bell_whatsnew_end_screen_text": "<text>Zach\u0119camy do podzielenia si\u0119<br/>opini\u0105 o tej wersji na<br/><b>mudita.com/forum</b></text>",
+    "app_bell_whatsnew_end_screen_text": "<text>Zach\u0119camy do podzielenia si\u0119<br/>opini\u0105 o tej wersji na<br/><b>forum.mudita.com</b></text>",
     "app_bell_whatsnew_skip": "Pomi\u0144",
     "app_bell_whatsnew_title": "Nowo\u015bci",
     "app_bell_whatsnew_version": "<text>Wersja OS: <token>$VERSION</token></text>",
