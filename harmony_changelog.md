@@ -3,22 +3,26 @@
 ## Unreleased
 
 ### Fixed
+
+### Added
+
+### Changed / Improved
+* Optimized power consumption for bedside lamp functionality
+
+## [2.9.0 2024-10-21]
+
+### Fixed
 * Fixed message shown when entering alarm sound list after deleting selected alarm file
 * Fixed invalid accusative form in meditation summary in Polish
 
 ### Added
 * Added label with the name of the application on the countdown screens
 * Added What's New section shown after update
-* Added versioning for private assets
 * Added greetings in all languages
 * Added fade in and fade out to relaxation songs
 * Added time sync endpoint to be used by Mudita Center
 * Added bedside lamp settings
 * Added gapless audio transition in relaxation
-
-
-### Changed / Improved
-* Optimized power consumption for bedside lamp functionality
 
 ## [2.8.0 2024-07-23]
 
