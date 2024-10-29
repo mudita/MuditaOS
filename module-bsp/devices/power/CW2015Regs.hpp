@@ -7,11 +7,11 @@
 
 namespace bsp::devices::power::CW2015Regs
 {
-    constexpr inline auto ADDRESS = 0x62;
+    inline constexpr auto ADDRESS = 0x62;
 
     struct Config
     {
-        constexpr static auto ADDRESS = 0x08;
+        static constexpr auto ADDRESS = 0x08;
 
         explicit Config(const std::uint8_t raw) : reg{raw}
         {}
@@ -57,7 +57,7 @@ namespace bsp::devices::power::CW2015Regs
 
     struct Mode
     {
-        constexpr static auto ADDRESS = 0x0A;
+        static constexpr auto ADDRESS = 0x0A;
 
         Mode() = default;
         explicit Mode(const std::uint8_t raw) : reg{raw}
@@ -111,10 +111,10 @@ namespace bsp::devices::power::CW2015Regs
 
     struct RRT_ALERT
     {
-        constexpr static auto ADDRESS_H = 0x06;
-        constexpr static auto ADDRESS_L = 0x07;
+        static constexpr auto ADDRESS_H = 0x06;
+        static constexpr auto ADDRESS_L = 0x07;
 
-        RRT_ALERT(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<uint16_t>(lsb | (msb << 8))}
+        RRT_ALERT(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<std::uint16_t>(lsb | (msb << 8))}
         {}
         explicit RRT_ALERT(const std::uint16_t reg) : reg{reg}
         {}
@@ -146,10 +146,10 @@ namespace bsp::devices::power::CW2015Regs
 
     struct VCELL
     {
-        constexpr static auto ADDRESS_H = 0x02;
-        constexpr static auto ADDRESS_L = 0x03;
+        static constexpr auto ADDRESS_H = 0x02;
+        static constexpr auto ADDRESS_L = 0x03;
 
-        VCELL(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<uint16_t>(lsb | (msb << 8))}
+        VCELL(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<std::uint16_t>(lsb | (msb << 8))}
         {}
         explicit VCELL(const std::uint16_t reg) : reg{reg}
         {}
@@ -170,10 +170,10 @@ namespace bsp::devices::power::CW2015Regs
 
     struct SOC
     {
-        constexpr static auto ADDRESS_H = 0x04;
-        constexpr static auto ADDRESS_L = 0x05;
+        static constexpr auto ADDRESS_H = 0x04;
+        static constexpr auto ADDRESS_L = 0x05;
 
-        SOC(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<uint16_t>(lsb | (msb << 8))}
+        SOC(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<std::uint16_t>(lsb | (msb << 8))}
         {}
         explicit SOC(const std::uint16_t reg) : reg{reg}
         {}
@@ -189,19 +189,20 @@ namespace bsp::devices::power::CW2015Regs
 
     class BATTINFO
     {
-        constexpr static auto BATTERY_INFO_SIZE = 64;
+        static constexpr auto BATTERY_INFO_SIZE = 64;
         using Type                              = const std::array<std::uint8_t, BATTERY_INFO_SIZE>;
 
         /* got from ODM init code */
-        constexpr static Type config_info = {
-            // profile_DEM50X_2nd_20211012
-            0x15, 0x15, 0x6E, 0x67, 0x65, 0x62, 0x60, 0x60, 0x5F, 0x5E, 0x5B, 0x59, 0x55, 0x50, 0x41, 0x33,
-            0x2A, 0x26, 0x24, 0x27, 0x31, 0x46, 0x55, 0x5B, 0x47, 0x4A, 0x0A, 0x3E, 0x38, 0x58, 0x59, 0x63,
-            0x67, 0x63, 0x62, 0x64, 0x3D, 0x1B, 0x6F, 0x15, 0x07, 0x21, 0x54, 0x85, 0x8F, 0x90, 0x90, 0x44,
-            0x63, 0x86, 0x94, 0x99, 0x80, 0x89, 0xBC, 0xCB, 0x2F, 0x00, 0x64, 0xA5, 0xB5, 0xC1, 0x46, 0xAE};
+        static constexpr Type config_info = {
+            //BH21P_3400mAh_DM140X_PROFILE_20241029
+            0x15, 0x39, 0x75, 0x36, 0x19, 0x16, 0x34, 0x50, 0x62, 0x67, 0x58, 0x4E, 0x53, 0x4F, 0x52, 0x56,
+            0x5B, 0x5F, 0x5C, 0x5E, 0x53, 0x61, 0x70, 0x76, 0x75, 0x65, 0x0A, 0x3E, 0x48, 0x70, 0x8C, 0x9D,
+            0x96, 0x91, 0x8A, 0x81, 0x43, 0x1F, 0xFF, 0x48, 0x09, 0x39, 0x59, 0x85, 0x8F, 0x90, 0x90, 0x38,
+            0x53, 0x84, 0x92, 0x92, 0x80, 0x69, 0x80, 0xCB, 0x2F, 0x00, 0x64, 0xA5, 0xB5, 0xC1, 0x46, 0xAE
+        };
 
       public:
-        constexpr static auto ADDRESS = 0x10;
+        static constexpr auto ADDRESS = 0x10;
 
         Type::const_iterator begin() const noexcept
         {
