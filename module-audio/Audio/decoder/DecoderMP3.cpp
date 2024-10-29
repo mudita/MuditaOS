@@ -23,8 +23,9 @@ namespace audio
         io->seek_data = this;
         dec->io       = io.get();
 
-        if (mp3dec_ex_open_cb(dec.get(), dec->io, MP3D_SEEK_TO_SAMPLE)) {
-            LOG_ERROR("Failed to open minimp3");
+        const auto decoderStatus = mp3dec_ex_open_cb(dec.get(), dec->io, MP3D_SEEK_TO_SAMPLE | MP3D_DO_NOT_SCAN);
+        if (decoderStatus != 0) {
+            LOG_ERROR("Failed to open minimp3, error: %d", decoderStatus);
             return;
         }
 
