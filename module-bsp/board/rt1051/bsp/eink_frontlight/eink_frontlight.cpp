@@ -10,15 +10,18 @@ namespace bsp::eink_frontlight
 {
     namespace
     {
-        std::shared_ptr<drivers::DriverPWM> pwm;
         constexpr auto pwmOutputFrequencyHz = 5000;
         constexpr auto pwmChannel = static_cast<drivers::PWMChannel>(BoardDefinitions::EINK_FRONTLIGHT_PWM_CHANNEL);
-        auto gammaFactor          = 2.5f;
 
-        std::uint8_t gammaCorrection(BrightnessPercentage brightness)
+        auto gammaFactor          = 2.5f;
+        std::shared_ptr<drivers::DriverPWM> pwm;
+
+        float gammaCorrection(BrightnessPercentage brightness)
         {
-            std::clamp(brightness, 0.0f, 100.0f);
-            return static_cast<std::uint8_t>(100 * std::pow((brightness / 100.0f), gammaFactor));
+            constexpr auto minPercent = 0.0f;
+            constexpr auto maxPercent = 100.0f;
+            std::clamp(brightness, minPercent, maxPercent);
+            return (maxPercent * std::pow(brightness / maxPercent, gammaFactor));
         }
     } // namespace
 
