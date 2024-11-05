@@ -17,7 +17,7 @@ namespace settings
 
         factoryData->addRow({Field(factory::serial_number_key), Field(serialNumber.c_str())});
         factoryData->addRow({Field(factory::case_colour_key), Field(colour.c_str())});
-        factoryData->addRow({Field(factory::device_version_key), Field(std::to_string(version).c_str())});
+        factoryData->addRow({Field(factory::device_version_key), Field(version.c_str())});
 
         return factoryData;
     }

@@ -49,9 +49,9 @@ namespace app::bell_settings
 
     void AboutYourBellModel::createData()
     {
-        const auto productSerialNumber = settings.getValue(factoryDataSerialPath, settings::SettingsScope::Global);
-        const auto productVersion      = settings.getValue(factoryDataVersionPath, settings::SettingsScope::Global);
-        const auto productName =
+        const auto &productSerialNumber = settings.getValue(factoryDataSerialPath, settings::SettingsScope::Global);
+        const auto &productVersion      = settings.getValue(factoryDataVersionPath, settings::SettingsScope::Global);
+        const auto &productName =
             utils::translate("app_bell_settings_about_product") + std::string(" ") + productVersion;
 
         internalData.push_back(

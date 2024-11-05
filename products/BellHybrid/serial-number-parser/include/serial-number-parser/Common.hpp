@@ -12,13 +12,14 @@ namespace serial_number_parser
 
     constexpr auto unknownSerialNumber = "0000000000000";
 
-    constexpr auto firstVersion   = 1;
-    constexpr auto secondVersion  = 2;
-    constexpr auto unknownVersion = 0;
+    constexpr auto unknownVersion   = "";
+    constexpr auto firstVersion     = "1";
+    constexpr auto secondVersion    = "2";
+    constexpr auto secondProVersion = "2 Pro";
 
     using SerialNumber    = std::string;
-    using CaseColor       = std::string;
-    using VersionNumber   = unsigned;
-    using VersionMetadata = std::pair<CaseColor, VersionNumber>;
+    using CaseColour      = std::string;
+    using VersionNumber   = std::string;
+    using VersionMetadata = std::pair<CaseColour, VersionNumber>;
     using DeviceMetadata  = std::pair<SerialNumber, VersionMetadata>;
 } // namespace serial_number_parser
