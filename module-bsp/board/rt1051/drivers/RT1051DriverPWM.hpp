@@ -21,17 +21,17 @@ namespace drivers
       public:
         RT1051DriverPWM(PWMInstances inst, PWMModules mod, const DriverPWMParams &params);
 
-        ~RT1051DriverPWM();
+        ~RT1051DriverPWM() override;
 
-        void InitNextChannel(const DriverPWMParams &params);
+        void InitNextChannel(const DriverPWMParams &params) override;
 
-        void SetDutyCycle(std::uint8_t dutyCyclePercent, PWMChannel channel);
+        void SetDutyCycle(float dutyCyclePercent, PWMChannel channel) override;
 
-        void Start(PWMChannel channel);
+        void Start(PWMChannel channel) override;
 
-        void Stop(PWMChannel channel);
+        void Stop(PWMChannel channel) override;
 
-        void UpdateClockFrequency();
+        void UpdateClockFrequency() override;
 
         enum class PwmState
         {
@@ -40,6 +40,28 @@ namespace drivers
         };
 
       private:
+        struct PwmSignalConfig
+        {
+          public:
+            pwm_channels_t pwmChannel;
+            float dutyCyclePercent;
+            pwm_level_select_t level;
+            std::uint16_t deadtimeValue;
+            pwm_fault_state_t faultState;
+            bool pwmchannelenable;
+
+            constexpr pwm_signal_param_t getFslConfig()
+            {
+                pwm_signal_param_t config = {.pwmChannel       = pwmChannel,
+                                             .dutyCyclePercent = static_cast<std::uint8_t>(dutyCyclePercent),
+                                             .level            = level,
+                                             .deadtimeValue    = deadtimeValue,
+                                             .faultState       = faultState,
+                                             .pwmchannelenable = pwmchannelenable};
+                return config;
+            }
+        };
+
         PwmState GetPwmState();
 
         void SetupPWMChannel(PWMChannel channel);
@@ -62,19 +84,18 @@ namespace drivers
 
         void restoreDutyCycle();
 
-        PWM_Type *base = nullptr;
+        PWM_Type *base{nullptr};
 
-        pwm_submodule_t pwmModule = kPWM_Module_0;
+        pwm_submodule_t pwmModule{kPWM_Module_0};
 
-        std::array<pwm_signal_param_t, 2> pwmSignalsConfig;
+        std::array<PwmSignalConfig, 2> pwmSignalsConfig{};
 
         std::vector<PWMChannel> enabledChannels;
-        std::map<PWMChannel, PwmState> pwmChannelState = {
+        std::map<PWMChannel, PwmState> pwmChannelState{
             {PWMChannel::A, PwmState::Off}, {PWMChannel::B, PwmState::Off}, {PWMChannel::X, PwmState::Off}};
 
         cpp_freertos::MutexStandard frequencyChangeMutex;
 
-        std::uint32_t pwmModuleClockFrequency = 0;
+        std::uint32_t pwmModuleClockFrequency{0};
     };
-
 } // namespace drivers
