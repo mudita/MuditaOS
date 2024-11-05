@@ -5,32 +5,34 @@
 
 #include <cmath>
 #include <cstdint>
+#include <algorithm>
 
 namespace frontlight_utils
 {
-    namespace
-    {
-        static constexpr auto minPercent                       = 0.0f;
-        static constexpr auto maxPercent                       = 100.0f;
-        static constexpr auto minimumLightOnPercentOffsetValue = 16.0f;
-        static constexpr auto minBrightness                    = 1U;
-        static constexpr auto maxBrightness                    = 10U;
-        static constexpr float multiplier = (maxPercent - minimumLightOnPercentOffsetValue) / maxBrightness;
-    } // namespace
+#if defined(CONFIG_VERSION_PRO) && (CONFIG_VERSION_PRO == 1)
+    inline constexpr auto minimumLightOnPercentOffsetValue = 8.0f;
+#else
+    inline constexpr auto minimumLightOnPercentOffsetValue = 16.0f;
+#endif
+    inline constexpr auto minPercent    = 0.0f;
+    inline constexpr auto maxPercent    = 100.0f;
+    inline constexpr auto minBrightness = 1U;
+    inline constexpr auto maxBrightness = 10U;
+    inline constexpr float multiplier   = (maxPercent - minimumLightOnPercentOffsetValue) / maxBrightness;
 
     /// 1-10 range
     using Brightness = std::uint8_t;
 
-    static inline float fixedValToPercentage(Brightness value)
+    inline static float fixedValToPercentage(Brightness value)
     {
-        float scaled = minimumLightOnPercentOffsetValue + (value - minBrightness) * multiplier;
-        return std::min(maxPercent, std::max(minPercent, scaled));
+        const float valueScaled =
+            (static_cast<float>(value) - minBrightness) * multiplier + minimumLightOnPercentOffsetValue;
+        return std::clamp(valueScaled, minPercent, maxPercent);
     }
 
-    static inline Brightness percentageToFixedVal(float percent)
+    inline static Brightness percentageToFixedVal(float percent)
     {
-        auto value = (percent - minimumLightOnPercentOffsetValue) / multiplier;
-        return std::round(value + minBrightness);
+        const float value = (percent - minimumLightOnPercentOffsetValue) / multiplier;
+        return static_cast<Brightness>(std::round(value + minBrightness));
     }
-
 } // namespace frontlight_utils

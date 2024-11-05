@@ -13,9 +13,6 @@ target_sources(
         bsp/common.cpp
         bsp/lpm/bsp_lpm.cpp
         devices/Device.cpp
-        devices/power/CW2015.cpp
-        devices/power/MP2615GQ.cpp
-        devices/temperature/CT7117.cpp
         drivers/dma/DriverDMA.cpp
         drivers/dmamux/DriverDMAMux.cpp
         drivers/gpio/DriverGPIO.cpp

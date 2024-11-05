@@ -36,12 +36,18 @@ include(AddDatabases)
 include(FetchContent)
 include(AddScripts)
 
+option(ENABLE_VERSION_PRO "Enable configuration for Pro version" OFF)
+if (ENABLE_VERSION_PRO)
+    add_compile_definitions(CONFIG_VERSION_PRO=1)
+endif()
+
 message("Selected product: ${PRODUCT}")
 message("Selected board:   ${BOARD}")
 message("Board revision:   ${BOARD_REVISION}")
 message("PROJECT_TARGET:   ${PROJECT_TARGET}")
 message("Assets version:   ${ASSETS_TYPE}")
 message("Version:          ${OS_VERSION_MAJOR}.${OS_VERSION_MINOR}.${OS_VERSION_PATCH}-${OS_VERSION_LABEL}")
+message("Pro config:       ${ENABLE_VERSION_PRO}")
 
 string(REPLACE "TARGET_" "" PROJECT_TARGET_NAME ${PROJECT_TARGET})
 string(TOLOWER "${PROJECT_TARGET_NAME}" PROJECT_TARGET_NAME)
@@ -112,12 +118,12 @@ add_compile_options(
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-option (GENERATE_STACK_USAGE "Generate stack usage report" OFF)
+option(GENERATE_STACK_USAGE "Generate stack usage report" OFF)
 if (GENERATE_STACK_USAGE)
     add_compile_options (-fstack-usage)
 endif ()
 
-option (ENABLE_SECURE_BOOT "Build signed binary for Secure Boot" OFF)
+option(ENABLE_SECURE_BOOT "Build signed binary for Secure Boot" OFF)
 set(SIGN_CLIENT_PATH "${CMAKE_SOURCE_DIR}/../sign_server/key_client" CACHE PATH "signclient.py path")
 set(SERVER "https://10.20.50.10:4430" CACHE STRING "sign server address")
 

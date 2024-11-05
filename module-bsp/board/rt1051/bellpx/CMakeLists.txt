@@ -16,15 +16,17 @@ target_sources(
 
         bsp/audio/AW8898driver.cpp
         bsp/audio/CodecAW8898.cpp
-
         bsp/eink/eink_gpio.cpp
         bsp/lpm/PowerProfile.cpp
         bsp/lpm/RT1051LPM.cpp
         bsp/lpm/WfiController.cpp
         bsp/lpm/EnterSleepMode.c
+        bsp/power/CW2015.cpp
+        bsp/power/MP2615GQ.cpp
         bsp/rotary_encoder/rotary_encoder.cpp
         bsp/rtc/rtc_configuration.cpp
         bsp/switches/switches.cpp
+        bsp/temperature/CT7117.cpp
 
         audio.cpp
         clock_config.cpp

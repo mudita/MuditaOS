@@ -10,8 +10,8 @@
 #include "timers.h"
 
 #include <hal/battery_charger/AbstractBatteryCharger.hpp>
-#include <devices/power/MP2615GQ.hpp>
-#include <devices/power/CW2015.hpp>
+#include <bsp/power/MP2615GQ.hpp>
+#include <bsp/power/CW2015.hpp>
 #include <board/BoardDefinitions.hpp>
 #include <log/log.hpp>
 

@@ -5,10 +5,8 @@
 
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControlParameters.hpp>
-
 #include <SystemManager/CpuSentinel.hpp>
 #include <Timers/TimerHandle.hpp>
-
 #include <memory>
 
 namespace sys
@@ -70,7 +68,12 @@ namespace bell::screen_light_control
 
         static constexpr auto controlTimerIntervalMs  = 25;
         static constexpr auto rampStepPerMs           = 0.1f;
+
+#if defined(CONFIG_VERSION_PRO) && (CONFIG_VERSION_PRO == 1)
+        static constexpr auto minimalTargetBrightness = 7;
+#else
         static constexpr auto minimalTargetBrightness = 15;
+#endif
 
         sys::TimerHandle controlTimer;
         std::shared_ptr<sys::CpuSentinel> cpuSentinel;

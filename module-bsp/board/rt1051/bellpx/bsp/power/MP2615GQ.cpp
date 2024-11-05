@@ -63,7 +63,7 @@ namespace bsp::devices::power
 
     void MP2615GQ::enable_charging(bool ctrl)
     {
-        configuration.mode_gpio->WritePin(configuration.mode_pin, ctrl ? 0 : 1);
+        configuration.mode_gpio->WritePin(configuration.mode_pin, !ctrl);
     }
 
     void MP2615GQ::enable_irq()

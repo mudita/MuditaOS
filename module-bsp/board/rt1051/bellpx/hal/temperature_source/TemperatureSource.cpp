@@ -3,7 +3,7 @@
 
 #include "hal/temperature_source/TemperatureSource.hpp"
 #include "hal/GenericFactory.hpp"
-#include "devices/temperature/CT7117.hpp"
+#include "bsp/temperature/CT7117.hpp"
 #include "drivers/gpio/DriverGPIO.hpp"
 #include "board/BoardDefinitions.hpp"
 
