@@ -55,7 +55,7 @@ namespace drivers
         virtual void InitNextChannel(const DriverPWMParams &params) = 0;
 
         // Duty cycle in percent: 0 - 100
-        virtual void SetDutyCycle(std::uint8_t duty_cycle, PWMChannel channel) = 0;
+        virtual void SetDutyCycle(float dutyCyclePercent, PWMChannel channel) = 0;
 
         virtual void Start(PWMChannel channel) = 0;
 
