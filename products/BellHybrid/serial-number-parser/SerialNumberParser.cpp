@@ -17,7 +17,7 @@
  *
  *
  * New SN is in MMRRCYYWWNNNN form, where:
- * MM - model code, 04 for Harmony;
+ * MM - model code, 04 for Harmony, 05 for Harmony Pro;
  * RR - hardware revision, P1, P2, P3...;
  * C - case colour; G = gray, B = black;
  * YY - production year;
@@ -30,6 +30,11 @@ namespace serial_number_parser
 {
     namespace
     {
+        /* Common constants */
+        constexpr auto modelCodeOffset     = 0;
+        constexpr auto modelCodeLength     = 2;
+        constexpr auto harmonyProModelCode = "05";
+
         /* Old serial number constants */
         constexpr auto idStringOffset = 0;
         constexpr auto idStringLength = 6;
@@ -48,6 +53,11 @@ namespace serial_number_parser
     bool isOldSerialNumberFormat(const std::string &serialNumber)
     {
         return (serialNumber.find_first_not_of("0123456789") == std::string::npos);
+    }
+
+    bool isHarmonyPro(const std::string &serialNumber)
+    {
+        return (serialNumber.substr(modelCodeOffset, modelCodeLength) == harmonyProModelCode);
     }
 
     std::optional<VersionMetadata> getDeviceVersionMetadata(const std::string &serialNumber)
@@ -69,7 +79,10 @@ namespace serial_number_parser
                 return std::nullopt;
             }
 
-            return VersionMetadata(item->second, secondVersion);
+            if (!isHarmonyPro(serialNumber)) {
+                return VersionMetadata(item->second, secondVersion);
+            }
+            return VersionMetadata(item->second, secondProVersion);
         }
     }
 } // namespace serial_number_parser
