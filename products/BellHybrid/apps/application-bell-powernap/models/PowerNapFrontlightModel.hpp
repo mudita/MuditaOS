@@ -30,7 +30,7 @@ namespace app::powernap
         const std::chrono::seconds alarmDuration;
         mutable settings::Settings settings;
 
-        auto getAlarmBrightness() const -> int;
+        auto getAlarmBrightness() const -> float;
         auto prepareFadeInParameters() const -> screen_light_control::LinearProgressModeParameters;
     };
 } // namespace app::powernap

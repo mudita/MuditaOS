@@ -7,6 +7,8 @@
 #include <apps-common/ApplicationCommon.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-evtmgr/ServiceEventManagerName.hpp>
+#include <FrontlightUtils.hpp>
+#include <Utils.hpp>
 
 namespace app::powernap
 {
@@ -59,25 +61,30 @@ namespace app::powernap
                              service::name::evt_manager);
     }
 
-    auto PowerNapFrontlightModel::getAlarmBrightness() const -> int
+    auto PowerNapFrontlightModel::getAlarmBrightness() const -> float
     {
-        const auto brightness = settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
-        return utils::toNumeric(brightness);
+        const auto &brightnessString =
+            settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
+        return utils::frontlight::fixedValToPercentage(utils::toNumeric(brightnessString));
     }
 
     auto PowerNapFrontlightModel::prepareFadeInParameters() const -> screen_light_control::LinearProgressModeParameters
     {
         constexpr auto targetReachTimeOffset = std::chrono::minutes{1};
         constexpr auto startFunctionDuration = std::chrono::seconds{5};
-        constexpr auto startFunctionTarget   = 10.0f;
 
+#if defined(CONFIG_VERSION_PRO) && (CONFIG_VERSION_PRO == 1)
+        constexpr auto startFunctionTarget = 5.0f;
+#else
+        constexpr auto startFunctionTarget = 10.0f;
+#endif
         const auto brightness          = getAlarmBrightness();
         const auto endFunctionDuration = alarmDuration - targetReachTimeOffset - startFunctionDuration;
 
         const screen_light_control::functions::LinearProgressFunction startFunction{.target   = startFunctionTarget,
                                                                                     .duration = startFunctionDuration};
-        const screen_light_control::functions::LinearProgressFunction endFunction{
-            .target = static_cast<float>(brightness), .duration = endFunctionDuration};
+        const screen_light_control::functions::LinearProgressFunction endFunction{.target   = brightness,
+                                                                                  .duration = endFunctionDuration};
 
         return screen_light_control::LinearProgressModeParameters{
             .startBrightnessValue = 0.0f, .functions = {startFunction, endFunction}, .brightnessHysteresis = 0.0f};

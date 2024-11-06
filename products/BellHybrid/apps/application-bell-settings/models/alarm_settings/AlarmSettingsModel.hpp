@@ -49,13 +49,13 @@ namespace app::bell_settings
         bool getValue() const override;
     };
 
-    class AlarmFrontlightModel : public gui::SettingsModel<frontlight_utils::Brightness>
+    class AlarmFrontlightModel : public gui::SettingsModel<std::uint8_t>
     {
       public:
         using SettingsModel::SettingsModel;
 
-        void setValue(frontlight_utils::Brightness value) override;
-        frontlight_utils::Brightness getValue() const override;
+        void setValue(std::uint8_t value) override;
+        std::uint8_t getValue() const override;
     };
 
     class AlarmSettingsModel : public AbstractAlarmSettingsModel

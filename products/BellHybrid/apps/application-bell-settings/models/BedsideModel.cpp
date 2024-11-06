@@ -7,17 +7,17 @@
 
 namespace app::bell_settings
 {
-    auto BedsideBrightnessModel::setValue(frontlight_utils::Brightness value) -> void
+    auto BedsideBrightnessModel::setValue(std::uint8_t value) -> void
     {
-        const auto str = std::to_string(frontlight_utils::fixedValToPercentage(value));
+        const auto str = std::to_string(value);
         settings.setValue(settings::Brightness::bedsideBrightnessLevel, str, settings::SettingsScope::Global);
     }
 
-    auto BedsideBrightnessModel::getValue() const -> frontlight_utils::Brightness
+    auto BedsideBrightnessModel::getValue() const -> std::uint8_t
     {
         const auto str =
             settings.getValue(settings::Brightness::bedsideBrightnessLevel, settings::SettingsScope::Global);
-        return frontlight_utils::percentageToFixedVal(static_cast<float>(utils::toNumeric(str)));
+        return utils::toNumeric(str);
     }
 
     auto BedsideTimeModel::setValue(std::uint8_t value) -> void

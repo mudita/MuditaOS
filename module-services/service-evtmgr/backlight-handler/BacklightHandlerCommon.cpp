@@ -5,6 +5,7 @@
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
 #include <Timers/TimerFactory.hpp>
+#include <FrontlightUtils.hpp>
 #include <Utils.hpp>
 
 namespace backlight
@@ -55,7 +56,8 @@ namespace backlight
 
     auto HandlerCommon::getScreenBrightnessValue() const noexcept -> bsp::eink_frontlight::BrightnessPercentage
     {
-        return utils::getNumericValue<float>(getValue(settings::Brightness::brightnessLevel));
+        const auto brightnessValue = utils::toNumeric(getValue(settings::Brightness::brightnessLevel));
+        return utils::frontlight::fixedValToPercentage(brightnessValue);
     }
 
     void HandlerCommon::handleScreenLightRefresh()
@@ -89,8 +91,9 @@ namespace backlight
             break;
         case screen_light_control::Action::setManualModeBrightness:
             if (params.hasManualModeParams()) {
-                setValue(settings::Brightness::brightnessLevel,
-                         utils::to_string(params.getManualModeParams().manualModeBrightness));
+                const auto brightnessValue =
+                    utils::frontlight::percentageToFixedVal(params.getManualModeParams().manualModeBrightness);
+                setValue(settings::Brightness::brightnessLevel, utils::to_string(brightnessValue));
             }
             else {
                 LOG_ERROR("Missing ManualModeBrightness value, change request ignored");

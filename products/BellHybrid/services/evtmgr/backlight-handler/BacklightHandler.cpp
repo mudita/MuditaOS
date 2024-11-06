@@ -2,13 +2,12 @@
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include <evtmgr/backlight-handler/BacklightHandler.hpp>
-
 #include <screen-light-control/ScreenLightControl.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
 #include <service-db/Settings.hpp>
-
 #include <Timers/TimerFactory.hpp>
 #include <keymap/KeyMap.hpp>
+#include <FrontlightUtils.hpp>
 #include <Utils.hpp>
 
 namespace backlight
@@ -36,7 +35,11 @@ namespace backlight
         using namespace screen_light_control;
 
         settings->registerValueChange(settings::Brightness::brightnessLevel, [&](const std::string &value) {
-            const ConstLinearProgressModeParameters params{utils::getNumericValue<float>(value)};
+            float percentValue = 0.0f;
+            if (!value.empty()) {
+                percentValue = utils::frontlight::fixedValToPercentage(utils::toNumeric(value));
+            }
+            const ConstLinearProgressModeParameters params{percentValue};
             screenLightController->processRequest(Action::setAutomaticModeParameters, Parameters(params));
         });
 
@@ -149,8 +152,9 @@ namespace backlight
         case screen_light_control::Action::setAutomaticModeParameters:
             if (params.hasConstLinearProgressModeParams()) {
                 backlightMode = BacklightMode::WithTimer;
-                setValue(settings::Brightness::brightnessLevel,
-                         utils::to_string(params.getConstLinearProgressModeParams().targetBrightness));
+                const auto brightnessValue =
+                    utils::frontlight::percentageToFixedVal(params.getConstLinearProgressModeParams().targetBrightness);
+                setValue(settings::Brightness::brightnessLevel, utils::to_string(brightnessValue));
             }
             else if (params.hasLinearProgressModeParams()) {
                 backlightMode = BacklightMode::WithoutTimer;
@@ -186,8 +190,9 @@ namespace backlight
     {
         using namespace screen_light_control;
 
-        const auto brightnessLevel = utils::getNumericValue<float>(getValue(settings::Brightness::brightnessLevel));
-        const ConstLinearProgressModeParameters params{brightnessLevel};
+        const auto &brightnessString = getValue(settings::Brightness::brightnessLevel);
+        const auto percentValue     = utils::frontlight::fixedValToPercentage(utils::toNumeric(brightnessString));
+        const ConstLinearProgressModeParameters params{percentValue};
         screenLightController->processRequest(Action::setAutomaticModeParameters, Parameters(params));
     }
 
@@ -209,9 +214,8 @@ namespace backlight
     {
         using namespace screen_light_control;
 
-        const auto bedsideBrightness =
-            utils::getNumericValue<float>(getValue(settings::Brightness::bedsideBrightnessLevel));
-        const auto manualParams = ManualModeParameters{bedsideBrightness};
-        return Parameters{manualParams};
+        const auto &brightnessString = getValue(settings::Brightness::bedsideBrightnessLevel);
+        const auto brightnessLevel   = utils::frontlight::fixedValToPercentage(utils::toNumeric(brightnessString));
+        return Parameters{ManualModeParameters{brightnessLevel}};
     }
 } // namespace backlight

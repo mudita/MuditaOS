@@ -4,7 +4,6 @@
 #pragma once
 
 #include <common/widgets/BellSideListItemWithCallbacks.hpp>
-#include <common/data/FrontlightUtils.hpp>
 #include <apps-common/InternalModel.hpp>
 
 namespace app::bell_settings
@@ -19,7 +18,7 @@ namespace app::bell_settings
         /// Val contains currently chosen volume (1-10 range)
         using VolumeCallback      = std::function<void(const uint32_t &val)>;
         using VolumeEnterCallback = ToneCallback;
-        using FrontlightCallback      = std::function<void(const frontlight_utils::Brightness &val)>;
+        using FrontlightCallback      = std::function<void(const std::uint8_t &val)>;
         using FrontlightEnterCallback = FrontlightCallback;
         using FrontlightExitCallback  = std::function<void()>;
 
