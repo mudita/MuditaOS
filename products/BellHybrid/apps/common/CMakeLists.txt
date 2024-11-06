@@ -112,7 +112,6 @@ target_sources(application-bell-common
         include/common/TimeUtils.hpp
 
         include/common/data/BatteryUtils.hpp
-        include/common/data/FrontlightUtils.hpp
         include/common/data/BatteryStatusSwitchData.hpp
 
         include/common/models/AbstractAlarmModel.hpp

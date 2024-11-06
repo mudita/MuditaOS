@@ -3,30 +3,33 @@
 
 #include "FrontlightAction.hpp"
 #include "BellAlarmConstants.hpp"
-
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
 #include <service-evtmgr/ServiceEventManagerName.hpp>
-
 #include <service-db/Settings.hpp>
 #include <db/SystemSettings.hpp>
+#include <module-utils/utility/FrontlightUtils.hpp>
 #include <module-utils/utility/Utils.hpp>
 
 namespace alarms
 {
     namespace
     {
-        constexpr std::string_view alarmFrontlightOff     = "0";
-        constexpr std::string_view prewakeupFrontlightOff = "0";
+        constexpr auto alarmFrontlightOff     = std::string_view{"0"};
+        constexpr auto prewakeupFrontlightOff = std::string_view{"0"};
 
         /* Reach and maintain target brightness 1 minute faster than
          * the duration of the action. */
         constexpr auto frontlightRampDurationOffset = std::chrono::minutes{1};
         constexpr auto initialTargetDuration        = std::chrono::seconds{5};
-        constexpr auto initialZeroBrightnessValue   = 10;
+#if defined(CONFIG_VERSION_PRO) && (CONFIG_VERSION_PRO == 1)
+        constexpr auto initialZeroBrightnessValue = 5.0f;
+#else
+        constexpr auto initialZeroBrightnessValue = 10.0f;
+#endif
 
-        void validateBrightness(std::string &brightness)
+        inline void validateBrightness(std::string &brightness)
         {
-            constexpr auto defaultBrightness = std::string_view{"50.0"};
+            constexpr auto defaultBrightness = std::string_view{"5"};
 
             if (brightness.empty()) {
                 brightness = defaultBrightness;
@@ -163,9 +166,9 @@ namespace alarms
 
         auto brightnessString = settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
         validateBrightness(brightnessString);
-        screen_light_control::ManualModeParameters params{};
-        params.manualModeBrightness = static_cast<BrightnessPercentage>(utils::toNumeric(brightnessString));
 
+        screen_light_control::ManualModeParameters params{
+            .manualModeBrightness = utils::frontlight::fixedValToPercentage(utils::toNumeric(brightnessString))};
         return params;
     }
 
@@ -239,17 +242,18 @@ namespace alarms
             auto initialBrightnessString =
                 settings.getValue(bell::settings::PrewakeUp::brightness, settings::SettingsScope::Global);
             validateBrightness(initialBrightnessString);
-            initialBrightness = utils::toNumeric(initialBrightnessString);
+            initialBrightness = utils::frontlight::fixedValToPercentage(utils::toNumeric(initialBrightnessString));
         }
 
         auto targetBrightnessString =
             settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
         validateBrightness(targetBrightnessString);
+        const auto targetBrightness = utils::frontlight::fixedValToPercentage(utils::toNumeric(targetBrightnessString));
 
-        const screen_light_control::functions::LinearProgressFunction startFunction{
-            .target = static_cast<float>(initialBrightness), .duration = initialTargetDuration};
-        const screen_light_control::functions::LinearProgressFunction endFunction{
-            .target = static_cast<float>(utils::toNumeric(targetBrightnessString)), .duration = mainTargetDuration};
+        const screen_light_control::functions::LinearProgressFunction startFunction{.target   = initialBrightness,
+                                                                                    .duration = initialTargetDuration};
+        const screen_light_control::functions::LinearProgressFunction endFunction{.target   = targetBrightness,
+                                                                                  .duration = mainTargetDuration};
 
         return screen_light_control::LinearProgressModeParameters{.startBrightnessValue =
                                                                       static_cast<float>(initialBrightness),
@@ -262,14 +266,16 @@ namespace alarms
         auto brightnessString =
             settings.getValue(bell::settings::PrewakeUp::brightness, settings::SettingsScope::Global);
         validateBrightness(brightnessString);
-        const auto value = settings.getValue(bell::settings::PrewakeUp::lightDuration, settings::SettingsScope::Global);
-        const auto lightDuration      = std::chrono::minutes{utils::toNumeric(value)};
+        const auto brightnessValue = utils::frontlight::fixedValToPercentage(utils::toNumeric(brightnessString));
+        const auto durationString =
+            settings.getValue(bell::settings::PrewakeUp::lightDuration, settings::SettingsScope::Global);
+        const auto lightDuration      = std::chrono::minutes{utils::toNumeric(durationString)};
         const auto mainTargetDuration = lightDuration - frontlightRampDurationOffset - initialTargetDuration;
 
         const screen_light_control::functions::LinearProgressFunction startFunction{
             .target = initialZeroBrightnessValue, .duration = initialTargetDuration};
-        const screen_light_control::functions::LinearProgressFunction endFunction{
-            .target = static_cast<float>(utils::toNumeric(brightnessString)), .duration = mainTargetDuration};
+        const screen_light_control::functions::LinearProgressFunction endFunction{.target   = brightnessValue,
+                                                                                  .duration = mainTargetDuration};
 
         return screen_light_control::LinearProgressModeParameters{
             .startBrightnessValue = 0.0f, .functions = {startFunction, endFunction}, .brightnessHysteresis = 0.0f};

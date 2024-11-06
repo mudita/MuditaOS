@@ -16,6 +16,7 @@ target_sources(utility
         Units.hpp
         Anonymize.hpp
         Version.hpp
+        FrontlightUtils.hpp
 )
 
 target_include_directories(utility

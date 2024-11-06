@@ -10,7 +10,7 @@ namespace app::bell_settings
     {
         inline void validateBrightness(std::string &brightness)
         {
-            constexpr auto defaultBrightness = std::string_view{"50.0"};
+            constexpr auto defaultBrightness = std::string_view{"5"};
 
             if (brightness.empty()) {
                 brightness = defaultBrightness;
@@ -72,16 +72,16 @@ namespace app::bell_settings
         return (utils::toNumeric(str) != 0);
     }
 
-    void AlarmFrontlightModel::setValue(frontlight_utils::Brightness value)
+    void AlarmFrontlightModel::setValue(std::uint8_t value)
     {
-        const auto valStr = std::to_string(frontlight_utils::fixedValToPercentage(value));
+        const auto valStr = std::to_string(value);
         settings.setValue(bell::settings::Alarm::brightness, valStr, settings::SettingsScope::Global);
     }
 
-    frontlight_utils::Brightness AlarmFrontlightModel::getValue() const
+    std::uint8_t AlarmFrontlightModel::getValue() const
     {
         auto str = settings.getValue(bell::settings::Alarm::brightness, settings::SettingsScope::Global);
         validateBrightness(str);
-        return frontlight_utils::percentageToFixedVal(static_cast<float>(utils::toNumeric(str)));
+        return utils::toNumeric(str);
     }
 } // namespace app::bell_settings

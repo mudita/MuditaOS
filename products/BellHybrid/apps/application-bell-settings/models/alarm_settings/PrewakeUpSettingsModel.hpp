@@ -6,7 +6,6 @@
 #include "AbstractPrewakeUpSettingsModel.hpp"
 #include <common/models/SettingsModel.hpp>
 #include <common/models/AudioModel.hpp>
-#include <common/data/FrontlightUtils.hpp>
 #include <common/SoundsRepository.hpp>
 
 namespace app::bell_settings
@@ -51,13 +50,13 @@ namespace app::bell_settings
         std::uint8_t getValue() const override;
     };
 
-    class PrewakeUpFrontlightModel : public gui::SettingsModel<frontlight_utils::Brightness>
+    class PrewakeUpFrontlightModel : public gui::SettingsModel<std::uint8_t>
     {
       public:
         using SettingsModel::SettingsModel;
 
-        void setValue(frontlight_utils::Brightness value) override;
-        frontlight_utils::Brightness getValue() const override;
+        void setValue(std::uint8_t value) override;
+        std::uint8_t getValue() const override;
     };
 
     class PrewakeUpSettingsModel : public AbstractPrewakeUpSettingsModel

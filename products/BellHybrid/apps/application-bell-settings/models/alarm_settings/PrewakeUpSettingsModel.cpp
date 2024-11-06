@@ -8,7 +8,14 @@ namespace app::bell_settings
 {
     namespace
     {
-        constexpr std::string_view DefaultBrightness{"50.0"};
+        inline void validateBrightness(std::string &brightness)
+        {
+            constexpr auto defaultBrightness = std::string_view{"5"};
+
+            if (brightness.empty()) {
+                brightness = defaultBrightness;
+            }
+        }
     }
 
     void PrewakeUpChimeDurationModel::setValue(std::uint8_t value)
@@ -65,18 +72,16 @@ namespace app::bell_settings
         return utils::toNumeric(str);
     }
 
-    void PrewakeUpFrontlightModel::setValue(frontlight_utils::Brightness value)
+    void PrewakeUpFrontlightModel::setValue(std::uint8_t value)
     {
-        const auto valStr = std::to_string(frontlight_utils::fixedValToPercentage(value));
+        const auto valStr = std::to_string(value);
         settings.setValue(bell::settings::PrewakeUp::brightness, valStr, settings::SettingsScope::Global);
     }
 
-    frontlight_utils::Brightness PrewakeUpFrontlightModel::getValue() const
+    std::uint8_t PrewakeUpFrontlightModel::getValue() const
     {
         auto str = settings.getValue(bell::settings::PrewakeUp::brightness, settings::SettingsScope::Global);
-        if (str.empty()) {
-            str = DefaultBrightness;
-        }
-        return frontlight_utils::percentageToFixedVal(static_cast<float>(utils::toNumeric(str)));
+        validateBrightness(str);
+        return utils::toNumeric(str);
     }
 } // namespace app::bell_settings

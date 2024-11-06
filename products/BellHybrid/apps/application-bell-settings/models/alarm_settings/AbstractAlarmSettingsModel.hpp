@@ -4,22 +4,19 @@
 #pragma once
 
 #include <common/models/AbstractSettingsModel.hpp>
-#include <common/data/FrontlightUtils.hpp>
-
-#include <cstdint>
 #include <utf8/UTF8.hpp>
+#include <cstdint>
 
 namespace app::bell_settings
 {
     class AbstractAlarmSettingsModel
     {
       public:
-        AbstractAlarmSettingsModel(
-            std::unique_ptr<gui::AbstractSettingsModel<UTF8>> alarmTone,
-            std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> alarmVolume,
-            std::unique_ptr<gui::AbstractSettingsModel<bool>> alarmFadeOnOff,
-            std::unique_ptr<gui::AbstractSettingsModel<bool>> alarmLightOnOff,
-            std::unique_ptr<gui::AbstractSettingsModel<frontlight_utils::Brightness>> alarmFrontlight)
+        AbstractAlarmSettingsModel(std::unique_ptr<gui::AbstractSettingsModel<UTF8>> alarmTone,
+                                   std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> alarmVolume,
+                                   std::unique_ptr<gui::AbstractSettingsModel<bool>> alarmFadeOnOff,
+                                   std::unique_ptr<gui::AbstractSettingsModel<bool>> alarmLightOnOff,
+                                   std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> alarmFrontlight)
             : alarmTone(std::move(alarmTone)), alarmVolume(std::move(alarmVolume)),
               alarmFadeOnOff(std::move(alarmFadeOnOff)), alarmLightOnOff(std::move(alarmLightOnOff)),
               alarmFrontlight(std::move(alarmFrontlight))
@@ -47,7 +44,7 @@ namespace app::bell_settings
             return *alarmLightOnOff;
         }
 
-        gui::AbstractSettingsModel<frontlight_utils::Brightness> &getBrightness()
+        gui::AbstractSettingsModel<std::uint8_t> &getBrightness()
         {
             return *alarmFrontlight;
         }
@@ -57,6 +54,6 @@ namespace app::bell_settings
         std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> alarmVolume;
         std::unique_ptr<gui::AbstractSettingsModel<bool>> alarmFadeOnOff;
         std::unique_ptr<gui::AbstractSettingsModel<bool>> alarmLightOnOff;
-        std::unique_ptr<gui::AbstractSettingsModel<frontlight_utils::Brightness>> alarmFrontlight;
+        std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> alarmFrontlight;
     };
 } // namespace app::bell_settings

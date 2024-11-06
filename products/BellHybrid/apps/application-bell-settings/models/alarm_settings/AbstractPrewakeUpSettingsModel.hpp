@@ -4,9 +4,7 @@
 #pragma once
 
 #include <common/models/AbstractSettingsModel.hpp>
-#include <common/data/FrontlightUtils.hpp>
 #include <utf8/UTF8.hpp>
-
 #include <cstdint>
 #include <memory>
 #include <string>
@@ -16,12 +14,11 @@ namespace app::bell_settings
     class AbstractPrewakeUpSettingsModel
     {
       public:
-        AbstractPrewakeUpSettingsModel(
-            std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> chimeDuration,
-            std::unique_ptr<gui::AbstractSettingsModel<UTF8>> chimeTone,
-            std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> chimeVolume,
-            std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> lightDuration,
-            std::unique_ptr<gui::AbstractSettingsModel<frontlight_utils::Brightness>> frontlight)
+        AbstractPrewakeUpSettingsModel(std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> chimeDuration,
+                                       std::unique_ptr<gui::AbstractSettingsModel<UTF8>> chimeTone,
+                                       std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> chimeVolume,
+                                       std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> lightDuration,
+                                       std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> frontlight)
             : chimeDuration(std::move(chimeDuration)), chimeTone(std::move(chimeTone)),
               chimeVolume(std::move(chimeVolume)), lightDuration(std::move(lightDuration)),
               frontlight(std::move(frontlight))
@@ -49,7 +46,7 @@ namespace app::bell_settings
             return *lightDuration;
         }
 
-        gui::AbstractSettingsModel<frontlight_utils::Brightness> &getBrightness()
+        gui::AbstractSettingsModel<std::uint8_t> &getBrightness()
         {
             return *frontlight;
         }
@@ -59,6 +56,6 @@ namespace app::bell_settings
         std::unique_ptr<gui::AbstractSettingsModel<UTF8>> chimeTone;
         std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> chimeVolume;
         std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> lightDuration;
-        std::unique_ptr<gui::AbstractSettingsModel<frontlight_utils::Brightness>> frontlight;
+        std::unique_ptr<gui::AbstractSettingsModel<std::uint8_t>> frontlight;
     };
 } // namespace app::bell_settings
