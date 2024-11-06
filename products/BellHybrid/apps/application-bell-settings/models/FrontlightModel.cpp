@@ -2,11 +2,11 @@
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include <common/models/FrontlightModel.hpp>
-
 #include <apps-common/ApplicationCommon.hpp>
 #include <service-evtmgr/screen-light-control/ScreenLightControl.hpp>
 #include <service-evtmgr/ServiceEventManagerName.hpp>
 #include <service-evtmgr/ScreenLightControlMessage.hpp>
+#include <FrontlightUtils.hpp>
 
 namespace app::bell_settings
 {
@@ -18,8 +18,8 @@ namespace app::bell_settings
     {
         const auto responseCallback = [this](const auto response) -> bool {
             const auto resp = dynamic_cast<sevm::ScreenLightControlParametersResponse *>(response);
-            if (resp) {
-                const auto brightness = frontlight_utils::percentageToFixedVal(resp->getParams().manualModeBrightness);
+            if (resp != nullptr) {
+                const auto brightness = utils::frontlight::percentageToFixedVal(resp->getParams().manualModeBrightness);
                 this->brightnessAdapter->update(brightness);
                 this->modeAdapter->update(
                     resp->getMode() == screen_light_control::ScreenLightMode::Automatic ? autoStr : onDemandStr);
@@ -53,10 +53,10 @@ namespace app::bell_settings
             service::name::evt_manager);
     }
 
-    void FrontlightModel::setBrightness(frontlight_utils::Brightness value)
+    void FrontlightModel::setBrightness(std::uint8_t value)
     {
         const screen_light_control::ConstLinearProgressModeParameters parameters{
-            frontlight_utils::fixedValToPercentage(value)};
+            utils::frontlight::fixedValToPercentage(value)};
         app->bus.sendUnicast(std::make_shared<sevm::ScreenLightSetConstLinearModeParams>(parameters),
                              service::name::evt_manager);
     }
