@@ -191,7 +191,7 @@ namespace backlight
         using namespace screen_light_control;
 
         const auto &brightnessString = getValue(settings::Brightness::brightnessLevel);
-        const auto percentValue     = utils::frontlight::fixedValToPercentage(utils::toNumeric(brightnessString));
+        const auto percentValue      = utils::frontlight::fixedValToPercentage(utils::toNumeric(brightnessString));
         const ConstLinearProgressModeParameters params{percentValue};
         screenLightController->processRequest(Action::setAutomaticModeParameters, Parameters(params));
     }
