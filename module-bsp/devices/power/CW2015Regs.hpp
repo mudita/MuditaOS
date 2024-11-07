@@ -7,16 +7,16 @@
 
 namespace bsp::devices::power::CW2015Regs
 {
-    constexpr inline auto ADDRESS = 0x62;
+    inline constexpr auto ADDRESS = 0x62;
 
     struct Config
     {
-        constexpr static auto ADDRESS = 0x08;
+        static constexpr auto ADDRESS = 0x08;
 
         explicit Config(const std::uint8_t raw) : reg{raw}
         {}
 
-        units::SOC get_alert_threshold() const
+        [[nodiscard]] units::SOC get_alert_threshold() const
         {
             return (reg & alert_mask) >> alert_shift;
         }
@@ -28,7 +28,7 @@ namespace bsp::devices::power::CW2015Regs
             return *this;
         }
 
-        bool is_ufg_set() const
+        [[nodiscard]] bool is_ufg_set() const
         {
             return (reg & ufg_mask) != 0;
         }
@@ -40,7 +40,7 @@ namespace bsp::devices::power::CW2015Regs
             return *this;
         }
 
-        std::uint8_t get_raw() const
+        [[nodiscard]] std::uint8_t get_raw() const
         {
             return reg;
         }
@@ -57,13 +57,13 @@ namespace bsp::devices::power::CW2015Regs
 
     struct Mode
     {
-        constexpr static auto ADDRESS = 0x0A;
+        static constexpr auto ADDRESS = 0x0A;
 
         Mode() = default;
         explicit Mode(const std::uint8_t raw) : reg{raw}
         {}
 
-        bool is_sleep() const
+        [[nodiscard]] bool is_sleep() const
         {
             return (reg & sleep_mask) == sleep_mask;
         }
@@ -92,7 +92,7 @@ namespace bsp::devices::power::CW2015Regs
             return *this;
         }
 
-        std::uint8_t get_raw() const
+        [[nodiscard]] std::uint8_t get_raw() const
         {
             return reg;
         }
@@ -111,15 +111,15 @@ namespace bsp::devices::power::CW2015Regs
 
     struct RRT_ALERT
     {
-        constexpr static auto ADDRESS_H = 0x06;
-        constexpr static auto ADDRESS_L = 0x07;
+        static constexpr auto ADDRESS_H = 0x06;
+        static constexpr auto ADDRESS_L = 0x07;
 
-        RRT_ALERT(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<uint16_t>(lsb | (msb << 8))}
+        RRT_ALERT(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<std::uint16_t>(lsb | (msb << 8))}
         {}
         explicit RRT_ALERT(const std::uint16_t reg) : reg{reg}
         {}
 
-        bool is_alert_triggered() const
+        [[nodiscard]] bool is_alert_triggered() const
         {
             return (reg & 0x8000) == 0;
         }
@@ -130,12 +130,12 @@ namespace bsp::devices::power::CW2015Regs
             return *this;
         }
 
-        std::uint16_t rrt() const
+        [[nodiscard]] std::uint16_t rrt() const
         {
             return reg & 0x1FFF;
         }
 
-        std::uint8_t get_raw() const
+        [[nodiscard]] std::uint8_t get_raw() const
         {
             return reg;
         }
@@ -146,20 +146,20 @@ namespace bsp::devices::power::CW2015Regs
 
     struct VCELL
     {
-        constexpr static auto ADDRESS_H = 0x02;
-        constexpr static auto ADDRESS_L = 0x03;
+        static constexpr auto ADDRESS_H = 0x02;
+        static constexpr auto ADDRESS_L = 0x03;
 
-        VCELL(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<uint16_t>(lsb | (msb << 8))}
+        VCELL(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<std::uint16_t>(lsb | (msb << 8))}
         {}
         explicit VCELL(const std::uint16_t reg) : reg{reg}
         {}
 
-        units::Voltage get_voltage() const
+        [[nodiscard]] units::Voltage get_voltage() const
         {
             return reg & 0x3FFF;
         }
 
-        std::uint8_t get_raw() const
+        [[nodiscard]] std::uint8_t get_raw() const
         {
             return reg;
         }
@@ -170,15 +170,15 @@ namespace bsp::devices::power::CW2015Regs
 
     struct SOC
     {
-        constexpr static auto ADDRESS_H = 0x04;
-        constexpr static auto ADDRESS_L = 0x05;
+        static constexpr auto ADDRESS_H = 0x04;
+        static constexpr auto ADDRESS_L = 0x05;
 
-        SOC(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<uint16_t>(lsb | (msb << 8))}
+        SOC(const std::uint8_t lsb, const std::uint8_t msb) : reg{static_cast<std::uint16_t>(lsb | (msb << 8))}
         {}
         explicit SOC(const std::uint16_t reg) : reg{reg}
         {}
 
-        units::Voltage get_soc() const
+        [[nodiscard]] units::Voltage get_soc() const
         {
             return (reg & 0xFF00) >> 8U;
         }
@@ -189,26 +189,35 @@ namespace bsp::devices::power::CW2015Regs
 
     class BATTINFO
     {
-        constexpr static auto BATTERY_INFO_SIZE = 64;
+        static constexpr auto BATTERY_INFO_SIZE = 64;
         using Type                              = const std::array<std::uint8_t, BATTERY_INFO_SIZE>;
 
-        /* got from ODM init code */
-        constexpr static Type config_info = {
+        /* Init code from ODM */
+#if defined(CONFIG_VERSION_PRO) && (CONFIG_VERSION_PRO == 1)
+        static constexpr Type config_info = {
+            // BH21P_3400mAh_DM140X_PROFILE_20241106
+            0x14, 0x97, 0x39, 0x1B, 0x14, 0x27, 0x4A, 0x5C, 0x64, 0x5E, 0x4B, 0x53, 0x4D, 0x4E, 0x52, 0x56,
+            0x5B, 0x5C, 0x5A, 0x5B, 0x4F, 0x67, 0x6B, 0x74, 0x71, 0x62, 0x0A, 0x3E, 0x45, 0x69, 0x83, 0x8F,
+            0x8E, 0x89, 0x88, 0x73, 0x45, 0x20, 0xFF, 0x48, 0x09, 0x3B, 0x59, 0x85, 0x8F, 0x90, 0x90, 0x38,
+            0x53, 0x84, 0x92, 0x92, 0x80, 0xBF, 0xDE, 0xCB, 0x2F, 0x00, 0x64, 0xA5, 0xB5, 0xC1, 0x46, 0xAE};
+#else
+        static constexpr Type config_info = {
             // profile_DEM50X_2nd_20211012
             0x15, 0x15, 0x6E, 0x67, 0x65, 0x62, 0x60, 0x60, 0x5F, 0x5E, 0x5B, 0x59, 0x55, 0x50, 0x41, 0x33,
             0x2A, 0x26, 0x24, 0x27, 0x31, 0x46, 0x55, 0x5B, 0x47, 0x4A, 0x0A, 0x3E, 0x38, 0x58, 0x59, 0x63,
             0x67, 0x63, 0x62, 0x64, 0x3D, 0x1B, 0x6F, 0x15, 0x07, 0x21, 0x54, 0x85, 0x8F, 0x90, 0x90, 0x44,
             0x63, 0x86, 0x94, 0x99, 0x80, 0x89, 0xBC, 0xCB, 0x2F, 0x00, 0x64, 0xA5, 0xB5, 0xC1, 0x46, 0xAE};
+#endif
 
       public:
-        constexpr static auto ADDRESS = 0x10;
+        static constexpr auto ADDRESS = 0x10;
 
-        Type::const_iterator begin() const noexcept
+        [[nodiscard]] Type::const_iterator begin() const noexcept
         {
             return config_info.begin();
         }
 
-        Type::const_iterator end() const noexcept
+        [[nodiscard]] Type::const_iterator end() const noexcept
         {
             return config_info.end();
         }
