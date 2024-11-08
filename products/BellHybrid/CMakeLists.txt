@@ -163,9 +163,13 @@ download_asset_json(json-rt1051-target
 download_asset_release(PureRecovery.bin recovery.bin PureRecovery ${RECOVERY_BIN_VERSION}  ${MUDITA_CACHE_DIR})
 download_asset_release(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION}  ${MUDITA_CACHE_DIR})
 
-
-add_standalone_image(BellHybrid)
-add_update_package(BellHybrid)
+if (ENABLE_VERSION_PRO)
+    add_standalone_image(BellHybrid BellHybridPro)
+    add_update_package(BellHybrid BellHybridPro)
+else ()
+    add_standalone_image(BellHybrid BellHybrid)
+    add_update_package(BellHybrid BellHybrid)
+endif ()
 
 add_subdirectory(alarms)
 add_subdirectory(apps)

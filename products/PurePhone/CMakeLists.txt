@@ -180,8 +180,8 @@ download_asset_release(PureRecovery.bin recovery.bin PureRecovery ${RECOVERY_BIN
 download_asset_release(ecoboot.bin ecoboot.bin ecoboot ${ECOBOOT_BIN_VERSION} ${MUDITA_CACHE_DIR})
 
 
-add_standalone_image(PurePhone)
-add_update_package(PurePhone)
+add_standalone_image(PurePhone PurePhone)
+add_update_package(PurePhone PurePhone)
 
 include(GitHubWorkerMessages)
 github_message_standalone()

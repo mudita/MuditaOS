@@ -23,12 +23,12 @@ macro(set_cpack_vars)
 
 endmacro()
 
-function(add_standalone_image SOURCE_TARGET)
+function(add_standalone_image SOURCE_TARGET IMAGE_NAME)
     if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         return()
     endif()
     set(BIN_FILE ${SOURCE_TARGET}-boot.bin)
-    set(CPACK_PACKAGE_NAME ${SOURCE_TARGET})
+    set(CPACK_PACKAGE_NAME ${IMAGE_NAME})
     set_cpack_vars()
 
     set(STANDALONE_PKG ${PACKAGE_COMMON_NAME}-image.tar.xz)
@@ -37,8 +37,8 @@ function(add_standalone_image SOURCE_TARGET)
 
     add_custom_target(${PACKAGE_COMMON_NAME}-package-standalone
         # please do not:
-        # 1. change compression to -9 (or higher) as i will have detrimental effects on compression times with not much gain
-        # 2. change -T parameter to explicit thread count - xz with T0 will adjust thread count to your machine capatibilies
+        # 1. change compression to -9 (or higher) as it will have detrimental effects on compression times with not much gain
+        # 2. change -T parameter to explicit thread count - xz with T0 will adjust thread count to your machine capabilities
         COMMAND tar Scf - ${SOURCE_TARGET}.img | xz -T0 > ${STANDALONE_PKG}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         DEPENDS ${BIN_FILE}
@@ -57,13 +57,13 @@ function(add_standalone_image SOURCE_TARGET)
 endfunction()
 
 
-function(add_update_package SOURCE_TARGET)
+function(add_update_package SOURCE_TARGET IMAGE_NAME)
     if (NOT ${PROJECT_TARGET} STREQUAL "TARGET_RT1051")
         return()
     endif()
-    set(CPACK_PACKAGE_NAME ${SOURCE_TARGET})
+    set(CPACK_PACKAGE_NAME ${IMAGE_NAME})
     set_cpack_vars()
-    set(UPDATE_PKG "${SOURCE_TARGET}-${PROJECT_VERSION}-RT1051-Update.tar")
+    set(UPDATE_PKG "${IMAGE_NAME}-${PROJECT_VERSION}-RT1051-Update.tar")
 
     set(PACKAGE_UPDATE_FILE_NAME ${UPDATE_PKG} PARENT_SCOPE)
     set(PACKAGE_UPDATE_MIME "application/x-tar" PARENT_SCOPE)
@@ -76,7 +76,7 @@ function(add_update_package SOURCE_TARGET)
                 ecoboot.bin-target
                 recovery.bin-target
                 assets
-        COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/generate_update_package.py --output_path ${CMAKE_BINARY_DIR} --system_path ${SYSROOT_PATH}/system_a --product ${SOURCE_TARGET}
+        COMMAND python3 ${CMAKE_SOURCE_DIR}/tools/generate_update_package.py --output_path ${CMAKE_BINARY_DIR} --system_path ${SYSROOT_PATH}/system_a --product ${IMAGE_NAME}
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMENT "Generating update image: ${UPDATE_PKG}"
     )

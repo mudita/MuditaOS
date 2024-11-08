@@ -59,6 +59,15 @@ pipeline {
             }
         }
 
+        stage('Build RT1051 - BellHybridPro') {
+            steps {
+                script{
+                    common.checkIfBranchIsRebased("false")
+                    buildSteps.build("rt1051","BellHybrid","Release","-DENABLE_VERSION_PRO=1")
+                }
+            }
+        }
+
         stage('Build Linux - PurePhone') {
             when {
                 expression {
