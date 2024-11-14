@@ -26,7 +26,7 @@ namespace app::focus
     namespace models::settings
     {
         inline constexpr auto focusTimeMin     = 5U;
-        inline constexpr auto focusTimeMax     = 60U;
+        inline constexpr auto focusTimeMax     = 120U;
         inline constexpr auto focusTimeStep    = 5U;
         inline constexpr auto focusTimeDefault = 25U;
         inline constexpr auto focusTimeName    = "focus_time";
