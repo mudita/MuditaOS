@@ -8,6 +8,7 @@
 
 ### Changed / Improved
 * Optimized power consumption for bedside lamp functionality
+* Changed maximum focus time length from 60 to 120 minutes.
 
 ## [2.9.0 2024-10-21]
 
