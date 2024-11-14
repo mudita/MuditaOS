@@ -82,8 +82,8 @@ namespace app::powernap
             return;
         }
 
+        frontlightModel->lockKeypressTrigger();
         if (frontlightModel->isAlarmLightEnabled()) {
-            frontlightModel->lockKeypressTrigger();
             frontlightModel->startBrightnessFadeIn();
         }
 
