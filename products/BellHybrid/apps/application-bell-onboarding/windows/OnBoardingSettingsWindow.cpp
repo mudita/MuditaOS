@@ -10,7 +10,7 @@ namespace gui
         app::ApplicationCommon *app,
         std::unique_ptr<app::bell_settings::TimeUnitsWindowContract::Presenter> &&windowPresenter,
         std::string name)
-        : BellSettingsTimeUnitsWindow(app, std::move(windowPresenter), name)
+        : BellSettingsTimeUnitsWindow(app, std::move(windowPresenter), std::move(name))
     {
         finishedCallback = [this]() { application->switchWindow(window::name::onBoardingUpdateInstructionWindow); };
         returnCallback   = [this]() { application->switchWindow(window::name::onBoardingShortcutsOptionWindow); };

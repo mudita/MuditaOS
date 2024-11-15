@@ -18,12 +18,12 @@ namespace style::onboarding
         constexpr auto marginExternal = 137;
         constexpr auto minimumSizeX   = style::window_width;
         constexpr auto minimumSizeY   = 64;
-    }; // namespace row
+    } // namespace row
 
     namespace arrow
     {
         constexpr auto marginLeft = 24;
-    }; // namespace arrow
+    } // namespace arrow
 
     namespace text
     {
@@ -31,7 +31,7 @@ namespace style::onboarding
         constexpr auto minimumSizeX = 81;
         constexpr auto minimumSizeY = 62;
     } // namespace text
-};    // namespace style::onboarding
+} // namespace style::onboarding
 
 namespace gui
 {
