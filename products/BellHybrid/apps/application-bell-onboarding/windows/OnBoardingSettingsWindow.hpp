@@ -15,5 +15,4 @@ namespace gui
             std::unique_ptr<app::bell_settings::TimeUnitsWindowContract::Presenter> &&windowPresenter,
             std::string name = gui::window::name::bellSettingsTimeUnits);
     };
-
 } // namespace gui

@@ -18,7 +18,8 @@ namespace gui
                               const std::string &name);
 
       private:
-        constexpr static auto displayDuration = std::chrono::seconds{5};
+        static constexpr auto displayDuration = std::chrono::seconds{15};
+
         bool onInput(const InputEvent &inputEvent) override;
         void buildInterface() override;
         void buildLayout();
@@ -26,5 +27,4 @@ namespace gui
 
         std::unique_ptr<AbstractPowerOffPresenter> presenter;
     };
-
 } // namespace gui
