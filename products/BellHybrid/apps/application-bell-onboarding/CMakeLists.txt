@@ -18,23 +18,21 @@ target_sources(application-bell-onboarding
         windows/OnBoardingFinalizeWindow.cpp
         windows/OnBoardingOnOffWindow.cpp
         windows/OnBoardingInstructionPromptWindow.cpp
-        windows/OnBoardingWelcomeWindow.cpp
         windows/OnBoardingShortcutsOptionWindow.cpp
         presenter/OnBoardingLanguageWindowPresenter.cpp
         presenter/OnBoardingFinalizeWindowPresenter.cpp
         presenter/OnBoardingShortcutsWindowPresenter.cpp
         presenter/OnBoardingUpdateInstructionWindowPresenter.cpp
 
+        windows/OnBoardingLanguageWindow.hpp
+        windows/OnBoardingSettingsWindow.hpp
+        windows/OnBoardingOnOffWindow.hpp
+        windows/OnBoardingInstructionPromptWindow.hpp
+        windows/OnBoardingShortcutsOptionWindow.hpp
         presenter/OnBoardingLanguageWindowPresenter.hpp
         presenter/OnBoardingFinalizeWindowPresenter.hpp
         presenter/OnBoardingShortcutsWindowPresenter.hpp
         presenter/OnBoardingUpdateInstructionWindowPresenter.hpp
-        windows/OnBoardingLanguageWindow.hpp
-        windows/OnBoardingOnOffWindow.hpp
-        windows/OnBoardingSettingsWindow.hpp
-        windows/OnBoardingInstructionPromptWindow.hpp
-        windows/OnBoardingWelcomeWindow.hpp
-        windows/OnBoardingShortcutsOptionWindow.hpp
 
     PUBLIC
         include/application-bell-onboarding/ApplicationBellOnBoarding.hpp

@@ -10,7 +10,6 @@
 #include <windows/OnBoardingFinalizeWindow.hpp>
 #include <windows/OnBoardingOnOffWindow.hpp>
 #include <windows/OnBoardingSettingsWindow.hpp>
-#include <windows/OnBoardingWelcomeWindow.hpp>
 #include <windows/OnBoardingInstructionPromptWindow.hpp>
 #include <windows/OnBoardingShortcutsOptionWindow.hpp>
 
@@ -338,11 +337,6 @@ namespace app
             if (getCurrentWindow()->getName() == gui::window::name::informationOnBoardingWindow) {
                 switch (informationState) {
                 case OnBoarding::InformationStates::DeepClickCorrectionInfo:
-                    if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
-                        switchWindow(*getPreviousWindow());
-                        return true;
-                    }
-                    break;
                 case OnBoarding::InformationStates::LightClickInfo:
                     if (inputEvent.isKeyRelease(gui::KeyCode::KEY_ENTER)) {
                         switchWindow(*getPreviousWindow());
