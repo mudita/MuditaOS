@@ -30,3 +30,4 @@ SET value = (SELECT CAST(ROUND((value - 16.0) / ((100.0 - 16.0) / 10.0) + 1.0) A
     FROM settings_tab
     WHERE path = 'prewake_up_brightness')
 WHERE path = 'prewake_up_brightness';
+
