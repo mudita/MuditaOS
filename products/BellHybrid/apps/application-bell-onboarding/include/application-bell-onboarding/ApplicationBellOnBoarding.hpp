@@ -45,7 +45,7 @@ namespace app
                                            StatusIndicators statusIndicators   = StatusIndicators{},
                                            StartInBackground startInBackground = {false},
                                            std::uint32_t stackDepth            = 1024 * 11);
-        ~ApplicationBellOnBoarding();
+        ~ApplicationBellOnBoarding() override;
 
         sys::ReturnCodes InitHandler() override;
         sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;

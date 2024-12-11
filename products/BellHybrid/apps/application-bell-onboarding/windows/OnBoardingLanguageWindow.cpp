@@ -20,7 +20,7 @@ namespace gui
     {
         std::list<gui::Option> languageOptionList;
 
-        for (auto language : presenter->getLanguages()) {
+        for (const auto &language : presenter->getLanguages()) {
             languageOptionList.emplace_back(std::make_unique<gui::option::OptionBellMenu>(
                 language,
                 [=](gui::Item &item) {

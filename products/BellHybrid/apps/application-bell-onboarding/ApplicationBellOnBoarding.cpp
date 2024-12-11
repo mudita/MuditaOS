@@ -69,7 +69,7 @@ namespace app
         createUserInterface();
 
         connect(typeid(manager::GetCurrentDisplayLanguageResponse), [&](sys::Message *msg) {
-            if (gui::window::name::onBoardingLanguageWindow == getCurrentWindow()->getName()) {
+            if (getCurrentWindow()->getName() == gui::window::name::onBoardingLanguageWindow) {
                 switchWindow(gui::window::name::onBoardingShortcutsOptionWindow);
                 return sys::msgHandled();
             }
@@ -83,11 +83,12 @@ namespace app
 
         userIdleTimer = sys::TimerFactory::createSingleShotTimer(
             this, userIdleTimerName, userIdleTimeout, [this]([[maybe_unused]] sys::Timer &timer) {
+                LOG_ERROR("UserIdleTimer called on window '%s'", getCurrentWindow()->getName().c_str());
                 if (getCurrentWindow()->getName() == gui::window::name::onBoardingLanguageWindow) {
+                    LOG_ERROR("Switching to window '%s'", gui::name::window::main_window);
                     switchWindow(gui::name::window::main_window);
                 }
             });
-
         userIdleTimer.start();
 
         return sys::ReturnCodes::Success;
@@ -95,7 +96,7 @@ namespace app
 
     void ApplicationBellOnBoarding::createUserInterface()
     {
-        windowsFactory.attach(gui::name::window::main_window, [this](ApplicationCommon *app, const std::string &name) {
+        windowsFactory.attach(gui::name::window::main_window, [](ApplicationCommon *app, const std::string &name) {
             auto powerOffPresenter = std::make_unique<gui::BellPowerOffPresenter>(app);
             return std::make_unique<gui::OnBoardingOnOffWindow>(app, std::move(powerOffPresenter), name);
         });
@@ -107,7 +108,7 @@ namespace app
             });
 
         windowsFactory.attach(gui::window::name::onBoardingShortcutsOptionWindow,
-                              [this](ApplicationCommon *app, const std::string &name) {
+                              [](ApplicationCommon *app, const std::string &name) {
                                   return std::make_unique<gui::OnBoardingShortcutsOptionWindow>(app, name);
                               });
 
@@ -223,7 +224,7 @@ namespace app
         case OnBoarding::InformationStates::DeepClickCorrectionInfo:
             return {"button_light_press_W_G", "app_bell_onboarding_info_deep_click_correction"};
         }
-        return {"", ""};
+        return {};
     }
 
     bool ApplicationBellOnBoarding::isInformationPromptPermittedOnCurrentWindow()
@@ -282,6 +283,8 @@ namespace app
     {
         const auto inputEvent = static_cast<AppInputEventMessage *>(msgl)->getEvent();
         restartTimerOnWindows();
+
+        userIdleTimer.stop();
         userIdleTimer.restart(userIdleTimeout);
 
         if (isInformationPromptPermittedOnCurrentWindow()) {
