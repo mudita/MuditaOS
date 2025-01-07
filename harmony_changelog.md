@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Fixed
+* Fixed crash in Relaxation when playing large MP3 file
 
 ### Added
 

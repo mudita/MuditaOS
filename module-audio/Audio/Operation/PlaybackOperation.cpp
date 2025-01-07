@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "PlaybackOperation.hpp"
@@ -16,8 +16,8 @@ namespace audio
     using namespace AudioServiceMessage;
 
     PlaybackOperation::PlaybackOperation(const std::string &filePath,
-                                         const audio::PlaybackType &playbackType,
-                                         const audio::PlaybackMode &playbackMode,
+                                         const PlaybackType &playbackType,
+                                         const PlaybackMode &playbackMode,
                                          Callback callback)
         : Operation(std::move(callback), playbackType), playbackMode(playbackMode), dec(nullptr)
     {
@@ -27,13 +27,13 @@ namespace audio
         AddProfile(Profile::Type::PlaybackLoudspeaker, playbackType, true);
 
         endOfFileCallback = [this]() {
-            if (this->playbackMode == audio::PlaybackMode::Single) {
+            if (this->playbackMode == PlaybackMode::Single) {
                 state          = State::Idle;
                 const auto msg = AudioServiceMessage::EndOfFile(operationToken);
                 serviceCallback(&msg);
             }
             else {
-                dec->setPosition(playbackStartPosition);
+                dec->rewind();
             }
         };
 
@@ -56,7 +56,7 @@ namespace audio
         }
     }
 
-    audio::RetCode PlaybackOperation::Start(audio::Token token)
+    RetCode PlaybackOperation::Start(Token token)
     {
         if (state == State::Active || (state == State::Paused && outputConnection != nullptr)) {
             return RetCode::InvokedInIncorrectState;
@@ -69,7 +69,7 @@ namespace audio
         }
         catch (std::invalid_argument &e) {
             LOG_FATAL("Cannot create audio stream: %s", e.what());
-            return audio::RetCode::Failed;
+            return RetCode::Failed;
         }
 
         // create audio connection
@@ -89,11 +89,11 @@ namespace audio
         return GetDeviceError(ret);
     }
 
-    audio::RetCode PlaybackOperation::Stop()
+    RetCode PlaybackOperation::Stop()
     {
         state = State::Idle;
         if (!audioDevice) {
-            return audio::RetCode::DeviceFailure;
+            return RetCode::DeviceFailure;
         }
 
         // stop playback by destroying audio connection
@@ -104,20 +104,20 @@ namespace audio
         return GetDeviceError(audioDevice->Stop());
     }
 
-    audio::RetCode PlaybackOperation::Pause()
+    RetCode PlaybackOperation::Pause()
     {
         if (state == State::Paused || state == State::Idle || outputConnection == nullptr) {
             return RetCode::InvokedInIncorrectState;
         }
         const auto retCode = GetDeviceError(audioDevice->Pause());
-        if (retCode == audio::RetCode::Success) {
+        if (retCode == RetCode::Success) {
             state = State::Paused;
             outputConnection->disable();
         }
         return retCode;
     }
 
-    audio::RetCode PlaybackOperation::Resume()
+    RetCode PlaybackOperation::Resume()
     {
         if (state == State::Active || state == State::Idle) {
             return RetCode::InvokedInIncorrectState;
@@ -132,14 +132,14 @@ namespace audio
         return GetDeviceError(audioDevice->Resume());
     }
 
-    audio::RetCode PlaybackOperation::SetOutputVolume(float vol)
+    RetCode PlaybackOperation::SetOutputVolume(float vol)
     {
         currentProfile->SetOutputVolume(vol);
         auto ret = audioDevice->setOutputVolume(vol);
         return GetDeviceError(ret);
     }
 
-    audio::RetCode PlaybackOperation::SetInputGain(float gain)
+    RetCode PlaybackOperation::SetInputGain(float gain)
     {
         currentProfile->SetInputGain(gain);
         auto ret = audioDevice->setInputGain(gain);
@@ -151,22 +151,21 @@ namespace audio
         return dec->getCurrentPosition();
     }
 
-    audio::RetCode PlaybackOperation::SwitchToPriorityProfile(audio::PlaybackType playbackType)
+    RetCode PlaybackOperation::SwitchToPriorityProfile(PlaybackType playbackType)
     {
         for (const auto &p : supportedProfiles) {
             const auto profileType = p.profile->GetType();
-            if (profileType == audio::Profile::Type::PlaybackBluetoothA2DP &&
-                playbackType == audio::PlaybackType::CallRingtone) {
+            if (profileType == Profile::Type::PlaybackBluetoothA2DP && playbackType == PlaybackType::CallRingtone) {
                 continue;
             }
             if (p.isAvailable) {
                 return SwitchProfile(profileType);
             }
         }
-        return audio::RetCode::ProfileNotSet;
+        return RetCode::ProfileNotSet;
     }
 
-    audio::RetCode PlaybackOperation::SendEvent(std::shared_ptr<Event> evt)
+    RetCode PlaybackOperation::SendEvent(std::shared_ptr<Event> evt)
     {
         const auto isAvailable = evt->getDeviceState() == Event::DeviceState::Connected;
         switch (evt->getType()) {
@@ -185,7 +184,7 @@ namespace audio
         return RetCode::Success;
     }
 
-    audio::RetCode PlaybackOperation::SwitchProfile(const Profile::Type type)
+    RetCode PlaybackOperation::SwitchProfile(const Profile::Type type)
     {
         auto newProfile = GetProfile(type);
         if (newProfile == nullptr) {
@@ -199,7 +198,7 @@ namespace audio
 
         // adjust new profile with information from file's tags
         newProfile->SetSampleRate(dec->getSourceFormat().getSampleRate());
-        newProfile->SetInOutFlags(static_cast<std::uint32_t>(audio::codec::Flags::OutputStereo));
+        newProfile->SetInOutFlags(static_cast<std::uint32_t>(codec::Flags::OutputStereo));
 
         /// profile change - (re)create output device; stop audio first by
         /// killing audio connection
@@ -228,7 +227,7 @@ namespace audio
             Start(operationToken);
         }
 
-        return audio::RetCode::Success;
+        return RetCode::Success;
     }
 
     PlaybackOperation::~PlaybackOperation()

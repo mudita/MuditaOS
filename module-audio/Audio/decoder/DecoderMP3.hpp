@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -12,11 +12,12 @@ namespace audio
     {
       public:
         explicit DecoderMP3(const std::string &filePath);
-        ~DecoderMP3();
+        ~DecoderMP3() override;
 
-        std::int32_t decode(std::uint32_t samplesToRead, std::int16_t *pcmData) override;
+        auto decode(std::uint32_t samplesToRead, std::int16_t *pcmData) -> std::int32_t override;
 
-        void setPosition(float pos) override;
+        auto setPosition(float pos) -> void override;
+        auto rewind() -> void override;
 
       private:
         std::unique_ptr<mp3dec_ex_t> dec;
@@ -32,7 +33,7 @@ namespace audio
         //
         // A return value of less than bytesToRead indicates the end of the stream. Do _not_ return from this callback
         // until either the entire bytesToRead is filled or you have reached the end of the stream.
-        static std::size_t mp3Read(void *pBufferOut, std::size_t bytesToRead, void *pUserData);
+        static auto mp3Read(void *pBufferOut, std::size_t bytesToRead, void *pUserData) -> std::size_t;
 
         // Callback for when data needs to be seeked.
         //
@@ -42,6 +43,6 @@ namespace audio
         // Returns whether the seek was successful.
         //
         // The offset will never be negative. It relates to the beginning position.
-        static int mp3Seek(std::uint64_t offset, void *pUserData);
+        static auto mp3Seek(std::uint64_t offset, void *pUserData) -> int;
     };
 } // namespace audio

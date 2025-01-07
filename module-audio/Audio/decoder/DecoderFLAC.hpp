@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -12,18 +12,15 @@ namespace audio
     {
       public:
         explicit DecoderFLAC(const std::string &filePath);
-        ~DecoderFLAC();
+        ~DecoderFLAC() override;
 
-        std::int32_t decode(std::uint32_t samplesToRead, std::int16_t *pcmData) override;
+        auto decode(std::uint32_t samplesToRead, std::int16_t *pcmData) -> std::int32_t override;
 
-        void setPosition(float pos) override;
+        auto setPosition(float pos) -> void override;
+        auto rewind() -> void override;
 
       private:
         drflac *flac = nullptr;
-
-        /* Data encoded in UTF-8 */
-        void parseText(
-            std::uint8_t *in, std::uint32_t taglen, std::uint32_t datalen, std::uint8_t *out, std::uint32_t outlen);
 
         // Callback for when data needs to be read from the client.
         //
@@ -35,7 +32,7 @@ namespace audio
         //
         // A return value of less than bytesToRead indicates the end of the stream. Do _not_ return from this callback
         // until either the entire bytesToRead is filled or you have reached the end of the stream.
-        static std::size_t drflacRead(void *pUserData, void *pBufferOut, std::size_t bytesToRead);
+        static auto drflacRead(void *pUserData, void *pBufferOut, std::size_t bytesToRead) -> std::size_t;
 
         // Callback for when data needs to be seeked.
         //
@@ -48,6 +45,6 @@ namespace audio
         // The offset will never be negative. Whether it is relative to the beginning or current position is
         // determined by the "origin" parameter which will be either drflac_seek_origin_start or
         // drflac_seek_origin_current.
-        static drflac_bool32 drflacSeek(void *pUserData, int offset, drflac_seek_origin origin);
+        static auto drflacSeek(void *pUserData, int offset, drflac_seek_origin origin) -> drflac_bool32;
     };
 } // namespace audio

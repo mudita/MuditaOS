@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -12,11 +12,12 @@ namespace audio
     {
       public:
         explicit DecoderWAV(const std::string &filePath);
-        ~DecoderWAV();
+        ~DecoderWAV() override;
 
-        std::int32_t decode(std::uint32_t samplesToRead, std::int16_t *pcmData) override;
+        auto decode(std::uint32_t samplesToRead, std::int16_t *pcmData) -> std::int32_t override;
 
-        void setPosition(float pos) override;
+        auto setPosition(float pos) -> void override;
+        auto rewind() -> void override;
 
       private:
         std::unique_ptr<drwav> wav;
@@ -31,7 +32,7 @@ namespace audio
         //
         // A return value of less than bytesToRead indicates the end of the stream. Do _not_ return from this callback
         // until either the entire bytesToRead is filled or you have reached the end of the stream.
-        static std::size_t drwavRead(void *pUserData, void *pBufferOut, std::size_t bytesToRead);
+        static auto drwavRead(void *pUserData, void *pBufferOut, std::size_t bytesToRead) -> std::size_t;
 
         // Callback for when data needs to be seeked.
         //
@@ -44,6 +45,6 @@ namespace audio
         // The offset will never be negative. Whether it is relative to the beginning or current position is
         // determined by the "origin" parameter which will be either drwav_seek_origin_start or
         // drwav_seek_origin_current.
-        static drwav_bool32 drwavSeek(void *pUserData, int offset, drwav_seek_origin origin);
+        static auto drwavSeek(void *pUserData, int offset, drwav_seek_origin origin) -> drwav_bool32;
     };
 } // namespace audio

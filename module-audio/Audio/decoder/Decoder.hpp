@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -28,49 +28,52 @@ namespace audio
         explicit Decoder(const std::string &path);
         virtual ~Decoder();
 
-        virtual std::int32_t decode(std::uint32_t samplesToRead, std::int16_t *pcmData) = 0;
+        virtual auto decode(std::uint32_t samplesToRead, std::int16_t *pcmData) -> std::int32_t = 0;
 
         // Range 0 - 1
-        virtual void setPosition(float pos) = 0;
+        virtual auto setPosition(float pos) -> void = 0;
 
-        std::uint32_t getSampleRate()
+        // Rewind to first audio sample
+        virtual auto rewind() -> void = 0;
+
+        [[nodiscard]] auto getSampleRate() const noexcept -> std::uint32_t
         {
             return sampleRate;
         }
 
-        std::uint32_t getChannelCount()
+        [[nodiscard]] auto getChannelCount() const noexcept -> std::uint32_t
         {
             return channelCount;
         }
 
-        float getCurrentPosition()
+        [[nodiscard]] auto getCurrentPosition() const noexcept -> float
         {
             return position;
         }
 
-        void onDataReceive() override;
-        void enableInput() override;
-        void disableInput() override;
+        auto onDataReceive() -> void override;
+        auto enableInput() -> void override;
+        auto disableInput() -> void override;
 
         auto getSourceFormat() -> AudioFormat override;
         auto getSupportedFormats() -> std::vector<AudioFormat> override;
 
         auto getTraits() const -> Endpoint::Traits override;
 
-        void startDecodingWorker(const DecoderWorker::EndOfFileCallback &endOfFileCallback,
-                                 const DecoderWorker::FileDeletedCallback &fileDeletedCallback);
-        void stopDecodingWorker();
+        auto startDecodingWorker(const DecoderWorker::EndOfFileCallback &endOfFileCallback,
+                                 const DecoderWorker::FileDeletedCallback &fileDeletedCallback) -> void;
+        auto stopDecodingWorker() -> void;
 
         // Factory method
-        static std::unique_ptr<Decoder> Create(const std::string &path);
+        static auto Create(const std::string &path) -> std::unique_ptr<Decoder>;
 
       protected:
-        virtual auto getBitWidth() -> unsigned int
+        [[nodiscard]] virtual auto getBitWidth() -> unsigned int
         {
             return bitsPerSample;
         }
 
-        virtual std::unique_ptr<tags::fetcher::Tags> fetchTags();
+        virtual auto fetchTags() -> std::unique_ptr<tags::fetcher::Tags>;
 
         static constexpr Endpoint::Traits decoderCaps = {.usesDMA = false};
 
