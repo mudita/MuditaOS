@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "RelaxationRunningLoopPresenter.hpp"
@@ -76,7 +76,7 @@ namespace app::relaxation
 
     void RelaxationRunningLoopPresenter::onFinished()
     {
-        auto onStopCallback = [this](audio::RetCode retCode) {};
+        auto onStopCallback = [](audio::RetCode retCode) {};
         player.stop(std::move(onStopCallback));
     }
 

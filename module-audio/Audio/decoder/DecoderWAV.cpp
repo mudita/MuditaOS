@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "DecoderWAV.hpp"
@@ -38,29 +38,39 @@ namespace audio
         }
     }
 
-    void DecoderWAV::setPosition(float pos)
+    auto DecoderWAV::setPosition(float pos) -> void
     {
         if (!isInitialized) {
             LOG_ERROR("WAV decoder not initialized");
             return;
         }
-        drwav_seek_to_pcm_frame(wav.get(), wav->totalPCMFrameCount * pos);
+
+        const auto frameToSeek = static_cast<std::uint64_t>(wav->totalPCMFrameCount * pos);
+        const auto status      = drwav_seek_to_pcm_frame(wav.get(), frameToSeek);
+        if (status == DRWAV_FALSE) {
+            LOG_ERROR("Failed to seek to frame %" PRIu64 " in file '%s'!", frameToSeek, filePath.c_str());
+        }
 
         /* Calculate new position */
-        position = static_cast<float>(wav->totalPCMFrameCount) * pos / static_cast<float>(sampleRate);
+        position = frameToSeek / static_cast<float>(sampleRate);
     }
 
-    std::int32_t DecoderWAV::decode(std::uint32_t samplesToRead, std::int16_t *pcmData)
+    auto DecoderWAV::rewind() -> void
+    {
+        setPosition(0.0f);
+    }
+
+    auto DecoderWAV::decode(std::uint32_t samplesToRead, std::int16_t *pcmData) -> std::int32_t
     {
         if (!isInitialized) {
             LOG_ERROR("WAV decoder not initialized");
             return 0;
         }
 
-        const auto samplesRead = drwav_read_pcm_frames_s16(wav.get(), samplesToRead / channelCount, pcmData);
-        if (samplesRead > 0) {
+        const auto framesRead = drwav_read_pcm_frames_s16(wav.get(), samplesToRead / channelCount, pcmData);
+        if (framesRead > 0) {
             /* Calculate frame duration in seconds */
-            position += static_cast<float>(samplesRead) / static_cast<float>(sampleRate);
+            position += static_cast<float>(framesRead) / static_cast<float>(sampleRate);
         }
         else if (!fileExists(fd)) {
             /* Unfortunately this second check of file existence is needed
@@ -69,12 +79,12 @@ namespace audio
             LOG_WARN("File '%s' was deleted during playback!", filePath.c_str());
             return fileDeletedRetCode;
         }
-        return samplesRead * channelCount;
+        return framesRead * channelCount;
     }
 
-    std::size_t DecoderWAV::drwavRead(void *pUserData, void *pBufferOut, std::size_t bytesToRead)
+    auto DecoderWAV::drwavRead(void *pUserData, void *pBufferOut, std::size_t bytesToRead) -> std::size_t
     {
-        const auto decoderContext = reinterpret_cast<DecoderWAV *>(pUserData);
+        const auto decoderContext = static_cast<DecoderWAV *>(pUserData);
 
         /* Check if the file exists - std::fread happily returns bytesToRead if
          * requested to read from deleted file, what causes decoding library
@@ -85,11 +95,11 @@ namespace audio
         return std::fread(pBufferOut, 1, bytesToRead, decoderContext->fd);
     }
 
-    drwav_bool32 DecoderWAV::drwavSeek(void *pUserData, int offset, drwav_seek_origin origin)
+    auto DecoderWAV::drwavSeek(void *pUserData, int offset, drwav_seek_origin origin) -> drwav_bool32
     {
-        const auto decoderContext = reinterpret_cast<DecoderWAV *>(pUserData);
+        const auto decoderContext = static_cast<DecoderWAV *>(pUserData);
         const auto seekError =
-            std::fseek(decoderContext->fd, offset, origin == drwav_seek_origin_start ? SEEK_SET : SEEK_CUR);
+            std::fseek(decoderContext->fd, offset, (origin == drwav_seek_origin_start) ? SEEK_SET : SEEK_CUR);
         return (seekError == 0) ? DRWAV_TRUE : DRWAV_FALSE;
     }
 } // namespace audio
