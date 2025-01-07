@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include <cstdio>
@@ -42,12 +42,12 @@ namespace audio
         }
     }
 
-    std::unique_ptr<tags::fetcher::Tags> Decoder::fetchTags()
+    auto Decoder::fetchTags() -> std::unique_ptr<tags::fetcher::Tags>
     {
         return std::make_unique<tags::fetcher::Tags>(tags::fetcher::fetchTags(filePath));
     }
 
-    std::unique_ptr<Decoder> Decoder::Create(const std::string &filePath)
+    auto Decoder::Create(const std::string &filePath) -> std::unique_ptr<Decoder>
     {
         const auto extension          = std::filesystem::path(filePath).extension();
         const auto extensionLowercase = utils::stringToLowercase(extension);
@@ -74,10 +74,11 @@ namespace audio
         return dec;
     }
 
-    void Decoder::startDecodingWorker(const DecoderWorker::EndOfFileCallback &endOfFileCallback,
-                                      const DecoderWorker::FileDeletedCallback &fileDeletedCallback)
+    auto Decoder::startDecodingWorker(const DecoderWorker::EndOfFileCallback &endOfFileCallback,
+                                      const DecoderWorker::FileDeletedCallback &fileDeletedCallback) -> void
     {
         assert(_stream != nullptr);
+
         if (audioWorker == nullptr) {
             const auto channelMode = (tags->num_channel == 1) ? DecoderWorker::ChannelMode::ForceStereo
                                                               : DecoderWorker::ChannelMode::NoConversion;
@@ -92,7 +93,7 @@ namespace audio
         }
     }
 
-    void Decoder::stopDecodingWorker()
+    auto Decoder::stopDecodingWorker() -> void
     {
         if (audioWorker) {
             audioWorker->close();
@@ -100,17 +101,17 @@ namespace audio
         audioWorker = nullptr;
     }
 
-    void Decoder::onDataReceive()
+    auto Decoder::onDataReceive() -> void
     {
         audioWorker->enablePlayback();
     }
 
-    void Decoder::enableInput()
+    auto Decoder::enableInput() -> void
     {
         audioWorker->enablePlayback();
     }
 
-    void Decoder::disableInput()
+    auto Decoder::disableInput() -> void
     {
         audioWorker->disablePlayback();
     }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -19,28 +19,27 @@ namespace audio
     {
       public:
         PlaybackOperation(const std::string &filePath,
-                          const audio::PlaybackType &playbackType,
-                          const audio::PlaybackMode &playbackMode,
+                          const PlaybackType &playbackType,
+                          const PlaybackMode &playbackMode,
                           AudioServiceMessage::Callback callback = nullptr);
 
         ~PlaybackOperation() override;
 
-        audio::RetCode Start(audio::Token token) final;
-        audio::RetCode Stop() final;
-        audio::RetCode Pause() final;
-        audio::RetCode Resume() final;
-        audio::RetCode SendEvent(std::shared_ptr<Event> evt) final;
-        audio::RetCode SwitchProfile(const Profile::Type type) final;
-        audio::RetCode SetOutputVolume(float vol) final;
-        audio::RetCode SetInputGain(float gain) final;
+        RetCode Start(Token token) final;
+        RetCode Stop() final;
+        RetCode Pause() final;
+        RetCode Resume() final;
+        RetCode SendEvent(std::shared_ptr<Event> evt) final;
+        RetCode SwitchProfile(const Profile::Type type) final;
+        RetCode SetOutputVolume(float vol) final;
+        RetCode SetInputGain(float gain) final;
 
         Position GetPosition() final;
-        audio::RetCode SwitchToPriorityProfile(audio::PlaybackType playbackType) final;
+        RetCode SwitchToPriorityProfile(PlaybackType playbackType) final;
 
       private:
         static constexpr auto playbackTimeConstraint = 10ms;
-        static constexpr auto playbackStartPosition  = 0U;
-        audio::PlaybackMode playbackMode             = audio::PlaybackMode::Single;
+        PlaybackMode playbackMode                    = PlaybackMode::Single;
 
         std::unique_ptr<Stream> dataStreamOut;
         std::unique_ptr<Decoder> dec;

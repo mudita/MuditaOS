@@ -1,9 +1,8 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "DecoderFLAC.hpp"
 #include "DecoderCommon.hpp"
-#include "flac/flacfile.h"
 
 #define DR_FLAC_IMPLEMENTATION
 #define DR_FLAC_NO_STDIO
@@ -39,13 +38,13 @@ namespace audio
         drflac_close(flac);
     }
 
-    std::int32_t DecoderFLAC::decode(std::uint32_t samplesToRead, std::int16_t *pcmData)
+    auto DecoderFLAC::decode(std::uint32_t samplesToRead, std::int16_t *pcmData) -> std::int32_t
     {
-        const auto samplesRead =
+        const auto framesRead =
             drflac_read_pcm_frames_s16(flac, samplesToRead / channelCount, reinterpret_cast<drflac_int16 *>(pcmData));
-        if (samplesRead > 0) {
+        if (framesRead > 0) {
             /* Calculate frame duration in seconds */
-            position += static_cast<float>(samplesRead) / static_cast<float>(sampleRate);
+            position += static_cast<float>(framesRead) / static_cast<float>(sampleRate);
         }
         else if (!fileExists(fd)) {
             /* Unfortunately this second check of file existence is needed
@@ -54,34 +53,34 @@ namespace audio
             LOG_WARN("File '%s' was deleted during playback!", filePath.c_str());
             return fileDeletedRetCode;
         }
-        return samplesRead * channelCount;
+        return framesRead * channelCount;
     }
 
-    void DecoderFLAC::setPosition(float pos)
+    auto DecoderFLAC::setPosition(float pos) -> void
     {
         if (!isInitialized) {
             LOG_ERROR("FLAC decoder not initialized");
             return;
         }
-        drflac_seek_to_pcm_frame(flac, flac->totalPCMFrameCount * pos);
+
+        const auto frameToSeek = static_cast<std::uint64_t>(flac->totalPCMFrameCount * pos);
+        const auto status      = drflac_seek_to_pcm_frame(flac, frameToSeek);
+        if (status == DRFLAC_FALSE) {
+            LOG_ERROR("Failed to seek to frame %" PRIu64 " in file '%s'!", frameToSeek, filePath.c_str());
+        }
 
         // Calculate new position
-        position = static_cast<float>(flac->totalPCMFrameCount) * pos / static_cast<float>(sampleRate);
+        position = frameToSeek / static_cast<float>(sampleRate);
     }
 
-    /* Data encoded in UTF-8 */
-    void DecoderFLAC::parseText(
-        std::uint8_t *in, std::uint32_t taglen, std::uint32_t datalen, std::uint8_t *out, std::uint32_t outlen)
+    auto DecoderFLAC::rewind() -> void
     {
-        /* Little Endian here */
-        const auto size = std::min(datalen - taglen, outlen - 1);
-        memcpy(out, in + taglen, size);
-        out[size] = '\0';
+        setPosition(0.0f);
     }
 
-    std::size_t DecoderFLAC::drflacRead(void *pUserData, void *pBufferOut, std::size_t bytesToRead)
+    auto DecoderFLAC::drflacRead(void *pUserData, void *pBufferOut, std::size_t bytesToRead) -> std::size_t
     {
-        const auto decoderContext = reinterpret_cast<DecoderFLAC *>(pUserData);
+        const auto decoderContext = static_cast<DecoderFLAC *>(pUserData);
 
         /* Check if the file exists - std::fread happily returns bytesToRead if
          * requested to read from deleted file, what causes decoding library
@@ -92,11 +91,11 @@ namespace audio
         return std::fread(pBufferOut, 1, bytesToRead, decoderContext->fd);
     }
 
-    drflac_bool32 DecoderFLAC::drflacSeek(void *pUserData, int offset, drflac_seek_origin origin)
+    auto DecoderFLAC::drflacSeek(void *pUserData, int offset, drflac_seek_origin origin) -> drflac_bool32
     {
-        const auto decoderContext = reinterpret_cast<DecoderFLAC *>(pUserData);
+        const auto decoderContext = static_cast<DecoderFLAC *>(pUserData);
         const auto seekError =
-            std::fseek(decoderContext->fd, offset, origin == drflac_seek_origin_start ? SEEK_SET : SEEK_CUR);
+            std::fseek(decoderContext->fd, offset, (origin == drflac_seek_origin_start) ? SEEK_SET : SEEK_CUR);
         return (seekError == 0) ? DRFLAC_TRUE : DRFLAC_FALSE;
     }
 } // namespace audio
