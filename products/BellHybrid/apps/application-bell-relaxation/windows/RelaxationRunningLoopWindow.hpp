@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -37,7 +37,6 @@ namespace gui
         void setTime(std::time_t newTime) override;
         void setTimeFormat(utils::time::Locale::TimeFormat fmt) override;
         RefreshModes updateTime() override;
-        void onFinished() override;
         void onPaused() override;
         void resume() override;
         bool updateBatteryStatus() override;
@@ -45,6 +44,5 @@ namespace gui
         void handleDeletedFile() override;
 
         void buildLayout();
-        void configureTimer();
     };
 } // namespace gui

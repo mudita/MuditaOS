@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "RelaxationRunningProgressWindow.hpp"
@@ -157,6 +157,7 @@ namespace gui
         timer->setVisible(false);
         pauseBox->setVisible(true);
         mainVBox->resizeItems();
+        application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
     }
 
     void RelaxationRunningProgressWindow::resume()
@@ -164,6 +165,7 @@ namespace gui
         timer->setVisible(true);
         pauseBox->setVisible(false);
         mainVBox->resizeItems();
+        application->refreshWindow(RefreshModes::GUI_REFRESH_DEEP);
     }
 
     void RelaxationRunningProgressWindow::configureTimer()

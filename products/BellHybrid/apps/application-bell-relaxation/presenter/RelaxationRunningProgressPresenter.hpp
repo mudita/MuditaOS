@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -65,7 +65,13 @@ namespace app::relaxation
 
     class RelaxationRunningProgressPresenter : public RelaxationRunningProgressContract::Presenter
     {
-        settings::Settings *settings = nullptr;
+      public:
+        RelaxationRunningProgressPresenter(settings::Settings *settings,
+                                           AbstractRelaxationPlayer &player,
+                                           std::unique_ptr<AbstractTimeModel> timeModel);
+
+      private:
+        settings::Settings *settings{nullptr};
         AbstractRelaxationPlayer &player;
         std::unique_ptr<app::TimerWithCallbacks> timer;
         std::unique_ptr<AbstractTimeModel> timeModel;
@@ -83,10 +89,5 @@ namespace app::relaxation
         void onBeforeShow() override;
 
         void onFinished();
-
-      public:
-        RelaxationRunningProgressPresenter(settings::Settings *settings,
-                                           AbstractRelaxationPlayer &player,
-                                           std::unique_ptr<AbstractTimeModel> timeModel);
     };
 } // namespace app::relaxation

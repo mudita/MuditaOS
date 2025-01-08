@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "WhatsNewMainPresenter.hpp"
@@ -27,7 +27,7 @@ namespace app::whatsnew
         settings->setValue(settings::SystemProperties::osCurrentVersion, VERSION, settings::SettingsScope::Global);
     }
 
-    auto WhatsNewMainPresenter::getFeaturesCount() -> bool
+    auto WhatsNewMainPresenter::getFeaturesCount() -> std::size_t
     {
         return model.getFeatures().size();
     }

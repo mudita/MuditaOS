@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "RelaxationRunningLoopWindow.hpp"
@@ -9,13 +9,10 @@
 
 #include <ApplicationBellRelaxation.hpp>
 #include <apps-common/widgets/BellBaseLayout.hpp>
-#include <apps-common/widgets/ProgressTimer.hpp>
 #include <Units.hpp>
 
 namespace
 {
-    constexpr auto relaxationLoopTimerName{"RelaxationLoopTimer"};
-    constexpr std::chrono::seconds relaxationLoopTimerPeriod{1};
     constexpr units::SOC dischargingLevelShowTop{20};
 
     std::string adjustDisplayedTitle(const UTF8 &title, const std::uint32_t maxCharsInLine)
@@ -72,7 +69,6 @@ namespace gui
     void RelaxationRunningLoopWindow::buildInterface()
     {
         AppWindow::buildInterface();
-        configureTimer();
         buildLayout();
     }
 
@@ -129,16 +125,6 @@ namespace gui
         mainVBox->resizeItems();
     }
 
-    void RelaxationRunningLoopWindow::configureTimer()
-    {
-        auto timer = std::make_unique<app::ProgressTimer>(application,
-                                                          *this,
-                                                          relaxationLoopTimerName,
-                                                          relaxationLoopTimerPeriod,
-                                                          app::ProgressCountdownMode::Increasing);
-        presenter->setTimer(std::move(timer));
-    }
-
     bool RelaxationRunningLoopWindow::onInput(const InputEvent &inputEvent)
     {
         if (inputEvent.isShortRelease()) {
@@ -157,11 +143,6 @@ namespace gui
             }
         }
         return AppWindow::onInput(inputEvent);
-    }
-
-    void RelaxationRunningLoopWindow::onFinished()
-    {
-        application->returnToPreviousWindow();
     }
 
     void RelaxationRunningLoopWindow::onPaused()

@@ -7,6 +7,7 @@
 ### Added
 
 ### Changed / Improved
+* Optimized power consumption in Relaxation loop mode
 
 ## [2.9.1 2024-12-16]
 
