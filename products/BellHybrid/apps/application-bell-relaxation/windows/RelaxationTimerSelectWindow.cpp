@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "RelaxationTimerSelectWindow.hpp"
@@ -19,12 +19,12 @@ namespace
     constexpr minutes onceValue{minutes::zero()};
     constexpr minutes loopValue{8760h};
 
-    const std::string getOnceValueText()
+    std::string getOnceValueText()
     {
         return utils::translate("app_bell_relaxation_once");
     }
 
-    const std::string getLoopValueText()
+    std::string getLoopValueText()
     {
         return utils::translate("app_bell_relaxation_loop");
     }
@@ -61,6 +61,7 @@ namespace
         return range;
     }
 } // namespace
+
 namespace gui
 {
 
@@ -107,9 +108,8 @@ namespace gui
         spinner->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         spinner->setEdges(RectangleEdge::None);
         spinner->setFocusEdges(RectangleEdge::None);
-        auto currentValue = timerValueToUTF8(presenter->getCurrentTimerValue());
-        spinner->set_value(std::move(currentValue));
-        spinner->onValueChanged = [this](const auto &) {
+        spinner->set_value(timerValueToUTF8(presenter->getCurrentTimerValue()));
+        spinner->onValueChanged = [this]([[maybe_unused]] const auto &value) {
             body->setMinMaxArrowsVisibility(spinner->is_min(), spinner->is_max());
             updateBottomDescription();
         };
@@ -150,12 +150,12 @@ namespace gui
 
     void RelaxationTimerSelectWindow::registerCallbacks()
     {
-        dimensionChangedCallback = [&](Item &, const BoundingBox &newDim) -> bool {
+        dimensionChangedCallback = [&]([[maybe_unused]] Item &item, const BoundingBox &newDim) -> bool {
             body->setArea({0, 0, newDim.w, newDim.h});
             return true;
         };
 
-        focusChangedCallback = [&](Item &) {
+        focusChangedCallback = [&]([[maybe_unused]] Item &item) {
             setFocusItem(focus ? body : nullptr);
             if (focus) {
                 setFocusItem(body);
@@ -190,7 +190,7 @@ namespace gui
                                                                     : gui::window::name::relaxationRunningProgress;
                 auto audioSwitchData  = std::make_unique<RelaxationSwitchData>(std::move(audioContext));
                 audioSwitchData->ignoreCurrentWindowOnStack = true;
-                application->switchWindow(std::move(switchWindowName), std::move(audioSwitchData));
+                application->switchWindow(switchWindowName, std::move(audioSwitchData));
             };
 
             const auto batteryState = presenter->getBatteryState();
@@ -212,5 +212,4 @@ namespace gui
         }
         return AppWindow::onInput(inputEvent);
     }
-
 } // namespace gui

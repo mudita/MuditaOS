@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -30,9 +30,9 @@ namespace app::relaxation
         virtual void stop(AbstractAudioModel::OnStateChangeCallback &&callback)                 = 0;
         virtual void pause(AbstractAudioModel::OnStateChangeCallback &&callback)                = 0;
         virtual void resume(AbstractAudioModel::OnStateChangeCallback &&callback)               = 0;
-        virtual AbstractAudioModel::PlaybackMode getCurrentMode() const noexcept                = 0;
-        virtual audio::Fade getFadeMode() const                                                 = 0;
-        virtual bool isPaused()                                                                 = 0;
+        [[nodiscard]] virtual AbstractAudioModel::PlaybackMode getCurrentMode() const noexcept  = 0;
+        [[nodiscard]] virtual audio::Fade getFadeMode() const                                   = 0;
+        [[nodiscard]] virtual bool isPaused() const noexcept                                    = 0;
     };
 
     class RelaxationPlayer : public AbstractRelaxationPlayer
@@ -49,9 +49,9 @@ namespace app::relaxation
         void stop(AbstractAudioModel::OnStateChangeCallback &&callback) override;
         void pause(AbstractAudioModel::OnStateChangeCallback &&callback) override;
         void resume(AbstractAudioModel::OnStateChangeCallback &&callback) override;
-        AbstractAudioModel::PlaybackMode getCurrentMode() const noexcept override;
-        audio::Fade getFadeMode() const override;
-        bool isPaused() override;
+        [[nodiscard]] AbstractAudioModel::PlaybackMode getCurrentMode() const noexcept override;
+        [[nodiscard]] audio::Fade getFadeMode() const override;
+        [[nodiscard]] bool isPaused() const noexcept override;
 
         AbstractRelaxationFadeModel &fadeModel;
         AbstractAudioModel &audioModel;
