@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "RelaxationPlayer.hpp"
@@ -27,7 +27,7 @@ namespace app::relaxation
         recentFilePath = filePath;
         playbackMode   = mode;
 
-        auto onPlayerFinished = [callback = finishedCallback, this](Status status) {
+        auto onPlayerFinished = [callback = finishedCallback](Status status) {
             if (status == Status::Error) {
                 callback(status); // Playback finished with error
             }
@@ -38,8 +38,7 @@ namespace app::relaxation
 
         auto fadeParams = audio::FadeParams{.mode = getFadeMode(), .playbackDuration = playbackDuration};
         audioModel.setPlaybackFinishedCb(std::move(onPlayerFinished));
-        audioModel.play(
-            filePath, Type::Multimedia, playbackMode, std::move(stateChangeCallback), std::move(fadeParams));
+        audioModel.play(filePath, Type::Multimedia, playbackMode, std::move(stateChangeCallback), fadeParams);
     }
 
     audio::Fade RelaxationPlayer::getFadeMode() const
@@ -65,7 +64,7 @@ namespace app::relaxation
         audioModel.resume(std::move(callback));
     }
 
-    bool RelaxationPlayer::isPaused()
+    bool RelaxationPlayer::isPaused() const noexcept
     {
         return paused;
     }

@@ -8,8 +8,9 @@
 
 ### Changed / Improved
 * Optimized power consumption for bedside lamp functionality
-* Changed maximum focus time length from 60 to 120 minutes.
-* Changed power off time on Onboarding On/Off screen from 5 to 15 seconds.
+* Changed maximum focus time length from 60 to 120 minutes
+* Changed power off time on Onboarding On/Off screen from 5 to 15 seconds
+* Optimized power consumption in Relaxation loop mode
 
 ## [2.9.0 2024-10-21]
 

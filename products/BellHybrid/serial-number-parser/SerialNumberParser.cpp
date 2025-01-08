@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include <serial-number-parser/SerialNumberParser.hpp>
@@ -48,17 +48,17 @@ namespace serial_number_parser
         /* New serial number constants */
         constexpr auto colourCodeOffset = 4;
         const std::map<char, std::string> colourCodeToColourMap{{'G', grayColor}, {'B', blackColor}};
+
+        bool isOldSerialNumberFormat(const std::string &serialNumber)
+        {
+            return (serialNumber.find_first_not_of("0123456789") == std::string::npos);
+        }
+
+        bool isHarmonyPro(const std::string &serialNumber)
+        {
+            return (serialNumber.substr(modelCodeOffset, modelCodeLength) == harmonyProModelCode);
+        }
     } // namespace
-
-    bool isOldSerialNumberFormat(const std::string &serialNumber)
-    {
-        return (serialNumber.find_first_not_of("0123456789") == std::string::npos);
-    }
-
-    bool isHarmonyPro(const std::string &serialNumber)
-    {
-        return (serialNumber.substr(modelCodeOffset, modelCodeLength) == harmonyProModelCode);
-    }
 
     std::optional<VersionMetadata> getDeviceVersionMetadata(const std::string &serialNumber)
     {
