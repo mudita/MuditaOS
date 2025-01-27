@@ -6,8 +6,12 @@ target_sources(
         EndpointFactoryBell.hpp
         EndpointFactoryBell.cpp
         deviceInfo/DeviceInfoEndpoint.cpp
+        quotes/QuotesEndpoint.cpp
+        quotes/QuotesHelper.cpp
     PUBLIC
         include/endpoints/deviceInfo/DeviceInfoEndpoint.hpp
+        include/endpoints/quotes/QuotesEndpoint.hpp
+        include/endpoints/quotes/QuotesHelper.hpp
 )
 
 target_include_directories(

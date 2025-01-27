@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -10,6 +10,9 @@
 
 namespace Quotes
 {
+    inline constexpr auto customGroup     = "Custom";
+    inline constexpr auto predefinedGroup = "Predefined";
+
     enum class ListUpdateMode
     {
         Normal,
@@ -18,9 +21,14 @@ namespace Quotes
 
     class ShuffleQuoteModel
     {
+      public:
+        ShuffleQuoteModel(settings::Settings &settings, Database *quotesDB);
+        auto updateList(ListUpdateMode updateMode) -> void;
+        [[nodiscard]] auto getId() -> int;
+
       private:
         app::ApplicationCommon *app{nullptr};
-        std::unique_ptr<settings::Settings> settings;
+        settings::Settings &settings;
         Database *quotesDB{nullptr};
         std::unique_ptr<QuotesSettingsSerializer> serializer;
         std::unique_ptr<std::mt19937> rngEngine;
@@ -28,11 +36,6 @@ namespace Quotes
         auto populateList(std::unique_ptr<IdsList> idsList, ListUpdateMode updateMode) -> void;
         auto shiftIdList() -> void;
         auto isQuoteExpired() -> bool;
-
-      public:
-        ShuffleQuoteModel(std::unique_ptr<settings::Settings> settings, Database *quotesDB);
-        auto updateList(ListUpdateMode updateMode) -> void;
-        [[nodiscard]] auto getId() -> int;
     };
 
 } // namespace Quotes
