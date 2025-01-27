@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "EndpointFactoryBell.hpp"
@@ -12,6 +12,7 @@
 #include <endpoints/update/UpdateEndpoint.hpp>
 #include <endpoints/reboot/RebootEndpoint.hpp>
 #include <endpoints/timeSync/TimeSyncEndpoint.hpp>
+#include <endpoints/quotes/QuotesEndpoint.hpp>
 
 namespace sdesktop::endpoints
 {
@@ -34,6 +35,8 @@ namespace sdesktop::endpoints
             return std::make_unique<RebootEndpoint>(ownerServicePtr);
         case EndpointType::TimeSync:
             return std::make_unique<TimeSyncEndpoint>(ownerServicePtr);
+        case EndpointType::Quotes:
+            return std::make_unique<QuotesEndpoint>(ownerServicePtr);
         default:
             return std::make_unique<NullEndpoint>(ownerServicePtr);
         }

@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -337,6 +337,19 @@ namespace Quotes
             }
         };
 
+        class NotificationResult : public db::QueryResult
+        {
+          public:
+            explicit NotificationResult(bool ret)
+            {}
+            bool ret;
+
+            [[nodiscard]] auto debugInfo() const -> std::string
+            {
+                return "NotificationResult";
+            }
+        };
+
         class InformLanguageChangeRequest : public db::Query
         {
           public:
@@ -358,6 +371,19 @@ namespace Quotes
             auto debugInfo() const -> std::string
             {
                 return "InformDateChanged";
+            }
+        };
+
+        class InformGroupChanged : public db::Query
+        {
+          public:
+            explicit InformGroupChanged(const std::string &group) : Query(Query::Type::Read), group(group)
+            {}
+            const std::string group;
+
+            auto debugInfo() const -> std::string
+            {
+                return "InformGroupChanged";
             }
         };
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "layouts/HomeScreenLayoutClassicWithQuotes.hpp"
@@ -137,7 +137,9 @@ namespace gui
     {
         constexpr auto dash{'-'};
         UTF8 authorWithDash = quoteAuthor;
-        authorWithDash.insert(&dash, 0);
+        if (!quoteAuthor.empty()) {
+            authorWithDash.insert(&dash, 0);
+        }
         author->setText(authorWithDash);
         quotes->setText(quoteContent);
     }

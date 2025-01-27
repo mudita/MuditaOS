@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -123,4 +123,21 @@ namespace sdesktop::endpoints::json
         inline constexpr auto value     = "value";
         inline constexpr auto timestamp = "timestamp";
     }
+
+    namespace quotes
+    {
+        namespace settings
+        {
+            inline constexpr auto group    = "group";
+            inline constexpr auto interval = "interval";
+        } // namespace settings
+
+        inline constexpr auto quotation = "quotation";
+        namespace quotations
+        {
+            inline constexpr auto text   = "text";
+            inline constexpr auto author = "author";
+        } // namespace quotations
+    }     // namespace quotes
+
 } // namespace sdesktop::endpoints::json

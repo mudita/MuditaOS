@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -17,7 +17,7 @@ namespace Quotes
     class QuotesAgent : public RecordInterface<QuoteRecord, QuotesRecordField>
     {
       public:
-        explicit QuotesAgent(Database *quotesDB, std::unique_ptr<settings::Settings> settings);
+        QuotesAgent(Database *quotesDB, std::unique_ptr<settings::Settings> settings);
         ~QuotesAgent() = default;
 
         auto runQuery(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
@@ -26,7 +26,10 @@ namespace Quotes
         auto handleReadRandomizedQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
 
       private:
+        std::unique_ptr<settings::Settings> settings;
         Database *quotesDB;
         ShuffleQuoteModel shuffleQuoteModel;
+
+        auto handleGroupChanged(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     };
 } // namespace Quotes

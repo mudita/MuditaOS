@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -81,6 +81,7 @@ namespace settings
     {
         inline constexpr auto randomQuotesList        = "quotes_random_list";
         inline constexpr auto randomQuoteIDUpdateTime = "quotes_random_id_update_time";
+        inline constexpr auto selectedGroup           = "quotes_group";
     } // namespace Quotes
 
     namespace Display
