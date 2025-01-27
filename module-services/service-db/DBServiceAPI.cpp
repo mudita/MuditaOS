@@ -1,4 +1,4 @@
-﻿// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+﻿// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "service-db/DBServiceAPI.hpp"
@@ -314,6 +314,12 @@ void DBServiceAPI::InformLanguageChanged(sys::Service *serv)
 void DBServiceAPI::InformDateChanged(sys::Service *serv)
 {
     auto query = std::make_unique<Quotes::Messages::InformDateChanged>();
+    DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+}
+
+void DBServiceAPI::QuotesGroupChanged(sys::Service *serv, const std::string &group)
+{
+    auto query = std::make_unique<Quotes::Messages::InformGroupChanged>(group);
     DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
 }
 
