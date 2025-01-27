@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "ShuffleQuoteModel.hpp"
@@ -32,16 +32,19 @@ namespace
 
 namespace Quotes
 {
-    ShuffleQuoteModel::ShuffleQuoteModel(std::unique_ptr<settings::Settings> settings, Database *quotesDB)
-        : settings(std::move(settings)), quotesDB(quotesDB),
+    ShuffleQuoteModel::ShuffleQuoteModel(settings::Settings &settings, Database *quotesDB)
+        : settings(settings), quotesDB(quotesDB),
           serializer(std::make_unique<QuotesSettingsSerializer>()), rngEngine{std::make_unique<std::mt19937>(
                                                                         bsp::trng::getRandomValue())}
     {}
 
     void ShuffleQuoteModel::updateList(ListUpdateMode updateMode)
     {
-        auto queryResult = quotesDB->query(Queries::getQuotes, utils::getDisplayLanguage().c_str());
-        auto quotesList  = getList<IdsList, IdRecord>(zeroOffset, maxLimit, std::move(queryResult));
+        const auto quotesGroup = settings.getValue(settings::Quotes::selectedGroup, settings::SettingsScope::Global);
+        auto queryResult       = quotesGroup == customGroup
+                                     ? quotesDB->query(Queries::getCustomQuotes)
+                                     : quotesDB->query(Queries::getPredefinedQuotes, utils::getDisplayLanguage().c_str());
+        auto quotesList        = getList<IdsList, IdRecord>(zeroOffset, maxLimit, std::move(queryResult));
         populateList(std::move(quotesList), updateMode);
     }
 
@@ -54,12 +57,12 @@ namespace Quotes
 
         std::shuffle(std::begin(list), std::end(list), *rngEngine);
         if (updateMode == ListUpdateMode::Normal) {
-            auto settingsList = settings->getValue(settings::Quotes::randomQuotesList, settings::SettingsScope::Global);
+            auto settingsList = settings.getValue(settings::Quotes::randomQuotesList, settings::SettingsScope::Global);
             if (not settingsList.empty()) {
                 return;
             }
         }
-        settings->setValue(
+        settings.setValue(
             settings::Quotes::randomQuotesList, serializer->serialize(list), settings::SettingsScope::Global);
         LOG_DEBUG("*** ID queue length: %zu", list.size());
     }
@@ -71,7 +74,7 @@ namespace Quotes
         }
 
         auto list = serializer->deserialize(
-            settings->getValue(settings::Quotes::randomQuotesList, settings::SettingsScope::Global));
+            settings.getValue(settings::Quotes::randomQuotesList, settings::SettingsScope::Global));
         const auto [_, id] = list.front();
         return id;
     }
@@ -79,7 +82,7 @@ namespace Quotes
     void ShuffleQuoteModel::shiftIdList()
     {
         auto list = serializer->deserialize(
-            settings->getValue(settings::Quotes::randomQuotesList, settings::SettingsScope::Global));
+            settings.getValue(settings::Quotes::randomQuotesList, settings::SettingsScope::Global));
 
         if (!list.empty()) {
             list.pop_front();
@@ -89,7 +92,7 @@ namespace Quotes
             updateList(ListUpdateMode::Forced);
         }
         else {
-            settings->setValue(
+            settings.setValue(
                 settings::Quotes::randomQuotesList, serializer->serialize(list), settings::SettingsScope::Global);
         }
     }
@@ -98,7 +101,7 @@ namespace Quotes
     {
         std::time_t lastTimestamp;
         const auto lastTimestampString =
-            settings->getValue(settings::Quotes::randomQuoteIDUpdateTime, settings::SettingsScope::Global);
+            settings.getValue(settings::Quotes::randomQuoteIDUpdateTime, settings::SettingsScope::Global);
 
         try {
             lastTimestamp = std::stoll(lastTimestampString);
@@ -110,9 +113,9 @@ namespace Quotes
 
         const auto currentTimestamp = std::time(nullptr);
         if (hasCrossedMidnight(currentTimestamp, lastTimestamp)) {
-            settings->setValue(settings::Quotes::randomQuoteIDUpdateTime,
-                               utils::to_string(currentTimestamp),
-                               settings::SettingsScope::Global);
+            settings.setValue(settings::Quotes::randomQuoteIDUpdateTime,
+                              utils::to_string(currentTimestamp),
+                              settings::SettingsScope::Global);
             return true;
         }
         return false;
