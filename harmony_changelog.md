@@ -3,9 +3,15 @@
 ## Unreleased
 
 ### Fixed
-* Fixed crash in Relaxation when playing large MP3 file
 
 ### Added
+
+### Changed / Improved
+
+## [2.9.2 2025-02-03]
+
+### Fixed
+* Fixed crash in Relaxation when playing large MP3 file
 
 ### Changed / Improved
 * Optimized power consumption in Relaxation loop mode
