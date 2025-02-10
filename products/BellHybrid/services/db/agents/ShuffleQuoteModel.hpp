@@ -12,6 +12,7 @@ namespace Quotes
 {
     inline constexpr auto customGroup     = "Custom";
     inline constexpr auto predefinedGroup = "Predefined";
+    inline constexpr auto atMidnight      = "AtMidnight";
 
     enum class ListUpdateMode
     {

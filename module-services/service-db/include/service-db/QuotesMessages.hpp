@@ -432,6 +432,19 @@ namespace Quotes
             }
         };
 
+        class InformIntervalChanged : public db::Query
+        {
+          public:
+            explicit InformIntervalChanged(const std::string &interval) : Query(Query::Type::Read), interval(interval)
+            {}
+            const std::string interval;
+
+            auto debugInfo() const -> std::string
+            {
+                return "InformIntervalChanged";
+            }
+        };
+
         class WriteQuoteRequest : public db::Query
         {
           public:
