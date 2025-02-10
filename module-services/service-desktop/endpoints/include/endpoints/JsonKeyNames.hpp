@@ -130,7 +130,7 @@ namespace sdesktop::endpoints::json
         inline constexpr auto author   = "author";
         inline constexpr auto group    = "group";
         inline constexpr auto interval = "interval";
-        inline constexpr auto quoteID = "quoteID";
+        inline constexpr auto quoteID  = "quoteID";
     } // namespace quotes
 
 } // namespace sdesktop::endpoints::json

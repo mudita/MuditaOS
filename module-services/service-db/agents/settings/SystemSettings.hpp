@@ -82,6 +82,7 @@ namespace settings
         inline constexpr auto randomQuotesList        = "quotes_random_list";
         inline constexpr auto randomQuoteIDUpdateTime = "quotes_random_id_update_time";
         inline constexpr auto selectedGroup           = "quotes_group";
+        inline constexpr auto selectedInterval        = "quotes_interval";
     } // namespace Quotes
 
     namespace Display

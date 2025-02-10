@@ -214,7 +214,7 @@ def main():
                         help='string with type of group of displayed quotes [Predefined or Custom]')
     parser.add_argument('-i', '--interval',
                         metavar='quotes_display_interval',
-                        help='quotes display interval [\'x\' minutes or \'at midnight\']')
+                        help='quotes display interval [\'x\' minutes or \'AtMidnight\']')
 
     args = parser.parse_args()
     if not args.port:

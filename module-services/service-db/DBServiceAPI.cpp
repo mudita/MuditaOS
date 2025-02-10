@@ -356,6 +356,12 @@ void DBServiceAPI::QuotesGroupChanged(sys::Service *serv, const std::string &gro
     DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
 }
 
+void DBServiceAPI::QuotesIntervalChanged(sys::Service *serv, const std::string &interval)
+{
+    auto query = std::make_unique<Quotes::Messages::InformIntervalChanged>(interval);
+    DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+}
+
 auto DBServiceAPI::hasContactSameNumbers(sys::Service *serv, const ContactRecord &rec) -> bool
 {
     std::shared_ptr<DBContactMessage> msg =
