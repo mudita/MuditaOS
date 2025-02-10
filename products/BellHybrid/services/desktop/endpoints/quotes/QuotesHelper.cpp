@@ -82,7 +82,7 @@ namespace sdesktop::endpoints
             DBServiceAPI::QuotesGroupChanged(owner, group.c_str());
         }
         else if (const auto &interval = body[json::quotes::interval].string_value(); !interval.empty()) {
-            // TODO: https://appnroll.atlassian.net/browse/BH-2095
+            DBServiceAPI::QuotesIntervalChanged(owner, interval.c_str());
         }
         else {
             return {Sent::No, ResponseContext{.status = http::Code::BadRequest}};

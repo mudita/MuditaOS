@@ -7,6 +7,7 @@
 #include <log/log.hpp>
 #include <bsp/trng/trng.hpp>
 #include <service-db/agents/settings/SystemSettings.hpp>
+#include <time/time_constants.hpp>
 
 #include <memory>
 #include <ctime>
@@ -27,6 +28,12 @@ namespace
             return true;
         }
         return (std::abs(current - last) > dayInSec); // If the day is the same but different month/year
+    }
+
+    bool isTimeElapsed(std::time_t current, std::time_t last, std::uint32_t intervalInMinutes)
+    {
+        const auto elapsedMinutes = std::abs(current - last) / utils::time::secondsInMinute;
+        return elapsedMinutes >= intervalInMinutes;
     }
 } // namespace
 
@@ -102,6 +109,7 @@ namespace Quotes
         std::time_t lastTimestamp;
         const auto lastTimestampString =
             settings.getValue(settings::Quotes::randomQuoteIDUpdateTime, settings::SettingsScope::Global);
+        const auto interval = settings.getValue(settings::Quotes::selectedInterval, settings::SettingsScope::Global);
 
         try {
             lastTimestamp = std::stoll(lastTimestampString);
@@ -112,12 +120,24 @@ namespace Quotes
         }
 
         const auto currentTimestamp = std::time(nullptr);
-        if (hasCrossedMidnight(currentTimestamp, lastTimestamp)) {
-            settings.setValue(settings::Quotes::randomQuoteIDUpdateTime,
-                              utils::to_string(currentTimestamp),
-                              settings::SettingsScope::Global);
-            return true;
+
+        if (utils::is_number(interval)) {
+            if (isTimeElapsed(currentTimestamp, lastTimestamp, utils::toNumeric(interval))) {
+                settings.setValue(settings::Quotes::randomQuoteIDUpdateTime,
+                                  utils::to_string(currentTimestamp),
+                                  settings::SettingsScope::Global);
+                return true;
+            }
         }
+        else if (interval == atMidnight) {
+            if (hasCrossedMidnight(currentTimestamp, lastTimestamp)) {
+                settings.setValue(settings::Quotes::randomQuoteIDUpdateTime,
+                                  utils::to_string(currentTimestamp),
+                                  settings::SettingsScope::Global);
+                return true;
+            }
+        }
+
         return false;
     }
 } // namespace Quotes
