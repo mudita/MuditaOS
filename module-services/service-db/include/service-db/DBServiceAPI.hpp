@@ -139,4 +139,5 @@ class DBServiceAPI
                                 std::unique_ptr<db::QueryListener> &&listener);
     static bool QuotesDeleteEntry(sys::Service *serv, std::uint32_t id, std::unique_ptr<db::QueryListener> &&listener);
     static void QuotesGroupChanged(sys::Service *serv, const std::string &group);
+    static void QuotesIntervalChanged(sys::Service *serv, const std::string &interval);
 };

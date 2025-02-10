@@ -36,6 +36,9 @@ namespace Quotes
         else if (typeid(*query) == typeid(Messages::InformGroupChanged)) {
             return handleGroupChanged(query);
         }
+        else if (typeid(*query) == typeid(Messages::InformIntervalChanged)) {
+            return handleIntervalChanged(query);
+        }
         return nullptr;
     }
 
@@ -146,6 +149,21 @@ namespace Quotes
         }
 
         settings->setValue(settings::Quotes::selectedGroup, request->group, settings::SettingsScope::Global);
+        shuffleQuoteModel.updateList(ListUpdateMode::Forced);
+        return std::make_unique<Messages::NotificationResult>(true);
+    }
+
+    auto QuotesAgent::handleIntervalChanged(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        const auto request = std::dynamic_pointer_cast<Messages::InformIntervalChanged>(query);
+        if (request == nullptr) {
+            return std::make_unique<Messages::NotificationResult>(false);
+        }
+        if (!utils::is_number(request->interval) && request->interval != atMidnight) {
+            return std::make_unique<Messages::NotificationResult>(false);
+        }
+
+        settings->setValue(settings::Quotes::selectedInterval, request->interval, settings::SettingsScope::Global);
         shuffleQuoteModel.updateList(ListUpdateMode::Forced);
         return std::make_unique<Messages::NotificationResult>(true);
     }
