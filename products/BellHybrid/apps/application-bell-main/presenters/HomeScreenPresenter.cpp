@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "application-bell-main/presenters/HomeScreenPresenter.hpp"
@@ -288,6 +288,7 @@ namespace app::home_screen
         const auto batteryState   = batteryModel.getLevelState().state;
         const bool isUsbConnected = usbStatusModel.isUsbConnected(batteryState);
         getView()->updateUsbStatus(isUsbConnected);
+        requestQuote();
     }
 
     bool HomeScreenPresenter::isLowBatteryWarningNeeded()

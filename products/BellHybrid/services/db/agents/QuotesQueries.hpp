@@ -20,4 +20,11 @@ namespace Quotes::Queries
         "SELECT quote_id, quote, author FROM custom_quote_table WHERE quote_id=" u32_ ";";
 
     inline constexpr auto getCustomQuotesCount = "SELECT COUNT(quote_id) FROM custom_quote_table;";
+
+    inline constexpr auto addCustomQuote = "INSERT INTO custom_quote_table (quote, author) VALUES (" str_c str_ ");";
+
+    inline constexpr auto deleteCustomQuote = "DELETE FROM custom_quote_table WHERE quote_id=" u32_ ";";
+
+    inline constexpr auto editCustomQuote =
+        "UPDATE custom_quote_table SET quote=" str_c "author=" str_ " WHERE quote_id=" u32_ ";";
 } // namespace Quotes::Queries
