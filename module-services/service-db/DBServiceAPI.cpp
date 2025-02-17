@@ -317,6 +317,39 @@ void DBServiceAPI::InformDateChanged(sys::Service *serv)
     DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
 }
 
+bool DBServiceAPI::QuotesAddNewEntry(sys::Service *serv,
+                                     const std::string &quote,
+                                     const std::string &author,
+                                     std::unique_ptr<db::QueryListener> &&listener)
+{
+    auto query = std::make_unique<Quotes::Messages::AddNewEntry>(quote, author);
+    query->setQueryListener(std::move(listener));
+    const auto [result, _] = DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+    return result;
+}
+
+bool DBServiceAPI::QuotesEditEntry(sys::Service *serv,
+                                   std::uint32_t id,
+                                   const std::string &quote,
+                                   const std::string &author,
+                                   std::unique_ptr<db::QueryListener> &&listener)
+{
+    auto query = std::make_unique<Quotes::Messages::EditEntry>(id, quote, author);
+    query->setQueryListener(std::move(listener));
+    const auto [result, _] = DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+    return result;
+}
+
+bool DBServiceAPI::QuotesDeleteEntry(sys::Service *serv,
+                                     std::uint32_t id,
+                                     std::unique_ptr<db::QueryListener> &&listener)
+{
+    auto query = std::make_unique<Quotes::Messages::DeleteQuoteRequest>(id);
+    query->setQueryListener(std::move(listener));
+    const auto [result, _] = DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+    return result;
+}
+
 void DBServiceAPI::QuotesGroupChanged(sys::Service *serv, const std::string &group)
 {
     auto query = std::make_unique<Quotes::Messages::InformGroupChanged>(group);

@@ -126,18 +126,11 @@ namespace sdesktop::endpoints::json
 
     namespace quotes
     {
-        namespace settings
-        {
-            inline constexpr auto group    = "group";
-            inline constexpr auto interval = "interval";
-        } // namespace settings
-
-        inline constexpr auto quotation = "quotation";
-        namespace quotations
-        {
-            inline constexpr auto text   = "text";
-            inline constexpr auto author = "author";
-        } // namespace quotations
-    }     // namespace quotes
+        inline constexpr auto quote    = "quote";
+        inline constexpr auto author   = "author";
+        inline constexpr auto group    = "group";
+        inline constexpr auto interval = "interval";
+        inline constexpr auto quoteID = "quoteID";
+    } // namespace quotes
 
 } // namespace sdesktop::endpoints::json

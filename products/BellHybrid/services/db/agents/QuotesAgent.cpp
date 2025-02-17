@@ -24,6 +24,15 @@ namespace Quotes
             shuffleQuoteModel.updateList(ListUpdateMode::Forced);
             return std::make_unique<Messages::NotificationResult>(true);
         }
+        else if (typeid(*query) == typeid(Messages::AddNewEntry)) {
+            return handleAddNewEntry(query);
+        }
+        else if (typeid(*query) == typeid(Messages::EditEntry)) {
+            return handleEditEntry(query);
+        }
+        else if (typeid(*query) == typeid(Messages::DeleteQuoteRequest)) {
+            return handleDeleteEntry(query);
+        }
         else if (typeid(*query) == typeid(Messages::InformGroupChanged)) {
             return handleGroupChanged(query);
         }
@@ -49,6 +58,72 @@ namespace Quotes
             }
         }
         return nullptr;
+    }
+
+    auto QuotesAgent::handleAddNewEntry(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        const auto request = std::dynamic_pointer_cast<Messages::AddNewEntry>(query);
+        if (request == nullptr) {
+            auto response = std::make_unique<Messages::AddQuoteResponse>();
+            response->setRequestQuery(query);
+            return response;
+        }
+
+        const auto quotesGroup = settings->getValue(settings::Quotes::selectedGroup, settings::SettingsScope::Global);
+        const auto executeResult =
+            quotesDB->execute(Queries::addCustomQuote, request->quote.c_str(), request->author.c_str());
+
+        if (executeResult && quotesGroup == customGroup) {
+            shuffleQuoteModel.updateList(ListUpdateMode::Forced);
+        }
+
+        const auto quoteId = quotesDB->getLastInsertRowId();
+        auto response      = std::make_unique<Messages::AddQuoteResponse>(executeResult, quoteId);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleEditEntry(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        const auto request = std::dynamic_pointer_cast<Messages::EditEntry>(query);
+        if (request == nullptr) {
+            auto response = std::make_unique<Messages::EditEntryResponse>();
+            response->setRequestQuery(query);
+            return response;
+        }
+
+        const auto quotesGroup = settings->getValue(settings::Quotes::selectedGroup, settings::SettingsScope::Global);
+        const auto executeResult =
+            quotesDB->execute(Queries::editCustomQuote, request->quote.c_str(), request->author.c_str(), request->id);
+
+        if (executeResult && quotesGroup == customGroup) {
+            shuffleQuoteModel.updateList(ListUpdateMode::Forced);
+        }
+
+        auto response = std::make_unique<Messages::EditEntryResponse>(executeResult);
+        response->setRequestQuery(query);
+        return response;
+    }
+
+    auto QuotesAgent::handleDeleteEntry(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        const auto request = std::dynamic_pointer_cast<Messages::DeleteQuoteRequest>(query);
+        if (request == nullptr) {
+            auto response = std::make_unique<Messages::DeleteQuoteResponse>();
+            response->setRequestQuery(query);
+            return response;
+        }
+
+        const auto quotesGroup   = settings->getValue(settings::Quotes::selectedGroup, settings::SettingsScope::Global);
+        const auto executeResult = quotesDB->execute(Queries::deleteCustomQuote, request->quoteId);
+
+        if (executeResult && quotesGroup == customGroup) {
+            shuffleQuoteModel.updateList(ListUpdateMode::Forced);
+        }
+
+        auto response = std::make_unique<Messages::DeleteQuoteResponse>(executeResult);
+        response->setRequestQuery(query);
+        return response;
     }
 
     auto QuotesAgent::handleGroupChanged(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
