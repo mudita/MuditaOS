@@ -298,7 +298,8 @@ namespace Quotes
         class AddQuoteResponse : public db::QueryResult
         {
           public:
-            explicit AddQuoteResponse(bool success, unsigned int quoteId) : success(success), quoteId(quoteId)
+            explicit AddQuoteResponse(bool success = false, unsigned int quoteId = 0)
+                : success(success), quoteId(quoteId)
             {}
             const bool success;
             const unsigned int quoteId;
@@ -374,6 +375,50 @@ namespace Quotes
             }
         };
 
+        class AddNewEntry : public db::Query
+        {
+          public:
+            explicit AddNewEntry(const std::string &quote, const std::string &author)
+                : Query(Query::Type::Create), quote(quote), author(author)
+            {}
+            const std::string quote;
+            const std::string author;
+
+            auto debugInfo() const -> std::string
+            {
+                return "AddNewEntry";
+            }
+        };
+
+        class EditEntry : public db::Query
+        {
+          public:
+            explicit EditEntry(std::uint32_t id, const std::string &quote, const std::string &author)
+                : Query(Query::Type::Update), id(id), quote(quote), author(author)
+            {}
+            const std::uint32_t id;
+            const std::string quote;
+            const std::string author;
+
+            auto debugInfo() const -> std::string
+            {
+                return "EditEntry";
+            }
+        };
+
+        class EditEntryResponse : public db::QueryResult
+        {
+          public:
+            explicit EditEntryResponse(bool success = false) : success(success)
+            {}
+            const bool success;
+
+            auto debugInfo() const -> std::string
+            {
+                return "EditEntryResponse";
+            }
+        };
+
         class InformGroupChanged : public db::Query
         {
           public:
@@ -434,7 +479,7 @@ namespace Quotes
         class DeleteQuoteResponse : public db::QueryResult
         {
           public:
-            explicit DeleteQuoteResponse(bool success) : success(success)
+            explicit DeleteQuoteResponse(bool success = false) : success(success)
             {}
             const bool success;
 
