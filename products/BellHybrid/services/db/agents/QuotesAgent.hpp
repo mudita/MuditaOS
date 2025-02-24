@@ -30,6 +30,7 @@ namespace Quotes
         Database *quotesDB;
         ShuffleQuoteModel shuffleQuoteModel;
 
+        auto isCustomQuotesDatabaseEmpty() -> bool;
         auto handleAddNewEntry(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
         auto handleEditEntry(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
         auto handleDeleteEntry(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
