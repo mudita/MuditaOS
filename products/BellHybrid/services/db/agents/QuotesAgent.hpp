@@ -35,6 +35,8 @@ namespace Quotes
         auto handleEditEntry(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
         auto handleDeleteEntry(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
         auto handleGroupChanged(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+        auto handleGetGroup(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
         auto handleIntervalChanged(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
+        auto handleGetInterval(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>;
     };
 } // namespace Quotes

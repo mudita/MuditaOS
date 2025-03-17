@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -34,7 +34,10 @@ class ServiceDB : public ServiceDBCommon
     std::unique_ptr<db::multimedia_files::MultimediaFilesRecordInterface> multimediaFilesRecordInterface;
 
     db::Interface *getInterface(db::Interface::Name interface) override;
+    sys::MessagePointer DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp) override;
     sys::ReturnCodes InitHandler() override;
+
+    bool StoreIntoSyncPackage(const std::filesystem::path &syncPackagePath);
 };
 
 namespace sys
