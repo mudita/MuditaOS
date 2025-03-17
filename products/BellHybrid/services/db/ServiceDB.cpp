@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "include/db/ServiceDB.hpp"
@@ -56,6 +56,35 @@ db::Interface *ServiceDB::getInterface(db::Interface::Name interface)
     return nullptr;
 }
 
+sys::MessagePointer ServiceDB::DataReceivedHandler(sys::DataMessage *msgl, sys::ResponseMessage *resp)
+{
+    const auto message = ServiceDBCommon::DataReceivedHandler(msgl, resp);
+    auto responseMsg   = std::static_pointer_cast<sys::ResponseMessage>(message);
+    if (responseMsg) {
+        return responseMsg;
+    }
+
+    auto type = static_cast<MessageType>(msgl->messageType);
+    switch (type) {
+    case MessageType::DBSyncPackage: {
+        auto time   = utils::time::Scoped("DBSyncPackage");
+        auto msg    = static_cast<DBServiceMessageSyncPackage *>(msgl);
+        auto ret    = StoreIntoSyncPackage({msg->syncPackagePath});
+        responseMsg = std::make_shared<DBServiceResponseMessage>(ret);
+    } break;
+
+    default:
+        break;
+    }
+
+    if (responseMsg == nullptr) {
+        return std::make_shared<sys::ResponseMessage>();
+    }
+
+    responseMsg->responseTo = msgl->messageType;
+    return responseMsg;
+}
+
 sys::ReturnCodes ServiceDB::InitHandler()
 {
     if (const auto returnCode = ServiceDBCommon::InitHandler(); returnCode != sys::ReturnCodes::Success) {
@@ -97,4 +126,14 @@ sys::ReturnCodes ServiceDB::InitHandler()
     quotesRecordInterface = std::make_unique<Quotes::QuotesAgent>(quotesDB.get(), std::move(settings));
 
     return sys::ReturnCodes::Success;
+}
+
+bool ServiceDB::StoreIntoSyncPackage(const std::filesystem::path &syncPackagePath)
+{
+    const auto &path = syncPackagePath / std::filesystem::path(quotesDB->getName()).filename();
+    if (!quotesDB->storeIntoFile(path)) {
+        LOG_ERROR("Store quotesDB in sync package failed");
+        return false;
+    }
+    return true;
 }

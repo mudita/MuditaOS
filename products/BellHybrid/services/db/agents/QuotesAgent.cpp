@@ -36,8 +36,14 @@ namespace Quotes
         else if (typeid(*query) == typeid(Messages::InformGroupChanged)) {
             return handleGroupChanged(query);
         }
+        else if (typeid(*query) == typeid(Messages::GetGroup)) {
+            return handleGetGroup(query);
+        }
         else if (typeid(*query) == typeid(Messages::InformIntervalChanged)) {
             return handleIntervalChanged(query);
+        }
+        else if (typeid(*query) == typeid(Messages::GetInterval)) {
+            return handleGetInterval(query);
         }
         return nullptr;
     }
@@ -160,6 +166,14 @@ namespace Quotes
         return std::make_unique<Messages::NotificationResult>(true);
     }
 
+    auto QuotesAgent::handleGetGroup(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        const auto &quotesGroup = settings->getValue(settings::Quotes::selectedGroup, settings::SettingsScope::Global);
+        auto response          = std::make_unique<Messages::GetGroupResponse>(quotesGroup);
+        response->setRequestQuery(query);
+        return response;
+    }
+
     auto QuotesAgent::handleIntervalChanged(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
     {
         const auto request = std::dynamic_pointer_cast<Messages::InformIntervalChanged>(query);
@@ -173,5 +187,14 @@ namespace Quotes
         settings->setValue(settings::Quotes::selectedInterval, request->interval, settings::SettingsScope::Global);
         shuffleQuoteModel.updateList(ListUpdateMode::Forced);
         return std::make_unique<Messages::NotificationResult>(true);
+    }
+
+    auto QuotesAgent::handleGetInterval(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
+    {
+        const auto &quotesInterval =
+            settings->getValue(settings::Quotes::selectedInterval, settings::SettingsScope::Global);
+        auto response = std::make_unique<Messages::GetIntervalResponse>(quotesInterval);
+        response->setRequestQuery(query);
+        return response;
     }
 } // namespace Quotes
