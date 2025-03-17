@@ -14,7 +14,50 @@ namespace sdesktop::endpoints
 {
     auto QuotesHelper::processGet(Context &context) -> ProcessResult
     {
-        // TODO: https://appnroll.atlassian.net/browse/BH-2099
+        const auto &body = context.getBody();
+        if (const auto settings = body[json::quotes::settings].string_value(); !settings.empty()) {
+            if (settings == json::quotes::group) {
+                auto listener = std::make_unique<db::EndpointListener>(
+                    [=](db::QueryResult *result, Context &context) {
+                        const auto getGroupResult = dynamic_cast<Quotes::Messages::GetGroupResponse *>(result);
+                        if (getGroupResult == nullptr) {
+                            context.setResponseStatus(http::Code::InternalServerError);
+                            sender::putToSendQueue(context.createSimpleResponse());
+                            return false;
+                        }
+
+                        context.setResponseBody(json11::Json::object{{json::quotes::group, getGroupResult->group}});
+                        context.setResponseStatus(http::Code::OK);
+                        sender::putToSendQueue(context.createSimpleResponse());
+                        return true;
+                    },
+                    context);
+
+                DBServiceAPI::QuotesGetGroup(owner, std::move(listener));
+                return {Sent::Yes, std::nullopt};
+            }
+            else if (settings == json::quotes::interval) {
+                auto listener = std::make_unique<db::EndpointListener>(
+                    [=](db::QueryResult *result, Context &context) {
+                        const auto getIntervalResult = dynamic_cast<Quotes::Messages::GetIntervalResponse *>(result);
+                        if (getIntervalResult == nullptr) {
+                            context.setResponseStatus(http::Code::InternalServerError);
+                            sender::putToSendQueue(context.createSimpleResponse());
+                            return false;
+                        }
+
+                        context.setResponseBody(
+                            json11::Json::object{{json::quotes::interval, getIntervalResult->interval}});
+                        context.setResponseStatus(http::Code::OK);
+                        sender::putToSendQueue(context.createSimpleResponse());
+                        return true;
+                    },
+                    context);
+
+                DBServiceAPI::QuotesGetInterval(owner, std::move(listener));
+                return {Sent::Yes, std::nullopt};
+            }
+        }
         return {Sent::No, ResponseContext{.status = http::Code::BadRequest}};
     }
 

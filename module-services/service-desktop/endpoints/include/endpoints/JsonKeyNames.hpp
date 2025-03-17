@@ -67,26 +67,26 @@ namespace sdesktop::endpoints::json
         inline constexpr auto categoryBackup   = "backup";
         inline constexpr auto categorySync     = "sync";
 
-        inline constexpr auto limit              = "limit";
-        inline constexpr auto offset             = "offset";
-        inline constexpr auto order              = "order";
-        inline constexpr auto entries            = "entries";
-        inline constexpr auto messageBody        = "messageBody";
-        inline constexpr auto messageCount       = "messageCount";
-        inline constexpr auto messageID          = "messageID";
-        inline constexpr auto messageType        = "messageType";
-        inline constexpr auto phoneNumber        = "phoneNumber";
-        inline constexpr auto createdAt          = "createdAt";
-        inline constexpr auto lastUsedAt         = "lastUsedAt";
-        inline constexpr auto lastUpdatedAt      = "lastUpdatedAt";
-        inline constexpr auto isUnread           = "isUnread";
-        inline constexpr auto contactID          = "contactID";
-        inline constexpr auto number             = "number";
-        inline constexpr auto numberID           = "numberID";
-        inline constexpr auto threadID           = "threadID";
-        inline constexpr auto messageSnippet     = "messageSnippet";
-        inline constexpr auto templateBody       = "templateBody";
-        inline constexpr auto templateID         = "templateID";
+        inline constexpr auto limit          = "limit";
+        inline constexpr auto offset         = "offset";
+        inline constexpr auto order          = "order";
+        inline constexpr auto entries        = "entries";
+        inline constexpr auto messageBody    = "messageBody";
+        inline constexpr auto messageCount   = "messageCount";
+        inline constexpr auto messageID      = "messageID";
+        inline constexpr auto messageType    = "messageType";
+        inline constexpr auto phoneNumber    = "phoneNumber";
+        inline constexpr auto createdAt      = "createdAt";
+        inline constexpr auto lastUsedAt     = "lastUsedAt";
+        inline constexpr auto lastUpdatedAt  = "lastUpdatedAt";
+        inline constexpr auto isUnread       = "isUnread";
+        inline constexpr auto contactID      = "contactID";
+        inline constexpr auto number         = "number";
+        inline constexpr auto numberID       = "numberID";
+        inline constexpr auto threadID       = "threadID";
+        inline constexpr auto messageSnippet = "messageSnippet";
+        inline constexpr auto templateBody   = "templateBody";
+        inline constexpr auto templateID     = "templateID";
     } // namespace messages
 
     namespace outbox
@@ -122,7 +122,7 @@ namespace sdesktop::endpoints::json
     {
         inline constexpr auto value     = "value";
         inline constexpr auto timestamp = "timestamp";
-    }
+    } // namespace timeSync
 
     namespace quotes
     {
@@ -131,6 +131,7 @@ namespace sdesktop::endpoints::json
         inline constexpr auto group    = "group";
         inline constexpr auto interval = "interval";
         inline constexpr auto quoteID  = "quoteID";
+        inline constexpr auto settings = "settings";
     } // namespace quotes
 
 } // namespace sdesktop::endpoints::json
