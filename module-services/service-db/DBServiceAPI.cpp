@@ -362,6 +362,22 @@ void DBServiceAPI::QuotesIntervalChanged(sys::Service *serv, const std::string &
     DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
 }
 
+bool DBServiceAPI::QuotesGetGroup(sys::Service *serv, std::unique_ptr<db::QueryListener> &&listener)
+{
+    auto query = std::make_unique<Quotes::Messages::GetGroup>();
+    query->setQueryListener(std::move(listener));
+    const auto [result, _] = DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+    return result;
+}
+
+bool DBServiceAPI::QuotesGetInterval(sys::Service *serv, std::unique_ptr<db::QueryListener> &&listener)
+{
+    auto query = std::make_unique<Quotes::Messages::GetInterval>();
+    query->setQueryListener(std::move(listener));
+    const auto [result, _] = DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+    return result;
+}
+
 auto DBServiceAPI::hasContactSameNumbers(sys::Service *serv, const ContactRecord &rec) -> bool
 {
     std::shared_ptr<DBContactMessage> msg =

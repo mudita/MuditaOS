@@ -432,6 +432,31 @@ namespace Quotes
             }
         };
 
+        class GetGroup : public db::Query
+        {
+          public:
+            explicit GetGroup() : Query(Query::Type::Create)
+            {}
+
+            auto debugInfo() const -> std::string
+            {
+                return "GetGroup";
+            }
+        };
+
+        class GetGroupResponse : public db::QueryResult
+        {
+          public:
+            explicit GetGroupResponse(const std::string &group) : group(group)
+            {}
+            const std::string group;
+
+            auto debugInfo() const -> std::string
+            {
+                return "GetGroupResponse";
+            }
+        };
+
         class InformIntervalChanged : public db::Query
         {
           public:
@@ -442,6 +467,31 @@ namespace Quotes
             auto debugInfo() const -> std::string
             {
                 return "InformIntervalChanged";
+            }
+        };
+
+        class GetInterval : public db::Query
+        {
+          public:
+            explicit GetInterval() : Query(Query::Type::Create)
+            {}
+
+            auto debugInfo() const -> std::string
+            {
+                return "GetInterval";
+            }
+        };
+
+        class GetIntervalResponse : public db::QueryResult
+        {
+          public:
+            explicit GetIntervalResponse(const std::string &interval) : interval(interval)
+            {}
+            const std::string interval;
+
+            auto debugInfo() const -> std::string
+            {
+                return "GetIntervalResponse";
             }
         };
 
