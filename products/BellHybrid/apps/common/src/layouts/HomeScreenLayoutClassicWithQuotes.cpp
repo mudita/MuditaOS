@@ -24,7 +24,7 @@ namespace
 
     constexpr auto authorFont{style::window::font::mediumbigbold};
     constexpr auto authorHeight{42U};
-}; // namespace
+} // namespace
 
 namespace gui
 {

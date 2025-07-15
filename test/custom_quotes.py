@@ -67,17 +67,16 @@ def send_data(port_path: str, payload_str: str, expected_response: int) -> bool:
         print(f'Request failed, status {status}')
         return False
     
-def get_request_response(port_path: str, request: str, expected_size: int) -> str:
+def get_request_response(port_path: str, request: str, expected_size: int) -> bytes:
     payload_len_str = str(len(request)).rjust(payload_size_len, '0')
     request_str = payload_marker + payload_len_str + request
 
-    response = ''
     with serial.Serial(port_path, port_baudrate, timeout=port_timeout_medium_s) as port:
         port.write(request_str.encode('ascii'))
         response = port.read(expected_size)
     return response
     
-def get_str_data(port_path: str, payload_str: str, expected_responses: int, body_str: str) -> str:
+def get_str_data(port_path: str, payload_str: str, expected_responses: list, body_str: str) -> str:
     payload_len_str = str(len(payload_str)).rjust(payload_size_len, '0')
     request_str = payload_marker + payload_len_str + payload_str
 
@@ -241,7 +240,7 @@ def download_file(port_path: str, path: str) -> bool:
     }
     payload_str = json.dumps(payload)
 
-    requestID = {
+    request_id = {
         'endpoint': endpoint_types['FilesystemUpload'],
         'method': http_methods['GET'],
         'uuid': uuid,
@@ -259,7 +258,7 @@ def download_file(port_path: str, path: str) -> bool:
     resp_json = json.loads(response[10:])
     status = resp_json['status']
     if status == 200:
-        requestID['body']['rxID'] = resp_json['body']['rxID']
+        request_id['body']['rxID'] = resp_json['body']['rxID']
         chunk_size = resp_json['body']['chunkSize']
         file_size = resp_json['body']['fileSize']
     else:
@@ -274,10 +273,10 @@ def download_file(port_path: str, path: str) -> bool:
     progress_bar = tqdm(desc=f'Downloading \'{path}\'', total=file_size, unit='bytes', unit_scale=True, unit_divisor=1024)
     with open(filename, 'wb') as file:
         for i in range(1, chunks + 1):
-            requestID_str = json.dumps(requestID)
-            response = get_request_response(port_path, requestID_str, chunk_rx_data_size)
+            request_id_str = json.dumps(request_id)
+            response = get_request_response(port_path, request_id_str, chunk_rx_data_size)
             if not response:
-                print("Request GET chunkNo: " + requestID['body']['chunkNo'] + " failed!")
+                print("Request GET chunkNo: " + request_id['body']['chunkNo'] + " failed!")
                 return False
 
             resp_json = json.loads(response[10:])
@@ -285,7 +284,7 @@ def download_file(port_path: str, path: str) -> bool:
             if status == 200:
                 data = base64.b64decode(resp_json['body']['data'])
                 file.write(data)
-                requestID['body']['chunkNo'] = i + 1
+                request_id['body']['chunkNo'] = i + 1
                 progress_bar.update(len(data))
             else:
                 print(f'Request failed, status {status}')
@@ -309,22 +308,22 @@ def delete_sync(port_path: str, path: str) -> bool:
     return send_data(port_path, payload_str, 204)
 
 def get_quotes(port_path: str) -> bool:
-    if start_sync(port_path) == False:
+    if not start_sync(port_path):
         print("Error! Synchronization has not been started.")
         return False
     print("Synchronization has started...")
 
-    if wait_for_sync_end(port_path, 20) == False:
+    if not wait_for_sync_end(port_path, 20):
         print("Error! Synchronization fail.")
         return False
     print("Synchronization completed successfully.")
 
-    if download_file(port_path, sync_path) == False:
+    if not download_file(port_path, sync_path):
         print("Error! Sync file download fail.")
         return False
     print("Sync file download completed.")
 
-    if delete_sync(port_path, sync_path) == False:
+    if not delete_sync(port_path, sync_path):
         print("Error! Failed to delete sync file.")
         return False
     print("Sync file deletion completed successfully.")
@@ -382,10 +381,10 @@ def main():
             return
         else:
             print("adding new quotes: " + args.quote)
-            status = add_quote(args.port, args.quote, args.author)
+            add_quote(args.port, args.quote, args.author)
     elif args.delete:
         print("deleting quotes nr: " + str(args.delete))
-        status = delete_quote(args.port, args.delete)
+        delete_quote(args.port, args.delete)
     elif args.edit:
         if not args.quote:
             print('Invalid usage: please add quote')
@@ -393,17 +392,17 @@ def main():
             return
         else:
             print("editing quotes nr: " + str(args.edit))
-            status = edit_quote(args.port, args.edit, args.quote, args.author)
+            edit_quote(args.port, args.edit, args.quote, args.author)
     elif args.group:
         print("quotes group: " + args.group)
-        status = change_group(args.port, args.group)
+        change_group(args.port, args.group)
     elif args.interval:
         print("quotes interval: " + args.interval)
-        status = change_interval(args.port, args.interval)
+        change_interval(args.port, args.interval)
     elif args.synchro:
         if args.synchro == "quotes":
             print("downloading quotes file")
-            status = get_quotes(args.port)
+            get_quotes(args.port)
         elif args.synchro == "group":
             group = get_settings(args.port, args.synchro)
             print("quotes group: " + group)

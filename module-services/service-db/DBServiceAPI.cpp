@@ -16,19 +16,14 @@
 #include <SMSTemplateRecord.hpp>
 #include <system/Common.hpp>
 #include <Service/Service.hpp>
-#include <ThreadRecord.hpp>
-#include <Utils.hpp>
 #include <log/log.hpp>
-#include <queries/messages/threads/QueryThreadGetByNumber.hpp>
 #include <queries/phonebook/QueryNumberGetByID.hpp>
 
 #include <utility>
-#include <cassert>
 
 namespace constants
 {
     constexpr std::uint32_t DefaultTimeoutInMs = 10000U;
-    constexpr std::uint32_t BackupTimeoutInMs  = 120000U;
 } // namespace constants
 
 struct NotesRecord;
@@ -350,16 +345,21 @@ bool DBServiceAPI::QuotesDeleteEntry(sys::Service *serv,
     return result;
 }
 
-void DBServiceAPI::QuotesGroupChanged(sys::Service *serv, const std::string &group)
+bool DBServiceAPI::QuotesGroupChanged(sys::Service *serv,
+                                      const std::string &group,
+                                      std::unique_ptr<db::QueryListener> &&listener)
 {
     auto query = std::make_unique<Quotes::Messages::InformGroupChanged>(group);
-    DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+    query->setQueryListener(std::move(listener));
+    const auto [result, _] = DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+    return result;
 }
 
-void DBServiceAPI::QuotesIntervalChanged(sys::Service *serv, const std::string &interval)
+bool DBServiceAPI::QuotesIntervalChanged(sys::Service *serv, const std::string &interval)
 {
     auto query = std::make_unique<Quotes::Messages::InformIntervalChanged>(interval);
-    DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+    const auto [result, _] = DBServiceAPI::GetQuery(serv, db::Interface::Name::Quotes, std::move(query));
+    return result;
 }
 
 bool DBServiceAPI::QuotesGetGroup(sys::Service *serv, std::unique_ptr<db::QueryListener> &&listener)

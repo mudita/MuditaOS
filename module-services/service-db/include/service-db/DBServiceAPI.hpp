@@ -23,10 +23,12 @@
 #include <vector>
 
 class DBContactMessage;
+
 namespace db
 {
     class Query;
 } // namespace db
+
 namespace sys
 {
     class Service;
@@ -138,8 +140,10 @@ class DBServiceAPI
                                 const std::string &author,
                                 std::unique_ptr<db::QueryListener> &&listener);
     static bool QuotesDeleteEntry(sys::Service *serv, std::uint32_t id, std::unique_ptr<db::QueryListener> &&listener);
-    static void QuotesGroupChanged(sys::Service *serv, const std::string &group);
-    static void QuotesIntervalChanged(sys::Service *serv, const std::string &interval);
+    static bool QuotesGroupChanged(sys::Service *serv,
+                                   const std::string &group,
+                                   std::unique_ptr<db::QueryListener> &&listener);
+    static bool QuotesIntervalChanged(sys::Service *serv, const std::string &interval);
     static bool QuotesGetGroup(sys::Service *serv, std::unique_ptr<db::QueryListener> &&listener);
     static bool QuotesGetInterval(sys::Service *serv, std::unique_ptr<db::QueryListener> &&listener);
 };

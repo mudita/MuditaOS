@@ -51,10 +51,10 @@ namespace Quotes
     auto QuotesAgent::isCustomQuotesDatabaseEmpty() -> bool
     {
         const auto result = quotesDB->query(Queries::getCustomQuotesCount);
-        if (result == nullptr || result->getRowCount() == 0) {
+        if ((result == nullptr) || (result->getRowCount() == 0)) {
             return true;
         }
-        return ((*result)[0].getUInt32() == 0);
+        return (*result)[0].getUInt32() == 0;
     }
 
     auto QuotesAgent::handleReadRandomizedQuote(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
@@ -62,12 +62,13 @@ namespace Quotes
         const auto request = std::dynamic_pointer_cast<Messages::ReadRandomizedQuoteRequest>(query);
         if (request) {
             const auto id = shuffleQuoteModel.getId();
-            const auto quotesGroup =
+            const auto &quotesGroup =
                 settings->getValue(settings::Quotes::selectedGroup, settings::SettingsScope::Global);
             LOG_DEBUG("Shuffle id: %d", id);
-            const auto readQuery = quotesGroup == customGroup ? Queries::readCustomQuote : Queries::readPredefinedQuote;
+            const auto readQuery =
+                (quotesGroup == customGroup) ? Queries::readCustomQuote : Queries::readPredefinedQuote;
             const auto result    = quotesDB->query(readQuery, id);
-            if (result && result->getRowCount() > 0) {
+            if (result && (result->getRowCount() > 0)) {
                 const IdQuoteAuthorRecord record(result.get());
                 auto response = std::make_unique<Messages::ReadRandomizedQuoteResponse>(
                     record.quote_id, record.quote, record.author);
@@ -91,7 +92,7 @@ namespace Quotes
         const auto executeResult =
             quotesDB->execute(Queries::addCustomQuote, request->quote.c_str(), request->author.c_str());
 
-        if (executeResult && quotesGroup == customGroup) {
+        if (executeResult && (quotesGroup == customGroup)) {
             shuffleQuoteModel.updateList(ListUpdateMode::Forced);
         }
 
@@ -110,11 +111,11 @@ namespace Quotes
             return response;
         }
 
-        const auto quotesGroup = settings->getValue(settings::Quotes::selectedGroup, settings::SettingsScope::Global);
+        const auto &quotesGroup = settings->getValue(settings::Quotes::selectedGroup, settings::SettingsScope::Global);
         const auto executeResult =
             quotesDB->execute(Queries::editCustomQuote, request->quote.c_str(), request->author.c_str(), request->id);
 
-        if (executeResult && quotesGroup == customGroup) {
+        if (executeResult && (quotesGroup == customGroup)) {
             shuffleQuoteModel.updateList(ListUpdateMode::Forced);
         }
 
@@ -132,10 +133,10 @@ namespace Quotes
             return response;
         }
 
-        const auto quotesGroup   = settings->getValue(settings::Quotes::selectedGroup, settings::SettingsScope::Global);
+        const auto &quotesGroup  = settings->getValue(settings::Quotes::selectedGroup, settings::SettingsScope::Global);
         const auto executeResult = quotesDB->execute(Queries::deleteCustomQuote, request->quoteId);
 
-        if (executeResult && quotesGroup == customGroup) {
+        if (executeResult && (quotesGroup == customGroup)) {
             if (isCustomQuotesDatabaseEmpty()) {
                 // if the list of custom quotes is empty, we change the group to a predefined one
                 settings->setValue(settings::Quotes::selectedGroup, predefinedGroup, settings::SettingsScope::Global);
@@ -151,19 +152,22 @@ namespace Quotes
     auto QuotesAgent::handleGroupChanged(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
     {
         const auto request = std::dynamic_pointer_cast<Messages::InformGroupChanged>(query);
+        auto response      = std::make_unique<Messages::NotificationResult>(false);
+        response->setRequestQuery(query);
+
         if (request == nullptr) {
-            return std::make_unique<Messages::NotificationResult>(false);
+            return response;
         }
-        if (request->group == customGroup && isCustomQuotesDatabaseEmpty()) {
-            // if the list of custom quotes is empty, we change the group to a predefined one
-            settings->setValue(settings::Quotes::selectedGroup, predefinedGroup, settings::SettingsScope::Global);
-            shuffleQuoteModel.updateList(ListUpdateMode::Forced);
-            return std::make_unique<Messages::NotificationResult>(true);
+
+        /* Prevent setting custom group if there are no custom quotes */
+        if ((request->group == customGroup) && isCustomQuotesDatabaseEmpty()) {
+            return response;
         }
 
         settings->setValue(settings::Quotes::selectedGroup, request->group, settings::SettingsScope::Global);
         shuffleQuoteModel.updateList(ListUpdateMode::Forced);
-        return std::make_unique<Messages::NotificationResult>(true);
+        response->success = true;
+        return response;
     }
 
     auto QuotesAgent::handleGetGroup(std::shared_ptr<db::Query> query) -> std::unique_ptr<db::QueryResult>
@@ -180,7 +184,7 @@ namespace Quotes
         if (request == nullptr) {
             return std::make_unique<Messages::NotificationResult>(false);
         }
-        if (!utils::is_number(request->interval) && request->interval != atMidnight) {
+        if (!utils::is_number(request->interval) && (request->interval != atMidnight)) {
             return std::make_unique<Messages::NotificationResult>(false);
         }
 
