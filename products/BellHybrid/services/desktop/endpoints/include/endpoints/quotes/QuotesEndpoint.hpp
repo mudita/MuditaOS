@@ -17,5 +17,4 @@ namespace sdesktop::endpoints
       private:
         std::unique_ptr<QuotesHelper> helper;
     };
-
 } // namespace sdesktop::endpoints

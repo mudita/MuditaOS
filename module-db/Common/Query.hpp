@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -12,10 +12,12 @@ namespace db
     using sdesktop::endpoints::Context;
     using sdesktop::endpoints::PagedContext;
 
-    class QueryResult; // Forward declaration
+    class QueryResult;
+
     using QueryCallbackFunction                  = std::function<bool(db::QueryResult *)>;
     using EndpointQueryCallbackFunction          = std::function<bool(db::QueryResult *, Context &)>;
     using EndpointQueryCallbackFunctionWithPages = std::function<bool(db::QueryResult *, PagedContext &)>;
+
     class QueryListener
     {
       public:
@@ -98,8 +100,8 @@ namespace db
 
         void setRequestQuery(const std::shared_ptr<Query> &requestQueryToSet);
         std::shared_ptr<Query> getRequestQuery() const noexcept;
-        void setRecordID(const uint32_t modifiedRecordID);
-        [[nodiscard]] auto getRecordID() -> std::optional<uint32_t>;
+        void setRecordID(const std::uint32_t modifiedRecordID);
+        [[nodiscard]] auto getRecordID() -> std::optional<std::uint32_t>;
 
         bool handle();
 
@@ -110,7 +112,6 @@ namespace db
         std::shared_ptr<Query> requestQuery;
 
       private:
-        std::optional<uint32_t> recordID;
+        std::optional<std::uint32_t> recordID;
     };
-
 } // namespace db
