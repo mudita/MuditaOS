@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "Query.hpp"
@@ -53,7 +53,7 @@ bool EndpointListenerWithPages::handleQueryResponse(db::QueryResult *response)
         return ret;
     }
 
-    LOG_ERROR("callback is nullptr!");
+    LOG_ERROR("Callback is nullptr!");
     return false;
 }
 

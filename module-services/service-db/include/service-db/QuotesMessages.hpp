@@ -279,6 +279,7 @@ namespace Quotes
                 return "EnableQuoteByIdResponse";
             }
         };
+
         class AddQuoteRequest : public db::Query
         {
           public:
@@ -341,9 +342,9 @@ namespace Quotes
         class NotificationResult : public db::QueryResult
         {
           public:
-            explicit NotificationResult(bool ret)
+            explicit NotificationResult(bool success) : success(success)
             {}
-            bool ret;
+            bool success;
 
             [[nodiscard]] auto debugInfo() const -> std::string
             {
@@ -354,7 +355,7 @@ namespace Quotes
         class InformLanguageChangeRequest : public db::Query
         {
           public:
-            explicit InformLanguageChangeRequest() : Query(Query::Type::Read)
+            explicit InformLanguageChangeRequest() : Query(Query::Type::Update)
             {}
 
             auto debugInfo() const -> std::string
@@ -422,7 +423,7 @@ namespace Quotes
         class InformGroupChanged : public db::Query
         {
           public:
-            explicit InformGroupChanged(const std::string &group) : Query(Query::Type::Read), group(group)
+            explicit InformGroupChanged(const std::string &group) : Query(Query::Type::Update), group(group)
             {}
             const std::string group;
 
@@ -435,7 +436,7 @@ namespace Quotes
         class GetGroup : public db::Query
         {
           public:
-            explicit GetGroup() : Query(Query::Type::Create)
+            explicit GetGroup() : Query(Query::Type::Read)
             {}
 
             auto debugInfo() const -> std::string
@@ -460,7 +461,7 @@ namespace Quotes
         class InformIntervalChanged : public db::Query
         {
           public:
-            explicit InformIntervalChanged(const std::string &interval) : Query(Query::Type::Read), interval(interval)
+            explicit InformIntervalChanged(const std::string &interval) : Query(Query::Type::Update), interval(interval)
             {}
             const std::string interval;
 
@@ -473,7 +474,7 @@ namespace Quotes
         class GetInterval : public db::Query
         {
           public:
-            explicit GetInterval() : Query(Query::Type::Create)
+            explicit GetInterval() : Query(Query::Type::Read)
             {}
 
             auto debugInfo() const -> std::string
