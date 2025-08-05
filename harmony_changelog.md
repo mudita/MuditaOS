@@ -5,6 +5,7 @@
 ### Fixed
 
 ### Added
+* Added custom quotations feature
 
 ### Changed / Improved
 
