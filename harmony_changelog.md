@@ -6,6 +6,7 @@
 
 ### Added
 * Added custom quotations feature
+* Added What's New entry for quotations feature
 
 ### Changed / Improved
 
