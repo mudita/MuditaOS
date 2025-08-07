@@ -13,9 +13,6 @@ update.img_success = "assets/gui_image_update_success.bin"
 update.img_failure = "assets/gui_image_update_failed.bin"
 update.img_in_progress_wait = false -- To display progress bar immediately after the script has started
 
--- Match only files with '.db' extensions and omit such files inside subdirectories
-local match_db_files = '^[^%/]*%.db$'
-
 -- Percent values to be shown on progress bar taking each step's processing time into account
 local update_stages = {
     init = 0,
@@ -64,7 +61,7 @@ local function copy_databases()
     local from = paths.db_dir
     local to = recovery.sys.target_slot() .. "/db"
     print(string.format("Copying databases from '%s' to '%s'", from, to))
-    helpers.copy_dir_filtered(from, to, match_db_files)
+    helpers.copy_dir_filtered(from, to, consts.match.only_db_files)
 end
 
 local function create_directories()

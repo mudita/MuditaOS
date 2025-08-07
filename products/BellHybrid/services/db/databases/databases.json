@@ -20,6 +20,10 @@
    {
     "name": "quotes",
     "version": "0"
+   },
+   {
+    "name": "whats_new",
+    "version": "0"
    }
   ]
  }
