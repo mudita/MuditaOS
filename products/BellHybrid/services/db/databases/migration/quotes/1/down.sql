@@ -6,9 +6,5 @@
 -- Create Date: 2025-01-23 15:32:56
 
 -- Insert SQL here
-CREATE TABLE IF NOT EXISTS custom_quote_table (
-    quote_id INTEGER NOT NULL,
-    quote TEXT NOT NULL,
-    author TEXT,
-    PRIMARY KEY (quote_id)
-);
+DROP TABLE custom_quote_table;
+

@@ -8,3 +8,4 @@
 -- Insert SQL here
 
 DELETE FROM whats_new WHERE Major = 2 AND Minor = 10 AND Patch = 0 AND English_title = 'Custom quotations';
+
