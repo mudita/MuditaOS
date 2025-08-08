@@ -10,3 +10,4 @@
 INSERT OR REPLACE INTO whats_new (Major, Minor, Patch, English_title, Deutsch_title, Español_title, Polski_title, Français_title, Icon, English_desc, Deutsch_desc, Español_desc, Polski_desc, Français_desc) VALUES
     (2, 10, 1, 'Dummy test 1', 'Test 1 German', 'Test 1 Spanish', 'Test 1 Polski', 'Test 1 French', 'whatsnew_info_W_M', 'Test message 1 in English.', 'Test message 1 in German.', 'Test message 1 in Spanish.', 'Wiadomość testowa 1 po polsku.', 'Test message 1 in French.'),
     (2, 10, 1, 'Dummy test 2', 'Test 2 German', 'Test 2 Spanish', 'Test 2 Polski', 'Test 2 French', 'whatsnew_quote_W_M', 'Test message 2 in English.', 'Test message 2 in German.', 'Test message 2 in Spanish.', 'Wiadomość testowa 2 po polsku.', 'Test message 2 in French.');
+

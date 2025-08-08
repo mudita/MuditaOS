@@ -9,3 +9,4 @@
 
 DELETE FROM whats_new WHERE Major = 2 AND Minor = 10 AND Patch = 1 AND English_title = 'Dummy test 1';
 DELETE FROM whats_new WHERE Major = 2 AND Minor = 10 AND Patch = 1 AND English_title = 'Dummy test 2';
+
