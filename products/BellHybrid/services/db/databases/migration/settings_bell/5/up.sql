@@ -9,3 +9,13 @@
 
 INSERT OR IGNORE INTO settings_tab (path, value) VALUES
        ('quotes_group', 'Predefined');
+
+-- Message: Add quote interval setting
+-- Revision: b6dd0dff-d717-4bf7-97e8-cc3e6359d9ff
+-- Create Date: 2025-01-30 13:47:07
+
+-- Insert SQL here
+
+INSERT OR IGNORE INTO settings_tab (path, value) VALUES
+       ('quotes_interval', 'AtMidnight');
+
