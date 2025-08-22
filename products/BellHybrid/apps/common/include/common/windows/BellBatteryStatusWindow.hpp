@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2025, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -8,7 +8,7 @@
 
 namespace gui
 {
-    class TextFixedSize;
+    class Text;
     class ImageBox;
     class Image;
 
@@ -17,7 +17,7 @@ namespace gui
       public:
         static constexpr auto windowName = "BellBatteryStatusWindow";
 
-        BellBatteryStatusWindow(app::ApplicationCommon *app, const std::string &name = windowName);
+        explicit BellBatteryStatusWindow(app::ApplicationCommon *app, const std::string &name = windowName);
 
       private:
         void buildInterface() override;
@@ -26,13 +26,13 @@ namespace gui
         void onClose(CloseReason reason) override;
 
         BellBaseLayout *body{};
-        TextFixedSize *topDescription{};
+        Text *topDescription{};
 
-        TextFixedSize *bottomDescription{};
+        Text *bottomDescription{};
         ImageBox *chargingIcon{};
 
         HBox *hbox{};
-        ImageBox *center{};
+        ImageBox *batteryImage{};
     };
 
 } // namespace gui
