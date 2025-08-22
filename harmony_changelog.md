@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### Fixed
+* Fixed misaligned charging symbol on battery state screen
 
 ### Added
 * Added custom quotations feature
