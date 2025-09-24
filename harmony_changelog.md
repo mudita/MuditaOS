@@ -3,13 +3,19 @@
 ## Unreleased
 
 ### Fixed
+
+### Added
+
+### Changed / Improved
+
+## [2.10.0 2025-09-24]
+
+### Fixed
 * Fixed misaligned charging symbol on battery state screen
 
 ### Added
 * Added custom quotations feature
 * Added What's New entry for quotations feature
-
-### Changed / Improved
 
 ## [2.9.2 2025-02-03]
 
