@@ -81,3 +81,9 @@ scripts/lua/test/update_udm/system/*
 scripts/lua/test/restore/user/*
 scripts/lua/test/restore/target/*
 scripts/lua/test/restore/system/*
+
+# python things
+venv*
+
+# VSCode
+.history*
