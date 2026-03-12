@@ -5,6 +5,7 @@
 ### Fixed
 
 ### Added
+* Added binary clock face for 24h format
 
 ### Changed / Improved
 

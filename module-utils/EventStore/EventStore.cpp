@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "EventStore.hpp"
@@ -36,6 +36,11 @@ namespace Store
             return true;
         }
         return false;
+    }
+
+    bool Battery::isCharging()
+    {
+        return (battery.state == State::Charging) || (battery.state == State::ChargingDone);
     }
 
     Usb usb;

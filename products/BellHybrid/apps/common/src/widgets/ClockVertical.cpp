@@ -1,12 +1,10 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
-#include <common/widgets/ClockVertical.hpp>
-#include "widgets/LayoutVertical.hpp"
+#include <widgets/ClockVertical.hpp>
+#include <widgets/LayoutVertical.hpp>
 
 #include <date/date.h>
-#include <gui/core/FontManager.hpp>
-#include <gui/core/RawFont.hpp>
 #include <widgets/spinners/Spinners.hpp>
 
 namespace
@@ -16,7 +14,6 @@ namespace
 
 namespace gui
 {
-
     ClockVertical::ClockVertical(
         Item *parent, uint32_t x, uint32_t y, uint32_t w, uint32_t h, utils::time::Locale::TimeFormat timeFormat)
         : VBox{parent, x, y, w, h}
@@ -26,25 +23,25 @@ namespace gui
         setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         setEdges(RectangleEdge::None);
 
-        hBoxHours = new gui::HBox(this, 0, 0, style::homescreen_vertical::center_box_w, 0);
-        hBoxHours->setEdges(gui::RectangleEdge::None);
+        hBoxHours = new HBox(this, 0, 0, style::homescreen_vertical::center_box_w, 0);
+        hBoxHours->setEdges(RectangleEdge::None);
         hBoxHours->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         hBoxHours->setMinimumSize(style::homescreen_vertical::center_box_w, style::homescreen_vertical::center_box_h);
-        hBoxHours->setMargins(gui::Margins(0, 0, 0, style::homescreen_vertical::topNegativeMargin));
+        hBoxHours->setMargins(Margins(0, 0, 0, style::homescreen_vertical::topNegativeMargin));
 
-        hBoxHoursLeft = new gui::HBox(hBoxHours, 0, 0, 0, 0);
-        hBoxHoursLeft->setEdges(gui::RectangleEdge::None);
+        hBoxHoursLeft = new HBox(hBoxHours, 0, 0, 0, 0);
+        hBoxHoursLeft->setEdges(RectangleEdge::None);
         hBoxHoursLeft->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         hBoxHoursLeft->setMaximumSize(style::homescreen_vertical::digit_box_w,
                                       style::homescreen_vertical::center_box_h);
 
-        hBoxHoursRight = new gui::HBox(hBoxHours, 0, 0, 0, 0);
-        hBoxHoursRight->setEdges(gui::RectangleEdge::None);
+        hBoxHoursRight = new HBox(hBoxHours, 0, 0, 0, 0);
+        hBoxHoursRight->setEdges(RectangleEdge::None);
         hBoxHoursRight->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
         hBoxHoursRight->setMaximumSize(style::homescreen_vertical::digit_box_w,
                                        style::homescreen_vertical::center_box_h);
 
-        hourFirst = new gui::TextFixedSize(hBoxHoursLeft, 0, 0, 0, 0);
+        hourFirst = new TextFixedSize(hBoxHoursLeft, 0, 0, 0, 0);
         updateFont(hourFirst, fontName);
 
         hourFirst->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
@@ -52,7 +49,7 @@ namespace gui
         hourFirst->setText("0");
         hourFirst->drawUnderline(false);
 
-        hourSecond = new gui::TextFixedSize(hBoxHoursRight, 0, 0, 0, 0);
+        hourSecond = new TextFixedSize(hBoxHoursRight, 0, 0, 0, 0);
         updateFont(hourSecond, fontName);
 
         hourSecond->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
@@ -60,25 +57,25 @@ namespace gui
         hourSecond->setText("0");
         hourSecond->drawUnderline(false);
 
-        hBoxMinutes = new gui::HBox(this, 0, 0, style::homescreen_vertical::center_box_w, 0);
-        hBoxMinutes->setEdges(gui::RectangleEdge::None);
+        hBoxMinutes = new HBox(this, 0, 0, style::homescreen_vertical::center_box_w, 0);
+        hBoxMinutes->setEdges(RectangleEdge::None);
         hBoxMinutes->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Bottom));
-        hBoxMinutes->setMargins(gui::Margins(0, 0, 0, 0));
+        hBoxMinutes->setMargins(Margins(0, 0, 0, 0));
         hBoxMinutes->setMinimumSize(style::homescreen_vertical::center_box_w, style::homescreen_vertical::center_box_h);
 
-        hBoxMinutesLeft = new gui::HBox(hBoxMinutes, 0, 0, 0, 0);
-        hBoxMinutesLeft->setEdges(gui::RectangleEdge::None);
+        hBoxMinutesLeft = new HBox(hBoxMinutes, 0, 0, 0, 0);
+        hBoxMinutesLeft->setEdges(RectangleEdge::None);
         hBoxMinutesLeft->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         hBoxMinutesLeft->setMaximumSize(style::homescreen_vertical::digit_box_w,
                                         style::homescreen_vertical::center_box_h);
 
-        hBoxMinutesRight = new gui::HBox(hBoxMinutes, 0, 0, 0, 0);
-        hBoxMinutesRight->setEdges(gui::RectangleEdge::None);
+        hBoxMinutesRight = new HBox(hBoxMinutes, 0, 0, 0, 0);
+        hBoxMinutesRight->setEdges(RectangleEdge::None);
         hBoxMinutesRight->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         hBoxMinutesRight->setMaximumSize(style::homescreen_vertical::digit_box_w,
                                          style::homescreen_vertical::center_box_h);
 
-        minuteFirst = new gui::TextFixedSize(hBoxMinutesLeft, 0, 0, 0, 0);
+        minuteFirst = new TextFixedSize(hBoxMinutesLeft, 0, 0, 0, 0);
         updateFont(minuteFirst, fontName);
 
         minuteFirst->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
@@ -86,7 +83,7 @@ namespace gui
         minuteFirst->setText("0");
         minuteFirst->drawUnderline(false);
 
-        minuteSecond = new gui::TextFixedSize(hBoxMinutesRight, 0, 0, 0, 0);
+        minuteSecond = new TextFixedSize(hBoxMinutesRight, 0, 0, 0, 0);
         updateFont(minuteSecond, fontName);
 
         minuteSecond->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));

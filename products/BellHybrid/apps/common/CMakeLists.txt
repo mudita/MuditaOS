@@ -59,7 +59,6 @@ target_sources(application-bell-common
         src/widgets/BellBattery.cpp
         src/widgets/BellConnectionStatus.cpp
         src/widgets/BellStatusClock.cpp
-        src/widgets/DuoHBox.cpp
         src/widgets/ProgressTimerWithSnoozeTimer.cpp
         src/widgets/SnoozeTimer.cpp
         src/widgets/LayoutVertical.cpp
@@ -67,6 +66,8 @@ target_sources(application-bell-common
         src/widgets/ListViewWithLabels.cpp
         src/widgets/LabelMarkerItem.cpp
         src/widgets/LabelOptionWithTick.cpp
+        src/widgets/BinaryDigitDisplay.cpp
+        src/widgets/ClockBinary.cpp
 
         src/options/BellOptionWindow.cpp
         src/options/BellShortOptionWindow.cpp
@@ -86,6 +87,7 @@ target_sources(application-bell-common
         src/layouts/HomeScreenLayoutVerticalSimple.cpp
         src/layouts/HomeScreenLayoutVerticalWithAmPm.cpp
         src/layouts/HomeScreenLayoutVerticalWithDate.cpp
+        src/layouts/HomeScreenLayoutBinary.cpp
         src/layouts/ShortcutsLayouts.cpp
         src/layouts/ShortcutsLayoutClassic.cpp
         src/layouts/UpdateInstructionLayouts.cpp
@@ -148,7 +150,6 @@ target_sources(application-bell-common
         include/common/widgets/BellConnectionStatus.hpp
         include/common/widgets/BellSideListItemWithCallbacks.hpp
         include/common/widgets/BellStatusClock.hpp
-        include/common/widgets/DuoHBox.hpp
         include/common/widgets/ProgressTimerWithSnoozeTimer.hpp
         include/common/widgets/SnoozeTimer.hpp
         include/common/widgets/ListItems.hpp
@@ -157,6 +158,8 @@ target_sources(application-bell-common
         include/common/widgets/ListViewWithLabels.hpp
         include/common/widgets/LabelMarkerItem.hpp
         include/common/widgets/LabelOptionWithTick.hpp
+        include/common/widgets/BinaryDigitDisplay.hpp
+        include/common/widgets/ClockBinary.hpp
 
         include/common/options/BellOptionWindow.hpp
         include/common/options/BellShortOptionWindow.hpp
@@ -175,6 +178,7 @@ target_sources(application-bell-common
         include/common/layouts/HomeScreenLayoutVerticalSimple.hpp
         include/common/layouts/HomeScreenLayoutVerticalWithAmPm.hpp
         include/common/layouts/HomeScreenLayoutVerticalWithDate.hpp
+        include/common/layouts/HomeScreenLayoutBinary.hpp
         include/common/layouts/HomeScreenLayoutNames.hpp
         include/common/layouts/ShortcutsLayouts.hpp
         include/common/layouts/ShortcutsLayoutProvider.hpp

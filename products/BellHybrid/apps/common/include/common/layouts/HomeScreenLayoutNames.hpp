@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -17,6 +17,7 @@ namespace gui::layout
     inline constexpr auto VerticalWithDate      = "VerticalWithDate";
     inline constexpr auto VerticalWithAmPm      = "VerticalWithAmPm";
     inline constexpr auto VerticalWithDateAmPm  = "VerticalWithDateAmPm";
+    inline constexpr auto Binary                = "Binary";
 
 #if CONFIG_ENABLE_TEMP == 1
     inline constexpr auto ClassicWithTemp = "ClassicWithTemp";

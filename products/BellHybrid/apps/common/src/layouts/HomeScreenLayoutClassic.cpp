@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "layouts/HomeScreenLayoutClassic.hpp"
@@ -7,10 +7,8 @@
 #include "data/StyleCommon.hpp"
 #include "widgets/BellBattery.hpp"
 #include "widgets/BellConnectionStatus.hpp"
-#include "widgets/DuoHBox.hpp"
 #include "widgets/SnoozeTimer.hpp"
 
-#include <apps-common/actions/AlarmRingingData.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
 #include <time/time_constants.hpp>
@@ -95,7 +93,7 @@ namespace gui
         connectionBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
         connectionBox->setVisible(true);
 
-        battery = new BellBattery(infoBox, gui::BatteryWidthMode::FitToContent);
+        battery = new BellBattery(infoBox, BatteryWidthMode::FitToContent);
         battery->setMargins(Margins(0U, style::bell_base_layout::info_box_top_margin, 0U, 0U));
         battery->setMaximumSize(battery::battery_widget_w, battery::battery_widget_h);
         battery->setEdges(RectangleEdge::None);
@@ -121,11 +119,10 @@ namespace gui
                                      style::window_height,
                                      "bell_status_battery_lvl0",
                                      {},
-                                     gui::ImageTypeSpecifier::W_G);
-        lowBatteryWarning->setAlignment(
-            gui::Alignment(gui::Alignment::Horizontal::Center, gui::Alignment::Vertical::Top));
-        lowBatteryWarning->image->setMargins({0, gui::bell_style::warning_icon_top_margin, 0, 0});
-        lowBatteryWarning->text->setMaximumWidth(gui::bell_style::warning_text_width);
+                                     ImageTypeSpecifier::W_G);
+        lowBatteryWarning->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Top));
+        lowBatteryWarning->image->setMargins({0, bell_style::warning_icon_top_margin, 0, 0});
+        lowBatteryWarning->text->setMaximumWidth(bell_style::warning_text_width);
         lowBatteryWarning->text->setFont(style::window::font::verybiglight);
         lowBatteryWarning->text->setRichText(utils::translate("app_bell_alarm_low_battery_info"));
         lowBatteryWarning->setVisible(false);
@@ -370,6 +367,7 @@ namespace gui
     {
         return this;
     }
+
     auto HomeScreenLayoutClassic::updateUsbStatus(bool isConnected) -> void
     {
         connectionStatus->show(isConnected);
@@ -386,7 +384,7 @@ namespace gui
 
     auto HomeScreenLayoutClassic::adjustConnectionStatusPosition() -> void
     {
-        if (getName() == gui::layout::Classic) {
+        if (getName() == layout::Classic) {
             if (battery->visible) {
                 widgetBox->removeWidget(infoBox);
                 widgetBox->removeWidget(connectionBox);

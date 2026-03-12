@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "layouts/HomeScreenLayoutVerticalWithAmPm.hpp"
@@ -6,13 +6,9 @@
 #include "widgets/BellBattery.hpp"
 #include "widgets/SnoozeTimer.hpp"
 
-#include <apps-common/actions/AlarmRingingData.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
-#include <gui/widgets/Style.hpp>
 #include <widgets/AlarmIcon.hpp>
-#include <widgets/AlarmSetSpinner.hpp>
-#include <widgets/ClockVertical.hpp>
 
 namespace gui
 {
@@ -22,12 +18,12 @@ namespace gui
         using namespace bellMainStyle;
 
         leftBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
-        auto leftTopBox = new gui::VBox(leftBox);
+        auto leftTopBox = new VBox(leftBox);
         leftTopBox->setMinimumSize(leftTopBox->parent->getWidth(), leftTopBox->parent->getHeight() / 2);
         leftTopBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         leftTopBox->setEdges(RectangleEdge::None);
 
-        auto leftBottomBox = new gui::VBox(leftBox);
+        auto leftBottomBox = new VBox(leftBox);
         leftBottomBox->setMinimumSize(leftBottomBox->parent->getWidth(), leftBottomBox->parent->getHeight() / 2);
         leftBottomBox->setAlignment(Alignment(Alignment::Horizontal::Center, Alignment::Vertical::Center));
         leftBottomBox->setEdges(RectangleEdge::None);

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "layouts/UpdateInstructionLayoutClassic.hpp"
@@ -74,7 +74,7 @@ namespace gui
     auto UpdateInstructionLayoutClassic::buildInterface(const Instruction &instruction) -> void
     {
         setAlignment(Alignment::Horizontal::Center);
-        setEdges(rectangle_enums::RectangleEdge::None);
+        setEdges(RectangleEdge::None);
 
         auto containerThreeBox = new HThreeBox<HBox, VBox, HBox>(this);
         containerThreeBox->setMinimumSize(container::width, container::height);

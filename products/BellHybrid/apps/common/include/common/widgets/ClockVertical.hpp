@@ -1,11 +1,10 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
 
 #include <widgets/spinners/Spinners.hpp>
 #include <gui/widgets/Style.hpp>
-#include <gui/widgets/text/TextConstants.hpp>
 #include <time/time_locale.hpp>
 
 #include <string>
@@ -50,21 +49,21 @@ namespace gui
         [[nodiscard]] auto getMinute() const noexcept -> int;
         [[nodiscard]] auto isPM() const noexcept -> bool;
 
-        auto getTimeFormat() const noexcept -> utils::time::Locale::TimeFormat;
+        [[nodiscard]] auto getTimeFormat() const noexcept -> utils::time::Locale::TimeFormat;
 
       private:
-        gui::HBox *hBoxHours             = nullptr;
-        gui::HBox *hBoxHoursLeft         = nullptr;
-        gui::HBox *hBoxHoursRight        = nullptr;
-        gui::HBox *hBoxMinutes           = nullptr;
-        gui::HBox *hBoxMinutesLeft       = nullptr;
-        gui::HBox *hBoxMinutesRight      = nullptr;
-        gui::TextFixedSize *hourFirst    = nullptr;
-        gui::TextFixedSize *hourSecond   = nullptr;
-        gui::TextFixedSize *minuteFirst  = nullptr;
-        gui::TextFixedSize *minuteSecond = nullptr;
+        HBox *hBoxHours                  = nullptr;
+        HBox *hBoxHoursLeft              = nullptr;
+        HBox *hBoxHoursRight             = nullptr;
+        HBox *hBoxMinutes                = nullptr;
+        HBox *hBoxMinutesLeft            = nullptr;
+        HBox *hBoxMinutesRight           = nullptr;
+        TextFixedSize *hourFirst         = nullptr;
+        TextFixedSize *hourSecond        = nullptr;
+        TextFixedSize *minuteFirst       = nullptr;
+        TextFixedSize *minuteSecond      = nullptr;
         std::string fontName             = style::window::font::supersizemelight;
 
         utils::time::Locale::TimeFormat timeFormat = utils::time::Locale::TimeFormat::FormatTime12H;
     };
-} /* namespace gui */
+} // namespace gui

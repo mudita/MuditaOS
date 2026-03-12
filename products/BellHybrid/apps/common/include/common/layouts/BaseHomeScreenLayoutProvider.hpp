@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -7,8 +7,6 @@
 #include <utf8/UTF8.hpp>
 #include <Temperature.hpp>
 #include <time/dateCommon.hpp>
-
-#include <chrono>
 
 namespace app::home_screen
 {
@@ -36,9 +34,6 @@ namespace gui
 
     class BaseHomeScreenLayoutProvider
     {
-      private:
-        std::string name;
-
       public:
         explicit BaseHomeScreenLayoutProvider(std::string name) : name{std::move(name)} {};
         virtual ~BaseHomeScreenLayoutProvider() noexcept = default;
@@ -59,10 +54,18 @@ namespace gui
         virtual SnoozeTimer *getSnoozeTimer()                                   = 0;
         virtual Item *getLayout()                                               = 0;
 
-        virtual void setTemperature(utils::temperature::Temperature newTemp){};
-        virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt){};
-        virtual void setSnoozeFormat(utils::time::Locale::TimeFormat fmt){};
-        virtual void setSnoozeTime(std::time_t newTime){};
-        virtual void setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor){};
+        virtual void setTemperature(utils::temperature::Temperature newTemp)
+        {}
+        virtual void setTimeFormat(utils::time::Locale::TimeFormat fmt)
+        {}
+        virtual void setSnoozeFormat(utils::time::Locale::TimeFormat fmt)
+        {}
+        virtual void setSnoozeTime(std::time_t newTime)
+        {}
+        virtual void setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor)
+        {}
+
+      private:
+        std::string name;
     };
 } // namespace gui

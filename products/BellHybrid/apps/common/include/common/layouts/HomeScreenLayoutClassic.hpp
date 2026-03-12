@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -25,7 +25,6 @@ namespace gui
     class SnoozeTimer;
     class BellBattery;
     class BellConnectionStatus;
-    class DuoHBox;
     class Icon;
 
     enum class LayoutClassicVersion

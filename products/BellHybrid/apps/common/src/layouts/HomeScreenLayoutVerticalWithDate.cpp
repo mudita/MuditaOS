@@ -1,18 +1,15 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "layouts/HomeScreenLayoutVerticalWithDate.hpp"
 #include "data/BellMainStyle.hpp"
 #include "widgets/BellBattery.hpp"
 #include "widgets/SnoozeTimer.hpp"
+#include "widgets/AlarmIcon.hpp"
 
-#include <apps-common/actions/AlarmRingingData.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
-
-#include <widgets/AlarmIcon.hpp>
-#include <widgets/ClockVertical.hpp>
 
 #include <time/dateCommon.hpp>
 #include <service-time/api/TimeSettingsApi.hpp>
@@ -24,7 +21,7 @@ namespace gui
     {
         using namespace bellMainStyle;
 
-        const auto sideBoxWidth = (style::window_width - style::homescreen_vertical::center_box_w) / 2;
+        constexpr auto sideBoxWidth = (style::window_width - style::homescreen_vertical::center_box_w) / 2;
 
         leftBox->setMinimumSize(sideBoxWidth, style::window_height);
         leftBox->setMargins(Margins({0, 0, 0, 0}));
