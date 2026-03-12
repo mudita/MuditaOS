@@ -1,11 +1,7 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include <common/widgets/AlarmIcon.hpp>
-
-#include <FontManager.hpp>
-#include <RawFont.hpp>
-#include <apps-common/widgets/TimeSetFmtSpinner.hpp>
 
 namespace gui
 {
@@ -42,5 +38,4 @@ namespace gui
 
         informContentChanged();
     }
-
-} /* namespace gui */
+} // namespace gui

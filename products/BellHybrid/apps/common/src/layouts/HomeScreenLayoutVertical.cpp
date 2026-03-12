@@ -1,19 +1,15 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "layouts/HomeScreenLayoutVertical.hpp"
-#include "data/BellMainStyle.hpp"
 #include "widgets/BellBattery.hpp"
-#include "widgets/DuoHBox.hpp"
 #include "widgets/SnoozeTimer.hpp"
 #include "widgets/BellConnectionStatus.hpp"
 
-#include <apps-common/actions/AlarmRingingData.hpp>
 #include <gui/widgets/Icon.hpp>
 #include <gui/widgets/Style.hpp>
 #include <time/time_constants.hpp>
 #include <widgets/AlarmIcon.hpp>
-#include <widgets/AlarmSetSpinner.hpp>
 #include <widgets/ClockVertical.hpp>
 
 namespace
@@ -28,12 +24,12 @@ namespace gui
           LayoutVertical(nullptr, 0, 0, style::window_width, style::window_height)
     {}
 
-    SnoozeTimer *HomeScreenLayoutVertical::getSnoozeTimer()
+    auto HomeScreenLayoutVertical::getSnoozeTimer() -> SnoozeTimer *
     {
         return nullptr;
     }
 
-    void HomeScreenLayoutVertical::setViewState(app::home_screen::ViewState state)
+    auto HomeScreenLayoutVertical::setViewState(app::home_screen::ViewState state) -> void
     {
         switch (state) {
         case app::home_screen::ViewState::Deactivated:
@@ -59,7 +55,7 @@ namespace gui
         case app::home_screen::ViewState::ActivatedLowBattery:
             setScreenMode(ScreenMode::AlarmActivatedDeactivated);
             alarmTopIcon->setStatus(AlarmIcon::Status::DEACTIVATED);
-            alarmActivatedDeactivatedScreen->image->set("bell_status_battery_lvl0", gui::ImageTypeSpecifier::W_G);
+            alarmActivatedDeactivatedScreen->image->set("bell_status_battery_lvl0", ImageTypeSpecifier::W_G);
             alarmActivatedDeactivatedScreen->image->setMaximumWidth(alarmActivatedDeactivatedScreen->image->getWidth());
             break;
         case app::home_screen::ViewState::ActivatedWait:
@@ -139,57 +135,48 @@ namespace gui
         resizeItems();
     }
 
-    void HomeScreenLayoutVertical::setTextDescription(const UTF8 &desc)
+    auto HomeScreenLayoutVertical::setTextDescription(const UTF8 &desc) -> void
     {
         alarmActivatedDeactivatedScreen->text->setRichText(desc);
         alarmActivatedDeactivatedScreen->text->informContentChanged();
     }
 
-    void HomeScreenLayoutVertical::setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor)
-    {}
-
-    bool HomeScreenLayoutVertical::isBatteryVisibilityAllowed(const Store::Battery &batteryContext)
+    auto HomeScreenLayoutVertical::isBatteryVisibilityAllowed(const Store::Battery &batteryContext) -> bool
     {
-        return (batteryContext.level < dischargingLevelShowTop) || isBatteryCharging(batteryContext.state);
+        return (batteryContext.level < dischargingLevelShowTop) || Store::Battery::isCharging();
     }
 
-    bool HomeScreenLayoutVertical::isAlarmTimeVisibilityAllowed()
+    auto HomeScreenLayoutVertical::isAlarmTimeVisibilityAllowed() -> bool
     {
         return false;
     }
 
-    bool HomeScreenLayoutVertical::isBatteryCharging(Store::Battery::State state)
+    auto HomeScreenLayoutVertical::setBatteryLevelState(const Store::Battery &batteryContext) -> void
     {
-        using State = Store::Battery::State;
-        return (state == State::Charging) || (state == State::ChargingDone);
-    }
-
-    void HomeScreenLayoutVertical::setBatteryLevelState(const Store::Battery &batteryContext)
-    {
-        battery->update(batteryContext.level, isBatteryCharging(batteryContext.state));
+        battery->update(batteryContext.level, Store::Battery::isCharging());
         battery->setVisible(isBatteryVisibilityAllowed(batteryContext));
         battery->informContentChanged();
     }
 
-    void HomeScreenLayoutVertical::setTime(std::time_t newTime)
+    auto HomeScreenLayoutVertical::setTime(std::time_t newTime) -> void
     {
         time->setTime(newTime);
     }
 
-    void HomeScreenLayoutVertical::setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt)
+    auto HomeScreenLayoutVertical::setAlarmTimeFormat(utils::time::Locale::TimeFormat fmt) -> void
     {
         setAlarmFmtSpinner->setTimeFormat(fmt);
         alarmMainTime->setTimeFormat(fmt);
     }
 
-    void HomeScreenLayoutVertical::setTimeFormat(utils::time::Locale::TimeFormat fmt)
+    auto HomeScreenLayoutVertical::setTimeFormat(utils::time::Locale::TimeFormat fmt) -> void
     {
         time->setTimeFormat(fmt);
     }
 
-    std::time_t HomeScreenLayoutVertical::getAlarmTime() const
+    auto HomeScreenLayoutVertical::getAlarmTime() const -> std::time_t
     {
-        const auto now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
+        const auto now = std::time(nullptr);
         auto alarmTime = setAlarmFmtSpinner->getTime();
         if (alarmTime < now) {
             alarmTime += utils::time::secondsInDay;
@@ -197,7 +184,7 @@ namespace gui
         return alarmTime;
     }
 
-    void HomeScreenLayoutVertical::setAlarmTime(std::time_t newTime)
+    auto HomeScreenLayoutVertical::setAlarmTime(std::time_t newTime) -> void
     {
         setAlarmFmtSpinner->setTime(newTime);
         alarmMainTime->setTime(newTime);
@@ -207,6 +194,7 @@ namespace gui
     {
         return this;
     }
+
     auto HomeScreenLayoutVertical::updateUsbStatus(bool isConnected) -> void
     {
         connectionStatus->show(isConnected);

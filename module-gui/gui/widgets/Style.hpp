@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -8,7 +8,6 @@
 #include <gui/core/Color.hpp>
 #include <gui/Common.hpp>
 #include <Alignment.hpp>
-#include <Margins.hpp>
 
 namespace gui
 {
@@ -56,6 +55,7 @@ namespace style
         inline constexpr auto default_border_rect_no_focus = 1U;
         inline constexpr auto default_border_no_focus_w    = 0U;
         inline constexpr auto default_rect_yaps            = 10U;
+
         namespace font
         {
             /// numeric
@@ -133,6 +133,7 @@ namespace style
         }; // namespace font
 
         inline constexpr auto list_offset_default = 12U;
+
         namespace label
         {
             inline constexpr auto small_h   = 33U;
@@ -183,6 +184,7 @@ namespace style
             inline constexpr auto time_box_y_pos  = 285U;
 
         } // namespace date
+
         namespace ussd
         {
             inline constexpr auto commonXPos = 40U;
@@ -193,10 +195,12 @@ namespace style
             inline constexpr auto commonTextH  = 99U;
         } // namespace ussd
     }     // namespace settings
+
     namespace color
     {
         inline constexpr auto lightgrey = gui::Color(3, 0);
     }; //  namespace color
+
     namespace text
     {
         inline constexpr auto defaultTextAlignment =

@@ -1,4 +1,4 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #pragma once
@@ -19,20 +19,19 @@ namespace gui
     class TimeSetFmtSpinner;
     class SnoozeTimer;
     class BellBattery;
-    class DuoHBox;
     class Icon;
     class Item;
-
-    enum class ScreenMode
-    {
-        Main,
-        AlarmEdit,
-        AlarmActivatedDeactivated,
-    };
 
     class HomeScreenLayoutVertical : public BaseHomeScreenLayoutProvider, public LayoutVertical
     {
       public:
+        enum class ScreenMode
+        {
+            Main,
+            AlarmEdit,
+            AlarmActivatedDeactivated,
+        };
+
         explicit HomeScreenLayoutVertical(std::string name);
 
         auto setViewState(app::home_screen::ViewState state) -> void override;
@@ -44,15 +43,13 @@ namespace gui
         [[nodiscard]] auto getAlarmTime() const -> std::time_t override;
         auto setAlarmTime(std::time_t newTime) -> void override;
         auto updateUsbStatus(bool isConnected) -> void override;
-        void setQuoteText(const UTF8 &quoteContent, const UTF8 &quoteAuthor) override;
 
         auto getSnoozeTimer() -> SnoozeTimer * override;
         auto getLayout() -> Item * override;
 
       protected:
         auto setScreenMode(ScreenMode mode) -> void;
-        virtual bool isBatteryVisibilityAllowed(const Store::Battery &batteryContext);
-        virtual bool isAlarmTimeVisibilityAllowed();
-        bool isBatteryCharging(Store::Battery::State state);
+        virtual auto isBatteryVisibilityAllowed(const Store::Battery &batteryContext) -> bool;
+        virtual auto isAlarmTimeVisibilityAllowed() -> bool;
     };
 } // namespace gui

@@ -1,21 +1,15 @@
-// Copyright (c) 2017-2024, Mudita Sp. z.o.o. All rights reserved.
+// Copyright (c) 2017-2026, Mudita Sp. z.o.o. All rights reserved.
 // For licensing, see https://github.com/mudita/MuditaOS/blob/master/LICENSE.md
 
 #include "widgets/LayoutVertical.hpp"
 #include "data/BellMainStyle.hpp"
 #include "widgets/BellBattery.hpp"
-#include "widgets/DuoHBox.hpp"
 #include "widgets/SnoozeTimer.hpp"
 
 #include <common/data/StyleCommon.hpp>
-#include <apps-common/actions/AlarmRingingData.hpp>
-#include <gui/input/InputEvent.hpp>
 #include <gui/widgets/Icon.hpp>
-#include <gui/widgets/text/TextFixedSize.hpp>
 #include <gui/widgets/Style.hpp>
-#include <time/time_constants.hpp>
 #include <widgets/AlarmIcon.hpp>
-#include <widgets/AlarmSetSpinner.hpp>
 #include <widgets/ClockVertical.hpp>
 #include <widgets/BellConnectionStatus.hpp>
 
