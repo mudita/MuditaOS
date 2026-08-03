@@ -10,7 +10,7 @@ namespace notifications
     class SMSNotificationPolicy
     {
       public:
-        void updateCurrentSMS(sys::phone_modes::PhoneMode phoneMode);
+        void updateCurrentSMS(sys::phone_modes::PhoneMode phoneMode, bool ignoreDnd = false);
         bool isRingtoneAllowed() const noexcept;
 
       private:

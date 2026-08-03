@@ -3,5 +3,5 @@
 
 #include "NotificationsDB.hpp"
 
-NotificationsDB::NotificationsDB(const char *name) : Database(name), notifications(this)
+NotificationsDB::NotificationsDB(const char *name) : Database(name), notifications(this), smsAlertOverrides(this)
 {}

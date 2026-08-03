@@ -25,9 +25,9 @@ void NotificationsConfiguration::updateCurrentList(NotificationsListPolicy &poli
                              getDNDNotificationsOnLockedScreen());
 }
 
-void NotificationsConfiguration::updateCurrentSMS(SMSNotificationPolicy &policy)
+void NotificationsConfiguration::updateCurrentSMS(SMSNotificationPolicy &policy, bool ignoreDnd)
 {
-    policy.updateCurrentSMS(phoneModeObserver->getCurrentPhoneMode());
+    policy.updateCurrentSMS(phoneModeObserver->getCurrentPhoneMode(), ignoreDnd);
 }
 
 auto NotificationsConfiguration::getDNDNotificationsOnLockedScreen() const noexcept -> bool

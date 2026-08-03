@@ -8,6 +8,7 @@
 #include "module-db/queries/notifications/QueryNotificationsMultipleIncrement.hpp"
 #include "module-db/queries/notifications/QueryNotificationsClear.hpp"
 #include "module-db/queries/notifications/QueryNotificationsGetAll.hpp"
+#include "module-db/queries/notifications/QuerySMSAlertOverrideGetByNumber.hpp"
 #include "module-db/databases/NotificationsDB.hpp"
 
 #include <log/log.hpp>
@@ -161,6 +162,9 @@ std::unique_ptr<db::QueryResult> NotificationsRecordInterface::runQuery(std::sha
     if (const auto local_query = dynamic_cast<const db::query::notifications::GetAll *>(query.get())) {
         return runQueryImpl(local_query);
     }
+    if (const auto local_query = dynamic_cast<const db::query::notifications::SMSAlertOverrideGetByNumber *>(query.get())) {
+        return runQueryImpl(local_query);
+    }
     return nullptr;
 }
 
@@ -222,6 +226,33 @@ std::unique_ptr<db::query::notifications::GetAllResult> NotificationsRecordInter
     auto numberOfNotifications = GetCount();
     auto records               = GetLimitOffset(0, numberOfNotifications);
     return std::make_unique<db::query::notifications::GetAllResult>(std::move(records));
+}
+
+std::unique_ptr<db::query::notifications::SMSAlertOverrideGetByNumberResult> NotificationsRecordInterface::runQueryImpl(
+    const db::query::notifications::SMSAlertOverrideGetByNumber *query)
+{
+    const auto &numberView = query->getNumber();
+    const auto primaryKey  = numberView.getNonEmpty();
+    auto row               = notificationsDb->smsAlertOverrides.getByNumber(primaryKey);
+
+    if (!row.isValid() && numberView.getEntered() != primaryKey) {
+        row = notificationsDb->smsAlertOverrides.getByNumber(numberView.getEntered());
+    }
+
+    if (!row.isValid()) {
+        return std::make_unique<db::query::notifications::SMSAlertOverrideGetByNumberResult>(std::nullopt);
+    }
+
+    db::query::notifications::SMSAlertOverride overrideRecord;
+    overrideRecord.normalizedNumber = row.normalizedNumber;
+    overrideRecord.soundPath        = row.soundPath;
+    overrideRecord.ignoreDnd        = row.ignoreDnd != 0;
+    overrideRecord.forceVibration   = row.forceVibration != 0;
+    overrideRecord.forceMaxVolume   = row.forceMaxVolume != 0;
+    overrideRecord.repeatIntervalSec = row.repeatIntervalSec;
+    overrideRecord.enabled          = row.enabled != 0;
+
+    return std::make_unique<db::query::notifications::SMSAlertOverrideGetByNumberResult>(std::move(overrideRecord));
 }
 
 bool NotificationsRecordInterface::processIncrement(NotificationsRecord::Key key,

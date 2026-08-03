@@ -13,6 +13,7 @@
 #include <queries/notifications/QueryNotificationsDecrement.hpp>
 #include <queries/notifications/QueryNotificationsClear.hpp>
 #include <queries/notifications/QueryNotificationsGetAll.hpp>
+#include <queries/notifications/QuerySMSAlertOverrideGetByNumber.hpp>
 
 #include <stdint.h>
 #include <stdio.h>
@@ -393,5 +394,43 @@ TEST_CASE("Notifications Record tests")
             decrementByKey(NotificationsRecord::Key::Sms, expectedNotificationPerContact);
             getByKey(NotificationsRecord::Key::Sms, noNotificationExpected, contactNotExpected);
         }
+    }
+
+    SECTION("SMS alert override query by number")
+    {
+        SMSAlertOverridesTableRow overrideRow;
+        overrideRow.normalizedNumber = "+15551234567";
+        overrideRow.soundPath        = "/user/ringtones/fire_alarm.ogg";
+        overrideRow.ignoreDnd        = 1;
+        overrideRow.forceVibration   = 1;
+        overrideRow.forceMaxVolume   = 1;
+        overrideRow.repeatIntervalSec = 30;
+        overrideRow.enabled          = 1;
+
+        REQUIRE(notificationsDb.get().smsAlertOverrides.add(overrideRow));
+
+        auto queryNumber = utils::PhoneNumber("+15551234567");
+        auto query = std::make_shared<db::query::notifications::SMSAlertOverrideGetByNumber>(queryNumber.getView());
+        auto ret   = notificationsRecordInterface.runQuery(query);
+        auto result = dynamic_cast<db::query::notifications::SMSAlertOverrideGetByNumberResult *>(ret.get());
+        REQUIRE(result != nullptr);
+        REQUIRE(result->getResult().has_value());
+
+        const auto &record = result->getResult().value();
+        REQUIRE(record.normalizedNumber == "+15551234567");
+        REQUIRE(record.soundPath == "/user/ringtones/fire_alarm.ogg");
+        REQUIRE(record.ignoreDnd);
+        REQUIRE(record.forceVibration);
+        REQUIRE(record.forceMaxVolume);
+        REQUIRE(record.repeatIntervalSec == 30);
+        REQUIRE(record.enabled);
+
+        auto unknownNumber = utils::PhoneNumber("+15557654321");
+        auto unknownQuery =
+            std::make_shared<db::query::notifications::SMSAlertOverrideGetByNumber>(unknownNumber.getView());
+        auto unknownRet    = notificationsRecordInterface.runQuery(unknownQuery);
+        auto unknownResult = dynamic_cast<db::query::notifications::SMSAlertOverrideGetByNumberResult *>(unknownRet.get());
+        REQUIRE(unknownResult != nullptr);
+        REQUIRE_FALSE(unknownResult->getResult().has_value());
     }
 }

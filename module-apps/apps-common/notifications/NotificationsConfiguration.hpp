@@ -20,7 +20,7 @@ namespace notifications
                                    const locks::PhoneLockHandler &phoneLockHandler);
         void updateCurrentCall(CallNotificationPolicy &policy);
         void updateCurrentList(NotificationsListPolicy &policy);
-        void updateCurrentSMS(SMSNotificationPolicy &policy);
+        void updateCurrentSMS(SMSNotificationPolicy &policy, bool ignoreDnd = false);
 
       private:
         auto getDNDNotificationsOnLockedScreen() const noexcept -> bool;
