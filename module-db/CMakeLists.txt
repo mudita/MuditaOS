@@ -39,6 +39,7 @@ set(SOURCES
         Tables/CalllogTable.cpp
         Tables/SMSTemplateTable.cpp
         Tables/NotificationsTable.cpp
+        Tables/SMSAlertOverridesTable.cpp
         Tables/MultimediaFilesTable.cpp
 
         Interface/AlarmEventRecord.cpp
@@ -111,6 +112,7 @@ set(SOURCES
         queries/notifications/QueryNotificationsIncrement.cpp
         queries/notifications/QueryNotificationsDecrement.cpp
         queries/notifications/QueryNotificationsMultipleIncrement.cpp
+        queries/notifications/QuerySMSAlertOverrideGetByNumber.cpp
         queries/phonebook/QueryCheckContactsListDuplicates.cpp
         queries/phonebook/QueryContactAdd.cpp
         queries/phonebook/QueryContactGet.cpp

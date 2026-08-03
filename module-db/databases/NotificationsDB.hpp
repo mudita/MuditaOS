@@ -5,6 +5,7 @@
 
 #include "Database/Database.hpp"
 #include "module-db/Tables/NotificationsTable.hpp"
+#include "module-db/Tables/SMSAlertOverridesTable.hpp"
 
 class NotificationsDB : public Database
 {
@@ -13,4 +14,5 @@ class NotificationsDB : public Database
     virtual ~NotificationsDB() = default;
 
     NotificationsTable notifications;
+    SMSAlertOverridesTable smsAlertOverrides;
 };

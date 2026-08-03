@@ -1437,7 +1437,7 @@ void ServiceCellular::onSMSReceived(const utils::PhoneNumber::View &number)
         db::Interface::Name::Notifications,
         std::make_unique<db::query::notifications::Increment>(NotificationsRecord::Key::Sms, number));
 
-    bus.sendMulticast(std::make_shared<cellular::IncomingSMSNotificationMessage>(),
+    bus.sendMulticast(std::make_shared<cellular::IncomingSMSNotificationMessage>(number),
                       sys::BusChannel::ServiceCellularNotifications);
 }
 

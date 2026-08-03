@@ -547,8 +547,17 @@ namespace cellular
     class IncomingSMSNotificationMessage : public CellularMessage
     {
       public:
-        IncomingSMSNotificationMessage() : CellularMessage(Type::IncomingSMSNotification)
+        explicit IncomingSMSNotificationMessage(const utils::PhoneNumber::View &number)
+            : CellularMessage(Type::IncomingSMSNotification), number(number)
         {}
+
+        [[nodiscard]] auto getNumber() const noexcept -> const utils::PhoneNumber::View &
+        {
+            return number;
+        }
+
+      private:
+        utils::PhoneNumber::View number;
     };
 
     class AnswerIncomingCallMessage : public CellularMessage

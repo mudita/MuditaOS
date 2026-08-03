@@ -18,6 +18,8 @@ class NotificationsDB;
 
 namespace db::query::notifications
 {
+    class SMSAlertOverrideGetByNumber;
+    class SMSAlertOverrideGetByNumberResult;
     class Get;
     class GetResult;
     class Increment;
@@ -95,6 +97,8 @@ class NotificationsRecordInterface : public RecordInterface<NotificationsRecord,
         const db::query::notifications::MultipleIncrement *query);
     std::unique_ptr<db::query::notifications::ClearResult> runQueryImpl(const db::query::notifications::Clear *query);
     std::unique_ptr<db::query::notifications::GetAllResult> runQueryImpl(const db::query::notifications::GetAll *query);
+    std::unique_ptr<db::query::notifications::SMSAlertOverrideGetByNumberResult> runQueryImpl(
+        const db::query::notifications::SMSAlertOverrideGetByNumber *query);
     [[nodiscard]] bool processIncrement(NotificationsRecord::Key key,
                                         std::optional<utils::PhoneNumber::View> &&number,
                                         size_t size);

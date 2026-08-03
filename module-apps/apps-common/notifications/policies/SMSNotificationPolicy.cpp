@@ -5,12 +5,12 @@
 
 using namespace notifications;
 
-void SMSNotificationPolicy::updateCurrentSMS(sys::phone_modes::PhoneMode phoneMode)
+void SMSNotificationPolicy::updateCurrentSMS(sys::phone_modes::PhoneMode phoneMode, bool ignoreDnd)
 {
     ringtoneOn = false;
     switch (phoneMode) {
     case sys::phone_modes::PhoneMode::DoNotDisturb:
-        ringtoneOn = false;
+        ringtoneOn = ignoreDnd;
         break;
     case sys::phone_modes::PhoneMode::Uninitialized:
     case sys::phone_modes::PhoneMode::Connected:

@@ -97,6 +97,15 @@ TEST_CASE("DoNotDisturb Mode notifications - sms policy test")
 
     callPolicy.updateCurrentSMS(sys::phone_modes::PhoneMode::DoNotDisturb);
     REQUIRE(!callPolicy.isRingtoneAllowed());
+
+    SECTION("DND bypass for emergency sender override")
+    {
+        callPolicy.updateCurrentSMS(sys::phone_modes::PhoneMode::DoNotDisturb, true);
+        REQUIRE(callPolicy.isRingtoneAllowed());
+
+        callPolicy.updateCurrentSMS(sys::phone_modes::PhoneMode::DoNotDisturb, false);
+        REQUIRE(!callPolicy.isRingtoneAllowed());
+    }
 }
 
 TEST_CASE("DoNotDisturb Mode notifications  - list policy test")
